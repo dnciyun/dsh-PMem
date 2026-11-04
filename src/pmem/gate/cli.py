@@ -510,6 +510,8 @@ def main(argv: list[str] | None = None) -> int:
 
     p_sl = sub.add_parser("sleep", help="夜间睡眠（M4）：8 阶段 replay")
     sl_sub = p_sl.add_subparsers(dest="sleep_action", required=True)
+    p_sll = sl_sub.add_parser("log", help="最近几次夜间睡眠（每阶段跑了什么）")
+    p_sll.add_argument("--limit", type=int, default=14)
     p_slr = sl_sub.add_parser("run", help="跑/续跑一轮睡眠")
     p_slr.add_argument("--day", default=None, help="处理哪一天，默认昨天")
     p_slr.add_argument("--resume", action="store_true", help="续跑未完成的 run")
@@ -1187,6 +1189,23 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "lifecycle":
             return _emit(app.lifecycle(dry_run=args.dry_run), args.json)
         if args.cmd == "sleep":
+            if args.sleep_action == "log":
+                result = app.sleep_history(limit=getattr(args, "limit", 14) or 14)
+                if getattr(args, "json", False):
+                    return _emit(result, True)
+                runs = result["data"]["runs"]
+                if not runs:
+                    print("— 还没有睡眠记录：跑一次 `pmem sleep run` 就有了")
+                    return 0
+                for run in runs:
+                    print(f"— {run['day']} · {run['status']} · {run['trigger']} · {run['started_at']}")
+                    for stage in run["stages"]:
+                        name = stage.get("name") or "?"
+                        rest = {k: v for k, v in stage.items() if k != "name"}
+                        print(f"    {name}: {str(rest)[:110]}")
+                    if run.get("error"):
+                        print(f"    错误：{run['error']}")
+                return 0
             if args.sleep_action == "run":
                 result = app.sleep(
                     day_key=args.day,
@@ -1212,6 +1231,23 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.cmd == "evolve":
             action = args.evolve_action
+            if action == "log":
+                result = app.sleep_history(limit=args.limit)
+                if args.json:
+                    return _emit(result, True)
+                runs = result["data"]["runs"]
+                if not runs:
+                    print("— 还没有睡眠记录：跑一次 `pmem sleep run` 就有了")
+                    return 0
+                for run in runs:
+                    print(f"— {run['day']} · {run['status']} · {run['trigger']} · {run['started_at']}")
+                    for stage in run["stages"]:
+                        name = stage.get("name") or stage.get("stage") or "?"
+                        print(f"    {name}: {str({k: v for k, v in stage.items() if k != 'name'})[:110]}")
+                    if run.get("error"):
+                        print(f"    错误：{run['error']}")
+                return 0
+
             if action == "run":
                 result = app.evolve(action="run", layers=args.layer, dry_run=args.dry_run)
             elif action == "review":

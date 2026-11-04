@@ -337,12 +337,9 @@
     '  bool useB = aCorner >= 2.5;',
     '  float side = (aCorner == 0.0 || aCorner == 2.0) ? -1.0 : 1.0;',
     '  vec4 clip = useB ? cb : ca;',
-    '  float w = max(aGeom.x * 0.5, 1.2);',
+    '  float w = max(aGeom.x * 0.5, 0.35);',
     '  vec2 offsetPx = nrm * side * w;',
-    // 关节补口：A 端往回、B 端往前各伸 0.75 个线宽，让相邻段在接缝处叠上。
-    // 不补的话每段两头各留一条 1px 缝，长连线看起来就是一串虚线。
-    '  vec2 capPx = dir * (useB ? 0.35 : -0.35) * w;',
-    '  clip.xy += ((offsetPx + capPx) / (uViewport * 0.5)) * clip.w;',
+    '  clip.xy += (offsetPx / (uViewport * 0.5)) * clip.w;',
     '  gl_Position = clip;',
     '  float t01 = useB ? 1.0 : 0.0;',
     '  vUv = vec2(mix(aGeom.y, aGeom.z, t01), side * 0.5 + 0.5);',
@@ -360,8 +357,7 @@
     'void main(){',
     '  float edge = 1.0 - abs(vUv.y * 2.0 - 1.0);',
     '  float soft = edge * edge;',
-    // 实线：只在两端各留 2% 收口，中段不衰减。之前 14% 的淡出会让细线看着像虚线。
-    '  float fade = smoothstep(0.0, 0.02, vUv.x) * (1.0 - smoothstep(0.98, 1.0, vUv.x));',
+    '  float fade = smoothstep(0.0, 0.14, vUv.x) * (1.0 - smoothstep(0.86, 1.0, vUv.x));',
     '  float a = soft * fade * vColor.a * uAlphaMul;',
     '  if (a < 0.0015) discard;',
     '  outColor = vec4(vColor.rgb * a, a);',
@@ -710,24 +706,22 @@
     group_chain: [0.72, 0.78, 0.95]
   };
   var LINK_ALPHA = {
-    similar: 0.62,
-    co_mention: 0.40,
-    mention: 0.48,
-    group: 0.28,
-    relation: 0.66,
-    evidence: 0.52,
-    group_chain: 0.20
+    similar: 0.55,
+    co_mention: 0.32,
+    mention: 0.40,
+    group: 0.20,
+    relation: 0.62,
+    evidence: 0.45,
+    group_chain: 0.13
   };
-  // 线宽整体抬一档：0.7~2.0px 的细线在高 DPI 屏上会被抗锯齿切成一段一段，
-  // 看起来就像虚线。实线的第一要求是「连续」，所以先把它画粗。
   var LINK_WIDTH = {
-    similar: 2.4,
-    co_mention: 1.5,
-    mention: 1.8,
-    group: 1.3,
-    relation: 3.0,
-    evidence: 1.9,
-    group_chain: 1.1
+    similar: 1.5,
+    co_mention: 0.9,
+    mention: 1.1,
+    group: 0.8,
+    relation: 2.0,
+    evidence: 1.2,
+    group_chain: 0.7
   };
 
   function colorOf(node) {
@@ -974,8 +968,6 @@
       goalDist: 3.05,
       theta: -Math.PI / 2 + 0.35,
       goalTheta: -Math.PI / 2 + 0.35,
-      // 机位略高：0.62 时几乎贴盘面，星系被压成一条横线（「横向有点薄」）。
-      // 0.98 是斜俯视，盘面能张开，又不至于变成正上方的俯视图。
       phi: 0.62,
       goalPhi: 0.62,
       fov: 42 * Math.PI / 180,
@@ -1378,10 +1370,7 @@
     }
 
     function buildLinks(nodes, links, adj) {
-      // 连线用单段直连：10 段贝塞尔拼出来的细带在关节处有 V 形缝隙，
-    // 远看就是一串点（虚线）。改成单段 = 线一定连续；要弯可以后续改成
-    // 带共享顶点的 triangle strip（miter 法线），现在先保证「实线」。
-    var segs = 1;
+      var segs = 10;
       var list = [];
       var byId = new Map();
       nodes.forEach(function (n) { byId.set(n.id, n); });
@@ -1908,7 +1897,7 @@
         gl.uniformMatrix4fv(uLine.uView, false, viewMat);
         gl.uniformMatrix4fv(uLine.uProj, false, projMat);
         gl.uniform2f(uLine.uViewport, viewport.w, viewport.h);
-        gl.uniform1f(uLine.uAlphaMul, 0.85);
+        gl.uniform1f(uLine.uAlphaMul, 1.45);
         gl.bindVertexArray(lineVao);
         gl.drawArrays(gl.TRIANGLES, 0, scene.lineVerts);
       }

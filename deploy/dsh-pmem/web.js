@@ -384,6 +384,36 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
   })
 
   // ---- 状态 ----------------------------------------------------------------
+  // ---- 夜间（M4 睡眠的镜子）：8 个阶段跑到哪、有没有跑 ----
+  route('exact', '/dsh-pmem/night', async (req, res) => {
+    const file = `${pluginDir}/night.html`
+    if (!existsSync(file)) return json(res, 500, { ok: false, error: '缺少 night.html' })
+    res.statusCode = 200
+    res.setHeader('content-type', 'text/html; charset=utf-8')
+    res.setHeader('cache-control', 'no-store')
+    res.end(readFileSync(file))
+  })
+
+  route('exact', `${API}/sleep`, async (req, res) => {
+    try {
+      const data = await callPmem(config, ['sleep', 'log', '--limit', '14'], { json: true, timeout: 30000 })
+      return json(res, 200, data)
+    } catch (error) {
+      return json(res, 500, { ok: false, error: String(error?.message ?? error) })
+    }
+  })
+
+  route('exact', `${API}/sleep/now`, async (req, res) => {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 POST' })
+    try {
+      // 主动入睡：跑一轮（默认处理昨天，可续跑未完成的 run）。可能几十秒，前端要等。
+      const data = await callPmem(config, ['sleep', 'run'], { json: true, timeout: 180000 })
+      return json(res, 200, data)
+    } catch (error) {
+      return json(res, 500, { ok: false, error: String(error?.message ?? error) })
+    }
+  })
+
   route('exact', `${API}/status`, async (req, res) => {
     const [dbStats, card, receipts, tokens] = await Promise.all([
       stats().catch(() => null),

@@ -1158,6 +1158,42 @@ class PMem:
             lines.append(json.dumps({"type": "memory", **payload}, ensure_ascii=False))
         return "\n".join(lines) + "\n"
 
+    def sleep_history(self, *, limit: int = 14) -> dict[str, Any]:
+        """最近几次夜间睡眠：每次的时段、状态、8 个阶段各跑了什么。"""
+        started = time.perf_counter()
+        import json as _json
+
+        rows = self.db.conn.execute(
+            "SELECT id, day_key, trigger, status, stage, started_at, finished_at, "
+            "stats_json, error FROM sleep_run WHERE subject_id=? "
+            "ORDER BY started_at DESC LIMIT ?",
+            (self.subject, max(1, min(60, int(limit)))),
+        ).fetchall()
+        runs = []
+        for row in rows:
+            try:
+                stats = _json.loads(row["stats_json"] or "{}")
+            except ValueError:
+                stats = {}
+            stages = stats.get("stages") or []
+            if isinstance(stages, dict):
+                stages = [{"name": key, **value} for key, value in stages.items()]
+            runs.append(
+                {
+                    "id": row["id"],
+                    "day": row["day_key"],
+                    "trigger": row["trigger"],
+                    "status": row["status"],
+                    "stage": row["stage"],
+                    "started_at": row["started_at"],
+                    "finished_at": row["finished_at"],
+                    "error": row["error"],
+                    "stages": stages,
+                    "stats": {k: v for k, v in stats.items() if k != "stages"},
+                }
+            )
+        return self._ok({"runs": runs, "limit": len(runs)}, started)
+
     # -- 迁移（M8） --------------------------------------------------------
     def export_bundle(self, *, redact: bool = True) -> dict[str, Any]:
         started = time.perf_counter()

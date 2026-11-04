@@ -132,11 +132,6 @@ def layout(graph: dict[str, Any], prev: dict[str, Any] | None = None) -> dict[st
     paths = sorted({p for n in memories for p in (n.get("groups") or [])})
     sectors = _sector_map(paths)
     ungrouped = [n for n in memories if not (n.get("groups") or [])]
-    # 分组 = 簇：每个分组一条固定半径的环 + 固定角度扇区。这样「有关联的」
-    # 会被放进同一个小格子，整体是一圈一格、有规律的排布，而不是随机撒点。
-    ring: dict[str, float] = {}
-    for index, path in enumerate(sorted(sectors)):
-        ring[path] = R_IN + (R_OUT - R_IN) * ((index + 0.5) / max(1, len(sectors)))
 
     # --- 记忆节点：半径 = 时间，角度 = 分组 --------------------------------
     for node in memories:
@@ -162,17 +157,10 @@ def layout(graph: dict[str, Any], prev: dict[str, Any] | None = None) -> dict[st
             # 一条记忆可以属于多个分组：取第一个有扇区的，其余只当轻微拉扯。
             anchor = next((g for g in groups if g in sectors), None)
             angle = sectors.get(anchor, _hf(node["id"], "ang") * math.tau)
-            if anchor is not None and anchor in ring:
-                # 半径也钉在分组环上，簇内只留 ±8% 的抖动：
-                # 同组记忆靠在一起，不同组一眼能分开。
-                radius = ring[anchor] * _GRADE_PULL.get(node.get("grade"), 1.0)
-                radius *= 0.92 + 0.16 * _hf(node["id"], "ring")
-                if node.get("status") in ("dormant", "archived"):
-                    radius *= 1.05
         else:
             angle = _hf(node["id"], "ang") * math.tau
         angle += TWIST * (radius / R_OUT)
-        angle += _jitter(node["id"], "spread", amp=0.03)
+        angle += _jitter(node["id"], "spread", amp=0.075)
 
         node["_u"] = radius * math.cos(angle)
         node["_v"] = radius * math.sin(angle)
