@@ -1,5 +1,8 @@
 # dsh-PMem · 可塑性记忆
 
+[![CI](https://github.com/dnciyun/dsh-PMem/actions/workflows/ci.yml/badge.svg)](https://github.com/dnciyun/dsh-PMem/actions/workflows/ci.yml)
+Linux 与 Windows 双平台跑同一套测试；向量通道是可选件，没装 numpy 也能跑词法链路。
+
 > 记忆不是被存下来的，是每次想起来时重新长出来的。
 
 给**你家那条大肥鱼**用的大脑。
