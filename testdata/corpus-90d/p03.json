@@ -1,0 +1,1150 @@
+{
+ "version": 1,
+ "id": "p03",
+ "name": "陈默",
+ "profile": {
+  "age": 33,
+  "city": "深圳",
+  "job": "嵌入式工程师",
+  "voice": "闷、话少、要精确；句子短，句号多；生气也不骂人，只是话更少",
+  "relations": "老婆阿慧做外贸；女儿豆豆四岁刚上幼儿园；老妈从湖南来带娃；老板张总；同事小马；硬件老贺；客户广汽和比亚迪"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "p03-d01-s1",
+     "time": "10:12",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "周六来公司补 EMC 报告。周四那版测试记录对不上。"},
+      {"role": "assistant", "text": "对不上是仪器数据没导全，还是版本拿错了。"},
+      {"role": "user", "text": "仪器导出的和截图差了 2dB。得重新算一遍。"},
+      {"role": "assistant", "text": "2dB 不小。先确认转台中心和线束位置有没有动过。"},
+      {"role": "user", "text": "动了。上次为了拍照把线束挪了半米。"},
+      {"role": "assistant", "text": "那报告就废了，重测。周一提上去也是白提。"}
+     ]
+    },
+    {
+     "id": "p03-d01-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "豆豆今天问我，幼儿园是不是要住在那里。"},
+      {"role": "assistant", "text": "四岁就开始担心住宿了。"},
+      {"role": "user", "text": "我说晚上接她回家。她连着问了五遍。"},
+      {"role": "assistant", "text": "问五遍是在确认你不是随口答的。"},
+      {"role": "user", "text": "我跟她保证了两遍。月底开始适应班。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u001", "kind": "episodic", "text": "用户周六加班补 EMC 报告，发现仪器导出数据和截图差了 2dB", "importance": 3, "keywords": ["EMC报告", "2dB", "测试记录"], "state": "active", "supersedes": ""},
+    {"id": "p03-u002", "kind": "relation", "text": "用户女儿豆豆四岁，月底要上幼儿园适应班，担心要住在园里", "importance": 3, "keywords": ["豆豆", "幼儿园", "适应班"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-08-02",
+   "sessions": [
+    {
+     "id": "p03-d02-s1",
+     "time": "20:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "老妈今天做了血鸭。辣得豆豆一直灌水。"},
+      {"role": "assistant", "text": "湖南做法，辣度降不下来。"},
+      {"role": "user", "text": "我让她少放辣椒。她说这已经是最少了。"},
+      {"role": "assistant", "text": "老人家的最少，翻译过来就是正常辣。"},
+      {"role": "user", "text": "最后豆豆吃蒸蛋。阿慧连喝两碗，说这周加班没好好吃。"},
+      {"role": "assistant", "text": "外贸这行，饭点本来就不归自己。"},
+      {"role": "user", "text": "她晚上十点还在回客户邮件。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u003", "kind": "trivia", "text": "用户老妈从湖南来带娃，做的血鸭太辣，豆豆只能改吃蒸蛋", "importance": 2, "keywords": ["血鸭", "老妈", "蒸蛋"], "state": "active", "supersedes": ""},
+    {"id": "p03-u004", "kind": "fact", "text": "用户老婆阿慧做外贸，经常加班到晚上十点还在回客户邮件", "importance": 3, "keywords": ["阿慧", "外贸", "加班"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 3,
+   "date": "2026-08-03",
+   "sessions": [
+    {
+     "id": "p03-d03-s1",
+     "time": "09:35",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "EMC 一轮复测，辐射发射超标 3dB。"},
+      {"role": "assistant", "text": "哪个频段。"},
+      {"role": "user", "text": "30 到 230MHz。开关电源那段最难看。"},
+      {"role": "assistant", "text": "先换共模电感，再看屏蔽罩接地。"},
+      {"role": "user", "text": "已经加了一个磁环，还差 2.5dB。"},
+      {"role": "assistant", "text": "磁环位置比数量重要。贴着接口放试试。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u005", "kind": "episodic", "text": "用户项目 EMC 辐射发射超标 3dB，30 到 230MHz 段开关电源最难看", "importance": 4, "keywords": ["辐射发射", "超标", "开关电源", "EMC"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 5,
+   "date": "2026-08-05",
+   "sessions": [
+    {
+     "id": "p03-d05-s1",
+     "time": "18:25",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "第二轮加了两个磁环，辐射从 3dB 降到 1.5dB。"},
+      {"role": "assistant", "text": "方向对了。屏蔽罩接地看看。"},
+      {"role": "user", "text": "从两点加到六点，明天再测一圈。"},
+      {"role": "assistant", "text": "六点够了。别把散热孔堵上。"},
+      {"role": "user", "text": "留了风道。这个不会犯。"}
+     ]
+    },
+    {
+     "id": "p03-d05-s2",
+     "time": "21:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天周三，游了一千米。"},
+      {"role": "assistant", "text": "加班还去，行。"},
+      {"role": "user", "text": "肩膀有点酸。坐一天太僵。"},
+      {"role": "assistant", "text": "自由泳别老单边换气。"},
+      {"role": "user", "text": "只会那一边。另一边会呛水。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u006", "kind": "fact", "text": "用户给屏蔽罩加的接地点从两个改到六个，EMC 辐射压到超标 1.5dB", "importance": 3, "keywords": ["屏蔽罩", "接地", "EMC"], "state": "active", "supersedes": ""},
+    {"id": "p03-u007", "kind": "fact", "text": "用户每周三固定去游泳，一次游一千米，只会单边换气", "importance": 3, "keywords": ["游泳", "周三", "一千米"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 6,
+   "date": "2026-08-06",
+   "sessions": [
+    {
+     "id": "p03-d06-s1",
+     "time": "17:45",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "又要写周报。这玩意儿有啥用。"},
+      {"role": "assistant", "text": "没用，但老板拿它看进度。"},
+      {"role": "user", "text": "我写三行。他问我为什么这么少。"},
+      {"role": "assistant", "text": "那你就写五行，每行后面加个百分比。"},
+      {"role": "user", "text": "行。下周开始加。烦。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u008", "kind": "preference", "text": "用户讨厌写周报，觉得没用，只写三行被老板说太少", "importance": 3, "keywords": ["周报", "三行", "老板"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 8,
+   "date": "2026-08-08",
+   "sessions": [
+    {
+     "id": "p03-d08-s1",
+     "time": "21:20",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "豆豆一天看三遍汪汪队。台词我都能背了。"},
+      {"role": "assistant", "text": "这比 EMC 报告难熬。"},
+      {"role": "user", "text": "她只看毛毛那几集，别的不看。"},
+      {"role": "assistant", "text": "有偏好说明记得住人。"},
+      {"role": "user", "text": "我夜里看攻壳。1995 那版剧场版。"},
+      {"role": "assistant", "text": "素子跳楼那段配川井宪次，绝了。"},
+      {"role": "user", "text": "押井守的版本每次看都闷。闷得挺对。"},
+      {"role": "assistant", "text": "闷是故意的。别用手机看。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u009", "kind": "preference", "text": "用户陪女儿看汪汪队，一天三遍台词都会背，女儿只看毛毛那几集", "importance": 2, "keywords": ["汪汪队", "毛毛", "豆豆"], "state": "active", "supersedes": ""},
+    {"id": "p03-u010", "kind": "preference", "text": "用户是攻壳老粉，喜欢押井守 1995 剧场版，觉得闷得对", "importance": 4, "keywords": ["攻壳", "押井守", "剧场版"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 10,
+   "date": "2026-08-10",
+   "sessions": [
+    {
+     "id": "p03-d10-s1",
+     "time": "10:05",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "第三轮，传导过了，辐射还是 1.5dB 没动。"},
+      {"role": "assistant", "text": "卡在同一个频点是好事，说明没走错方向。"},
+      {"role": "user", "text": "电源那边我换了电感，还是那段。"},
+      {"role": "assistant", "text": "那就不是电感的事。看壳体的缝。"},
+      {"role": "user", "text": "塑料壳没缝。是屏排线过孔那里。"},
+      {"role": "assistant", "text": "排线包铜箔，两端接地。试一次。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u011", "kind": "episodic", "text": "用户 EMC 第三轮传导过了，辐射卡在同一个频点还是 1.5dB", "importance": 3, "keywords": ["传导", "辐射", "频点"], "state": "active", "supersedes": ""},
+    {"id": "p03-u012", "kind": "plan", "text": "用户打算给屏排线包铜箔再测一轮 EMC", "importance": 3, "keywords": ["屏排线", "铜箔", "EMC"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 12,
+   "date": "2026-08-12",
+   "sessions": [
+    {
+     "id": "p03-d12-s1",
+     "time": "19:40",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "自行车后闸松了。第一次去楼下那个修车摊。"},
+      {"role": "assistant", "text": "松到什么程度。"},
+      {"role": "user", "text": "捏到底才有点劲。师傅十五块换线管调好了。"},
+      {"role": "assistant", "text": "十五块值。别自己上手。"},
+      {"role": "user", "text": "上次自己调刹车，骑出去差点摔。"}
+     ]
+    },
+    {
+     "id": "p03-d12-s2",
+     "time": "22:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "游泳回来右边下牙有点疼。"},
+      {"role": "assistant", "text": "冷水激的，还是自己疼。"},
+      {"role": "user", "text": "自己疼。一阵一阵的，晚上更明显。疼了快一礼拜。"},
+      {"role": "assistant", "text": "那多半到牙髓了。别拖。"},
+      {"role": "user", "text": "先吃布洛芬。这周排满了，下周去。"},
+      {"role": "assistant", "text": "根管比补牙贵三倍。你自己算。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u013", "kind": "fact", "text": "用户右边下牙一阵阵疼，晚上更明显，先吃布洛芬拖着没去医院", "importance": 3, "keywords": ["牙疼", "布洛芬", "牙髓"], "state": "superseded", "superseded_by": "p03-u020", "supersedes": ""},
+    {"id": "p03-u014", "kind": "episodic", "text": "用户自行车后闸松了，第一次去楼下修车摊花十五块换线管修好", "importance": 2, "keywords": ["自行车", "后闸", "修车摊"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 14,
+   "date": "2026-08-14",
+   "sessions": [
+    {
+     "id": "p03-d14-s1",
+     "time": "16:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "采购说 TDA4 交期二十六周。"},
+      {"role": "assistant", "text": "二十六周，项目等不了。"},
+      {"role": "user", "text": "国内排到明年二月。"},
+      {"role": "assistant", "text": "那得看国产方案了。工具链能接吗。"},
+      {"role": "user", "text": "芯驰给了块 X9 的板子，下周试。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u015", "kind": "fact", "text": "用户项目用的是 TI 的 TDA4 芯片，采购说交期要二十六周", "importance": 5, "keywords": ["TDA4", "交期", "采购"], "state": "superseded", "superseded_by": "p03-u030", "supersedes": ""},
+    {"id": "p03-u016", "kind": "plan", "text": "用户下周要试芯驰 X9 的板子，看工具链能不能接", "importance": 3, "keywords": ["芯驰", "开发板", "工具链"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 17,
+   "date": "2026-08-17",
+   "sessions": [
+    {
+     "id": "p03-d17-s1",
+     "time": "11:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "周报又写三行。张总直接打电话过来。"},
+      {"role": "assistant", "text": "打电话说明他真看了。"},
+      {"role": "user", "text": "他问国产芯片有几成把握。我说六成。"},
+      {"role": "assistant", "text": "六成会被打回。你得说风险在哪。"},
+      {"role": "user", "text": "风险是工具链。X9 的编译器我们没人用过。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u017", "kind": "fact", "text": "老板张总问用户换国产芯片有几成把握，用户答六成，风险在工具链", "importance": 3, "keywords": ["张总", "国产芯片", "六成"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 19,
+   "date": "2026-08-19",
+   "sessions": [
+    {
+     "id": "p03-d19-s1",
+     "time": "21:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "游泳一千二。回来腿有点抖。"},
+      {"role": "assistant", "text": "比上周多了两百。"},
+      {"role": "user", "text": "嗯。回来想喝口热的。咖啡我不喝，一喝心慌。"},
+      {"role": "assistant", "text": "那你泡茶。"},
+      {"role": "user", "text": "我妈从湖南带了绿茶过来，喝着还行。"},
+      {"role": "assistant", "text": "绿茶也提神，别下午喝。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u018", "kind": "preference", "text": "用户不喝咖啡，说一喝就心慌，平时泡老妈从湖南带来的绿茶", "importance": 3, "keywords": ["咖啡", "心慌", "绿茶"], "state": "superseded", "superseded_by": "p03-u033", "supersedes": ""},
+    {"id": "p03-u019", "kind": "trivia", "text": "用户游泳从一千米加到一千二百米，回来说腿有点抖", "importance": 2, "keywords": ["游泳", "一千二百米", "腿"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 22,
+   "date": "2026-08-22",
+   "sessions": [
+    {
+     "id": "p03-d22-s1",
+     "time": "15:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "去看了。医生说牙髓炎，要做根管。"},
+      {"role": "assistant", "text": "拖半个月，果然。"},
+      {"role": "user", "text": "今天第一次。打麻药，花了六百多。"},
+      {"role": "assistant", "text": "总共多少。"},
+      {"role": "user", "text": "说一共一千二。医保报了一点，自费八百。"},
+      {"role": "assistant", "text": "后面还得去两次？"},
+      {"role": "user", "text": "嗯。三周内做完。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u020", "kind": "update", "text": "用户牙疼拖了半个月才去看，诊断牙髓炎，要做根管治疗", "importance": 4, "keywords": ["牙髓炎", "根管", "看病"], "state": "active", "supersedes": "p03-u013"},
+    {"id": "p03-u021", "kind": "fact", "text": "用户根管第一次花了六百多，总共一千二，自费八百", "importance": 3, "keywords": ["根管", "六百", "自费"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 24,
+   "date": "2026-08-24",
+   "sessions": [
+    {
+     "id": "p03-d24-s1",
+     "time": "08:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天送豆豆去适应班，哭了四十分钟。"},
+      {"role": "assistant", "text": "四十分钟不算长。老师怎么说。"},
+      {"role": "user", "text": "老师说放下就走。我在门外听了十分钟。"},
+      {"role": "assistant", "text": "听着难受，但走了是对的。"},
+      {"role": "user", "text": "下午接她，她第一句问明天还来吗。"},
+      {"role": "assistant", "text": "她在确认今天是意外还是常态。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u022", "kind": "relation", "text": "用户女儿豆豆第一天上适应班哭了四十分钟，下午接时问明天还来吗", "importance": 3, "keywords": ["豆豆", "适应班", "分离焦虑"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 26,
+   "date": "2026-08-26",
+   "sessions": [
+    {
+     "id": "p03-d26-s1",
+     "time": "14:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "X9 的板子跑起来了。工具链能用，文档太烂。"},
+      {"role": "assistant", "text": "烂到什么程度。"},
+      {"role": "user", "text": "寄存器手册是机翻的。看一段要猜半天。"},
+      {"role": "assistant", "text": "那你们得自己写一份注释。有人推荐用 AI 翻吗。"},
+      {"role": "user", "text": "那些工具我不信。生成的东西不敢往固件里放。"},
+      {"role": "assistant", "text": "先当字典用，别让它写逻辑。"},
+      {"role": "user", "text": "再说。我先把关键寄存器整理成表。"}
+     ]
+    },
+    {
+     "id": "p03-d26-s2",
+     "time": "21:15",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "阿慧这周出两次差。豆豆全甩给我妈。"},
+      {"role": "assistant", "text": "你妈身体撑得住吗。"},
+      {"role": "user", "text": "腿不好。幼儿园门口那个坡推车不好走。"},
+      {"role": "assistant", "text": "跟老师说说提前五分钟接。"},
+      {"role": "user", "text": "说了。老师同意。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u023", "kind": "fact", "text": "用户的芯驰 X9 开发板能跑起来，工具链可用，但寄存器手册是机翻的", "importance": 4, "keywords": ["芯驰", "寄存器手册", "工具链"], "state": "active", "supersedes": ""},
+    {"id": "p03-u024", "kind": "plan", "text": "用户打算把 X9 的关键寄存器整理成一张表", "importance": 3, "keywords": ["X9", "寄存器", "整理"], "state": "active", "supersedes": ""},
+    {"id": "p03-u025", "kind": "preference", "text": "用户不信 AI 写代码的工具，说生成的东西不敢往固件里放", "importance": 3, "keywords": ["AI工具", "固件", "不信"], "state": "superseded", "superseded_by": "p03-u076", "supersedes": ""},
+    {"id": "p03-u026", "kind": "relation", "text": "用户老婆阿慧一周出两次差，孩子只能靠腿不好的老妈接送，幼儿园门口有坡", "importance": 3, "keywords": ["阿慧", "出差", "老妈腿"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 27,
+   "date": "2026-08-27",
+   "sessions": [
+    {
+     "id": "p03-d27-s1",
+     "time": "19:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "第四轮 EMC，传导过了，辐射还差 1.2dB。"},
+      {"role": "assistant", "text": "换了板子还差 1.2dB，那是结构。"},
+      {"role": "user", "text": "我也这么想。壳体是模具定的，改不了。"},
+      {"role": "assistant", "text": "那就动线束走向。客户能商量吗。"},
+      {"role": "user", "text": "广汽说可以调一点。要出个方案。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u028", "kind": "fact", "text": "用户第四轮 EMC 辐射还差 1.2dB，怀疑是结构问题，壳体模具改不了", "importance": 4, "keywords": ["壳体", "模具", "结构"], "state": "active", "supersedes": ""},
+    {"id": "p03-u029", "kind": "fact", "text": "用户在找广汽商量调整车内的线束走向，得先出方案", "importance": 3, "keywords": ["广汽", "线束", "方案"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 30,
+   "date": "2026-08-30",
+   "sessions": [
+    {
+     "id": "p03-d30-s1",
+     "time": "10:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "周五开会拍板了。换芯驰 X9。板子重画。"},
+      {"role": "assistant", "text": "时间表怎么排。"},
+      {"role": "user", "text": "十月出样机，十一月小批量。压得很死。"},
+      {"role": "assistant", "text": "那 EMC 得从头再来一遍。"},
+      {"role": "user", "text": "等于前面四轮白做。"},
+      {"role": "assistant", "text": "不白做。整改思路能复用。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u030", "kind": "update", "text": "用户项目芯片方案从 TI 的 TDA4 换成国产芯驰 X9，板子要重画", "importance": 5, "keywords": ["芯驰X9", "换芯片", "板子"], "state": "active", "supersedes": "p03-u015"},
+    {"id": "p03-u031", "kind": "plan", "text": "用户计划十月出样机、十一月小批量，EMC 流程要重走一遍", "importance": 4, "keywords": ["十月", "样机", "小批量"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 32,
+   "date": "2026-09-01",
+   "sessions": [
+    {
+     "id": "p03-d32-s1",
+     "time": "07:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天正式开学。豆豆自己走进去了，没哭。"},
+      {"role": "assistant", "text": "这是进步了。"},
+      {"role": "user", "text": "我反而不习惯。在门口站了一会儿。"},
+      {"role": "assistant", "text": "分离焦虑那个是你。"},
+      {"role": "user", "text": "可能是。晚上她话变多了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u032", "kind": "relation", "text": "用户女儿豆豆九月一号正式开学自己走进教室没哭，用户倒是在门口站了一会儿", "importance": 2, "keywords": ["开学", "豆豆", "门口"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 34,
+   "date": "2026-09-03",
+   "sessions": [
+    {
+     "id": "p03-d34-s1",
+     "time": "23:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "加班到十一点。小马给了杯美式。"},
+      {"role": "assistant", "text": "你不是不喝咖啡。"},
+      {"role": "user", "text": "以前喝一口就心慌。今天喝了没事。"},
+      {"role": "assistant", "text": "身体会变。别一天两杯。"},
+      {"role": "user", "text": "第二杯已经喝了。板子不来电，靠它撑。"},
+      {"role": "assistant", "text": "不来电先查供电时序，别硬调。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u033", "kind": "update", "text": "用户以前不喝咖啡，九月开始加班喝美式续命，一晚上两杯", "importance": 3, "keywords": ["美式", "加班", "咖啡"], "state": "active", "supersedes": "p03-u018"},
+    {"id": "p03-u034", "kind": "fact", "text": "用户的新板子不上电，用户在查供电时序", "importance": 3, "keywords": ["供电时序", "新板", "调试"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 35,
+   "date": "2026-09-04",
+   "sessions": [
+    {
+     "id": "p03-d35-s1",
+     "time": "20:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "串口没输出。示波器看时钟没起来。"},
+      {"role": "assistant", "text": "晶振没起振？"},
+      {"role": "user", "text": "焊接问题。补了一遍，起来了。"},
+      {"role": "assistant", "text": "新板第一批，焊接问题最多。"},
+      {"role": "user", "text": "六块板，三块有问题。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u035", "kind": "episodic", "text": "用户的 X9 新板第一批串口没输出，是晶振焊接问题，六块板坏了三块", "importance": 3, "keywords": ["串口", "晶振", "焊接"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 37,
+   "date": "2026-09-06",
+   "sessions": [
+    {
+     "id": "p03-d37-s1",
+     "time": "22:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "补攻壳 SAC。第二集那个笑面男我有点没跟上。"},
+      {"role": "assistant", "text": "SAC 的信息量比剧场版大。"},
+      {"role": "user", "text": "塔奇克马那段挺可爱。跟剧场版完全不一样。"},
+      {"role": "assistant", "text": "神山健治那版更像刑侦剧。"},
+      {"role": "user", "text": "押井守是闷，神山是绕。都行。"},
+      {"role": "assistant", "text": "你更吃哪一口。"},
+      {"role": "user", "text": "闷的。绕的要动脑，累。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u036", "kind": "preference", "text": "用户补攻壳机动队 SAC，觉得神山健治那版绕，还是更喜欢押井守的闷", "importance": 4, "keywords": ["攻壳SAC", "神山健治", "塔奇克马"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 39,
+   "date": "2026-09-08",
+   "sessions": [
+    {
+     "id": "p03-d39-s1",
+     "time": "19:05",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "新板重测 EMC，辐射反而高了一个点。"},
+      {"role": "assistant", "text": "换芯片换布局，正常。"},
+      {"role": "user", "text": "层叠改了。地平面被切了一刀。"},
+      {"role": "assistant", "text": "那就先补地。别急着改电路。"},
+      {"role": "user", "text": "下周补完再测。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u037", "kind": "fact", "text": "用户新板重测 EMC 辐射反而高了一个点，原因是地平面被切开", "importance": 3, "keywords": ["地平面", "层叠", "辐射"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 41,
+   "date": "2026-09-10",
+   "sessions": [
+    {
+     "id": "p03-d41-s1",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "豆豆发烧，三十八度七。幼儿园让接回来。"},
+      {"role": "assistant", "text": "精神好不好。"},
+      {"role": "user", "text": "还行，就是蔫。我妈说湖南的老办法是刮痧。"},
+      {"role": "assistant", "text": "别刮。先退热贴加美林。"},
+      {"role": "user", "text": "贴了。夜里退了。三点又起来量一次。"},
+      {"role": "assistant", "text": "那你也没睡。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u038", "kind": "episodic", "text": "用户女儿豆豆发烧三十八度七被幼儿园送回来，夜里三点又起来量体温", "importance": 3, "keywords": ["豆豆", "发烧", "三十八度七"], "state": "active", "supersedes": ""},
+    {"id": "p03-u039", "kind": "relation", "text": "用户老妈想用湖南刮痧的老办法给豆豆退烧，用户没让", "importance": 2, "keywords": ["老妈", "刮痧", "退烧"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 43,
+   "date": "2026-09-12",
+   "sessions": [
+    {
+     "id": "p03-d43-s1",
+     "time": "18:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "周报写五行了。张总没说话。"},
+      {"role": "assistant", "text": "沉默就是通过。"},
+      {"role": "user", "text": "这周加了四个晚上。小马说他也扛不住。"},
+      {"role": "assistant", "text": "两个人一起加，进度能快点。"},
+      {"role": "user", "text": "硬件老贺也住公司了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u040", "kind": "fact", "text": "用户这周加了四个晚上班，周报按五行写，张总没再说什么", "importance": 3, "keywords": ["周报", "五行", "加班"], "state": "active", "supersedes": ""},
+    {"id": "p03-u041", "kind": "relation", "text": "用户的硬件同事老贺也在公司住下加班，项目周期压得紧", "importance": 2, "keywords": ["老贺", "硬件", "加班"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 44,
+   "date": "2026-09-13",
+   "sessions": [
+    {
+     "id": "p03-d44-s1",
+     "time": "11:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "自行车内胎被玻璃碴扎了。第二次去修车摊。"},
+      {"role": "assistant", "text": "深圳路边这玩意儿多。"},
+      {"role": "user", "text": "二十块换内胎。师傅说外胎也该换了。"},
+      {"role": "assistant", "text": "先别换，撑到年底。"},
+      {"role": "user", "text": "我等发年终。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u042", "kind": "episodic", "text": "用户自行车内胎被玻璃碴扎破，第二次去修车摊花二十块换内胎", "importance": 2, "keywords": ["内胎", "玻璃碴", "二十块"], "state": "active", "supersedes": ""},
+    {"id": "p03-u043", "kind": "plan", "text": "用户想等发了年终奖再换自行车外胎", "importance": 2, "keywords": ["年终", "外胎", "自行车"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 46,
+   "date": "2026-09-15",
+   "sessions": [
+    {
+     "id": "p03-d46-s1",
+     "time": "17:55",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "样机送广汽了。他们要自己测三天。"},
+      {"role": "assistant", "text": "你有底吗。"},
+      {"role": "user", "text": "EMC 刚过。软件还有两个 bug 没修。"},
+      {"role": "assistant", "text": "那在现场容易出事。"},
+      {"role": "user", "text": "他们只做静态测试，先不动。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u044", "kind": "episodic", "text": "用户把样机送到广汽，对方要自己测三天，软件还有两个 bug 没修", "importance": 4, "keywords": ["样机", "广汽", "bug"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 47,
+   "date": "2026-09-16",
+   "sessions": [
+    {
+     "id": "p03-d47-s1",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "游泳没去。加班到九点。"},
+      {"role": "assistant", "text": "破戒了。"},
+      {"role": "user", "text": "牙复查了一次。医生说恢复得还行。"},
+      {"role": "assistant", "text": "那这钱没白花。"},
+      {"role": "user", "text": "第二次治疗又交了三百。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u045", "kind": "fact", "text": "用户这周没去游泳，加班到九点，牙根管复查说恢复得可以", "importance": 2, "keywords": ["游泳", "复查", "根管"], "state": "active", "supersedes": ""},
+    {"id": "p03-u046", "kind": "fact", "text": "用户根管第二次治疗又交了三百块", "importance": 2, "keywords": ["根管", "三百", "治疗"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 49,
+   "date": "2026-09-18",
+   "sessions": [
+    {
+     "id": "p03-d49-s1",
+     "time": "20:15",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "豆豆现在会自己唱汪汪队的歌。调全跑。"},
+      {"role": "assistant", "text": "四岁跑调正常。"},
+      {"role": "user", "text": "昨天她拿积木搭了个塔，说是总部。"},
+      {"role": "assistant", "text": "这是把剧看进去了。"},
+      {"role": "user", "text": "我陪她搭了一个小时。比写代码累。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u047", "kind": "trivia", "text": "用户女儿豆豆会唱汪汪队的歌，用积木搭总部，用户陪她搭了一个小时", "importance": 2, "keywords": ["豆豆", "汪汪队", "积木"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 53,
+   "date": "2026-09-22",
+   "sessions": [
+    {
+     "id": "p03-d53-s1",
+     "time": "14:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "广汽现场死机了。三次。"},
+      {"role": "assistant", "text": "三次是同一个动作触发的吗。"},
+      {"role": "user", "text": "都是切倒车影像的时候。黑屏然后重启。"},
+      {"role": "assistant", "text": "倒车影像占内存？还是中断堵了。"},
+      {"role": "user", "text": "抓不到日志。串口也断了。"},
+      {"role": "assistant", "text": "把复位改成保留日志，先能看见再说。"},
+      {"role": "user", "text": "我明天一早就过去。带两块备用板。"},
+      {"role": "assistant", "text": "别空手去，现场最怕没备件。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u048", "kind": "episodic", "text": "用户九月二十二日在广汽客户现场死机三次，都是切倒车影像时黑屏重启", "importance": 5, "keywords": ["广汽", "现场死机", "倒车影像"], "state": "active", "supersedes": ""},
+    {"id": "p03-u049", "kind": "plan", "text": "用户打算把复位策略改成保留日志，还要带两块备用板去广汽现场", "importance": 4, "keywords": ["复位", "日志", "备用板"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 56,
+   "date": "2026-09-25",
+   "sessions": [
+    {
+     "id": "p03-d56-s1",
+     "time": "20:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "中秋。老妈做了血鸭和糍粑。"},
+      {"role": "assistant", "text": "深圳能买到糍粑？"},
+      {"role": "user", "text": "她从湖南带的糯米。自己打的。"},
+      {"role": "assistant", "text": "这手艺现在少见。"},
+      {"role": "user", "text": "吃完她说想回去看看。我爸一个人在老家。"},
+      {"role": "assistant", "text": "那得商量一下什么时候回。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u050", "kind": "relation", "text": "用户老妈中秋做的血鸭和糍粑，说想回湖南看看", "importance": 3, "keywords": ["中秋", "糍粑", "湖南"], "state": "active", "supersedes": ""},
+    {"id": "p03-u051", "kind": "relation", "text": "用户爸一个人在湖南老家，老妈是来深圳帮忙带娃的", "importance": 3, "keywords": ["爸", "湖南老家", "带娃"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 58,
+   "date": "2026-09-27",
+   "sessions": [
+    {
+     "id": "p03-d58-s1",
+     "time": "22:05",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "查了快一周了。换了三块板都能复现。"},
+      {"role": "assistant", "text": "说明是软件或者电源。"},
+      {"role": "user", "text": "电源纹波测过，干净。"},
+      {"role": "assistant", "text": "那就剩软件。先看看门狗配置。"},
+      {"role": "user", "text": "看门狗使能了。喂狗在定时器里。"},
+      {"role": "assistant", "text": "定时器被高优先级任务占了，就喂不上。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u052", "kind": "fact", "text": "用户查死机快一周，换三块板都能复现，电源纹波是干净的", "importance": 4, "keywords": ["死机", "复现", "电源纹波"], "state": "active", "supersedes": ""},
+    {"id": "p03-u053", "kind": "fact", "text": "用户的看门狗喂狗放在定时器里，开始怀疑定时器被高优先级任务占用", "importance": 4, "keywords": ["看门狗", "喂狗", "定时器"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 60,
+   "date": "2026-09-29",
+   "sessions": [
+    {
+     "id": "p03-d60-s1",
+     "time": "19:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "国庆还得来两天。广汽那边催。"},
+      {"role": "assistant", "text": "排班了吗。"},
+      {"role": "user", "text": "十月五号六号。其他人在家。"},
+      {"role": "assistant", "text": "那两天你别熬通宵。"},
+      {"role": "user", "text": "尽量。死机没定位，睡不着。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u054", "kind": "plan", "text": "用户国庆要加两天班，十月五号六号去公司查死机问题", "importance": 3, "keywords": ["国庆", "加班", "死机"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 62,
+   "date": "2026-10-01",
+   "sessions": [
+    {
+     "id": "p03-d62-s1",
+     "time": "18:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "国庆带豆豆去了深圳湾公园。风挺大。"},
+      {"role": "assistant", "text": "人多不多。"},
+      {"role": "user", "text": "多。停车排了一个半小时。"},
+      {"role": "assistant", "text": "假期就这样。"},
+      {"role": "user", "text": "她在草地上跑了半天。回来吃了两碗饭。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u055", "kind": "episodic", "text": "用户国庆带女儿去深圳湾公园，停车排了一个半小时，孩子在草地上跑了半天", "importance": 2, "keywords": ["深圳湾公园", "国庆", "停车"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 65,
+   "date": "2026-10-04",
+   "sessions": [
+    {
+     "id": "p03-d65-s1",
+     "time": "15:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "自行车又出问题。第三次去修车摊。"},
+      {"role": "assistant", "text": "这回是什么。"},
+      {"role": "user", "text": "链条和前拨一起。师傅说外胎也磨平了。"},
+      {"role": "assistant", "text": "第三次了，要不换一辆。"},
+      {"role": "user", "text": "换一辆得两千。先修，八十块。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u056", "kind": "episodic", "text": "用户自行车第三次去修车摊，链条前拨一起修，外胎已经磨平，花了八十", "importance": 2, "keywords": ["自行车", "链条", "八十块"], "state": "active", "supersedes": ""},
+    {"id": "p03-u057", "kind": "preference", "text": "用户说换一辆自行车得两千，决定先修着骑", "importance": 2, "keywords": ["两千", "换车", "修车"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 66,
+   "date": "2026-10-05",
+   "sessions": [
+    {
+     "id": "p03-d66-s1",
+     "time": "13:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "国庆还是来了公司。把喂狗那段单独拉出来看。"},
+      {"role": "assistant", "text": "看出什么了。"},
+      {"role": "user", "text": "喂狗在定时器回调里。有个 flash 写操作会占着回调。"},
+      {"role": "assistant", "text": "写 flash 关不关中断。"},
+      {"role": "user", "text": "关。关多久还没量。"},
+      {"role": "assistant", "text": "量一下。超过看门狗就完了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u058", "kind": "fact", "text": "用户国庆加班查到喂狗回调会被 flash 写操作占住，怀疑关中断时间过长", "importance": 4, "keywords": ["喂狗", "flash", "关中断"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 69,
+   "date": "2026-10-08",
+   "sessions": [
+    {
+     "id": "p03-d69-s1",
+     "time": "21:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "找到了。就是看门狗没喂上。"},
+      {"role": "assistant", "text": "关中断多久。"},
+      {"role": "user", "text": "两百毫秒。看门狗是一百五十毫秒。必死。"},
+      {"role": "assistant", "text": "那五十毫秒就是欠的。"},
+      {"role": "user", "text": "改法两个。喂狗提前，或者 flash 写分片。"},
+      {"role": "assistant", "text": "先喂狗提前，快。"},
+      {"role": "user", "text": "今天改了版本。明天给广汽。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u059", "kind": "fact", "text": "用户十月八日确认死机是看门狗没喂上，flash 写操作关中断两百毫秒，看门狗一百五十毫秒", "importance": 5, "keywords": ["看门狗", "两百毫秒", "flash"], "state": "active", "supersedes": ""},
+    {"id": "p03-u060", "kind": "plan", "text": "用户打算先把喂狗提前，后面再把 flash 写操作分片", "importance": 3, "keywords": ["喂狗", "分片", "改法"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 71,
+   "date": "2026-10-10",
+   "sessions": [
+    {
+     "id": "p03-d71-s1",
+     "time": "10:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "新版给广汽了。他们复测两天。"},
+      {"role": "assistant", "text": "这次有底？"},
+      {"role": "user", "text": "有。同场景压了两百次没死。"},
+      {"role": "assistant", "text": "两百次够了。"},
+      {"role": "user", "text": "现在就怕比亚迪那边出别的问题。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u061", "kind": "episodic", "text": "用户的新版本给广汽复测，同场景压了两百次没再死机", "importance": 4, "keywords": ["复测", "两百次", "看门狗修复"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 73,
+   "date": "2026-10-12",
+   "sessions": [
+    {
+     "id": "p03-d73-s1",
+     "time": "20:35",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "买了个三十块的理发推子，自己剪头。"},
+      {"role": "assistant", "text": "三十块，能用吗。"},
+      {"role": "user", "text": "后脑勺剪得跟狗啃一样。豆豆说爸爸不像爸爸。"},
+      {"role": "assistant", "text": "她这是实话。"},
+      {"role": "user", "text": "阿慧笑了五分钟。明天去店里补一刀。"},
+      {"role": "assistant", "text": "三十加三十，还是比办卡便宜。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u062", "kind": "episodic", "text": "用户买了三十块的理发推子自己剪头，后脑勺剪得像狗啃，女儿说不像爸爸", "importance": 2, "keywords": ["理发推子", "三十块", "剪头"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 75,
+   "date": "2026-10-14",
+   "sessions": [
+    {
+     "id": "p03-d75-s1",
+     "time": "16:45",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "比亚迪路测死机了。这次是路测车。"},
+      {"role": "assistant", "text": "跟广汽那次一样吗。"},
+      {"role": "user", "text": "不一样。这次是颠簸路段加 4G 上传。"},
+      {"role": "assistant", "text": "那像电源。"},
+      {"role": "user", "text": "日志留下来了。复位原因是欠压。"},
+      {"role": "assistant", "text": "4G 发射瞬时电流大，纹波一压就复位。"},
+      {"role": "user", "text": "对。要加滤波。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u063", "kind": "episodic", "text": "用户十月十四日比亚迪路测死机，复位原因是欠压，发生在颠簸路段加 4G 上传时", "importance": 5, "keywords": ["比亚迪", "路测死机", "欠压"], "state": "active", "supersedes": ""},
+    {"id": "p03-u064", "kind": "fact", "text": "用户分析比亚迪路测死机，怀疑 4G 发射的瞬时电流导致欠压复位", "importance": 4, "keywords": ["4G发射", "瞬时电流", "欠压复位"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 78,
+   "date": "2026-10-17",
+   "sessions": [
+    {
+     "id": "p03-d78-s1",
+     "time": "22:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "开始重看 EVA。第一话真嗣到第三新东京市。"},
+      {"role": "assistant", "text": "多少年没看了。"},
+      {"role": "user", "text": "十来年。这次看懂了美里那句不要逃。"},
+      {"role": "assistant", "text": "第一话就把主题摆出来了。"},
+      {"role": "user", "text": "以前只看机器人打使徒。现在看的全是人。"},
+      {"role": "assistant", "text": "这就是年纪。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u065", "kind": "preference", "text": "用户十月开始重看 EVA，第一话就注意到美里那句不要逃", "importance": 4, "keywords": ["EVA", "美里", "重看"], "state": "active", "supersedes": ""},
+    {"id": "p03-u066", "kind": "fact", "text": "用户十几年前第一次看 EVA 只看机器人打使徒，现在看的是人", "importance": 3, "keywords": ["使徒", "机器人", "十年"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 79,
+   "date": "2026-10-18",
+   "sessions": [
+    {
+     "id": "p03-d79-s1",
+     "time": "19:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "豆豆在幼儿园咬了小朋友。"},
+      {"role": "assistant", "text": "为什么咬。"},
+      {"role": "user", "text": "抢玩具。老师让家长去一趟。"},
+      {"role": "assistant", "text": "她怎么说。"},
+      {"role": "user", "text": "她说她说了对不起。晚上睡前还在提。"},
+      {"role": "assistant", "text": "她知道错了，别追着问。"}
+     ]
+    },
+    {
+     "id": "p03-d79-s2",
+     "time": "21:10",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "厨房水龙头一直在渗水。滴了一晚上。"},
+      {"role": "assistant", "text": "阀芯老化。楼下五金店有卖。"},
+      {"role": "user", "text": "二十五块买了个阀芯，自己换了。"},
+      {"role": "assistant", "text": "这次没叫人上门。"},
+      {"role": "user", "text": "上门要八十。我自己能弄。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u067", "kind": "episodic", "text": "用户女儿豆豆在幼儿园抢玩具咬了小朋友，老师叫家长去了一趟", "importance": 3, "keywords": ["豆豆", "咬人", "抢玩具"], "state": "active", "supersedes": ""},
+    {"id": "p03-u068", "kind": "episodic", "text": "用户厨房水龙头渗水，自己花二十五块换阀芯修好，省了八十上门费", "importance": 2, "keywords": ["水龙头", "阀芯", "上门费"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 80,
+   "date": "2026-10-19",
+   "sessions": [
+    {
+     "id": "p03-d80-s1",
+     "time": "15:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "比亚迪的日志看完。欠压有三段。"},
+      {"role": "assistant", "text": "都是 4G 上传的时候？"},
+      {"role": "user", "text": "两段是。一段不是，是过减速带。"},
+      {"role": "assistant", "text": "那就不只是 4G。接插件也可能松。"},
+      {"role": "user", "text": "我让他们把电源线束重新压一遍。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u069", "kind": "fact", "text": "用户分析比亚迪日志发现三段欠压，两段在 4G 上传时，一段在过减速带时", "importance": 4, "keywords": ["比亚迪", "欠压", "减速带"], "state": "active", "supersedes": ""},
+    {"id": "p03-u070", "kind": "plan", "text": "用户让比亚迪把电源线束重新压一遍，同时准备加滤波", "importance": 3, "keywords": ["电源线束", "接插件", "滤波"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 82,
+   "date": "2026-10-21",
+   "sessions": [
+    {
+     "id": "p03-d82-s1",
+     "time": "21:45",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "游泳一千五。腰有点撑不住。"},
+      {"role": "assistant", "text": "一千五是加了三百。"},
+      {"role": "user", "text": "水下转身的时候腰闪了一下。"},
+      {"role": "assistant", "text": "别硬加。先把核心练起来。"},
+      {"role": "user", "text": "买了块瑜伽垫。放家里落灰两天了。"},
+      {"role": "assistant", "text": "落灰两天算刚开始。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u071", "kind": "fact", "text": "用户游泳从一千二加到一千五，水下转身时把腰闪了一下", "importance": 2, "keywords": ["游泳", "一千五", "腰"], "state": "active", "supersedes": ""},
+    {"id": "p03-u072", "kind": "trivia", "text": "用户买了块瑜伽垫想练核心，放家里落灰两天", "importance": 1, "keywords": ["瑜伽垫", "核心", "落灰"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 84,
+   "date": "2026-10-23",
+   "sessions": [
+    {
+     "id": "p03-d84-s1",
+     "time": "23:15",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "看到十九话。初号机暴走。"},
+      {"role": "assistant", "text": "那段配乐一响就知道完了。"},
+      {"role": "user", "text": "以前觉得燃。这次觉得真嗣可怜。"},
+      {"role": "assistant", "text": "暴走不是他自己选的。"},
+      {"role": "user", "text": "二十四话薰那段我快进了。"},
+      {"role": "assistant", "text": "你重看还快进。"},
+      {"role": "user", "text": "不敢看第二次。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u073", "kind": "preference", "text": "用户重看 EVA 到十九话初号机暴走，以前觉得燃，这次觉得真嗣可怜", "importance": 4, "keywords": ["初号机", "暴走", "真嗣"], "state": "active", "supersedes": ""},
+    {"id": "p03-u074", "kind": "preference", "text": "用户重看 EVA 二十四话薰那段直接快进了，说不敢看第二次", "importance": 3, "keywords": ["二十四话", "薰", "快进"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 87,
+   "date": "2026-10-26",
+   "sessions": [
+    {
+     "id": "p03-d87-s1",
+     "time": "18:05",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "滤波加上，线束重压。路测跑了四百公里。"},
+      {"role": "assistant", "text": "没再复位？"},
+      {"role": "user", "text": "没有。欠压最低到四点七伏。"},
+      {"role": "assistant", "text": "那稳了。"},
+      {"role": "user", "text": "还差一份复测报告。周五交。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u075", "kind": "episodic", "text": "用户加滤波重压线束后路测四百公里没再复位，欠压最低到四点七伏", "importance": 4, "keywords": ["滤波", "路测", "四点七伏"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 88,
+   "date": "2026-10-27",
+   "sessions": [
+    {
+     "id": "p03-d88-s1",
+     "time": "20:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "复测报告写完了。张总这次没挑刺。"},
+      {"role": "assistant", "text": "这次难得。"},
+      {"role": "user", "text": "我用了 Cursor 帮我把寄存器表补成文档。"},
+      {"role": "assistant", "text": "你以前不是不用这些。"},
+      {"role": "user", "text": "以前觉得它是玩具。现在查宏定义确实快。"},
+      {"role": "assistant", "text": "工具就是工具，看你怎么用。"},
+      {"role": "user", "text": "这事我没跟组里说。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u076", "kind": "update", "text": "用户以前觉得 AI 写代码的工具是玩具，现在偷偷用 Cursor 补寄存器文档", "importance": 4, "keywords": ["Cursor", "AI工具", "寄存器文档"], "state": "active", "supersedes": "p03-u025"},
+    {"id": "p03-u077", "kind": "fact", "text": "用户的复测报告交了，张总这次没挑刺", "importance": 3, "keywords": ["复测报告", "张总", "交报告"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 90,
+   "date": "2026-10-29",
+   "sessions": [
+    {
+     "id": "p03-d90-s1",
+     "time": "22:50",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "昨天看完 EVA 最后一话。二十六话。"},
+      {"role": "assistant", "text": "最后那段鼓掌。"},
+      {"role": "user", "text": "嗯。恭喜你那句。这次看居然不难受了。"},
+      {"role": "assistant", "text": "十几年前看是什么感觉。"},
+      {"role": "user", "text": "闷了两天。这次是坐下来抽了根烟。"},
+      {"role": "assistant", "text": "那也算过去了。"},
+      {"role": "user", "text": "十一月小批量。明天还得交周报。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p03-u078", "kind": "preference", "text": "用户重看完 EVA 二十六话，这次看最后的鼓掌不难受了，十几年前闷了两天", "importance": 4, "keywords": ["EVA", "二十六话", "鼓掌"], "state": "active", "supersedes": ""},
+    {"id": "p03-u079", "kind": "plan", "text": "用户的 X9 项目十一月进小批量，死机问题已经闭环", "importance": 4, "keywords": ["小批量", "十一月", "闭环"], "state": "active", "supersedes": ""}
+   ]
+  }
+ ],
+ "probes": [
+  {"id": "p03-q01", "category": "daily", "ask_day": 90, "query": "豆豆头一次去幼儿园那天，哭得厉害吗？", "expect": {"any": ["四十分钟"], "none": []}, "unit_ids": ["p03-u022"], "note": "第 24 天第一次送适应班"},
+  {"id": "p03-q02", "category": "daily", "ask_day": 90, "query": "上次那颗牙最后是怎么弄的，总共花多少？", "expect": {"any": ["牙髓炎", "根管", "一千二"], "none": []}, "unit_ids": ["p03-u020", "p03-u021"], "note": "第 22 天看牙"},
+  {"id": "p03-q03", "category": "daily", "ask_day": 90, "query": "豆豆那次发烧烧到多少度，我妈想干什么来着？", "expect": {"any": ["三十八度七", "刮痧"], "none": []}, "unit_ids": ["p03-u038", "p03-u039"], "note": "第 41 天发烧"},
+  {"id": "p03-q04", "category": "daily", "ask_day": 90, "query": "我自己剪头那次，后脑勺剪成什么样了？", "expect": {"any": ["理发推子", "狗啃"], "none": []}, "unit_ids": ["p03-u062"], "note": "第 73 天三十块的推子"},
+  {"id": "p03-q05", "category": "daily", "ask_day": 90, "query": "国庆带娃去的那个公园，停车排了多长时间？", "expect": {"any": ["一个半小时"], "none": []}, "unit_ids": ["p03-u055"], "note": "第 62 天深圳湾公园"},
+  {"id": "p03-q06", "category": "work", "ask_day": 90, "query": "最后查出来死机那个根因是什么？", "expect": {"any": ["看门狗没喂上"], "none": []}, "unit_ids": ["p03-u059"], "note": "第 69 天定位到看门狗"},
+  {"id": "p03-q07", "category": "work", "ask_day": 90, "query": "广汽那边出问题的时候，是什么操作触发的？", "expect": {"any": ["倒车影像"], "none": []}, "unit_ids": ["p03-u048"], "note": "第 53 天现场死机三次"},
+  {"id": "p03-q08", "category": "work", "ask_day": 90, "query": "比亚迪路测那次复位是什么原因？", "expect": {"any": ["颠簸路段", "欠压"], "none": []}, "unit_ids": ["p03-u063", "p03-u064"], "note": "第 75 天第二次死机"},
+  {"id": "p03-q09", "category": "update", "ask_day": 90, "query": "我那项目最后用的是什么芯片方案？", "expect": {"any": ["芯驰 X9"], "none": ["TDA4"]}, "unit_ids": ["p03-u030"], "note": "第 30 天拍板换国产芯片"},
+  {"id": "p03-q10", "category": "work", "ask_day": 90, "query": "我周报后来改成怎么写了？", "expect": {"any": ["五行"], "none": []}, "unit_ids": ["p03-u040"], "note": "第 43 天周报改成五行"},
+  {"id": "p03-q11", "category": "work", "ask_day": 90, "query": "路测跑了多远才确认不复位了？", "expect": {"any": ["四百公里"], "none": []}, "unit_ids": ["p03-u075"], "note": "第 87 天加滤波后复测"},
+  {"id": "p03-q12", "category": "anime", "ask_day": 90, "query": "我一直喜欢攻壳那个闷闷的版本，监督是谁来着？", "expect": {"any": ["押井守"], "none": []}, "unit_ids": ["p03-u010"], "note": "第 8 天夜里看攻壳剧场版"},
+  {"id": "p03-q13", "category": "anime", "ask_day": 90, "query": "我重看 EVA 到十九话的时候，反应跟以前有什么不一样？", "expect": {"any": ["真嗣可怜"], "none": []}, "unit_ids": ["p03-u073"], "note": "第 84 天初号机暴走"},
+  {"id": "p03-q14", "category": "anime", "ask_day": 90, "query": "重看第一话，这次注意到美里说了句什么？", "expect": {"any": ["不要逃"], "none": []}, "unit_ids": ["p03-u065"], "note": "第 78 天开始重看 EVA"},
+  {"id": "p03-q15", "category": "anime", "ask_day": 90, "query": "豆豆看动画片只看哪只狗的部分？", "expect": {"any": ["毛毛"], "none": []}, "unit_ids": ["p03-u009"], "note": "第 8 天陪女儿看汪汪队"},
+  {"id": "p03-q16", "category": "anime", "ask_day": 90, "query": "攻壳那版 TV 动画我觉得怎么样来着？", "expect": {"any": ["神山健治"], "none": []}, "unit_ids": ["p03-u036"], "note": "第 37 天补 SAC"},
+  {"id": "p03-q17", "category": "trivia", "ask_day": 90, "query": "自行车头一回送去修，是哪个零件出的问题？", "expect": {"any": ["后闸"], "none": []}, "unit_ids": ["p03-u014"], "note": "第 12 天修刹车"},
+  {"id": "p03-q18", "category": "trivia", "ask_day": 90, "query": "我买了个垫子想练什么，结果放哪落灰了？", "expect": {"any": ["瑜伽垫"], "none": []}, "unit_ids": ["p03-u072"], "note": "第 82 天腰闪了"},
+  {"id": "p03-q19", "category": "trivia", "ask_day": 90, "query": "我写周报一开始写几行，老板说了什么？", "expect": {"any": ["三行"], "none": []}, "unit_ids": ["p03-u008"], "note": "第 6 天被说太少"},
+  {"id": "p03-q20", "category": "trivia", "ask_day": 90, "query": "每周三下班固定去干什么，一次游多少？", "expect": {"any": ["游泳", "一千米"], "none": []}, "unit_ids": ["p03-u007"], "note": "第 5 天第一次提游泳"},
+  {"id": "p03-q21", "category": "update", "ask_day": 90, "query": "我现在加班靠什么撑着，以前不是这样吧？", "expect": {"any": ["美式"], "none": ["心慌"]}, "unit_ids": ["p03-u033"], "note": "第 34 天开始喝咖啡"},
+  {"id": "p03-q22", "category": "update", "ask_day": 90, "query": "我最近偷偷用什么工具补文档了？", "expect": {"any": ["Cursor"], "none": ["不敢往固件里放"]}, "unit_ids": ["p03-u076"], "note": "第 88 天承认用 Cursor"},
+  {"id": "p03-q23", "category": "aggregate", "ask_day": 90, "query": "这三个月车机出过两次大问题，都是什么情况下死的？", "expect": {"any": ["倒车影像", "颠簸路段"], "none": []}, "unit_ids": ["p03-u048", "p03-u063"], "note": "两次死机合起来问"},
+  {"id": "p03-q24", "category": "aggregate", "ask_day": 90, "query": "那辆破自行车我一共修了几回，都修的什么地方？", "expect": {"any": ["后闸", "内胎", "链条"], "none": []}, "unit_ids": ["p03-u014", "p03-u042", "p03-u056"], "note": "三次修车"},
+  {"id": "p03-q25", "category": "aggregate", "ask_day": 90, "query": "我游泳这几个月是怎么加上去的，最后加到多少？", "expect": {"any": ["一千米", "一千二百米", "一千五"], "none": []}, "unit_ids": ["p03-u007", "p03-u019", "p03-u071"], "note": "游泳距离三次变化"},
+  {"id": "p03-q26", "category": "cross", "ask_day": 90, "query": "九月那阵家里和公司同时出事，分别是啥来着？", "expect": {"any": ["三十八度七", "倒车影像"], "none": []}, "unit_ids": ["p03-u038", "p03-u048"], "note": "豆豆发烧和现场死机撞在九月"},
+  {"id": "p03-q27", "category": "cross", "ask_day": 90, "query": "看牙那阵子项目也在赶，我加了几个晚上班？", "expect": {"any": ["四个晚上"], "none": []}, "unit_ids": ["p03-u020", "p03-u040"], "note": "看牙和加班撞一起"},
+  {"id": "p03-q28", "category": "precision", "ask_day": 90, "query": "现场那次死机是切什么功能的时候出的？", "expect": {"any": ["倒车影像"], "none": ["颠簸路段"]}, "unit_ids": ["p03-u048"], "note": "别和比亚迪路测混了"},
+  {"id": "p03-q29", "category": "precision", "ask_day": 90, "query": "客户现场那次，是哪家客户的？", "expect": {"any": ["广汽"], "none": ["比亚迪"]}, "unit_ids": ["p03-u048"], "note": "两个客户别混"},
+  {"id": "p03-q30", "category": "no_memory", "ask_day": 90, "query": "我之前是不是去海岛考过潜水证？", "expect": {"any": [], "none": ["潜水", "海岛"]}, "unit_ids": [], "note": "从没提过潜水海岛"},
+  {"id": "p03-q31", "category": "no_memory", "ask_day": 90, "query": "我是不是说过想炒股赚点外快？", "expect": {"any": [], "none": ["炒股", "基金"]}, "unit_ids": [], "note": "从没提过炒股"}
+ ]
+}

@@ -1,0 +1,1430 @@
+{
+ "version": 1,
+ "id": "p09",
+ "name": "梁心",
+ "profile": {
+  "age": 26,
+  "city": "广州",
+  "job": "护士（内科病房，9 月调急诊）",
+  "voice": "直、护短，骂病人也骂自己；夜班后语气更冲，句子短，爱说「烦死了」「我不理解」",
+  "relations": "合租闺蜜阿May；男友小邹（异地，10 月分手）；湛江老家开小卖部的爸妈"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "p09-d01-s1",
+     "time": "07:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天白班一进门就接了三个新病人，3床那个何奶奶慢阻肺又急性加重，喘得跟拉风箱一样"},
+      {"role": "assistant", "text": "慢阻肺急性加重最磨人，家属那边呢？"},
+      {"role": "user", "text": "家属就是她儿子，一进来就拍桌子，说我们给氧给慢了，我解释两句他还瞪我"},
+      {"role": "assistant", "text": "这种家属最难缠，你后来怎么处理的？"},
+      {"role": "user", "text": "我懒得跟他吵，直接把护士长叫过来了。反正3床家属不好搞，科里都知道"},
+      {"role": "assistant", "text": "你躲得对，跟这种人讲道理是白讲。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u001", "kind": "fact", "text": "用户在内科七楼病房当护士，负责的3床是慢阻肺的何奶奶", "importance": 4, "keywords": ["内科七楼", "3床", "何奶奶", "慢阻肺"], "state": "active", "supersedes": ""},
+    {"id": "p09-u002", "kind": "episodic", "text": "用户8月1日白班被3床家属拍桌子指责给氧慢，后来交给护士长处理", "importance": 3, "keywords": ["3床家属", "拍桌子", "给氧", "护士长"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-08-02",
+   "sessions": [
+    {
+     "id": "p09-d02-s1",
+     "time": "23:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "明天又是夜班，我现在躺床上睡不着，脑子里全是监护仪滴滴的声音"},
+      {"role": "assistant", "text": "夜班前睡不着最要命，几点得到岗？"},
+      {"role": "user", "text": "十点，我现在数羊数到三百了还清醒。我妈今天还打电话来问我什么时候回湛江"},
+      {"role": "assistant", "text": "你妈还是想让你回老家？"},
+      {"role": "user", "text": "她说小卖部后面那间屋空着，我回去就能住。我说我在这儿有工作，她就在电话那头叹气"},
+      {"role": "assistant", "text": "这种叹气最磨人，比吵一架还累。"},
+      {"role": "user", "text": "是啊，挂了电话我更睡不着了，什么人啊，烦死"},
+      {"role": "assistant", "text": "别数羊了，闭眼躺着也算休息。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u003", "kind": "fact", "text": "用户老家在湛江，爸妈开小卖部，妈妈一直想让她回去住", "importance": 4, "keywords": ["湛江", "小卖部", "妈妈"], "state": "active", "supersedes": ""},
+    {"id": "p09-u004", "kind": "episodic", "text": "用户夜班是晚上十点到早上八点，每次上班前都睡不着", "importance": 2, "keywords": ["夜班", "晚上十点", "睡不着"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 3,
+   "date": "2026-08-03",
+   "sessions": [
+    {
+     "id": "p09-d03-s1",
+     "time": "21:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "排班表出来了，我这个月连着三个夜班，护士长是不是看我不顺眼"},
+      {"role": "assistant", "text": "连着三个夜班？人顶得住吗？"},
+      {"role": "user", "text": "顶不住也得顶，我们科的排班从来都是谁好说话就排谁"},
+      {"role": "assistant", "text": "那你跟她说过没有？"},
+      {"role": "user", "text": "说过一次，她说年轻人多担待。我真想调到急诊去，那边至少排班公平，我懒得再讲第二遍"},
+      {"role": "assistant", "text": "急诊可不比病房轻松。"},
+      {"role": "user", "text": "累我不怕，我怕的是在这儿耗着，一眼能看到十年后"},
+      {"role": "assistant", "text": "二十七岁能看到十年后，确实有点吓人。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u005", "kind": "episodic", "text": "用户8月初被排了连续三个夜班，跟护士长反映只得到「年轻人多担待」", "importance": 3, "keywords": ["排班", "连续三个夜班", "护士长"], "state": "active", "supersedes": ""},
+    {"id": "p09-u006", "kind": "fact", "text": "用户在内科病房上三班倒，最烦的是夜班一轮接一轮看不到头", "importance": 3, "keywords": ["内科病房", "三班倒", "夜班"], "state": "superseded", "supersedes": "", "superseded_by": "p09-u043"}
+   ]
+  },
+  {
+   "day": 5,
+   "date": "2026-08-05",
+   "sessions": [
+    {
+     "id": "p09-d05-s1",
+     "time": "22:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "今天二刷排球少年第三季，乌野打白鸟泽那十集我看一次哭一次"},
+      {"role": "assistant", "text": "白鸟泽那场确实经典，你最喜欢哪一球？"},
+      {"role": "user", "text": "月岛拦牛若那一球！他平时一副不关我事的样子，结果单人拦网直接把牛若按下去，第三季就十集，那一球我反复倒回去看"},
+      {"role": "assistant", "text": "月岛那一下是真封神，弹幕都得炸。"},
+      {"role": "user", "text": "我刷第三遍了还是起鸡皮疙瘩。影山那个二传我也想给他鼓掌"},
+      {"role": "assistant", "text": "你这职业滤镜有点重啊。"},
+      {"role": "user", "text": "我承认。我就吃影山这种不废话、该狠的时候狠的类型"},
+      {"role": "assistant", "text": "难怪你上夜班也这个风格，一脉相承。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u007", "kind": "preference", "text": "用户把《排球少年》刷了三遍，最爱第三季打白鸟泽那段", "importance": 3, "keywords": ["排球少年", "白鸟泽", "三遍"], "state": "active", "supersedes": ""},
+    {"id": "p09-u008", "kind": "preference", "text": "用户偏爱影山飞雄这种不废话、该狠就狠的类型，也爱月岛单人拦网那一球", "importance": 3, "keywords": ["影山飞雄", "月岛", "拦网", "二传"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 6,
+   "date": "2026-08-06",
+   "sessions": [
+    {
+     "id": "p09-d06-s1",
+     "time": "19:05",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "12床那个周叔今天又闹着要出院，糖尿病足烂到脚踝了，他还说自己能走"},
+      {"role": "assistant", "text": "糖尿病足最怕他自己下地，走两步就麻烦。"},
+      {"role": "user", "text": "我给他换药他还在那儿念叨，说我们想骗他钱。我一边换一边在心里骂他"},
+      {"role": "assistant", "text": "换药的时候还得忍着，不容易。"},
+      {"role": "user", "text": "换完我拍了照片给医生看，医生说还得再清创一次。周叔一听脸都白了"},
+      {"role": "assistant", "text": "这回总算老实了。"},
+      {"role": "user", "text": "我不烦他闹，我烦的是他一个人住院，家里人一个都没来过"},
+      {"role": "assistant", "text": "这个才是真让人心里堵的地方。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u009", "kind": "fact", "text": "用户的12床病人周叔是糖尿病足，脚踝都烂了还闹着出院", "importance": 3, "keywords": ["12床", "周叔", "糖尿病足", "出院"], "state": "active", "supersedes": ""},
+    {"id": "p09-u010", "kind": "preference", "text": "用户不怕病人闹，最见不得住院却没人来陪的", "importance": 3, "keywords": ["病人", "住院", "没人陪"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 8,
+   "date": "2026-08-08",
+   "sessions": [
+    {
+     "id": "p09-d08-s1",
+     "time": "11:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "客厅空调昨晚开始滴水，滴了一地，我跟阿May打电话给房东，房东说下周再看"},
+      {"role": "assistant", "text": "空调滴水一般是排水管堵了，先拿盆接着。"},
+      {"role": "user", "text": "已经接了三盆。阿May说要不扣这个月房租，我说先别扣，房东那个人记仇"},
+      {"role": "assistant", "text": "你们俩分工还挺清楚。"},
+      {"role": "user", "text": "她负责打嘴仗，我负责垫钱。上个月换灯管也是我先掏的钱"},
+      {"role": "assistant", "text": "房东拖习惯了就这样。"},
+      {"role": "user", "text": "烦死了，这房子我租了两年，除了涨房租他从来没积极过"},
+      {"role": "assistant", "text": "两年房东都这德行，换谁都火大。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u011", "kind": "episodic", "text": "用户8月客厅空调滴水，房东拖着说下周再看", "importance": 2, "keywords": ["空调", "滴水", "房东"], "state": "active", "supersedes": ""},
+    {"id": "p09-u012", "kind": "relation", "text": "用户和阿May合租，家里的琐事都是她先垫钱，阿May负责跟房东吵架", "importance": 3, "keywords": ["阿May", "合租", "垫钱"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 10,
+   "date": "2026-08-10",
+   "sessions": [
+    {
+     "id": "p09-d10-s1",
+     "time": "06:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "刚下夜班，凌晨三点九床那个老爷子血氧掉到八十，我跑去叫值班医生"},
+      {"role": "assistant", "text": "后来救回来了吗？"},
+      {"role": "user", "text": "救回来了，推了药上了无创，天亮的时候稳住了。我手一直是抖的"},
+      {"role": "assistant", "text": "第一次独立碰上这种事？"},
+      {"role": "user", "text": "也不算第一次，但那天夜里走廊特别静，就听见监护仪一直叫，特别吓人"},
+      {"role": "assistant", "text": "手抖是正常反应，睡一觉就好。"},
+      {"role": "user", "text": "睡不着，硬躺。我在病房待久了，觉得医生来的那几分钟太长了"},
+      {"role": "assistant", "text": "几分钟在里面跟几个钟头一样。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u013", "kind": "episodic", "text": "用户8月10日夜班凌晨三点九床病人血氧掉到八十，她跑去叫值班医生", "importance": 4, "keywords": ["夜班", "九床", "血氧", "值班医生"], "state": "active", "supersedes": ""},
+    {"id": "p09-u014", "kind": "preference", "text": "用户说夜班最难的不是累，是等医生来的那几分钟", "importance": 3, "keywords": ["夜班", "等医生", "几分钟"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 12,
+   "date": "2026-08-12",
+   "sessions": [
+    {
+     "id": "p09-d12-s1",
+     "time": "21:50",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "药屋少女的呢喃我看到第二季第九集了，猫猫试毒那段我笑死，这姑娘太对我胃口"},
+      {"role": "assistant", "text": "猫猫那种闷头干活心里骂人的性格吧？"},
+      {"role": "user", "text": "对！她不吭声，心里一套一套的，我上夜班就是这个状态"},
+      {"role": "assistant", "text": "所以你是把猫猫当自己了。"},
+      {"role": "user", "text": "我还喜欢壬氏，虽然他是个老狐狸，但对猫猫是真的上心"},
+      {"role": "assistant", "text": "这对好多人站。"},
+      {"role": "user", "text": "站，必须站。壬氏要是敢渣，我当场弃番"},
+      {"role": "assistant", "text": "行，这话我记下了，到时候看你弃不弃。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u015", "kind": "preference", "text": "用户在追《药屋少女的呢喃》，最喜欢猫猫那种闷头干活心里骂人的性格", "importance": 3, "keywords": ["药屋少女", "猫猫", "壬氏"], "state": "active", "supersedes": ""},
+    {"id": "p09-u016", "kind": "trivia", "text": "用户说壬氏要是敢渣猫猫，她当场弃番", "importance": 1, "keywords": ["壬氏", "弃番", "猫猫"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 14,
+   "date": "2026-08-14",
+   "sessions": [
+    {
+     "id": "p09-d14-s1",
+     "time": "23:15",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "说好这周不喝奶茶的，刚才夜班前又点了杯杨枝甘露，三分糖，我真是个废物"},
+      {"role": "assistant", "text": "夜班前来一杯，算续命不算破戒吧。"},
+      {"role": "user", "text": "算，我这个月体重又涨了两斤。我上个月还立过誓说要减到一百一"},
+      {"role": "assistant", "text": "护士这行作息乱，减重本来就难。"},
+      {"role": "user", "text": "难也怪我，我今天穿护士裤都有点勒。明天开始只喝美式，我说真的"},
+      {"role": "assistant", "text": "行，那我替你记着。"},
+      {"role": "user", "text": "你别记，我下周肯定又喝，我这人太了解我自己了。算了，先睡，明天白班"},
+      {"role": "assistant", "text": "睡吧，明天再说减肥的事。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u017", "kind": "episodic", "text": "用户8月14日夜班前又破戒喝了杨枝甘露，体重涨了两斤", "importance": 2, "keywords": ["杨枝甘露", "奶茶", "体重"], "state": "active", "supersedes": ""},
+    {"id": "p09-u018", "kind": "plan", "text": "用户把减肥目标定在一百一十斤，但隔三差五就破戒", "importance": 2, "keywords": ["减肥", "一百一十斤", "破戒"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 16,
+   "date": "2026-08-16",
+   "sessions": [
+    {
+     "id": "p09-d16-s1",
+     "time": "20:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈今晚视频，镜头一转就是货架，说今年夏天冰棍卖得不好"},
+      {"role": "assistant", "text": "小卖部夏天不是最旺吗？"},
+      {"role": "user", "text": "她说旁边开了家零食很忙，抢生意。我爸在旁边插一句，让我别操心，好好上班"},
+      {"role": "assistant", "text": "你爸这是心疼你。"},
+      {"role": "user", "text": "他嘴上这么说，转头就问我什么时候回去。我妈更直接，问我存了多少钱"},
+      {"role": "assistant", "text": "催钱催人，两头都催。"},
+      {"role": "user", "text": "我报了个数，她沉默了五秒，然后说广州房租那么贵不如回家。我一句话都没接"},
+      {"role": "assistant", "text": "接不下去，这种话接什么都错。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u019", "kind": "episodic", "text": "用户8月跟妈妈视频，妈妈说小卖部被新开的零食店抢了生意", "importance": 3, "keywords": ["小卖部", "零食店", "冰棍"], "state": "active", "supersedes": ""},
+    {"id": "p09-u020", "kind": "relation", "text": "用户的爸妈在湛江开小卖部，妈妈总拿广州房租贵为由劝她回家", "importance": 3, "keywords": ["爸妈", "湛江", "房租", "回家"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 18,
+   "date": "2026-08-18",
+   "sessions": [
+    {
+     "id": "p09-d18-s1",
+     "time": "17:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "医务科的人今天来找我谈话，说急诊缺人，问我愿不愿意调过去"},
+      {"role": "assistant", "text": "你不是一直想去急诊？"},
+      {"role": "user", "text": "想是想，真到这时候又有点怂。急诊节奏快，我怕我上手慢"},
+      {"role": "assistant", "text": "你内科干了三年，基本功在那儿。"},
+      {"role": "user", "text": "我也这么安慰自己。他们说调过去工资能多五六百，夜班费也高一点"},
+      {"role": "assistant", "text": "那还挺实在的。"},
+      {"role": "user", "text": "我说我考虑两天。其实心里已经有答案了，就是不敢签字"},
+      {"role": "assistant", "text": "不敢签字才是真在意，说明不是一时冲动。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u021", "kind": "episodic", "text": "用户8月18日被医务科问要不要调去急诊，说考虑两天", "importance": 4, "keywords": ["医务科", "急诊", "调岗", "考虑两天"], "state": "active", "supersedes": ""},
+    {"id": "p09-u022", "kind": "fact", "text": "用户内科干了三年，调岗去急诊工资能多五六百，夜班费也高一点", "importance": 3, "keywords": ["内科三年", "工资", "五六百", "夜班费"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 20,
+   "date": "2026-08-20",
+   "sessions": [
+    {
+     "id": "p09-d20-s1",
+     "time": "22:05",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "我今天把调岗申请交了。手抖着签的字，签完反而松了口气"},
+      {"role": "assistant", "text": "决定了？"},
+      {"role": "user", "text": "决定了。护士长脸色不太好看，说我这是撂挑子。我没顶嘴，也没解释"},
+      {"role": "assistant", "text": "这态度挺硬的。"},
+      {"role": "user", "text": "我不是硬，我是想清楚了。内科待着舒服，但舒服的地方不长本事"},
+      {"role": "assistant", "text": "这话说得像老护士。"},
+      {"role": "user", "text": "我本来想干满五年再动，现在提前两年，我也不知道对不对"},
+      {"role": "assistant", "text": "想清楚了就先走，后面再修正。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u023", "kind": "episodic", "text": "用户8月20日交了调岗申请，护士长脸色不好说她撂挑子", "importance": 4, "keywords": ["调岗申请", "护士长", "撂挑子"], "state": "active", "supersedes": ""},
+    {"id": "p09-u024", "kind": "preference", "text": "用户觉得内科待着舒服但舒服的地方不长本事，宁可去急诊", "importance": 3, "keywords": ["内科", "舒服", "长本事"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 22,
+   "date": "2026-08-22",
+   "sessions": [
+    {
+     "id": "p09-d22-s1",
+     "time": "12:15",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "护师资格考试的成绩出来了，我居然过了，四科全过，就是低分飘过那种"},
+      {"role": "assistant", "text": "过了就是过了，恭喜。"},
+      {"role": "user", "text": "我考前根本没怎么看，全靠平时翻两页。同科室小李差两分，哭了一下午"},
+      {"role": "assistant", "text": "你这运气确实好。"},
+      {"role": "user", "text": "我一点都不想考编，真的。背那些公共基础知识我头就疼，我宁可在急诊多练手"},
+      {"role": "assistant", "text": "很多人都是先干着再看。"},
+      {"role": "user", "text": "反正证到手了，我请阿May吃了顿潮汕牛肉火锅，花了二百三"},
+      {"role": "assistant", "text": "值得，过一科都值得庆祝。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u025", "kind": "episodic", "text": "用户8月22日护师资格考试四科全过，低分飘过", "importance": 4, "keywords": ["护师资格考试", "四科全过", "低分"], "state": "active", "supersedes": ""},
+    {"id": "p09-u026", "kind": "fact", "text": "用户说自己不想考编，背公共基础知识头疼，宁可在急诊练手", "importance": 3, "keywords": ["考编", "公共基础知识", "练手"], "state": "superseded", "supersedes": "", "superseded_by": "p09-u056"},
+    {"id": "p09-u027", "kind": "trivia", "text": "用户请阿May吃潮汕牛肉火锅花了二百三", "importance": 1, "keywords": ["潮汕牛肉火锅", "二百三", "阿May"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 24,
+   "date": "2026-08-24",
+   "sessions": [
+    {
+     "id": "p09-d24-s1",
+     "time": "22:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "今天排球少年看到青叶城西那场，及川彻发球的时候我起立了，太帅了"},
+      {"role": "assistant", "text": "及川那手发球确实骚。"},
+      {"role": "user", "text": "但我还是更吃影山。及川是聪明，影山是那种笨得可怕的努力"},
+      {"role": "assistant", "text": "一句话把两个人说清了。"},
+      {"role": "user", "text": "而且影山那种「我不会输」的表情，我上夜班困的时候就会想一下"},
+      {"role": "assistant", "text": "拿二次元角色续命，标准操作。"},
+      {"role": "user", "text": "我还去搜了影山的声优，想听别的作品，结果听一半就出戏了"},
+      {"role": "assistant", "text": "声优一换角色，耳朵就不认了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u028", "kind": "preference", "text": "用户夸及川彻的发球，但本命还是影山飞雄那种笨得可怕的努力", "importance": 2, "keywords": ["及川彻", "发球", "影山", "努力"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 26,
+   "date": "2026-08-26",
+   "sessions": [
+    {
+     "id": "p09-d26-s1",
+     "time": "19:50",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "今天交房租，3400，我出1700。转完账余额只剩四百多，我先活到发工资，烦死了"},
+      {"role": "assistant", "text": "就剩四百？那这两天怎么吃？"},
+      {"role": "user", "text": "食堂啊，我们医院食堂一顿八块，我能一直吃到发薪日"},
+      {"role": "assistant", "text": "行，也算能扛。"},
+      {"role": "user", "text": "阿May还要我陪她去退空调那笔钱，我说你去吧，我上夜班，我实在没力气吵"},
+      {"role": "assistant", "text": "那笔维修费还没退？"},
+      {"role": "user", "text": "退了八十，房东说算他让一步。我心想你让个屁"},
+      {"role": "assistant", "text": "八十块还让一步，脸皮够厚的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u029", "kind": "fact", "text": "用户和阿May合租两房，这个月交房租3400，她出1700", "importance": 3, "keywords": ["房租", "3400", "1700", "阿May"], "state": "active", "supersedes": ""},
+    {"id": "p09-u030", "kind": "episodic", "text": "用户8月底交完房租卡里只剩四百多，靠食堂一顿八块撑到发工资", "importance": 2, "keywords": ["四百多", "食堂", "发工资"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 28,
+   "date": "2026-08-28",
+   "sessions": [
+    {
+     "id": "p09-d28-s1",
+     "time": "03:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "昨晚宵夜吃了麻辣烫又灌了杯冰的，凌晨开始上吐下泻，我现在自己给自己补液"},
+      {"role": "assistant", "text": "你这是急性肠胃炎了，别硬扛。"},
+      {"role": "user", "text": "我自己就是护士，我知道该干嘛。口服补液盐一包冲了，先看能不能压住"},
+      {"role": "assistant", "text": "上吐下泻还上着班？"},
+      {"role": "user", "text": "今天休息。我要是上班早去挂水了，我们科的床位不用白不用"},
+      {"role": "assistant", "text": "你这职业优势都用在这种地方。"},
+      {"role": "user", "text": "我妈要是知道我一个人在这儿烧到三十八度，肯定又劝我回家"},
+      {"role": "assistant", "text": "那就别让她知道，先把自己弄好。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u031", "kind": "episodic", "text": "用户8月28日吃麻辣烫加冰饮得了肠胃炎，凌晨上吐下泻自己补液", "importance": 3, "keywords": ["麻辣烫", "肠胃炎", "口服补液盐"], "state": "active", "supersedes": ""},
+    {"id": "p09-u032", "kind": "fact", "text": "用户发烧到三十八度也不告诉家里，怕妈妈又劝她回家", "importance": 3, "keywords": ["三十八度", "发烧", "妈妈"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 30,
+   "date": "2026-08-30",
+   "sessions": [
+    {
+     "id": "p09-d30-s1",
+     "time": "08:15",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "内科最后一个夜班结束了。熬到早上七点交完班，我在值班室坐了一会儿"},
+      {"role": "assistant", "text": "什么感觉？"},
+      {"role": "user", "text": "有点像毕业。这层楼我走了三年，哪个病人夜里咳两声我都知道是谁"},
+      {"role": "assistant", "text": "走之前去看3床了没？"},
+      {"role": "user", "text": "去了。何奶奶拉着我的手说姑娘你别走，我说我去楼下上班，还在一个医院"},
+      {"role": "assistant", "text": "这一句挺戳人的。"},
+      {"role": "user", "text": "我出门差点哭。心想以后再也不回来蹭内科的微波炉了"},
+      {"role": "assistant", "text": "微波炉都成念想了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u033", "kind": "episodic", "text": "用户8月30日上完内科最后一个夜班，去跟3床何奶奶告别", "importance": 4, "keywords": ["内科", "最后一个夜班", "3床", "告别"], "state": "active", "supersedes": ""},
+    {"id": "p09-u034", "kind": "preference", "text": "用户最受不了病人拉着她的手说别走，出门差点哭", "importance": 3, "keywords": ["病人", "拉着", "别走", "差点哭"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 31,
+   "date": "2026-08-31",
+   "sessions": [
+    {
+     "id": "p09-d31-s1",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "小邹今天说他深圳那边辞职了，下个月回广州，我听完第一反应是慌"},
+      {"role": "assistant", "text": "慌什么？"},
+      {"role": "user", "text": "我们异地两年了，本来一个月见两次，现在要天天见，我不太确定"},
+      {"role": "assistant", "text": "这是好事吧，两个人总算能在一起。"},
+      {"role": "user", "text": "理智上是的。可他回来就要租房同居，我这儿跟阿May合租呢"},
+      {"role": "assistant", "text": "那你打算怎么办？"},
+      {"role": "user", "text": "先看房吧，他说他出大头。我心里还是打鼓，但没跟他说"},
+      {"role": "assistant", "text": "小邹这人靠谱吗？"},
+      {"role": "user", "text": "靠谱，就是太顺着他妈。这个以后再说吧"},
+      {"role": "assistant", "text": "那先看房，一步一步来。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u035", "kind": "episodic", "text": "用户男友小邹8月底辞了深圳的工作，9月回广州", "importance": 4, "keywords": ["小邹", "深圳", "辞职", "回广州"], "state": "active", "supersedes": ""},
+    {"id": "p09-u036", "kind": "plan", "text": "用户和小邹打算9月找房同居，说好小邹出大头", "importance": 3, "keywords": ["找房", "同居", "出大头"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 33,
+   "date": "2026-09-02",
+   "sessions": [
+    {
+     "id": "p09-d33-s1",
+     "time": "18:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "排班表贴出来了，我下周一去急诊报到。最后这周在内科带新人"},
+      {"role": "assistant", "text": "9月8号？"},
+      {"role": "user", "text": "对，8号。护士长让我把交班本整理一下，我一看那本子密密麻麻，全是我的字"},
+      {"role": "assistant", "text": "还挺有仪式感。"},
+      {"role": "user", "text": "带的新人是个刚毕业的本科生，问我内科是不是很闲。我笑了，没说话"},
+      {"role": "assistant", "text": "她干一个月就知道了。"},
+      {"role": "user", "text": "我让她第一周先把所有药名背下来，她眼睛都直了"},
+      {"role": "assistant", "text": "你这个带教方式够狠。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u037", "kind": "plan", "text": "用户9月8号到急诊报到，最后一周留在内科带新人", "importance": 3, "keywords": ["急诊报到", "9月8号", "带新人"], "state": "active", "supersedes": ""},
+    {"id": "p09-u038", "kind": "trivia", "text": "用户带的新人是刚毕业的本科生，被她要求第一周背药名", "importance": 2, "keywords": ["新人", "本科生", "背药名"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 35,
+   "date": "2026-09-04",
+   "sessions": [
+    {
+     "id": "p09-d35-s1",
+     "time": "20:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "小邹今天到广州了，拖着两个箱子站在我医院楼下，我下班看见他就笑了"},
+      {"role": "assistant", "text": "比想的顺利？"},
+      {"role": "user", "text": "比想的顺利。我们去员村吃了顿猪脚饭，他说广州的房租比他想的贵"},
+      {"role": "assistant", "text": "那是真贵。"},
+      {"role": "user", "text": "看了三套，两套朝北，一套在七楼没电梯。他腿都爬软了"},
+      {"role": "assistant", "text": "你们打算定哪套？"},
+      {"role": "user", "text": "还没定。他说宁可多花三百也要电梯，我说行，你出钱你说话"},
+      {"role": "assistant", "text": "这配合不错，一个出钱一个点头。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u039", "kind": "episodic", "text": "用户9月4日接小邹到广州，一起在员村吃猪脚饭又看了三套房", "importance": 3, "keywords": ["小邹", "员村", "猪脚饭", "看房"], "state": "active", "supersedes": ""},
+    {"id": "p09-u040", "kind": "fact", "text": "用户看的三套房两套朝北，一套在七楼没电梯", "importance": 2, "keywords": ["三套房", "朝北", "七楼", "电梯"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 37,
+   "date": "2026-09-06",
+   "sessions": [
+    {
+     "id": "p09-d37-s1",
+     "time": "16:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "今天收拾东西，才发现我在这间房攒了三个纸箱的书和一个柜子，我服了自己"},
+      {"role": "assistant", "text": "三年攒这么多，正常。"},
+      {"role": "user", "text": "最麻烦的是我那套排球少年漫画，不敢打包，怕磕角"},
+      {"role": "assistant", "text": "那就自己抱着走。"},
+      {"role": "user", "text": "我就是这么想的。阿May说以后这间房租出去，房租能涨两百"},
+      {"role": "assistant", "text": "她这是有点舍不得吧。"},
+      {"role": "user", "text": "她嘴上算账，其实眼睛红了。我说我就搬两个站，你哭什么"},
+      {"role": "assistant", "text": "两个站也是不一起住了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u041", "kind": "relation", "text": "用户9月收拾东西搬出和阿May合租的房子，阿May嘴上算账其实舍不得", "importance": 3, "keywords": ["阿May", "搬家", "合租", "舍不得"], "state": "active", "supersedes": ""},
+    {"id": "p09-u042", "kind": "fact", "text": "用户有一整套排球少年漫画，搬的时候怕磕角", "importance": 2, "keywords": ["排球少年", "漫画", "磕角"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 39,
+   "date": "2026-09-08",
+   "sessions": [
+    {
+     "id": "p09-d39-s1",
+     "time": "23:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "急诊第一天。报到两个小时就来了个车祸伤员，我整个人是懵的，跟着老师跑"},
+      {"role": "assistant", "text": "第一天就上车祸，够呛。"},
+      {"role": "user", "text": "老师让我负责清创，我手很稳，稳完才发现自己后背全湿了"},
+      {"role": "assistant", "text": "手稳就说明你没慌。"},
+      {"role": "user", "text": "我从内科调到急诊，本来以为跟不上，结果发现自己还行"},
+      {"role": "assistant", "text": "内科三年不是白待的。"},
+      {"role": "user", "text": "就是急诊的家属比病房凶十倍，走廊上全是人，喊得我耳朵疼"},
+      {"role": "assistant", "text": "慢慢就习惯了，先保住手稳。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u043", "kind": "update", "text": "用户9月8日从内科正式调到急诊科，第一天就跟着处理车祸伤员", "importance": 5, "keywords": ["调到急诊", "车祸伤员", "清创", "急诊第一天"], "state": "active", "supersedes": "p09-u006"},
+    {"id": "p09-u044", "kind": "episodic", "text": "用户急诊第一天手很稳，处理完才发现后背全湿了", "importance": 3, "keywords": ["手很稳", "后背", "全湿了"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 41,
+   "date": "2026-09-10",
+   "sessions": [
+    {
+     "id": "p09-d41-s1",
+     "time": "08:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "急诊第二天就碰上一个醉酒摔破头的，缝完针他非要跟我握手，说要认我当姐"},
+      {"role": "assistant", "text": "醉汉的江湖义气。"},
+      {"role": "user", "text": "我手上还戴着血手套，只能躲。他老婆在旁边一直道歉"},
+      {"role": "assistant", "text": "你这一天够热闹的。"},
+      {"role": "user", "text": "热闹是热闹，但急诊比内科爽多了，处理完就走，不用听家属念三天"},
+      {"role": "assistant", "text": "各有各的累。"},
+      {"role": "user", "text": "累我也不后悔。我现在下班腿是软的，脑子是清楚的"},
+      {"role": "assistant", "text": "脑子清楚比什么都强。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u045", "kind": "episodic", "text": "用户9月10日在急诊遇到醉酒摔破头的病人，缝完针要认她当姐", "importance": 2, "keywords": ["醉酒", "摔破头", "缝针", "认姐"], "state": "active", "supersedes": ""},
+    {"id": "p09-u046", "kind": "preference", "text": "用户觉得急诊比内科爽，处理完就走，不用听家属念三天", "importance": 3, "keywords": ["急诊", "内科", "处理完就走"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 43,
+   "date": "2026-09-12",
+   "sessions": [
+    {
+     "id": "p09-d43-s1",
+     "time": "21:15",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "排球少年十周年画册的预售公告出来了，签名版只有三百本，10月3号开抢"},
+      {"role": "assistant", "text": "三百本？那得蹲点守着。"},
+      {"role": "user", "text": "我已经设了三个闹钟。上次漫画周边我手慢了一分钟就没抢到，我记到现在"},
+      {"role": "assistant", "text": "这次的执念可以理解。"},
+      {"role": "user", "text": "主要是我刷了三遍动画，总得留个实物。阿May说我有病，一本画册四百多"},
+      {"role": "assistant", "text": "你自己觉得值吗？"},
+      {"role": "user", "text": "值。我一想到影山那个发球，这四百多就不算钱"},
+      {"role": "assistant", "text": "行，那到时候抢不到别哭。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u047", "kind": "plan", "text": "用户打算10月3日抢排球少年十周年画册签名版，只三百本", "importance": 3, "keywords": ["十周年画册", "签名版", "10月3号", "三百本"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 45,
+   "date": "2026-09-14",
+   "sessions": [
+    {
+     "id": "p09-d45-s1",
+     "time": "19:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "搬完了。新房子在六楼有电梯，我东西摊了一客厅，小邹在装晾衣杆"},
+      {"role": "assistant", "text": "总算落定了。"},
+      {"role": "user", "text": "从今天开始我跟小邹就算同居了。晚上他做饭，炒了个番茄鸡蛋，盐放多了"},
+      {"role": "assistant", "text": "第一次做饭手下没数。"},
+      {"role": "user", "text": "我吃完没说难吃，他自己尝了一口，脸都皱了，我笑死"},
+      {"role": "assistant", "text": "这日子听着还行。"},
+      {"role": "user", "text": "我有点不习惯，两个人一张床，半夜翻身怕吵到他。以前一个人怎么滚都行"},
+      {"role": "assistant", "text": "适应期，过两周就好了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u048", "kind": "fact", "text": "用户9月14日和小邹搬进新房同居", "importance": 4, "keywords": ["小邹", "同居", "搬进新房"], "state": "superseded", "supersedes": "", "superseded_by": "p09-u086"},
+    {"id": "p09-u049", "kind": "episodic", "text": "用户同居第一晚小邹炒番茄鸡蛋盐放多了", "importance": 2, "keywords": ["番茄鸡蛋", "盐放多了", "同居"], "state": "active", "supersedes": ""},
+    {"id": "p09-u091", "kind": "fact", "text": "用户和小邹同居的新房在六楼，有电梯", "importance": 2, "keywords": ["新房", "六楼", "有电梯"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 47,
+   "date": "2026-09-16",
+   "sessions": [
+    {
+     "id": "p09-d47-s1",
+     "time": "22:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天急诊收了个八十多的老太太，在家摔了一跤，髋部骨折，家里人第二天才发现"},
+      {"role": "assistant", "text": "独居老人最怕这个。"},
+      {"role": "user", "text": "她躺了一天，自己爬不起来，是邻居闻到味道去敲门的。我给她换衣服的时候手都轻"},
+      {"role": "assistant", "text": "听着就难受。"},
+      {"role": "user", "text": "我们科这种病人特别多。老太太一直说对不起麻烦你们，我说别说话，你好好躺着"},
+      {"role": "assistant", "text": "你这句说得很软。"},
+      {"role": "user", "text": "我凶是凶惯了，但这种时候我真的凶不出来，我不理解我自己"},
+      {"role": "assistant", "text": "凶不出来才是正常的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u050", "kind": "episodic", "text": "用户9月16日急诊收了个独居老太太，在家摔了一天被邻居发现", "importance": 3, "keywords": ["独居老人", "髋部骨折", "邻居"], "state": "active", "supersedes": ""},
+    {"id": "p09-u051", "kind": "preference", "text": "用户说自己平时凶，但碰上一直道歉的病人就凶不出来", "importance": 2, "keywords": ["凶", "道歉", "病人"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 49,
+   "date": "2026-09-18",
+   "sessions": [
+    {
+     "id": "p09-d49-s1",
+     "time": "18:40",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "新房子宽带还没装，我这两天全靠手机热点，流量烧得比我工资还快"},
+      {"role": "assistant", "text": "装宽带的排队了？"},
+      {"role": "user", "text": "约了周六，师傅说要收一百二的调测费，我说这不是含在套餐里吗"},
+      {"role": "assistant", "text": "一般都要另收。"},
+      {"role": "user", "text": "洗衣机也是二手的，小邹在楼下搬的时候闪了腰，现在趴床上不肯动"},
+      {"role": "assistant", "text": "这第一周就开始折旧了。"},
+      {"role": "user", "text": "我笑他，他说我幸灾乐祸。我说我这是关心"},
+      {"role": "assistant", "text": "你这种关心法，谁听都得笑。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u052", "kind": "episodic", "text": "用户9月新家宽带约了周六装，师傅要收一百二调测费", "importance": 2, "keywords": ["宽带", "调测费", "一百二"], "state": "active", "supersedes": ""},
+    {"id": "p09-u053", "kind": "episodic", "text": "用户和小邹搬二手洗衣机，小邹闪了腰趴床上不动", "importance": 2, "keywords": ["二手洗衣机", "闪了腰", "小邹"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 51,
+   "date": "2026-09-20",
+   "sessions": [
+    {
+     "id": "p09-d51-s1",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈知道我跟小邹同居了，电话里沉默了半分钟，然后问我什么时候领证"},
+      {"role": "assistant", "text": "跳得有点快。"},
+      {"role": "user", "text": "我说才刚住一起。她说没名没分住一起像什么话，我听完火一下就上来"},
+      {"role": "assistant", "text": "老一辈就这样。"},
+      {"role": "user", "text": "我说妈你别管，她就把电话给我爸。我爸只说了一句你自己想清楚，就挂了"},
+      {"role": "assistant", "text": "你爸倒是给空间。"},
+      {"role": "user", "text": "我爸那人就这样，越是这样我越难受。挂了电话我在阳台站了十分钟"},
+      {"role": "assistant", "text": "骂你两句你可能还好受点。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u054", "kind": "episodic", "text": "用户9月妈妈知道她和人同居，电话里质问她什么时候领证", "importance": 3, "keywords": ["妈妈", "同居", "领证"], "state": "active", "supersedes": ""},
+    {"id": "p09-u055", "kind": "relation", "text": "用户的爸爸不劝她，只说让她自己想清楚，她反而更难受", "importance": 3, "keywords": ["爸爸", "想清楚", "阳台"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 53,
+   "date": "2026-09-22",
+   "sessions": [
+    {
+     "id": "p09-d53-s1",
+     "time": "23:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "我今天报了区卫健系统的编制考试，护理岗，招六个。报完我自己都笑了"},
+      {"role": "assistant", "text": "你不是说不考吗？"},
+      {"role": "user", "text": "我改主意了。急诊干了一个月，我看到那些四十岁的老师还在熬通宵，我怕了"},
+      {"role": "assistant", "text": "所以是想要个稳定。"},
+      {"role": "user", "text": "对，我承认。我原来觉得考编是认输，现在觉得是给自己留条后路"},
+      {"role": "assistant", "text": "这不算认输。"},
+      {"role": "user", "text": "考试在10月11号，我现在开始看书，公共基础知识那本厚得能砸人"},
+      {"role": "assistant", "text": "厚是厚，拆开一章一章啃。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u056", "kind": "update", "text": "用户9月22日报了区卫健系统编制的护理岗，决定考编", "importance": 5, "keywords": ["考编", "区卫健系统", "护理岗", "10月11号"], "state": "active", "supersedes": "p09-u026"},
+    {"id": "p09-u057", "kind": "episodic", "text": "用户说自己在急诊看到四十岁的老师还在熬通宵，所以怕了", "importance": 3, "keywords": ["四十岁", "老师", "熬通宵"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 56,
+   "date": "2026-09-25",
+   "sessions": [
+    {
+     "id": "p09-d56-s1",
+     "time": "23:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "白班下了之后看公共基础知识，看到十一点，眼睛都是花的，明天还要上夜班"},
+      {"role": "assistant", "text": "一天能挤多少时间出来？"},
+      {"role": "user", "text": "通勤地铁上听网课，回来吃饭的时候翻两页，实在困就趴十分钟"},
+      {"role": "assistant", "text": "你这复习法挺硬核。"},
+      {"role": "user", "text": "硬核也背不进啊。我今天看到事业单位人事管理条例，看到第三遍还是不记得"},
+      {"role": "assistant", "text": "要背的东西都这样。"},
+      {"role": "user", "text": "我有时候想，就算考上了，是不是也还是上夜班，只是多个编制，我不理解"},
+      {"role": "assistant", "text": "编制不解决夜班，只解决心里没底。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u058", "kind": "episodic", "text": "用户9月一边上夜班一边复习考编，通勤地铁上听网课", "importance": 3, "keywords": ["复习", "通勤", "听网课", "考编"], "state": "active", "supersedes": ""},
+    {"id": "p09-u059", "kind": "preference", "text": "用户怀疑考上编也还是上夜班，只是多个编制", "importance": 2, "keywords": ["编制", "夜班", "怀疑"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 58,
+   "date": "2026-09-27",
+   "sessions": [
+    {
+     "id": "p09-d58-s1",
+     "time": "22:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "今晚三刷排球少年青城战，及川最后那个发球出界我居然还是难受"},
+      {"role": "assistant", "text": "及川那条线太苦了。"},
+      {"role": "user", "text": "他明明那么强，就是进不了全国。我看到他笑着说恭喜的时候，心里堵"},
+      {"role": "assistant", "text": "所以你还是希望他赢一次。"},
+      {"role": "user", "text": "我希望。但影山必须赢，这俩我都能理解，就是没法都满足"},
+      {"role": "assistant", "text": "你这纠结得挺真实。"},
+      {"role": "user", "text": "我还跟小邹讲了半天，他听完说这不就是个打排球的，我差点跟他吵"},
+      {"role": "assistant", "text": "不懂的人一句话就能把人惹炸。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u060", "kind": "preference", "text": "用户三刷排球少年青城战，为及川彻总是进不了全国难受", "importance": 2, "keywords": ["青城战", "及川彻", "全国"], "state": "active", "supersedes": ""},
+    {"id": "p09-u061", "kind": "relation", "text": "用户跟小邹讲排球少年，被说这不就是个打排球的，差点吵起来", "importance": 2, "keywords": ["小邹", "排球", "差点吵"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 61,
+   "date": "2026-09-30",
+   "sessions": [
+    {
+     "id": "p09-d61-s1",
+     "time": "20:15",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "月底了，这个月到手七千三，房租我出两千一，加上吃饭，能存一千多"},
+      {"role": "assistant", "text": "存一千多已经算不错了。"},
+      {"role": "user", "text": "我算的是存活，不是存钱。我打算明年要是考不上，就攒钱报个班"},
+      {"role": "assistant", "text": "你还挺有规划。"},
+      {"role": "user", "text": "规划个鬼。今天阿May发消息说她那房子找好新室友了，问我什么时候回去做客"},
+      {"role": "assistant", "text": "她这是把你当自家人。"},
+      {"role": "user", "text": "我看那条消息看了半天，说不清什么感觉，反正有点想她"},
+      {"role": "assistant", "text": "那就找天回去吃顿饭。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u062", "kind": "fact", "text": "用户9月到手七千三，房租出两千一，能存一千多", "importance": 3, "keywords": ["到手七千三", "房租", "两千一", "存钱"], "state": "active", "supersedes": ""},
+    {"id": "p09-u063", "kind": "relation", "text": "用户搬走后阿May找到了新室友，还叫她回去做客", "importance": 2, "keywords": ["阿May", "新室友", "做客"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 62,
+   "date": "2026-10-01",
+   "sessions": [
+    {
+     "id": "p09-d62-s1",
+     "time": "09:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "国庆我上四天班，急诊不放假。朋友圈全在晒旅游，我今天真的想辞职"},
+      {"role": "assistant", "text": "医院就这样，节假日最忙。"},
+      {"role": "user", "text": "我妈问我回不回去，我说回不去。她说那她和我爸来广州玩两天"},
+      {"role": "assistant", "text": "那也挺好。"},
+      {"role": "user", "text": "我让他们别来，我上班没人陪。她说不用陪，就是想看看我住的地方"},
+      {"role": "assistant", "text": "这句话你想拒绝也难。"},
+      {"role": "user", "text": "我最后说行吧，你们来。挂了电话我就开始收拾屋子，烦"},
+      {"role": "assistant", "text": "嘴上嫌烦，手上收拾得比谁都快。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u064", "kind": "episodic", "text": "用户国庆要上四天班，爸妈说要来广州看她住的地方", "importance": 3, "keywords": ["国庆", "四天班", "爸妈"], "state": "active", "supersedes": ""},
+    {"id": "p09-u065", "kind": "fact", "text": "用户想辞职又不敢，怕辞了什么都没有", "importance": 3, "keywords": ["辞职", "不敢", "什么都没有"], "state": "superseded", "supersedes": "", "superseded_by": "p09-u088"}
+   ]
+  },
+  {
+   "day": 64,
+   "date": "2026-10-03",
+   "sessions": [
+    {
+     "id": "p09-d64-s1",
+     "time": "10:20",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "抢到了！排球少年十周年画册签名版！三百本我抢到第八十七本"},
+      {"role": "assistant", "text": "可以啊，手速可以。"},
+      {"role": "user", "text": "我提前十分钟守着，倒计时一结束就点，页面卡了两秒我心脏都要停了"},
+      {"role": "assistant", "text": "卡那一下最吓人。"},
+      {"role": "user", "text": "付款完我截图发群里，群里马上有人出一千二收，我没卖"},
+      {"role": "assistant", "text": "当然不卖。"},
+      {"role": "user", "text": "我上夜班攒的钱，就为这个。等书到了我要包书皮"},
+      {"role": "assistant", "text": "包书皮这仪式感，够可以。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u066", "kind": "episodic", "text": "用户10月3日抢到排球少年十周年画册的签名版，是第87本", "importance": 3, "keywords": ["排球少年", "签名版", "第87本", "抢到"], "state": "active", "supersedes": ""},
+    {"id": "p09-u067", "kind": "trivia", "text": "用户抢到画册后有人出一千二收，她没卖", "importance": 2, "keywords": ["一千二", "收", "没卖"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 66,
+   "date": "2026-10-05",
+   "sessions": [
+    {
+     "id": "p09-d66-s1",
+     "time": "23:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天跟小邹大吵了一架，起因是他说我下班回家不说话，脸臭得像谁欠我钱"},
+      {"role": "assistant", "text": "你下班确实不太爱说话。"},
+      {"role": "user", "text": "我上十二个小时班，回家就想安静二十分钟，这很难理解吗？他说我把他当空气"},
+      {"role": "assistant", "text": "两个人都没错，就是没对上。"},
+      {"role": "user", "text": "他说他在深圳的时候我不是这样的。我说那是因为那时候我们一个月见两次"},
+      {"role": "assistant", "text": "这句挺伤人。"},
+      {"role": "user", "text": "我知道伤人，我还是说了。说完我们都不讲话，他睡沙发去了，烦死了"},
+      {"role": "assistant", "text": "明天都消消气吧。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u068", "kind": "episodic", "text": "用户10月5日跟小邹大吵，起因是小邹说她下班回家脸臭不说话", "importance": 3, "keywords": ["小邹", "吵架", "脸臭", "沙发"], "state": "active", "supersedes": ""},
+    {"id": "p09-u069", "kind": "preference", "text": "用户觉得一个月见两次和天天住一起完全是两回事", "importance": 3, "keywords": ["一个月见两次", "住一起", "两回事"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 68,
+   "date": "2026-10-07",
+   "sessions": [
+    {
+     "id": "p09-d68-s1",
+     "time": "19:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天急诊来个四岁的小孩，把奶奶的降压药当糖吃了，送来的时候我们已经给他洗胃"},
+      {"role": "assistant", "text": "洗胃，孩子得多遭罪。"},
+      {"role": "user", "text": "他一直哭，我按着他，他奶奶在旁边哭得比我还用力"},
+      {"role": "assistant", "text": "这种家属最可怜。"},
+      {"role": "user", "text": "我一边按一边跟小孩说数到十就好，数到七他就停了，我还挺得意"},
+      {"role": "assistant", "text": "你哄孩子有一套。"},
+      {"role": "user", "text": "我后来才知道那药是硝苯地平，吃多了血压能掉到没有。他妈妈赶到的时候一直骂奶奶，我把她拦下来了，说先看孩子"},
+      {"role": "assistant", "text": "那真是差点出大事。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u070", "kind": "episodic", "text": "用户10月7日急诊给四岁误服降压药的小孩洗胃", "importance": 3, "keywords": ["误服", "洗胃", "硝苯地平"], "state": "active", "supersedes": ""},
+    {"id": "p09-u071", "kind": "trivia", "text": "用户哄小孩说数到十就好，数到七那孩子就停了", "importance": 1, "keywords": ["数到十", "小孩", "停了"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 71,
+   "date": "2026-10-10",
+   "sessions": [
+    {
+     "id": "p09-d71-s1",
+     "time": "22:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "明天考试。我现在把书摊在床上，一个字都看不进去，心跳得厉害"},
+      {"role": "assistant", "text": "复习多久了？"},
+      {"role": "user", "text": "三周，下了班就看。公共基础知识只背了一半，我估计悬"},
+      {"role": "assistant", "text": "明天先做会的。"},
+      {"role": "user", "text": "我今天夜班还接了五个，回家已经七点了。我要是不去考，报名费也白交"},
+      {"role": "assistant", "text": "去考，就当练手。"},
+      {"role": "user", "text": "行吧。我明天七点半出门，考完直接回来睡觉，什么都不想"},
+      {"role": "assistant", "text": "就这么定，别再看书了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u072", "kind": "episodic", "text": "用户10月11日考编笔试，前一晚书摊在床上看不进去", "importance": 3, "keywords": ["笔试", "报名费", "看不进去"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 73,
+   "date": "2026-10-12",
+   "sessions": [
+    {
+     "id": "p09-d73-s1",
+     "time": "23:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天有个病人没救回来。四十二岁，男的，胸痛半小时送来，主动脉夹层"},
+      {"role": "assistant", "text": "你还好吗？"},
+      {"role": "user", "text": "我们按压了四十分钟，肾上腺素推了六支，他的心电图最后还是成了一条线"},
+      {"role": "assistant", "text": "这种送来就晚了，谁也没办法。"},
+      {"role": "user", "text": "他老婆在门外一直问我们能不能再试试，我出去跟她说的时候，一句话都说不完整"},
+      {"role": "assistant", "text": "你不用说得完整。"},
+      {"role": "user", "text": "我现在坐在更衣室，手上有一股味道洗不掉。我今天考完试还挺高兴的"},
+      {"role": "assistant", "text": "这落差太大了。"},
+      {"role": "user", "text": "我明天还要上班。我不知道我明天怎么面对下一个胸痛的病人"},
+      {"role": "assistant", "text": "明天先只管手上这一件事。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u073", "kind": "episodic", "text": "用户10月12日抢救一个四十二岁的主动脉夹层病人，按压四十分钟没救回来", "importance": 5, "keywords": ["主动脉夹层", "四十二岁", "按压", "没救回来"], "state": "active", "supersedes": ""},
+    {"id": "p09-u074", "kind": "episodic", "text": "用户出去通知家属时一句话都说不完整，坐在更衣室闻到手上味道洗不掉", "importance": 4, "keywords": ["家属", "说不完整", "更衣室"], "state": "active", "supersedes": ""},
+    {"id": "p09-u075", "kind": "preference", "text": "用户不知道第二天怎么面对下一个胸痛的病人", "importance": 4, "keywords": ["胸痛", "病人", "不知道怎么面对"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 75,
+   "date": "2026-10-14",
+   "sessions": [
+    {
+     "id": "p09-d75-s1",
+     "time": "21:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "阿May昨晚打电话来，我一句话没说就开始哭，哭了十几分钟"},
+      {"role": "assistant", "text": "憋两天了。"},
+      {"role": "user", "text": "我之前觉得抢救失败离我很远，内科三年我送走的病人也不少，但都是老病号"},
+      {"role": "assistant", "text": "这个太年轻了。"},
+      {"role": "user", "text": "四十二岁。他儿子跟我差不多大。我一直在想他老婆站在门口的样子"},
+      {"role": "assistant", "text": "这不是你的错。"},
+      {"role": "user", "text": "我知道。但这句话我自己说不出来，你们说我才听得进去"},
+      {"role": "assistant", "text": "那就多听几遍，听到了为止。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u076", "kind": "episodic", "text": "用户10月14日给阿May打电话，一句话没说就哭，哭了十几分钟", "importance": 3, "keywords": ["阿May", "电话", "十几分钟"], "state": "active", "supersedes": ""},
+    {"id": "p09-u077", "kind": "preference", "text": "用户说内科送走的都是老病号，这次四十二岁还年轻让她过不去", "importance": 4, "keywords": ["老病号", "四十二岁", "年轻", "过不去"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 78,
+   "date": "2026-10-17",
+   "sessions": [
+    {
+     "id": "p09-d78-s1",
+     "time": "22:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "这两天我把药屋少女呢喃重新翻出来看，猫猫在药房里一句话不说，我居然看哭了"},
+      {"role": "assistant", "text": "这部这么治愈吗？"},
+      {"role": "user", "text": "不是治愈，是她那种事情做完再说的劲。我这几天就靠这个劲撑着上班"},
+      {"role": "assistant", "text": "你这算拿角色当药。"},
+      {"role": "user", "text": "我还想起排球少年里影山说我要变强，以前觉得热血，现在觉得这四个字很沉"},
+      {"role": "assistant", "text": "长大了看同一句话就是不一样。"},
+      {"role": "user", "text": "我打算明天去剪头发，剪短，及耳那种。人总得有点变化"},
+      {"role": "assistant", "text": "剪短挺好的，好洗好吹。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u078", "kind": "preference", "text": "用户10月靠药屋少女里猫猫那股劲撑着上班，看哭了", "importance": 3, "keywords": ["药屋少女", "猫猫", "那股劲", "看哭"], "state": "active", "supersedes": ""},
+    {"id": "p09-u079", "kind": "plan", "text": "用户打算去剪头发，剪成及耳那种短发", "importance": 2, "keywords": ["剪头发", "及耳", "短发"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 80,
+   "date": "2026-10-19",
+   "sessions": [
+    {
+     "id": "p09-d80-s1",
+     "time": "18:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "护士长今天把我叫到办公室，说我这两周精神状态不对，问我要不要请假"},
+      {"role": "assistant", "text": "她看出来了。"},
+      {"role": "user", "text": "我说不用。她说不是问我能不能扛，是问我需不需要有人分担"},
+      {"role": "assistant", "text": "这个护士长可以。"},
+      {"role": "user", "text": "我愣了半天，说那给我排两天白班吧，别排夜班。她说好"},
+      {"role": "assistant", "text": "你这算让步了。"},
+      {"role": "user", "text": "我以前觉得示弱就是输了。现在我累得懒得赢"},
+      {"role": "assistant", "text": "懒得赢这三个字，听着就知道你有多累。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u080", "kind": "episodic", "text": "用户10月19日被护士长说精神状态不对，要求先排两天白班", "importance": 3, "keywords": ["护士长", "精神状态", "两天白班"], "state": "active", "supersedes": ""},
+    {"id": "p09-u081", "kind": "preference", "text": "用户以前觉得示弱就是输了，现在累得懒得赢", "importance": 3, "keywords": ["示弱", "输了", "懒得赢"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 83,
+   "date": "2026-10-22",
+   "sessions": [
+    {
+     "id": "p09-d83-s1",
+     "time": "23:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "小邹跟我冷战三天了。他不吵，就是把饭做好放桌上，自己进房间"},
+      {"role": "assistant", "text": "这种冷战最熬人。"},
+      {"role": "user", "text": "我宁愿他骂我两句。我今天收拾桌子，看见他给我留的那份汤居然还热着"},
+      {"role": "assistant", "text": "他其实在等你开口。"},
+      {"role": "user", "text": "我知道。我一开口就要说分手，所以我不开口"},
+      {"role": "assistant", "text": "你已经想到了。"},
+      {"role": "user", "text": "我这两天一直在想，我们是不是就适合异地。离得远的时候什么都好说"},
+      {"role": "assistant", "text": "离得远，很多事可以不用面对。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u082", "kind": "episodic", "text": "用户10月下旬和小邹冷战三天，他做好饭放桌上，还给她留了一份汤", "importance": 3, "keywords": ["冷战", "做好饭", "一份汤"], "state": "active", "supersedes": ""},
+    {"id": "p09-u083", "kind": "preference", "text": "用户觉得自己和小邹可能只适合异地，离得远什么都好说", "importance": 3, "keywords": ["异地", "离得远", "好说"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 86,
+   "date": "2026-10-25",
+   "sessions": [
+    {
+     "id": "p09-d86-s1",
+     "time": "20:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "考编成绩出来了，我差三分进面。招六个，我排第八，就差三分"},
+      {"role": "assistant", "text": "差三分，太难受了。"},
+      {"role": "user", "text": "我看完成绩单居然没哭。可能前两天那个病人把我哭完了"},
+      {"role": "assistant", "text": "你这心态有点吓人。"},
+      {"role": "user", "text": "我在急诊走廊站了一会儿，然后回去接了三个病人。就这么过了"},
+      {"role": "assistant", "text": "你自己消化了。"},
+      {"role": "user", "text": "我妈知道了，说差三分就是没缘分，让我明年再考。我说好"},
+      {"role": "assistant", "text": "明年再来一次，这回有底了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u084", "kind": "episodic", "text": "用户10月25日考编成绩出来，差三分进面，招六个她排第八", "importance": 5, "keywords": ["考编成绩", "差三分", "进面", "排第八"], "state": "active", "supersedes": ""},
+    {"id": "p09-u085", "kind": "plan", "text": "用户决定明年再考编，妈妈说差三分就是没缘分", "importance": 3, "keywords": ["明年再考", "没缘分", "考编"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 88,
+   "date": "2026-10-27",
+   "sessions": [
+    {
+     "id": "p09-d88-s1",
+     "time": "22:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "分手了。我今天搬出来了，两个箱子，一个装衣服一个装书"},
+      {"role": "assistant", "text": "这么快。"},
+      {"role": "user", "text": "是我提的。我说我们分开吧，他没吵，就问我想清楚没有。我说想清楚了"},
+      {"role": "assistant", "text": "你现在在哪儿？"},
+      {"role": "user", "text": "在阿May这儿。她那间房已经租出去了，我在客厅打地铺，她说你想住多久住多久"},
+      {"role": "assistant", "text": "那还算有地方去。"},
+      {"role": "user", "text": "我把那本排球少年画册也搬出来了。别的都可以不要，这个不行"},
+      {"role": "assistant", "text": "这个必须带走，理解。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u086", "kind": "update", "text": "用户10月27日和小邹分手，搬出同居的房子，回阿May那里打地铺", "importance": 5, "keywords": ["分手", "搬出来", "打地铺", "阿May"], "state": "active", "supersedes": "p09-u048"},
+    {"id": "p09-u087", "kind": "relation", "text": "用户分手搬走时只带了衣服、书和那本排球少年画册", "importance": 3, "keywords": ["衣服", "排球少年画册", "搬走"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 90,
+   "date": "2026-10-29",
+   "sessions": [
+    {
+     "id": "p09-d90-s1",
+     "time": "23:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天发了工资，我把钱分了三份，一份还给阿May，一份存着，剩一份吃饭"},
+      {"role": "assistant", "text": "三分法，挺清醒。"},
+      {"role": "user", "text": "我本来想这个月辞职的，辞了就去大理待三个月，什么都不干"},
+      {"role": "assistant", "text": "然后呢？"},
+      {"role": "user", "text": "然后我没辞。护士长刚给我排了白班，我这时候走太不地道"},
+      {"role": "assistant", "text": "你还是心软。"},
+      {"role": "user", "text": "我打算明年再考一次编，考上了再说辞职的事。现在先把我这双手练稳"},
+      {"role": "assistant", "text": "这个顺序合理。"},
+      {"role": "user", "text": "对了，画册到了，我今晚包书皮包到十二点。影山那页我看了很久"},
+      {"role": "assistant", "text": "十二点还没睡，明天不上班？"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p09-u088", "kind": "update", "text": "用户10月29日决定这个月不辞职，明年再考一次编再说", "importance": 4, "keywords": ["不辞职", "明年再考", "大理"], "state": "active", "supersedes": "p09-u065"},
+    {"id": "p09-u089", "kind": "episodic", "text": "用户10月29日发工资，把钱分了三份，一份还阿May", "importance": 2, "keywords": ["工资", "分了三份", "阿May"], "state": "active", "supersedes": ""},
+    {"id": "p09-u090", "kind": "episodic", "text": "用户包书皮包到十二点，盯着影山那页看了很久", "importance": 2, "keywords": ["包书皮", "十二点", "影山"], "state": "active", "supersedes": ""}
+   ]
+  }
+ ],
+ "probes": [
+  {
+   "id": "p09-q01",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "八月初有个病人家属跟我拍桌子，是因为什么",
+   "expect": {"any": ["给氧慢"], "none": []},
+   "unit_ids": ["p09-u002"],
+   "note": "第1天白班3床家属为给氧慢拍桌子；P1 修：gold 由撞 3 个单元的3床换成 u002 独有的给氧慢"
+  },
+  {
+   "id": "p09-q02",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我八月末半夜上吐下泻那次，是吃了什么闹的",
+   "expect": {"any": ["麻辣烫"], "none": []},
+   "unit_ids": ["p09-u031"],
+   "note": "第28天麻辣烫加冰饮肠胃炎"
+  },
+  {
+   "id": "p09-q03",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我十月半给阿May打电话哭成那样，说了多久",
+   "expect": {"any": ["十几分钟"], "none": []},
+   "unit_ids": ["p09-u076"],
+   "note": "第75天给阿May打电话哭十几分钟"
+  },
+  {
+   "id": "p09-q04",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我十月底冷战那几天，他做了什么让我最受不了",
+   "expect": {"any": ["一份汤"], "none": []},
+   "unit_ids": ["p09-u082"],
+   "note": "第83天冷战，汤还热着"
+  },
+  {
+   "id": "p09-q05",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我最后那天发工资，钱是怎么分的来着",
+   "expect": {"any": ["分了三份"], "none": []},
+   "unit_ids": ["p09-u089"],
+   "note": "第90天工资分三份"
+  },
+  {
+   "id": "p09-q06",
+   "category": "work",
+   "ask_day": 90,
+   "query": "八月那次夜班我跑去找医生，是几床的血氧掉了",
+   "expect": {"any": ["九床"], "none": []},
+   "unit_ids": ["p09-u013"],
+   "note": "第10天凌晨三点九床血氧掉到八十"
+  },
+  {
+   "id": "p09-q07",
+   "category": "work",
+   "ask_day": 90,
+   "query": "我八月那会儿考虑调岗，那边说工资能多多少",
+   "expect": {"any": ["五六百"], "none": []},
+   "unit_ids": ["p09-u022"],
+   "note": "第18天医务科谈调岗条件"
+  },
+  {
+   "id": "p09-q08",
+   "category": "work",
+   "ask_day": 90,
+   "query": "我九月复习那阵子，路上是怎么挤时间的",
+   "expect": {"any": ["听网课"], "none": []},
+   "unit_ids": ["p09-u058"],
+   "note": "第56天通勤地铁上听网课"
+  },
+  {
+   "id": "p09-q09",
+   "category": "work",
+   "ask_day": 90,
+   "query": "护士长后来让我先上什么班来着",
+   "expect": {"any": ["两天白班"], "none": []},
+   "unit_ids": ["p09-u080"],
+   "note": "第80天护士长同意先排两天白班"
+  },
+  {
+   "id": "p09-q10",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "那部排球动画我一共刷了几遍来着",
+   "expect": {"any": ["三遍"], "none": []},
+   "unit_ids": ["p09-u007"],
+   "note": "第5天二刷，实际已是第三遍"
+  },
+  {
+   "id": "p09-q11",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我追那部药屋的，最吃里面哪个人物",
+   "expect": {"any": ["猫猫"], "none": []},
+   "unit_ids": ["p09-u015"],
+   "note": "第12天喜欢猫猫"
+  },
+  {
+   "id": "p09-q12",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "十月那本画册我抢到的是第几本",
+   "expect": {"any": ["第87本"], "none": []},
+   "unit_ids": ["p09-u066"],
+   "note": "第64天抢到第87本"
+  },
+  {
+   "id": "p09-q13",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我十月中重新看药屋，是被什么撑住的",
+   "expect": {"any": ["那股劲"], "none": []},
+   "unit_ids": ["p09-u078"],
+   "note": "第78天说靠猫猫那股劲撑着上班"
+  },
+  {
+   "id": "p09-q14",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "那个月交完房租我卡里还剩多少",
+   "expect": {"any": ["四百多"], "none": []},
+   "unit_ids": ["p09-u030"],
+   "note": "第26天交完房租剩四百多"
+  },
+  {
+   "id": "p09-q15",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我装宽带那天，师傅要收多少钱",
+   "expect": {"any": ["一百二"], "none": []},
+   "unit_ids": ["p09-u052"],
+   "note": "第49天宽带调测费一百二"
+  },
+  {
+   "id": "p09-q16",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我最后那天晚上包书皮包到几点",
+   "expect": {"any": ["十二点"], "none": []},
+   "unit_ids": ["p09-u090"],
+   "note": "第90天包书皮到十二点"
+  },
+  {
+   "id": "p09-q17",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我后来是调到哪个科去了",
+   "expect": {"any": ["调到急诊"], "none": ["内科病房"]},
+   "unit_ids": ["p09-u043"],
+   "note": "第39天内科调急诊，取代第3天内科三班倒"
+  },
+  {
+   "id": "p09-q18",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我不是一直说不考的吗，后来报了什么岗",
+   "expect": {"any": ["区卫健系统"], "none": ["不想考编"]},
+   "unit_ids": ["p09-u056"],
+   "note": "第53天报名考编，取代第22天说不考编"
+  },
+  {
+   "id": "p09-q19",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我十月底搬出来以后住哪儿了",
+   "expect": {"any": ["打地铺"], "none": ["同居"]},
+   "unit_ids": ["p09-u086"],
+   "note": "第88天分手搬回阿May家打地铺，取代第45天同居"
+  },
+  {
+   "id": "p09-q20",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我不是说要去大理待几个月吗，最后怎么定的",
+   "expect": {"any": ["不辞职"], "none": ["想辞职"]},
+   "unit_ids": ["p09-u088"],
+   "note": "第90天决定不辞职，取代第62天想辞职"
+  },
+  {
+   "id": "p09-q21",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "我管的那两个病人，一个喘一个脚烂，分别是什么病",
+   "expect": {"any": ["慢阻肺", "糖尿病足"], "none": []},
+   "unit_ids": ["p09-u001", "p09-u009"],
+   "note": "3床何奶奶慢阻肺 + 12床周叔糖尿病足"
+  },
+  {
+   "id": "p09-q22",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "我今年那两场考试，结果都怎么样",
+   "expect": {"any": ["护师资格考试", "差三分"], "none": []},
+   "unit_ids": ["p09-u025", "p09-u084"],
+   "note": "护师资格四科全过 vs 考编差三分"
+  },
+  {
+   "id": "p09-q23",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "排球少年里我反复看的那几场，分别什么感觉",
+   "expect": {"any": ["白鸟泽", "青城战"], "none": []},
+   "unit_ids": ["p09-u007", "p09-u060"],
+   "note": "白鸟泽那场和青城战"
+  },
+  {
+   "id": "p09-q24",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "那个没救回来的病人，多大年纪来着",
+   "expect": {"any": ["主动脉夹层", "四十二岁"], "none": []},
+   "unit_ids": ["p09-u073", "p09-u077"],
+   "note": "第73天抢救失败，第75天情绪崩溃"
+  },
+  {
+   "id": "p09-q25",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "小邹当初是从哪儿回来的，后来我俩怎么了",
+   "expect": {"any": ["回广州", "分手"], "none": []},
+   "unit_ids": ["p09-u035", "p09-u086"],
+   "note": "8月底小邹辞深圳工作回广州，10月27日分手"
+  },
+  {
+   "id": "p09-q26",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "我抢到的那本画册，搬走那天怎么处理的",
+   "expect": {"any": ["排球少年画册"], "none": []},
+   "unit_ids": ["p09-u066", "p09-u087"],
+   "note": "10月3日抢到画册，10月27日搬走只带画册"
+  },
+  {
+   "id": "p09-q27",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "脚烂到脚踝还闹着出院的那个病人住几床",
+   "expect": {"any": ["12床"], "none": ["3床"]},
+   "unit_ids": ["p09-u009"],
+   "note": "易混：3床是慢阻肺老太太，12床是糖尿病足周叔"
+  },
+  {
+   "id": "p09-q28",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "我那次去考护师资格考试，结果到底怎么样",
+   "expect": {"any": ["四科全过"], "none": ["差三分"]},
+   "unit_ids": ["p09-u025"],
+   "note": "易混：护师资格证四科全过 vs 考编差三分"
+  },
+  {
+   "id": "p09-q29",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "我九月搬去跟小邹住的那房子在几层",
+   "expect": {"any": ["六楼有电梯"], "none": ["没电梯", "打地铺"]},
+   "unit_ids": ["p09-u091"],
+   "note": "易混：9月同居那套在六楼有电梯（active 单元 p09-u091），d35 看过但没选的是七楼没电梯；none=没电梯（看房那条）+打地铺（10月住处），避开内科七楼"
+  },
+  {
+   "id": "p09-q30",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我是不是跟你说过我想养猫的事",
+   "expect": {"any": [], "none": ["养猫", "猫砂", "英短"]},
+   "unit_ids": [],
+   "note": "她从没提过养猫"
+  },
+  {
+   "id": "p09-q31",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我有没有提过想去学潜水这回事",
+   "expect": {"any": [], "none": ["潜水证", "海岛", "冲浪"]},
+   "unit_ids": [],
+   "note": "她从没提过潜水"
+  }
+ ]
+}

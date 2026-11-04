@@ -1,0 +1,1278 @@
+{
+ "version": 1,
+ "id": "p10",
+ "name": "傅北",
+ "profile": {
+  "age": 38,
+  "city": "西安",
+  "job": "网约车司机",
+  "voice": "话密、江湖气、爱讲道理，开口就是「你听我说」，遇事先说「么事么事」再算账",
+  "relations": "老婆在超市上班；儿子上初一；父亲9月脑梗住院；老伙计老三也跑网约车"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "p10-d01-s1",
+     "time": "22:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "咱这行啊，一天到晚跟个陀螺似的。今天从早上七点转到晚上七点，流水才两百八。你听我说，这活儿是越来越不好干，前几年一天轻轻松松四百，现在得靠熬"},
+      {"role": "assistant", "text": "十二个小时两百八，不算多。"},
+      {"role": "user", "text": "平台抽成一刀下去就剩那点。早年间跑车还能挑客人，现在倒过来了，客人挑你。我那台帝豪烧油，一脚油门就是钱，一天一百五打不住"},
+      {"role": "assistant", "text": "你这车多少年了？"},
+      {"role": "user", "text": "六年了，帝豪，除了费油没别的毛病。我算过，油钱一个月就得四千多，等于我天天给加油站打工"},
+      {"role": "assistant", "text": "那流水八千多，也就是剩一半。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u001", "kind": "fact", "text": "用户开一台烧油的帝豪跑网约车，一天跑十二个小时左右", "importance": 4, "keywords": ["帝豪", "油车", "网约车", "烧油"], "state": "superseded", "supersedes": "", "superseded_by": "p10-u075"},
+    {"id": "p10-u002", "kind": "fact", "text": "用户算过一个月油钱要四千多，一直琢磨换电车", "importance": 3, "keywords": ["油钱", "四千多", "换电车"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-08-02",
+   "sessions": [
+    {
+     "id": "p10-d02-s1",
+     "time": "23:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "晚上收工去洒金桥咥了一碗泡馍，又整了两把烤肉，花了四十六，你说值不值，我觉得值"},
+      {"role": "assistant", "text": "收工吃点好的应该。"},
+      {"role": "user", "text": "就是这腰不行了。坐一天车，腰跟断了似的，贴膏药呢，云南白药那个，贴上热乎乎管三天，第四天又疼"},
+      {"role": "assistant", "text": "这不是治，这是糊弄。"},
+      {"role": "user", "text": "么事么事，跑车的有几个腰好的。我儿子下个月就开学上初一了，学费校服一堆钱，哪有空去医院"},
+      {"role": "assistant", "text": "初一了，花销确实上来。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u003", "kind": "preference", "text": "用户爱吃洒金桥的泡馍和烤肉，收工常去吃一顿", "importance": 3, "keywords": ["洒金桥", "泡馍", "烤肉"], "state": "active", "supersedes": ""},
+    {"id": "p10-u004", "kind": "fact", "text": "用户腰不好，贴云南白药膏药，说贴上管三天", "importance": 3, "keywords": ["腰", "云南白药", "膏药"], "state": "active", "supersedes": ""},
+    {"id": "p10-u005", "kind": "fact", "text": "用户的儿子9月开学上初一", "importance": 3, "keywords": ["儿子", "初一", "开学"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 3,
+   "date": "2026-08-03",
+   "sessions": [
+    {
+     "id": "p10-d03-s1",
+     "time": "18:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "今天去加油，92号，加满花了三百二。我这油箱见底就见钱，一箱油跑两天半"},
+      {"role": "assistant", "text": "现在油价不便宜。"},
+      {"role": "user", "text": "八块多一升，一天一百五的油，一个月四千三。你算算一年多少钱，五万多，等于白养一台车"},
+      {"role": "assistant", "text": "这么一算确实肉疼。"},
+      {"role": "user", "text": "小区停车费还涨了，从一百五涨到两百。我说我停的又不是地库，是墙根底下那块水泥地，人家就一句规定"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u006", "kind": "fact", "text": "用户加92号油，加满一箱三百二，一天油钱一百五", "importance": 3, "keywords": ["92号", "加满", "三百二", "油钱"], "state": "active", "supersedes": ""},
+    {"id": "p10-u007", "kind": "episodic", "text": "用户小区停车费从一百五涨到两百，跟物业掰扯没用", "importance": 2, "keywords": ["停车费", "物业", "涨"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 4,
+   "date": "2026-08-04",
+   "sessions": [
+    {
+     "id": "p10-d04-s1",
+     "time": "19:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天在南二环出事了。我停着等红灯，后头一个出租车怼我车屁股上了，你说这叫啥事"},
+      {"role": "assistant", "text": "人没事吧？"},
+      {"role": "user", "text": "人没事，就是后保险杠裂了，尾灯碎一个。那司机下来还跟我争，说我刹车太急，我当时就想笑"},
+      {"role": "assistant", "text": "明明是他追尾，还赖你？"},
+      {"role": "user", "text": "交警来了看监控，他全责。么事么事，走他保险，修车两天，修了两千五。上个月我在小区门口蹭了下后视镜花三百，跟这个一比算个啥"},
+      {"role": "assistant", "text": "那真是小意思。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u008", "kind": "episodic", "text": "用户8月4日在南二环等红灯被出租车追尾，对方全责", "importance": 4, "keywords": ["南二环", "出租车", "追尾", "全责"], "state": "active", "supersedes": ""},
+    {"id": "p10-u009", "kind": "episodic", "text": "用户修车两天跑不了车，修了两千五走对方保险", "importance": 3, "keywords": ["修车两天", "两千五", "对方保险"], "state": "active", "supersedes": ""},
+    {"id": "p10-u010", "kind": "trivia", "text": "用户上个月在小区门口蹭了后视镜，花了三百", "importance": 1, "keywords": ["后视镜", "刮蹭", "三百"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 5,
+   "date": "2026-08-05",
+   "sessions": [
+    {
+     "id": "p10-d05-s1",
+     "time": "22:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天跟我媳妇吵了一架。她嫌我一天到晚不着家，回来倒头就睡，孩子作业也不管，你说她这话没道理吗"},
+      {"role": "assistant", "text": "她说的是实情。"},
+      {"role": "user", "text": "我知道是实情。可我不跑车，钱从哪来？她超市一个月三千五，房贷两千八，我一天流水三百扣了油钱和平台就剩一百二"},
+      {"role": "assistant", "text": "算清楚了反而更难受。"},
+      {"role": "user", "text": "她就是心疼我，嘴上不说。吵完给我端了碗剩的面汤，我儿子在旁边抬头说爸你别吵了，我俩都不吭声了"},
+      {"role": "assistant", "text": "孩子一句话比啥都管用。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u011", "kind": "relation", "text": "用户的媳妇在超市上班，一个月三千五，家里房贷两千八", "importance": 3, "keywords": ["媳妇", "超市", "三千五", "房贷"], "state": "active", "supersedes": ""},
+    {"id": "p10-u012", "kind": "relation", "text": "用户跟媳妇吵架，吵完她给他端了碗面汤，儿子说了句爸你别吵了", "importance": 2, "keywords": ["面汤", "吵架", "儿子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 7,
+   "date": "2026-08-07",
+   "sessions": [
+    {
+     "id": "p10-d07-s1",
+     "time": "20:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "车在厂里躺了三天，今天下午才提回来。理赔那套流程跑得我腿细，要定损要责任书，还要对方保险点头"},
+      {"role": "assistant", "text": "走保险还这么麻烦？"},
+      {"role": "user", "text": "定损员看我车老，说配件按折旧算，后杠按七成赔。我一听这话，合着我修的是一台破车呗"},
+      {"role": "assistant", "text": "老车保费低，赔得也低。"},
+      {"role": "user", "text": "三天没跑，流水少九百。我以前一直在4S店保养，图个放心，现在想想那钱花得冤"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u013", "kind": "episodic", "text": "用户8月车修了三天，跑定损、责任书、对方保险一堆流程", "importance": 3, "keywords": ["定损", "责任书", "修了三天"], "state": "active", "supersedes": ""},
+    {"id": "p10-u014", "kind": "fact", "text": "用户修车定损时老车按七成折旧赔，他觉得老车最坑", "importance": 2, "keywords": ["七成", "折旧", "老车"], "state": "active", "supersedes": ""},
+    {"id": "p10-u015", "kind": "fact", "text": "用户的车以前一直在4S店保养，图个放心，后来觉得那钱花得冤", "importance": 2, "keywords": ["4S店", "保养", "花得冤"], "state": "superseded", "supersedes": "", "superseded_by": "p10-u057"}
+   ]
+  },
+  {
+   "day": 9,
+   "date": "2026-08-09",
+   "sessions": [
+    {
+     "id": "p10-d09-s1",
+     "time": "21:15",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "今天陪儿子看海贼王，从四百六十集一直看到顶上战争，艾斯死那集我儿子眼泪汪汪的，我坐旁边没说话"},
+      {"role": "assistant", "text": "顶上战争那段确实镇不住。"},
+      {"role": "user", "text": "你说一个动画片，咋能看得人心里这么堵。路飞那小子哭得跟啥一样，我儿子问我艾斯为啥非要死"},
+      {"role": "assistant", "text": "你怎么答的？"},
+      {"role": "user", "text": "我说因为他要护着他弟弟，这就是男人该干的事。他听懂一半，说爸你以后别死，我说么事么事，你爸硬朗着呢"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u016", "kind": "preference", "text": "用户陪儿子看《海贼王》顶上战争，艾斯死那段心里堵", "importance": 3, "keywords": ["海贼王", "顶上战争", "艾斯"], "state": "active", "supersedes": ""},
+    {"id": "p10-u017", "kind": "relation", "text": "用户平时不看这些，陪儿子看就是为了跟儿子有话聊", "importance": 3, "keywords": ["儿子", "陪", "有话聊"], "state": "active", "supersedes": ""},
+    {"id": "p10-u018", "kind": "episodic", "text": "用户儿子看完要买路飞的草帽，说放学戴", "importance": 2, "keywords": ["路飞", "草帽", "放学戴"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 11,
+   "date": "2026-08-11",
+   "sessions": [
+    {
+     "id": "p10-d11-s1",
+     "time": "08:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天早高峰在钟楼盘道绕了三圈，一趟活儿都没接着。平台那派单，我到现在也说不清是咋派的"},
+      {"role": "assistant", "text": "早高峰不是单多吗？"},
+      {"role": "user", "text": "多是多，都是起步价的短单，跑三单不如一个机场单。你不接就影响你分，接了不挣钱，你说这气人不气人"},
+      {"role": "assistant", "text": "平台说了算，没办法。"},
+      {"role": "user", "text": "最早跑车那阵补贴一天五十，现在一分没有，抽成还涨到两成。我跟你说，这行就是被平台掐着脖子跑"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u019", "kind": "fact", "text": "用户说平台抽成涨到两成，补贴一分没有", "importance": 3, "keywords": ["平台", "抽成", "两成", "补贴"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 15,
+   "date": "2026-08-15",
+   "sessions": [
+    {
+     "id": "p10-d15-s1",
+     "time": "23:05",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "今天收工在小区门口快递驿站旁边坐了会儿按摩椅，十块钱二十分钟，怼着腰眼一顿敲，下来走路都轻快"},
+      {"role": "assistant", "text": "十块钱，也还行。"},
+      {"role": "user", "text": "我办了张卡，充一百送二十。老板是个小姑娘，说常来的都是跑车的、送外卖的，一坐一排，谁都哼哼"},
+      {"role": "assistant", "text": "那都是腰不好的。"},
+      {"role": "user", "text": "么事么事，站着说话腰也疼。有回旁边那个也是跑车的，跑了一宿，坐着坐着就睡着了，呼噜震得按摩椅都顿"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u021", "kind": "trivia", "text": "用户收工常去小区门口坐十块钱二十分钟的共享按摩椅", "importance": 2, "keywords": ["按摩椅", "十块钱", "二十分钟"], "state": "active", "supersedes": ""},
+    {"id": "p10-u022", "kind": "relation", "text": "用户在按摩椅上认识了不少跑车送外卖的同行，都是腰不好", "importance": 2, "keywords": ["同行", "跑车", "腰不好"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 17,
+   "date": "2026-08-17",
+   "sessions": [
+    {
+     "id": "p10-d17-s1",
+     "time": "20:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天接了个赶飞机的女乘客，从高新区去机场，赶七点的飞机，五点半才上车，一路上她比我还急"},
+      {"role": "assistant", "text": "那你可真得压着点跑。"},
+      {"role": "user", "text": "我说姐你放心，这条路我闭着眼都能开。到咸阳机场T3的时候六点二十，她松了口大气"},
+      {"role": "assistant", "text": "赶上了就成。"},
+      {"role": "user", "text": "她下车非要给我加五十，我说么事么事，平台不能私下收。她说那给你个五星。这种讲究人我记一辈子"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u023", "kind": "episodic", "text": "用户8月17日接了个赶飞机的女乘客，从高新区到咸阳机场T3", "importance": 3, "keywords": ["咸阳机场", "T3", "女乘客", "机场"], "state": "active", "supersedes": ""},
+    {"id": "p10-u024", "kind": "preference", "text": "用户说讲究的乘客他记一辈子，难伺候的也多", "importance": 2, "keywords": ["讲究", "五星", "乘客"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 19,
+   "date": "2026-08-19",
+   "sessions": [
+    {
+     "id": "p10-d19-s1",
+     "time": "21:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天我爸打电话来，说这两天头晕，站起来眼前发黑。我一听就让他去查，他说量了血压，高，吃两天药就停了"},
+      {"role": "assistant", "text": "这可不能自己停。"},
+      {"role": "user", "text": "我火一下就上来，说了他两句。他嫌我管他，把电话给我妈了。老头就是不服老，你说气人不"},
+      {"role": "assistant", "text": "老人都这样。"},
+      {"role": "user", "text": "我寻思周四回趟老家，带他好好查一次。就是车排得紧，一天不跑少三百，么事么事，钱后面再挣"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u025", "kind": "episodic", "text": "用户8月19日接到父亲电话说头晕，量出血压高还自己停了药", "importance": 4, "keywords": ["父亲", "头晕", "血压", "停药"], "state": "active", "supersedes": ""},
+    {"id": "p10-u026", "kind": "plan", "text": "用户打算周四回老家带父亲好好查一次", "importance": 3, "keywords": ["回老家", "查一次", "周四"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 21,
+   "date": "2026-08-21",
+   "sessions": [
+    {
+     "id": "p10-d21-s1",
+     "time": "22:20",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "我儿子现在追斗罗大陆的动画，一天看三集。我说你看那个花里胡哨的干啥，书里写得比这清楚多了"},
+      {"role": "assistant", "text": "他还看得进去小说？"},
+      {"role": "user", "text": "看不下去，说字太多。我说字多才有味道，你看那打斗全靠光，一集就那点东西，还得等一周，急死人"},
+      {"role": "assistant", "text": "你这话说得像个老书虫。"},
+      {"role": "user", "text": "我年轻在工地那会儿，晚上就拿手机看小说，斗罗大陆追得凶。所以我说话有底气，书就是比动画强"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u027", "kind": "preference", "text": "用户觉得《斗罗大陆》小说比动画好，动画全靠光和特效", "importance": 3, "keywords": ["斗罗大陆", "小说", "动画"], "state": "active", "supersedes": ""},
+    {"id": "p10-u028", "kind": "preference", "text": "用户年轻在工地时爱用手机看小说，斗罗大陆追得凶", "importance": 2, "keywords": ["工地", "看小说", "手机"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 23,
+   "date": "2026-08-23",
+   "sessions": [
+    {
+     "id": "p10-d23-s1",
+     "time": "19:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我儿子开学上初一，学校让报个社团，他自己挑了篮球，说要长个子。我给他买了篮球一百六，球鞋两百八"},
+      {"role": "assistant", "text": "打篮球长个子，好事。"},
+      {"role": "user", "text": "咱小时候哪有这些。我跟他妈说别嫌贵，孩子愿意动就行。结果这小子第一天回来就说累，让我给他请假"},
+      {"role": "assistant", "text": "这就打退堂鼓了？"},
+      {"role": "user", "text": "我说你想得美，报了就得练满一学期。他晚饭多吃了两碗，么事么事，小子皮实，过两天就习惯了"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u029", "kind": "fact", "text": "用户的儿子上初一，报了学校的篮球社团", "importance": 3, "keywords": ["儿子", "篮球社团", "初一"], "state": "superseded", "supersedes": "", "superseded_by": "p10-u079"},
+    {"id": "p10-u030", "kind": "episodic", "text": "用户给儿子买了篮球一百六和球鞋两百八", "importance": 2, "keywords": ["篮球", "球鞋", "一百六", "两百八"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 27,
+   "date": "2026-08-27",
+   "sessions": [
+    {
+     "id": "p10-d27-s1",
+     "time": "23:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天老三请我吃饭。他跑高德我跑滴滴，俩人一比划，他那个补贴比我多，上个月他跑了一万出头，我八千六"},
+      {"role": "assistant", "text": "那差不少。"},
+      {"role": "user", "text": "关键人家车新，纯电的，一天电费四十。我这油车一天一百五。他劝我赶紧换，我说首付哪来"},
+      {"role": "assistant", "text": "老三这算给你指路了。"},
+      {"role": "user", "text": "老三是南方人，跑车十年，媳妇都跑了，一个人吃住都在车里。他那样都能撑着，我这一天到晚有热饭吃，还好意思诉苦"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u031", "kind": "relation", "text": "用户的老伙计老三也跑网约车，跑高德，车是纯电的", "importance": 3, "keywords": ["老三", "高德", "纯电", "老伙计"], "state": "active", "supersedes": ""},
+    {"id": "p10-u032", "kind": "fact", "text": "老三跑车十年，一个人吃住都在车里", "importance": 2, "keywords": ["老三", "十年", "吃住在车里"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 29,
+   "date": "2026-08-29",
+   "sessions": [
+    {
+     "id": "p10-d29-s1",
+     "time": "17:50",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "家里热水器坏了，洗澡洗一半变凉水，我媳妇在里头叫了一嗓子。我拿螺丝刀捅咕半天，越捅越凉"},
+      {"role": "assistant", "text": "别自己拆，燃气的东西危险。"},
+      {"role": "user", "text": "我也不敢。找小区门口修家电的老赵，他一看说太老了，换个新的八百。我说行，结果他一看管道说也得换，加一百五"},
+      {"role": "assistant", "text": "一修就是一串。"},
+      {"role": "user", "text": "换完了，旧的热水器搬楼下，收废品的给我二十。么事么事，修好就行，这两天我媳妇看我的眼神都顺了"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u033", "kind": "episodic", "text": "用户8月家里热水器坏了，找老赵换了新的八百，管道又加一百五", "importance": 2, "keywords": ["热水器", "老赵", "八百", "管道"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 31,
+   "date": "2026-08-31",
+   "sessions": [
+    {
+     "id": "p10-d31-s1",
+     "time": "23:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "八月过完了，我给你算算账。流水八千六，油钱四千三，扣完到手就剩四千三，你听我说，这钱连保险都没算"},
+      {"role": "assistant", "text": "一个月就落四千三？"},
+      {"role": "user", "text": "再加上保险保养停车费，真到手三千八。我都不知道这钱咋就没了，一天跑十二个小时，等于给自己找罪受，你说这算个啥生意"},
+      {"role": "assistant", "text": "这账算得人心里发凉。"},
+      {"role": "user", "text": "所以说要换电车。老三算过，电车一个月电费一千二，我这一下就多出三千。九月我要拼一把，跑满三十天"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u035", "kind": "fact", "text": "用户8月流水八千六，油钱四千三，到手就剩四千三", "importance": 4, "keywords": ["流水", "八千六", "油钱", "四千三"], "state": "active", "supersedes": ""},
+    {"id": "p10-u036", "kind": "plan", "text": "用户说9月要拼一把，跑满三十天", "importance": 2, "keywords": ["9月", "跑满三十天", "拼一把"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 35,
+   "date": "2026-09-04",
+   "sessions": [
+    {
+     "id": "p10-d35-s1",
+     "time": "23:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天收工跟老三在洒金桥一人一碗面，又要了把烤腰子，谝到十一点。他说我命好，回来有媳妇有娃"},
+      {"role": "assistant", "text": "听着有点心酸。"},
+      {"role": "user", "text": "我说那你找个啊，他说找不动了。我又问他今年挣多少，他说一万二一个月，我不敢信，他说夜里跑单贵"},
+      {"role": "assistant", "text": "夜里跑单确实贵点。"},
+      {"role": "user", "text": "我心里就动了。可我不想跑夜班，我媳妇一个人在家带孩子已经够呛。么事么事，先看看，等我爸那边安顿好再说"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u037", "kind": "relation", "text": "用户的老伙计老三夜里跑车，一个月能跑一万二", "importance": 3, "keywords": ["老三", "夜里跑", "一万二"], "state": "active", "supersedes": ""},
+    {"id": "p10-u038", "kind": "preference", "text": "用户不想跑夜班，怕媳妇一个人在家带孩子够呛", "importance": 3, "keywords": ["不想跑夜班", "媳妇", "带孩子"], "state": "superseded", "supersedes": "", "superseded_by": "p10-u048"}
+   ]
+  },
+  {
+   "day": 37,
+   "date": "2026-09-06",
+   "sessions": [
+    {
+     "id": "p10-d37-s1",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "儿子今天看海贼王和之国那段，路飞变成五档，那小子在客厅蹦起来了，蹦得地板都响"},
+      {"role": "assistant", "text": "五档那段确实炸。"},
+      {"role": "user", "text": "我瞅了两眼，那画风一换，我还以为是另一个动画片。他说这是搞笑风格。我问他五档厉害还是四档厉害"},
+      {"role": "assistant", "text": "他怎么说？"},
+      {"role": "user", "text": "他说五档能把凯多打趴下。我一听凯多这名字就想笑。么事么事，孩子高兴就行，我一年到头也就这时候觉得日子有滋味"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u039", "kind": "preference", "text": "用户陪儿子看《海贼王》和之国，路飞五档那段儿子兴奋得在客厅蹦", "importance": 2, "keywords": ["和之国", "路飞", "五档", "凯多"], "state": "active", "supersedes": ""},
+    {"id": "p10-u040", "kind": "relation", "text": "用户说一年到头也就陪儿子看动画这时候觉得日子有滋味", "importance": 3, "keywords": ["陪儿子", "日子", "有滋味"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 39,
+   "date": "2026-09-08",
+   "sessions": [
+    {
+     "id": "p10-d39-s1",
+     "time": "22:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "老三把他电车借我开了一天。我一天没舍得踩刹车，太安静了，一脚电门就窜出去，车里静得能听见自己喘气"},
+      {"role": "assistant", "text": "电车开着舒服吧？"},
+      {"role": "user", "text": "舒服。关键是电费，他说一天四十块，跑得跟我一样多。我这油车一天一百五，差了快四倍，你说这账"},
+      {"role": "assistant", "text": "这差距太直观了。"},
+      {"role": "user", "text": "我算了一路，到他那儿摊开纸一算，一个月多落三千二。这数字我盯着看了半天。就是首付八万，卖车顶多三万，还得借五万"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u041", "kind": "episodic", "text": "用户9月借老三的电车开了一天，算出一月能多落三千二", "importance": 3, "keywords": ["电车", "三千二", "一天四十"], "state": "active", "supersedes": ""},
+    {"id": "p10-u042", "kind": "plan", "text": "用户盘算旧车卖三万再借五万换电车，首付要八万", "importance": 3, "keywords": ["首付", "借五万", "旧车卖三万"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 41,
+   "date": "2026-09-10",
+   "sessions": [
+    {
+     "id": "p10-d41-s1",
+     "time": "23:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "出事了。今天下午我姐打电话，说我爸在家坐不住了，嘴有点歪，送到医院去了。我车直接停路边，接了儿子就往医院跑"},
+      {"role": "assistant", "text": "脑梗？现在怎么样？"},
+      {"role": "user", "text": "脑梗，说话不利索，左边身子动不了。我妈在走廊哭，我姐在办手续。医生说得有人守着，前三天危险期"},
+      {"role": "assistant", "text": "家里得有人拿主意。"},
+      {"role": "user", "text": "我姐从咸阳赶过来的，最多请五天假，剩下日子我不顶上谁顶。么事么事，先把人稳住，钱的事后面再说"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u043", "kind": "episodic", "text": "用户父亲9月10日脑梗送到医院，嘴歪，左边身子动不了", "importance": 5, "keywords": ["父亲", "脑梗", "医院", "左边身子"], "state": "active", "supersedes": ""},
+    {"id": "p10-u044", "kind": "relation", "text": "用户的姐姐从咸阳赶过来，跟他在医院轮班，最多请五天假", "importance": 3, "keywords": ["姐姐", "咸阳", "轮班", "五天假"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 43,
+   "date": "2026-09-12",
+   "sessions": [
+    {
+     "id": "p10-d43-s1",
+     "time": "22:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "这两天我白天在医院，晚上回家睡三个钟头，我姐让我回去，她在医院打地铺。我爸醒了还问我今天不出车啊"},
+      {"role": "assistant", "text": "老人还是惦记你挣钱。"},
+      {"role": "user", "text": "我说爸你养病别管钱。他嘴不利索，还拿手比划，意思是别耽误活儿。我就骗他说车坏了在修，他这才安稳睡"},
+      {"role": "assistant", "text": "你这是善意的谎。"},
+      {"role": "user", "text": "我姐说，爸这辈子就是个老实人，怕给别人添麻烦。晚上我开车回家，把车停路边坐了十分钟。我这三十八年，好像没怎么陪过他"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u045", "kind": "episodic", "text": "用户9月白天在医院陪父亲，晚上回家只睡三个钟头", "importance": 3, "keywords": ["医院", "陪父亲", "三个钟头"], "state": "active", "supersedes": ""},
+    {"id": "p10-u046", "kind": "relation", "text": "用户的父亲怕耽误他跑车，嘴不利索还拿手比划", "importance": 3, "keywords": ["父亲", "比划", "别耽误"], "state": "active", "supersedes": ""},
+    {"id": "p10-u047", "kind": "preference", "text": "用户突然发现这三十八年没怎么陪过父亲", "importance": 4, "keywords": ["三十八年", "没怎么陪", "父亲"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 45,
+   "date": "2026-09-14",
+   "sessions": [
+    {
+     "id": "p10-d45-s1",
+     "time": "23:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "我今天开始跑夜班了。跟我姐商量好，她白天我晚上，医院那边请了护工，一天两百，正好我夜里多跑的一百五够补"},
+      {"role": "assistant", "text": "白天陪护晚上跑车，你顶得住？"},
+      {"role": "user", "text": "顶不住也得顶。夜里单贵，跑到凌晨两点，早上八点去医院换我姐。我媳妇不愿意，说你不要命了，我说命和钱你让我选一样，她就不说话了"},
+      {"role": "assistant", "text": "她这话不是没道理。"},
+      {"role": "user", "text": "我说要命，要命才得挣钱看病。我跟她保证跑一个月，我爸出院就调回来，她这才点头。么事么事，一个月，扛得住"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u048", "kind": "update", "text": "用户9月父亲住院后开始跑夜班，白天去医院陪护", "importance": 4, "keywords": ["跑夜班", "父亲住院", "陪护", "护工"], "state": "active", "supersedes": "p10-u038"},
+    {"id": "p10-u049", "kind": "fact", "text": "用户算过夜班一天多跑一百五，正好够父亲一天的护工费", "importance": 3, "keywords": ["一百五", "护工费", "一天两百"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 46,
+   "date": "2026-09-15",
+   "sessions": [
+    {
+     "id": "p10-d46-s1",
+     "time": "21:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "完了，今天出大事了。绕城高速上我追尾了，把前面一辆轿车怼出去两米。人没事，就是我脑子当时一蒙"},
+      {"role": "assistant", "text": "疲劳驾驶了？"},
+      {"role": "user", "text": "我爸那事这几天就没睡好，前车一刹我没踩住。交警来了一看，我全责。对方修两千六，我这车头修要九千"},
+      {"role": "assistant", "text": "九千，这一下够呛。"},
+      {"role": "user", "text": "我站在高速边上腿都是软的。给我媳妇打电话，她愣了半天说人没事就好，我听完眼泪差点上来。老三来把车拖走的，说兄弟你别垮"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u050", "kind": "episodic", "text": "用户9月15日在绕城高速追尾前车，全责，自己车修九千", "importance": 5, "keywords": ["绕城高速", "追尾", "全责", "九千"], "state": "active", "supersedes": ""},
+    {"id": "p10-u051", "kind": "episodic", "text": "用户因为父亲住院几天没睡好，疲劳驾驶没踩住刹车", "importance": 4, "keywords": ["疲劳驾驶", "没睡好", "没踩住"], "state": "active", "supersedes": ""},
+    {"id": "p10-u052", "kind": "relation", "text": "用户给媳妇打电话，她说人没事就好，他差点掉眼泪", "importance": 3, "keywords": ["媳妇", "人没事就好", "掉眼泪"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 48,
+   "date": "2026-09-17",
+   "sessions": [
+    {
+     "id": "p10-d48-s1",
+     "time": "22:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "车进厂了，说最少五天，修九千，对方那两千八我还得先垫。这五天我借老三的车跑，一天给他二百油钱"},
+      {"role": "assistant", "text": "老三这人可以。"},
+      {"role": "user", "text": "跑了三天，我算是服了电车，一天电费四十，我跑得比油车还多。你说我这三年图啥，白烧那么多油"},
+      {"role": "assistant", "text": "这下你更想换了。"},
+      {"role": "user", "text": "必须换。么事么事，等我提了车，这窟窿一年就补回来了"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u053", "kind": "episodic", "text": "用户车修五天，借老三的车跑，一天给二百油钱", "importance": 3, "keywords": ["借老三", "二百油钱", "修五天"], "state": "active", "supersedes": ""},
+    {"id": "p10-u054", "kind": "fact", "text": "用户跑了三天电车后确定要换，说油车跑网约车不划算", "importance": 3, "keywords": ["电车", "不划算", "确定要换"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 50,
+   "date": "2026-09-19",
+   "sessions": [
+    {
+     "id": "p10-d50-s1",
+     "time": "23:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天跟媳妇吵了一架，为了钱。我爸住院交了八千押金，她说家里就剩两万了，我说先救人，她说后面拿什么还"},
+      {"role": "assistant", "text": "两头都是压力。"},
+      {"role": "user", "text": "我当时就没话了。我知道她不是不孝顺，她是怕。最后她把存折拿出来，说这六千是她攒的，先拿去"},
+      {"role": "assistant", "text": "她心里还是向着这个家的。"},
+      {"role": "user", "text": "向着的。所以我更难受。么事么事，我多跑两趟就补上了。就是夜里跑久了眼睛花，昨天差点又蹭了"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u055", "kind": "episodic", "text": "用户9月为父亲八千押金跟媳妇吵架，媳妇拿出自己攒的六千", "importance": 4, "keywords": ["八千押金", "六千", "媳妇", "存折"], "state": "active", "supersedes": ""},
+    {"id": "p10-u056", "kind": "fact", "text": "用户夜里跑久了眼睛花，差点又蹭车", "importance": 3, "keywords": ["眼睛花", "夜里跑", "差点蹭"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 52,
+   "date": "2026-09-21",
+   "sessions": [
+    {
+     "id": "p10-d52-s1",
+     "time": "19:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "今天去4S店问修车，人家报九千二，说用原厂件。我说能不能便宜点，人家说没有，你说这不是拿人当冤大头"},
+      {"role": "assistant", "text": "4S店就这价。"},
+      {"role": "user", "text": "老三介绍我去东郊一个修理厂，老板姓赵，看了说六千八能修好，件是副厂的。我说副厂的靠得住不，他说你这车都六年了，还挑啥"},
+      {"role": "assistant", "text": "这话实在。"},
+      {"role": "user", "text": "从今往后我保养也去老赵那儿了。4S店那套我是真受够，动不动让你换一堆。么事么事，找着个靠谱手艺人不容易"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u057", "kind": "update", "text": "用户9月把修车保养从4S店换到东郊老赵的修理厂，便宜两千多", "importance": 3, "keywords": ["老赵", "修理厂", "4S店", "便宜"], "state": "active", "supersedes": "p10-u015"},
+    {"id": "p10-u058", "kind": "episodic", "text": "用户4S店报价九千二，老赵的修理厂六千八包修好", "importance": 3, "keywords": ["九千二", "六千八", "副厂件"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 54,
+   "date": "2026-09-23",
+   "sessions": [
+    {
+     "id": "p10-d54-s1",
+     "time": "22:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "我跟媳妇说了，我要换电车。她问多少钱，我说首付八万，旧车卖三万，还差五万。她算了一晚上"},
+      {"role": "assistant", "text": "她同意了吗？"},
+      {"role": "user", "text": "第二天早上说换。她说反正你这车一个月烧四千三的油，早换早省。就一个条件，跑夜班这个月就调回来"},
+      {"role": "assistant", "text": "这条件合理。"},
+      {"role": "user", "text": "我答应了。十月初去看车，老三说秦PLUS那个电车皮实，适合跑网约车，街上跑的多，修起来也便宜"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u059", "kind": "plan", "text": "用户9月在追尾之后跟媳妇定下来换电车，十月初去看车", "importance": 4, "keywords": ["换电车", "媳妇", "十月初"], "state": "active", "supersedes": ""},
+    {"id": "p10-u060", "kind": "fact", "text": "用户看中秦PLUS，老三说皮实，适合跑网约车", "importance": 3, "keywords": ["秦PLUS", "皮实", "网约车"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 56,
+   "date": "2026-09-25",
+   "sessions": [
+    {
+     "id": "p10-d56-s1",
+     "time": "21:50",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "我给我儿子定了规矩，周一到周五不许看动画，周五晚上能看两集海贼王。结果他偷偷在平板上看"},
+      {"role": "assistant", "text": "抓现行了？"},
+      {"role": "user", "text": "我一摸平板发烫就知道。我问看啥呢，他说看学习视频。我说学习视频能把平板看烫？他不吭声了"},
+      {"role": "assistant", "text": "小孩这点小心思。"},
+      {"role": "user", "text": "我也不是不让他看。我就怕他学那些打打杀杀的。不过海贼王讲的是伙伴，路飞为了救朋友啥都干，这个我认"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u061", "kind": "fact", "text": "用户给儿子定规矩，周一到周五不许看动画，周五能看两集海贼王", "importance": 3, "keywords": ["规矩", "周一到周五", "两集海贼王"], "state": "active", "supersedes": ""},
+    {"id": "p10-u062", "kind": "preference", "text": "用户怕孩子学打打杀杀，但认海贼王讲的伙伴和救朋友", "importance": 2, "keywords": ["打打杀杀", "伙伴", "救朋友"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 58,
+   "date": "2026-09-27",
+   "sessions": [
+    {
+     "id": "p10-d58-s1",
+     "time": "23:15",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天在医院给我爸做康复，护士教他抬手，他左胳膊抬到一半就掉下来。他急，我也急，他还骂自己没用"},
+      {"role": "assistant", "text": "脑梗康复就这样，慢慢来。"},
+      {"role": "user", "text": "我说爸你别急，一天抬一寸就是进步。劝人的话谁都会说，轮到自己的爹就不一样，我在走廊站着，眼睛有点酸"},
+      {"role": "assistant", "text": "难受是正常的。"},
+      {"role": "user", "text": "我姐说医生讲右边恢复得不错，说话比刚来清楚多了。这就是好消息。么事么事，只要人在就有盼头"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u063", "kind": "episodic", "text": "用户9月底在医院陪父亲做康复，他左胳膊抬到一半就掉", "importance": 4, "keywords": ["康复", "左胳膊", "抬到一半"], "state": "active", "supersedes": ""},
+    {"id": "p10-u064", "kind": "preference", "text": "用户说只要人在就有盼头", "importance": 3, "keywords": ["人在", "有盼头", "好消息"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 61,
+   "date": "2026-09-30",
+   "sessions": [
+    {
+     "id": "p10-d61-s1",
+     "time": "23:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "九月过完了。修车五天，父亲住院，我这个月流水才六千二，到手三千一，我都不好意思跟我媳妇报"},
+      {"role": "assistant", "text": "这个月是真难。"},
+      {"role": "user", "text": "难也得说。晚上我把账给她看，她看完没说话，去给我热了饭。我扒了两口就吃不下了"},
+      {"role": "assistant", "text": "她不说话，比说什么都重。"},
+      {"role": "user", "text": "对。我爸还躺在医院，我这时候垮了，这家就完了。么事么事，十月份我提了电车，一定把这个窟窿补上"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u065", "kind": "fact", "text": "用户9月因为修车和父亲住院，流水才六千二，到手三千一", "importance": 4, "keywords": ["流水", "六千二", "三千一", "9月"], "state": "active", "supersedes": ""},
+    {"id": "p10-u066", "kind": "preference", "text": "用户说自己这时候垮了，这个家就完了", "importance": 3, "keywords": ["垮了", "家就完了", "窟窿"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 62,
+   "date": "2026-10-01",
+   "sessions": [
+    {
+     "id": "p10-d62-s1",
+     "time": "23:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "国庆了，到处堵。今天从大雁塔拉到北客站，三公里走了四十分钟，乘客还急，说师傅你能不能快点"},
+      {"role": "assistant", "text": "堵在路上谁也没辙。"},
+      {"role": "user", "text": "我让他看窗外。一天跑了十三单，流水四百二，比平时多一百多，堵得值。就是腿坐麻了，下车差点跪了"},
+      {"role": "assistant", "text": "那确实是坐太久了。"},
+      {"role": "user", "text": "最后收工绕过去接我儿子和他妈，三个人在路边喝了碗胡辣汤。么事么事，也挺好，一年到头能有这样一天"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u067", "kind": "episodic", "text": "用户国庆在大雁塔一带堵了四十分钟，一天流水四百二", "importance": 2, "keywords": ["国庆", "大雁塔", "四百二"], "state": "active", "supersedes": ""},
+    {"id": "p10-u068", "kind": "relation", "text": "用户国庆收工去接儿子和媳妇，三个人在路边喝了碗胡辣汤", "importance": 2, "keywords": ["胡辣汤", "儿子", "媳妇"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 64,
+   "date": "2026-10-03",
+   "sessions": [
+    {
+     "id": "p10-d64-s1",
+     "time": "22:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "我儿子现在二刷海贼王，从第一集开始。我问他看过的有啥意思，他说要攒细节，还跟我讲路飞第一集就说要当海贼王"},
+      {"role": "assistant", "text": "小孩刷片有自己的乐趣。"},
+      {"role": "user", "text": "他说那是伏笔。我说这不是废话嘛，他还不服。你说这孩子，看个动画片能看出门道"},
+      {"role": "assistant", "text": "比咱们强。"},
+      {"role": "user", "text": "我就不行，我看东西只看热闹。顶上战争我光看他们打，谁跟谁有啥仇我都记不住。他给我画了张人物关系图，A4纸画满"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u069", "kind": "episodic", "text": "用户儿子10月二刷海贼王，还画了张人物关系图", "importance": 2, "keywords": ["二刷", "人物关系图", "A4纸"], "state": "active", "supersedes": ""},
+    {"id": "p10-u070", "kind": "relation", "text": "用户听儿子讲动画里的伏笔，心里热乎，自己只看热闹", "importance": 2, "keywords": ["伏笔", "心里热乎", "看热闹"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 66,
+   "date": "2026-10-05",
+   "sessions": [
+    {
+     "id": "p10-d66-s1",
+     "time": "19:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "今天把旧车开到二手车市场，人家看了半天给我报两万八。我说六年车保养记录全的，人家说记录不值钱"},
+      {"role": "assistant", "text": "比你想的三万少点。"},
+      {"role": "user", "text": "我又跑了两家，一家两万六，一家两万九，你说这水多深。最后卖给老三一个朋友，三万整，当场转账"},
+      {"role": "assistant", "text": "这算卖了个好价。"},
+      {"role": "user", "text": "我把车里的东西收了一下午，脚垫抱枕我那个水杯。开了六年，说舍不得也不是假话"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u071", "kind": "episodic", "text": "用户10月卖旧车，市场报价两万八到两万九，最后三万整卖给老三的朋友", "importance": 3, "keywords": ["旧车", "两万九", "老三的朋友", "三万整"], "state": "active", "supersedes": ""},
+    {"id": "p10-u072", "kind": "preference", "text": "用户收车里的东西时有点舍不得那辆开了六年的车", "importance": 2, "keywords": ["舍不得", "六年", "脚垫"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 68,
+   "date": "2026-10-07",
+   "sessions": [
+    {
+     "id": "p10-d68-s1",
+     "time": "22:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "明天去提车。今天问物业装充电桩，物业说小区电容不够，装不了。你说这事闹的，车还没提，桩先没戏"},
+      {"role": "assistant", "text": "那怎么充？"},
+      {"role": "user", "text": "只能去公共桩。小区后面有个充电站，晚上十一点后谷电，四毛多一度。老三说他充一次二十块能跑三百多公里"},
+      {"role": "assistant", "text": "那比油便宜太多了。"},
+      {"role": "user", "text": "所以排队就排队，我打算十一点去充一个小时，正好那会儿单少。么事么事，明天提车，后头的事后头再说"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u073", "kind": "fact", "text": "用户小区电容不够，装不了充电桩，只能去公共桩", "importance": 3, "keywords": ["充电桩", "电容不够", "公共桩"], "state": "active", "supersedes": ""},
+    {"id": "p10-u074", "kind": "fact", "text": "用户打算夜里十一点后去充电站充谷电，四毛多一度", "importance": 3, "keywords": ["谷电", "四毛多", "十一点"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 69,
+   "date": "2026-10-08",
+   "sessions": [
+    {
+     "id": "p10-d69-s1",
+     "time": "21:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "提车了！白的秦PLUS，坐进去那叫一个安静，我都不太会开了。销售教我用大屏，我按了半天"},
+      {"role": "assistant", "text": "恭喜，总算换了。"},
+      {"role": "user", "text": "我说这玩意儿整这么花哨干啥，能跑不就行了。从店里开回来还习惯性找换挡杆，找了两回都是空的"},
+      {"role": "assistant", "text": "脚上也得改，别踩错。"},
+      {"role": "user", "text": "第一趟就去拉了个机场单，一百四，电费不到十块，我坐车里乐了半天。给我媳妇视频，她说你别高兴太早"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u075", "kind": "update", "text": "用户10月8日提了白色的秦PLUS电车，从油车换成电车", "importance": 5, "keywords": ["提车", "秦PLUS", "电车", "10月8日"], "state": "active", "supersedes": "p10-u001"},
+    {"id": "p10-u076", "kind": "episodic", "text": "用户提车第一趟就拉了机场单，电费不到十块", "importance": 3, "keywords": ["机场单", "电费", "不到十块"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 71,
+   "date": "2026-10-10",
+   "sessions": [
+    {
+     "id": "p10-d71-s1",
+     "time": "23:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "跑了三天，我给你算算。以前一天油钱一百五，现在一天电费四十二，一个月就是三千，原来我一个月到手四千出头，现在能到七千多"},
+      {"role": "assistant", "text": "这账太清楚了。"},
+      {"role": "user", "text": "就是充电麻烦，排队一小时充一小时，一晚上没了两个钟头。所以我改夜里充，十一点到两点，边充边在车里睡一会儿"},
+      {"role": "assistant", "text": "睡车里对腰不好。"},
+      {"role": "user", "text": "么事么事，腰早就不好了，不差这一回。你说这钱省下来，值不值这两个钟头"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u077", "kind": "fact", "text": "用户电车一天电费四十二，比油车一天一百五省一百", "importance": 3, "keywords": ["电费", "四十二", "一百五", "省"], "state": "active", "supersedes": ""},
+    {"id": "p10-u078", "kind": "fact", "text": "用户现在一个月能到手七千多，比原来四千出头多了不少", "importance": 4, "keywords": ["到手七千多", "四千出头", "多了"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 73,
+   "date": "2026-10-12",
+   "sessions": [
+    {
+     "id": "p10-d73-s1",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我儿子把篮球退了，改学乒乓球。他说打篮球太累，乒乓球在屋里不晒。我一听就火了，五百多的球鞋刚买"},
+      {"role": "assistant", "text": "这孩子挑得挺精明。"},
+      {"role": "user", "text": "他说那鞋跑步也能穿。他妈在旁边笑，我一看这架势就算了，乒乓球也是运动，国球嘛"},
+      {"role": "assistant", "text": "国球，没毛病。"},
+      {"role": "user", "text": "结果他学了两周还挺上瘾，天天拿个拍子在饭桌上颠球。就是那球桌要两千多，我先不给他买，么事么事，先在学校的打"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u079", "kind": "update", "text": "用户儿子10月把篮球退了，改学乒乓球", "importance": 3, "keywords": ["儿子", "乒乓球", "篮球退了"], "state": "active", "supersedes": "p10-u029"},
+    {"id": "p10-u080", "kind": "episodic", "text": "用户儿子学两周乒乓就上瘾，天天在饭桌上颠球", "importance": 2, "keywords": ["颠球", "饭桌", "上瘾"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 75,
+   "date": "2026-10-14",
+   "sessions": [
+    {
+     "id": "p10-d75-s1",
+     "time": "22:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天我媳妇下夜班回来，我给她下了碗面，煎了个蛋。她愣了一下，说太阳打西边出来了"},
+      {"role": "assistant", "text": "你这是转性了。"},
+      {"role": "user", "text": "九年了我下厨的次数一只手数得过来。我说你辛苦了，就这一句，她眼睛红了，转过去洗脸"},
+      {"role": "assistant", "text": "这句话你早该说了。"},
+      {"role": "user", "text": "以前总觉得挣钱回来就行了，说这些肉麻的没用。这两天家里气氛好多了，我儿子说爸你以后天天做饭吧"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u081", "kind": "episodic", "text": "用户10月给媳妇下了碗面煎了个蛋，说了句你辛苦了，她眼睛红了", "importance": 3, "keywords": ["下了碗面", "你辛苦了", "眼睛红"], "state": "active", "supersedes": ""},
+    {"id": "p10-u082", "kind": "preference", "text": "用户以前觉得挣钱回来就行，肉麻的话没用", "importance": 3, "keywords": ["挣钱回来", "肉麻的话", "没用"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 77,
+   "date": "2026-10-16",
+   "sessions": [
+    {
+     "id": "p10-d77-s1",
+     "time": "01:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "前天夜里拉了个乘客，抱个孩子，说去儿童医院，孩子发烧四十度。他妈的声音都抖了，我一听就把双闪打开走高架"},
+      {"role": "assistant", "text": "这大半夜的，够急的。"},
+      {"role": "user", "text": "二十分钟到了。她掏手机付款，我说别付了赶紧抱孩子进去。她愣了半天，说了三遍谢谢"},
+      {"role": "assistant", "text": "你这事办得漂亮。"},
+      {"role": "user", "text": "我儿子小时候也这么发过烧，我知道那个慌。后来平台给我发了个表扬，还奖励五十，这五十我拿着挺舒服"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u083", "kind": "episodic", "text": "用户10月夜里拉了个抱发烧孩子的妈妈去儿童医院，没要钱", "importance": 3, "keywords": ["儿童医院", "发烧", "没要钱"], "state": "active", "supersedes": ""},
+    {"id": "p10-u084", "kind": "fact", "text": "用户因这事拿到平台表扬和五十块奖励", "importance": 2, "keywords": ["平台表扬", "五十块", "奖励"], "state": "active", "supersedes": ""},
+    {"id": "p10-u085", "kind": "preference", "text": "用户懂孩子发高烧时那种慌，因为儿子小时候也这样", "importance": 2, "keywords": ["发高烧", "那种慌", "儿子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 79,
+   "date": "2026-10-18",
+   "sessions": [
+    {
+     "id": "p10-d79-s1",
+     "time": "20:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天我爸出院了！住了一个多月，能拄着拐自己走两步了。我去办手续，医保报完自己掏了一万三"},
+      {"role": "assistant", "text": "这是好事啊。"},
+      {"role": "user", "text": "我姐说一人一半，我说不用我出。她跟我急，说你逞强。我说我不逞强，我换了电车一个月多挣三千，扛得住"},
+      {"role": "assistant", "text": "那也确实扛得住。"},
+      {"role": "user", "text": "把我爸送回咸阳，我妈煮了面。我爸坐炕上指着我，说你这阵子瘦了。我说么事么事，换车省了钱，瘦点值"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u086", "kind": "episodic", "text": "用户10月18日接父亲出院，医保报完自己掏了一万三", "importance": 4, "keywords": ["出院", "医保", "一万三"], "state": "active", "supersedes": ""},
+    {"id": "p10-u087", "kind": "relation", "text": "用户的姐姐说医药费一人一半，他说不用他出", "importance": 3, "keywords": ["姐姐", "一人一半", "不用"], "state": "active", "supersedes": ""},
+    {"id": "p10-u088", "kind": "relation", "text": "用户把父亲送回咸阳，爸妈说这阵子瘦了", "importance": 3, "keywords": ["咸阳", "瘦了", "炕上"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 83,
+   "date": "2026-10-22",
+   "sessions": [
+    {
+     "id": "p10-d83-s1",
+     "time": "22:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "这两天腰又犯了，晚上翻不了身，早上起来得扶着墙站一会儿，你说这身体是真不抗造。去拍了个片子，大夫说腰突，第四第五节"},
+      {"role": "assistant", "text": "这毛病就是坐出来的。"},
+      {"role": "user", "text": "他问我干啥的，我说跑网约车。他笑了，说你这行十个有八个突。给我开了膏药和一个护腰的，让我跑车的时候戴上"},
+      {"role": "assistant", "text": "管用就行，难看点算啥。"},
+      {"role": "user", "text": "我戴上照镜子，像八十的。我儿子说爸你这样像动画片里的机器人，么事么事，这小子就会损我"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u089", "kind": "episodic", "text": "用户10月腰疼犯了，拍片子是腰突第四第五节", "importance": 4, "keywords": ["腰疼", "腰突", "第四第五节"], "state": "active", "supersedes": ""},
+    {"id": "p10-u090", "kind": "trivia", "text": "用户戴护腰跑车，儿子说他像动画片里的机器人", "importance": 1, "keywords": ["护腰", "机器人", "儿子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 86,
+   "date": "2026-10-25",
+   "sessions": [
+    {
+     "id": "p10-d86-s1",
+     "time": "23:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "十月快完了，我给你算笔账。流水八千八，电费一千二，到手七千四，比八月多了三千六"},
+      {"role": "assistant", "text": "这才像个样子。"},
+      {"role": "user", "text": "你说这三年我白烧了多少油钱，想想都心疼。我媳妇说这七千四里拿三千还借的钱，一年就还清"},
+      {"role": "assistant", "text": "一年多就翻过来了。"},
+      {"role": "user", "text": "我说还清了以后咱换个有车位的房子。她笑，说你先别犯梦。么事么事，一步一步来，我这个人不怕跑，就怕跑不出数"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u091", "kind": "fact", "text": "用户10月流水八千八，电费一千二，到手七千四", "importance": 4, "keywords": ["流水", "八千八", "电费", "七千四"], "state": "active", "supersedes": ""},
+    {"id": "p10-u092", "kind": "plan", "text": "用户想还清借款后换一个带车位的房子", "importance": 3, "keywords": ["车位", "房子", "还清借款"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 88,
+   "date": "2026-10-27",
+   "sessions": [
+    {
+     "id": "p10-d88-s1",
+     "time": "21:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "今天我儿子非要拉我看海贼王的剧场版，看到路飞开五档打那个大块头。我陪他看完，还问他这算不算暴力"},
+      {"role": "assistant", "text": "他怎么答的？"},
+      {"role": "user", "text": "他说不算，路飞是保护人的。你说这孩子道理比我会讲，我跟他妈吵架的时候他都不吭声，心里有数"},
+      {"role": "assistant", "text": "孩子心里有数。"},
+      {"role": "user", "text": "看完他靠在我肩上睡着了，我也不敢动，就那么坐着把片尾曲看完。么事么事，我这辈子没啥大本事，能陪他看个动画片也不赖"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u093", "kind": "episodic", "text": "用户10月陪儿子看海贼王剧场版，儿子靠他肩上睡着了", "importance": 3, "keywords": ["剧场版", "肩上", "片尾曲"], "state": "active", "supersedes": ""},
+    {"id": "p10-u094", "kind": "preference", "text": "用户说自己没啥大本事，能陪儿子看动画片也不赖", "importance": 3, "keywords": ["没啥大本事", "陪儿子", "不赖"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 90,
+   "date": "2026-10-29",
+   "sessions": [
+    {
+     "id": "p10-d90-s1",
+     "time": "23:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天把账本合上。这一年跑下来总算没白跑，我爸能自己吃饭了，儿子球也打得挺好。下午我把车擦了一遍，白的，太阳底下一看还挺亮，跟新的一样"},
+      {"role": "assistant", "text": "都往好处走了。"},
+      {"role": "user", "text": "这车我得再跑五年。老三今天说他也想换车，问我电车咋样，我把这一个月的气电账给他算了一遍，他现在也动了"},
+      {"role": "assistant", "text": "你也成了劝人换车的人了。"},
+      {"role": "user", "text": "么事么事，好话不说二遍。我还想着明年开春把我爸接到西安住一阵，找一楼能推轮椅的。行了，我明天早班五点半出车"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p10-u095", "kind": "plan", "text": "用户打算明年开春把父亲接到西安住一阵，想找一楼能推轮椅的房子", "importance": 3, "keywords": ["明年开春", "一楼", "推轮椅", "西安"], "state": "active", "supersedes": ""},
+    {"id": "p10-u096", "kind": "fact", "text": "用户说这辆白色电车要再跑五年", "importance": 2, "keywords": ["再跑五年", "白色电车", "擦车"], "state": "active", "supersedes": ""}
+   ]
+  }
+ ],
+ "probes": [
+  {
+   "id": "p10-q01",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我收工以后爱去哪条街吃东西",
+   "expect": {"any": ["洒金桥"], "none": []},
+   "unit_ids": ["p10-u003"],
+   "note": "第2天说去洒金桥咥泡馍"
+  },
+  {
+   "id": "p10-q02",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我爸八月份给我打电话，说的是哪儿不舒服",
+   "expect": {"any": ["头晕"], "none": []},
+   "unit_ids": ["p10-u025"],
+   "note": "第19天父亲说头晕、血压高"
+  },
+  {
+   "id": "p10-q03",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "那天下班我给媳妇弄了什么吃，她眼睛红了",
+   "expect": {"any": ["下了碗面"], "none": []},
+   "unit_ids": ["p10-u081"],
+   "note": "第75天下面条煎蛋"
+  },
+  {
+   "id": "p10-q04",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我腰疼去拍片子，大夫说是哪儿的问题",
+   "expect": {"any": ["腰突"], "none": []},
+   "unit_ids": ["p10-u089"],
+   "note": "第83天拍片子腰突"
+  },
+  {
+   "id": "p10-q05",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我明年开春想把爸接到哪儿住",
+   "expect": {"any": ["一楼"], "none": []},
+   "unit_ids": ["p10-u095"],
+   "note": "第90天说找一楼能推轮椅的"
+  },
+  {
+   "id": "p10-q06",
+   "category": "work",
+   "ask_day": 90,
+   "query": "我那次修车定损，配件按几成赔的",
+   "expect": {"any": ["七成"], "none": []},
+   "unit_ids": ["p10-u014"],
+   "note": "第7天定损按七成折旧"
+  },
+  {
+   "id": "p10-q07",
+   "category": "work",
+   "ask_day": 90,
+   "query": "平台现在抽我几成来着",
+   "expect": {"any": ["两成"], "none": []},
+   "unit_ids": ["p10-u019"],
+   "note": "第11天说抽成涨到两成"
+  },
+  {
+   "id": "p10-q08",
+   "category": "work",
+   "ask_day": 90,
+   "query": "我车进厂那五天，是借谁的车跑的",
+   "expect": {"any": ["借老三的车跑"], "none": []},
+   "unit_ids": ["p10-u053"],
+   "note": "第48天借老三的车跑，一天两百油钱"
+  },
+  {
+   "id": "p10-q09",
+   "category": "work",
+   "ask_day": 90,
+   "query": "九月我流水多少，到手还剩多少",
+   "expect": {"any": ["六千二", "三千一"], "none": []},
+   "unit_ids": ["p10-u065"],
+   "note": "第61天算9月账；P0 修：9月到手 2800→3100，两千八 只剩房贷一个含义，对方修车费也改 2600"
+  },
+  {
+   "id": "p10-q10",
+   "category": "work",
+   "ask_day": 90,
+   "query": "我爸出院的时候，医保报完家里还掏了多少",
+   "expect": {"any": ["一万三"], "none": []},
+   "unit_ids": ["p10-u086"],
+   "note": "第79天出院，自掏一万三"
+  },
+  {
+   "id": "p10-q11",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我陪儿子看海贼王，哪一段看得心里堵",
+   "expect": {"any": ["顶上战争"], "none": []},
+   "unit_ids": ["p10-u016"],
+   "note": "第9天看顶上战争艾斯死"
+  },
+  {
+   "id": "p10-q12",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我儿子二刷的时候，给我画了张什么",
+   "expect": {"any": ["人物关系图"], "none": []},
+   "unit_ids": ["p10-u069"],
+   "note": "第64天儿子画人物关系图"
+  },
+  {
+   "id": "p10-q13",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "看剧场版那回，我儿子最后怎么着了",
+   "expect": {"any": ["肩上"], "none": []},
+   "unit_ids": ["p10-u093"],
+   "note": "第88天儿子靠肩上睡着"
+  },
+  {
+   "id": "p10-q14",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我那台车加满一箱油多少钱来着",
+   "expect": {"any": ["三百二"], "none": []},
+   "unit_ids": ["p10-u006"],
+   "note": "第3天加满三百二"
+  },
+  {
+   "id": "p10-q15",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "旧车最后到底卖了多少钱",
+   "expect": {"any": ["三万整"], "none": []},
+   "unit_ids": ["p10-u071"],
+   "note": "第66天成交三万整；P1 修：原 gold 两万九 只是市场报价，正确答案不在 any"
+  },
+  {
+   "id": "p10-q16",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我拉了那个发烧的孩子，平台给了我啥",
+   "expect": {"any": ["五十块"], "none": []},
+   "unit_ids": ["p10-u084"],
+   "note": "第77天平台表扬加五十块"
+  },
+  {
+   "id": "p10-q17",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我把那台烧油的老伙计换成啥了",
+   "expect": {"any": ["秦PLUS"], "none": ["帝豪"]},
+   "unit_ids": ["p10-u075"],
+   "note": "第69天提电车，取代第1天的帝豪"
+  },
+  {
+   "id": "p10-q18",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我爸住院以后，我晚上还跑不跑车了",
+   "expect": {"any": ["开始跑夜班"], "none": ["不想跑夜班"]},
+   "unit_ids": ["p10-u048"],
+   "note": "第45天开始跑夜班；P0 修：gold 换成新状态独有的开始跑夜班，旧单元只有不想跑夜班"
+  },
+  {
+   "id": "p10-q19",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我儿子那个社团后来改成啥了",
+   "expect": {"any": ["乒乓球"], "none": ["篮球"]},
+   "unit_ids": ["p10-u079"],
+   "note": "第73天篮球改乒乓球"
+  },
+  {
+   "id": "p10-q20",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我修车后来都去哪儿了",
+   "expect": {"any": ["老赵的修理厂"], "none": ["4S店"]},
+   "unit_ids": ["p10-u057"],
+   "note": "第52天从4S店换到老赵的修理厂；P1 修：老赵 也出现在 d29 修热水器的记忆里，gold 收窄"
+  },
+  {
+   "id": "p10-q21",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "我八月的流水、十月的到手，分别是多少",
+   "expect": {"any": ["八千六", "七千四"], "none": []},
+   "unit_ids": ["p10-u035", "p10-u091"],
+   "note": "8月流水八千六 / 10月到手七千四；P1 修：问句改成分别问两个口径，gold 直接答题面"
+  },
+  {
+   "id": "p10-q22",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "我爸那场病是啥病，最后在医院花了多少",
+   "expect": {"any": ["脑梗", "一万三"], "none": []},
+   "unit_ids": ["p10-u043", "p10-u086"],
+   "note": "9月10日脑梗住院，10月18日出院自掏一万三"
+  },
+  {
+   "id": "p10-q23",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "换电车这事我是怎么算过来的",
+   "expect": {"any": ["三千二", "四十二"], "none": []},
+   "unit_ids": ["p10-u041", "p10-u077"],
+   "note": "借电车开一天算多落三千二；电费一天四十二"
+  },
+  {
+   "id": "p10-q24",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "我那次追尾之后，决定换成什么了",
+   "expect": {"any": ["定下来换电车"], "none": []},
+   "unit_ids": ["p10-u050", "p10-u059"],
+   "note": "9月15日追尾修九千，随后定下换电车；P1 修：去掉不答题面的九千，gold 用 u059 独有的定下来换电车（避开 8月琢磨换电车/9月初盘算）"
+  },
+  {
+   "id": "p10-q25",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "我爸住院之后我把班改成什么了",
+   "expect": {"any": ["开始跑夜班", "护工费"], "none": []},
+   "unit_ids": ["p10-u043", "p10-u048", "p10-u049"],
+   "note": "父亲住院→开始跑夜班，夜班多的一百五够护工费；P2：gold 与 q18 同源已同步收窄，仍与 q18 部分重复，按规则未删题"
+  },
+  {
+   "id": "p10-q26",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "换车前后，我一个月到手分别是多少",
+   "expect": {"any": ["三千一", "七千四"], "none": []},
+   "unit_ids": ["p10-u065", "p10-u091"],
+   "note": "9月到手三千一 / 10月到手七千四；P1 修：原 any 只有两个时点值且含撞车的两千八，现按两个时点分别给 gold"
+  },
+  {
+   "id": "p10-q27",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "我拉的那个赶飞机的，是去哪个机场",
+   "expect": {"any": ["咸阳机场"], "none": ["儿童医院"]},
+   "unit_ids": ["p10-u023"],
+   "note": "易混：去咸阳机场的乘客 vs 去儿童医院的乘客"
+  },
+  {
+   "id": "p10-q28",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "八月在南二环那次，是撞的什么车",
+   "expect": {"any": ["出租车"], "none": ["绕城高速"]},
+   "unit_ids": ["p10-u008"],
+   "note": "易混：8月被出租车追尾 vs 9月绕城高速自己追尾"
+  },
+  {
+   "id": "p10-q29",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "我爸九月份那次进医院，是什么病",
+   "expect": {"any": ["脑梗"], "none": ["儿童医院"]},
+   "unit_ids": ["p10-u043"],
+   "note": "易混：父亲住的医院 vs 乘客去的儿童医院"
+  },
+  {
+   "id": "p10-q30",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我是不是跟你说过我想养狗的事",
+   "expect": {"any": [], "none": ["养狗", "金毛", "遛狗"]},
+   "unit_ids": [],
+   "note": "他从没提过养狗"
+  },
+  {
+   "id": "p10-q31",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我有没有提过炒股这回事",
+   "expect": {"any": [], "none": ["炒股", "基金定投", "大盘"]},
+   "unit_ids": [],
+   "note": "他从没提过炒股"
+  }
+ ]
+}

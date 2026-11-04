@@ -26,9 +26,17 @@ bench/
 docs/*
 !docs/07-hippocampus.md
 !docs/archive-semantics.md
+# README 用的渲染图（演示数据生成，不含真实记忆）
+!docs/images
+docs/images/*
+!docs/images/architecture.png
+!docs/images/live-card.png
+!docs/images/starmap.png
 
 # 开发草稿
 tools/
 .rename-backup/
 _qa_tmp/
 tests/test_holdout.py
+1.md
+PLAN.md

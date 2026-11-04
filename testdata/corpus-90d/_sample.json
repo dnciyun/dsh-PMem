@@ -1,0 +1,2932 @@
+{
+ "version": 1,
+ "id": "p00",
+ "name": "样例",
+ "profile": {
+  "age": 29,
+  "city": "杭州",
+  "job": "后端工程师",
+  "voice": "短句",
+  "relations": "妈妈；室友老周"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "_sample-d01-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "今天又去盯订单服务的灰度了，心累，编号蓝鲸01号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是订单服务这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "订单服务那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d01-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "自行车链条又掉了，懒得修，顺便又想起蓝鲸01号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，自行车那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u001",
+     "kind": "episodic",
+     "text": "用户第01天说订单服务那边不太顺，还记了蓝鲸01号这件事",
+     "importance": 3,
+     "keywords": [
+      "订单服务",
+      "蓝鲸01号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u002",
+     "kind": "trivia",
+     "text": "用户第01天也提了自行车，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "自行车",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-08-02",
+   "sessions": [
+    {
+     "id": "_sample-d02-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "年糕今天又把杯子扒到地上了，编号蓝鲸02号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是年糕这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "年糕那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d02-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "芙莉莲看了两集，没太大感觉，顺便又想起蓝鲸02号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，葬送的芙莉莲那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u003",
+     "kind": "episodic",
+     "text": "用户第02天说年糕那边不太顺，还记了蓝鲸02号这件事",
+     "importance": 3,
+     "keywords": [
+      "年糕",
+      "蓝鲸02号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u004",
+     "kind": "fact",
+     "text": "用户第02天也提了葬送的芙莉莲，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "葬送的芙莉莲",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 4,
+   "date": "2026-08-04",
+   "sessions": [
+    {
+     "id": "_sample-d04-s1",
+     "time": "09:20",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "补番补到命运石之门第八集，脑子要烧了；用户一直用 VS Code 写代码，一直没变过"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是命运石之门这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "命运石之门那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d04-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "楼下的流浪猫又来了，顺便又想起蓝鲸04号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，流浪猫那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-old0",
+     "kind": "fact",
+     "text": "用户一直用 VS Code 写代码，觉得顺手",
+     "importance": 3,
+     "keywords": [
+      "命运石之门",
+      "蓝鲸04号"
+     ],
+     "state": "superseded",
+     "supersedes": "",
+     "superseded_by": "_sample-u009"
+    },
+    {
+     "id": "_sample-u006",
+     "kind": "fact",
+     "text": "用户第04天也提了流浪猫，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "流浪猫",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 6,
+   "date": "2026-08-06",
+   "sessions": [
+    {
+     "id": "_sample-d06-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "自行车链条又掉了，懒得修，编号蓝鲸06号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是自行车这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "自行车那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d06-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "晚上跑了三公里，腿软，顺便又想起蓝鲸06号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，跑步那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u007",
+     "kind": "episodic",
+     "text": "用户第06天说自行车那边不太顺，还记了蓝鲸06号这件事",
+     "importance": 3,
+     "keywords": [
+      "自行车",
+      "蓝鲸06号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u008",
+     "kind": "fact",
+     "text": "用户第06天也提了跑步，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "跑步",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 9,
+   "date": "2026-08-09",
+   "sessions": [
+    {
+     "id": "_sample-d09-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "接口文档被人改乱了，想骂人；用户把写代码的工具从 VS Code 换成 Cursor 了，就这么定了"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是接口文档这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "接口文档那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d09-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "下班被雨淋了，顺便又想起蓝鲸09号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，下雨那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u009",
+     "kind": "update",
+     "text": "用户把写代码的工具从 VS Code 换成 Cursor 了",
+     "importance": 3,
+     "keywords": [
+      "接口文档",
+      "蓝鲸09号"
+     ],
+     "state": "active",
+     "supersedes": "_sample-old0"
+    },
+    {
+     "id": "_sample-u010",
+     "kind": "trivia",
+     "text": "用户第09天也提了下雨，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "下雨",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 12,
+   "date": "2026-08-12",
+   "sessions": [
+    {
+     "id": "_sample-d12-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "今天喝了三杯咖啡还是困；用户一般挤地铁上班，一直没变过"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是咖啡这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "咖啡那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d12-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "孤独摇滚最新一集看哭了，顺便又想起蓝鲸12号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，孤独摇滚那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-old1",
+     "kind": "preference",
+     "text": "用户一般挤地铁上班，懒得骑车",
+     "importance": 3,
+     "keywords": [
+      "咖啡",
+      "蓝鲸12号"
+     ],
+     "state": "superseded",
+     "supersedes": "",
+     "superseded_by": "_sample-u035"
+    },
+    {
+     "id": "_sample-u012",
+     "kind": "fact",
+     "text": "用户第12天也提了孤独摇滚，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "孤独摇滚",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 15,
+   "date": "2026-08-15",
+   "sessions": [
+    {
+     "id": "_sample-d15-s1",
+     "time": "09:20",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "孤独摇滚最新一集看哭了，编号蓝鲸15号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是孤独摇滚这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "孤独摇滚那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d15-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "新买的键盘声音太大，被室友嫌，顺便又想起蓝鲸15号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，键盘那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u013",
+     "kind": "episodic",
+     "text": "用户第15天说孤独摇滚那边不太顺，还记了蓝鲸15号这件事",
+     "importance": 3,
+     "keywords": [
+      "孤独摇滚",
+      "蓝鲸15号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u014",
+     "kind": "preference",
+     "text": "用户第15天也提了键盘，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "键盘",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 18,
+   "date": "2026-08-18",
+   "sessions": [
+    {
+     "id": "_sample-d18-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "又失眠到三点才睡着，编号蓝鲸18号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是失眠这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "失眠那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d18-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "代码评审被同事怼了，顺便又想起蓝鲸18号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，代码评审那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u015",
+     "kind": "episodic",
+     "text": "用户第18天说失眠那边不太顺，还记了蓝鲸18号这件事",
+     "importance": 3,
+     "keywords": [
+      "失眠",
+      "蓝鲸18号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u016",
+     "kind": "fact",
+     "text": "用户第18天也提了代码评审，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "代码评审",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 21,
+   "date": "2026-08-21",
+   "sessions": [
+    {
+     "id": "_sample-d21-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "房东又来催房租了，编号蓝鲸21号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是房租这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "房租那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d21-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "监控大盘全是绿的，终于能睡个好觉，顺便又想起蓝鲸21号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，监控那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u017",
+     "kind": "episodic",
+     "text": "用户第21天说房租那边不太顺，还记了蓝鲸21号这件事",
+     "importance": 3,
+     "keywords": [
+      "房租",
+      "蓝鲸21号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u018",
+     "kind": "trivia",
+     "text": "用户第21天也提了监控，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "监控",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 24,
+   "date": "2026-08-24",
+   "sessions": [
+    {
+     "id": "_sample-d24-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "缓存那块儿的坑终于填了，编号蓝鲸24号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是缓存这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "缓存那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d24-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "补番补到命运石之门第八集，脑子要烧了，顺便又想起蓝鲸24号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，命运石之门那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u019",
+     "kind": "episodic",
+     "text": "用户第24天说缓存那边不太顺，还记了蓝鲸24号这件事",
+     "importance": 3,
+     "keywords": [
+      "缓存",
+      "蓝鲸24号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u020",
+     "kind": "fact",
+     "text": "用户第24天也提了命运石之门，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "命运石之门",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 27,
+   "date": "2026-08-27",
+   "sessions": [
+    {
+     "id": "_sample-d27-s1",
+     "time": "09:20",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "芙莉莲看了两集，没太大感觉，编号蓝鲸27号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是葬送的芙莉莲这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "葬送的芙莉莲那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d27-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "缓存那块儿的坑终于填了，顺便又想起蓝鲸27号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，缓存那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u021",
+     "kind": "episodic",
+     "text": "用户第27天说葬送的芙莉莲那边不太顺，还记了蓝鲸27号这件事",
+     "importance": 3,
+     "keywords": [
+      "葬送的芙莉莲",
+      "蓝鲸27号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u022",
+     "kind": "fact",
+     "text": "用户第27天也提了缓存，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "缓存",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 30,
+   "date": "2026-08-30",
+   "sessions": [
+    {
+     "id": "_sample-d30-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "妈妈周日又打电话来催婚；用户说绝对不养猫，一直没变过"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是妈妈这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "妈妈那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d30-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "最烦写周报，顺便又想起蓝鲸30号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，周报那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-old2",
+     "kind": "preference",
+     "text": "用户说绝对不养猫，嫌掉毛",
+     "importance": 3,
+     "keywords": [
+      "妈妈",
+      "蓝鲸30号"
+     ],
+     "state": "superseded",
+     "supersedes": "",
+     "superseded_by": "_sample-u059"
+    },
+    {
+     "id": "_sample-u024",
+     "kind": "fact",
+     "text": "用户第30天也提了周报，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "周报",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 33,
+   "date": "2026-09-02",
+   "sessions": [
+    {
+     "id": "_sample-d33-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "这周五要上线，紧张，编号蓝鲸33号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是上线这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "上线那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d33-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "快递被放错驿站了，顺便又想起蓝鲸33号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，快递那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u025",
+     "kind": "episodic",
+     "text": "用户第33天说上线那边不太顺，还记了蓝鲸33号这件事",
+     "importance": 3,
+     "keywords": [
+      "上线",
+      "蓝鲸33号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u026",
+     "kind": "trivia",
+     "text": "用户第33天也提了快递，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "快递",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 36,
+   "date": "2026-09-05",
+   "sessions": [
+    {
+     "id": "_sample-d36-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "新买的键盘声音太大，被室友嫌，编号蓝鲸36号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是键盘这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "键盘那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d36-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "体检报告出来了，脂肪肝，顺便又想起蓝鲸36号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，体检那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u027",
+     "kind": "episodic",
+     "text": "用户第36天说键盘那边不太顺，还记了蓝鲸36号这件事",
+     "importance": 3,
+     "keywords": [
+      "键盘",
+      "蓝鲸36号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u028",
+     "kind": "fact",
+     "text": "用户第36天也提了体检，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "体检",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 39,
+   "date": "2026-09-08",
+   "sessions": [
+    {
+     "id": "_sample-d39-s1",
+     "time": "09:20",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "巨人的结局让我很生气，编号蓝鲸39号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是进击的巨人这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "进击的巨人那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d39-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "今天喝了三杯咖啡还是困，顺便又想起蓝鲸39号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，咖啡那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u029",
+     "kind": "episodic",
+     "text": "用户第39天说进击的巨人那边不太顺，还记了蓝鲸39号这件事",
+     "importance": 3,
+     "keywords": [
+      "进击的巨人",
+      "蓝鲸39号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u030",
+     "kind": "fact",
+     "text": "用户第39天也提了咖啡，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "咖啡",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 42,
+   "date": "2026-09-11",
+   "sessions": [
+    {
+     "id": "_sample-d42-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "昨天火锅吃多了，今天胃难受，编号蓝鲸42号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是火锅这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "火锅那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d42-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "这周五要上线，紧张，顺便又想起蓝鲸42号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，上线那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u031",
+     "kind": "episodic",
+     "text": "用户第42天说火锅那边不太顺，还记了蓝鲸42号这件事",
+     "importance": 3,
+     "keywords": [
+      "火锅",
+      "蓝鲸42号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u032",
+     "kind": "fact",
+     "text": "用户第42天也提了上线，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "上线",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 45,
+   "date": "2026-09-14",
+   "sessions": [
+    {
+     "id": "_sample-d45-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "最烦写周报，编号蓝鲸45号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是周报这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "周报那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d45-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "咒术回战越看越压抑，顺便又想起蓝鲸45号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，咒术回战那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u033",
+     "kind": "episodic",
+     "text": "用户第45天说周报那边不太顺，还记了蓝鲸45号这件事",
+     "importance": 3,
+     "keywords": [
+      "周报",
+      "蓝鲸45号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u034",
+     "kind": "trivia",
+     "text": "用户第45天也提了咒术回战，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "咒术回战",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 48,
+   "date": "2026-09-17",
+   "sessions": [
+    {
+     "id": "_sample-d48-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "楼下的流浪猫又来了；用户从九月开始骑车上班，就这么定了"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是流浪猫这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "流浪猫那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d48-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "赛马娘抽卡又沉了，顺便又想起蓝鲸48号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，赛马娘那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u035",
+     "kind": "update",
+     "text": "用户从九月开始骑车上班，不挤地铁了",
+     "importance": 3,
+     "keywords": [
+      "流浪猫",
+      "蓝鲸48号"
+     ],
+     "state": "active",
+     "supersedes": "_sample-old1"
+    },
+    {
+     "id": "_sample-u036",
+     "kind": "fact",
+     "text": "用户第48天也提了赛马娘，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "赛马娘",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 51,
+   "date": "2026-09-20",
+   "sessions": [
+    {
+     "id": "_sample-d51-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "水电费这个月涨了一截，编号蓝鲸51号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是水电费这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "水电费那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d51-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "年糕今天又把杯子扒到地上了，顺便又想起蓝鲸51号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，年糕那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u037",
+     "kind": "episodic",
+     "text": "用户第51天说水电费那边不太顺，还记了蓝鲸51号这件事",
+     "importance": 3,
+     "keywords": [
+      "水电费",
+      "蓝鲸51号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u038",
+     "kind": "preference",
+     "text": "用户第51天也提了年糕，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "年糕",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 54,
+   "date": "2026-09-23",
+   "sessions": [
+    {
+     "id": "_sample-d54-s1",
+     "time": "09:20",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "咒术回战越看越压抑，编号蓝鲸54号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是咒术回战这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "咒术回战那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d54-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "房东又来催房租了，顺便又想起蓝鲸54号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，房租那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u039",
+     "kind": "episodic",
+     "text": "用户第54天说咒术回战那边不太顺，还记了蓝鲸54号这件事",
+     "importance": 3,
+     "keywords": [
+      "咒术回战",
+      "蓝鲸54号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u040",
+     "kind": "fact",
+     "text": "用户第54天也提了房租，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "房租",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 57,
+   "date": "2026-09-26",
+   "sessions": [
+    {
+     "id": "_sample-d57-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "代码评审被同事怼了，编号蓝鲸57号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是代码评审这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "代码评审那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d57-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "昨天火锅吃多了，今天胃难受，顺便又想起蓝鲸57号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，火锅那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u041",
+     "kind": "episodic",
+     "text": "用户第57天说代码评审那边不太顺，还记了蓝鲸57号这件事",
+     "importance": 3,
+     "keywords": [
+      "代码评审",
+      "蓝鲸57号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u042",
+     "kind": "trivia",
+     "text": "用户第57天也提了火锅，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "火锅",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 60,
+   "date": "2026-09-29",
+   "sessions": [
+    {
+     "id": "_sample-d60-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "下班被雨淋了，编号蓝鲸60号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是下雨这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "下雨那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d60-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "芙莉莲看了两集，没太大感觉，顺便又想起蓝鲸60号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，葬送的芙莉莲那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u043",
+     "kind": "episodic",
+     "text": "用户第60天说下雨那边不太顺，还记了蓝鲸60号这件事",
+     "importance": 3,
+     "keywords": [
+      "下雨",
+      "蓝鲸60号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u044",
+     "kind": "fact",
+     "text": "用户第60天也提了葬送的芙莉莲，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "葬送的芙莉莲",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 63,
+   "date": "2026-10-02",
+   "sessions": [
+    {
+     "id": "_sample-d63-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "只喝铁观音，别的茶喝不惯，编号蓝鲸63号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是铁观音这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "铁观音那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d63-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "快递被放错驿站了，顺便又想起蓝鲸63号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，快递那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u045",
+     "kind": "episodic",
+     "text": "用户第63天说铁观音那边不太顺，还记了蓝鲸63号这件事",
+     "importance": 3,
+     "keywords": [
+      "铁观音",
+      "蓝鲸63号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u046",
+     "kind": "fact",
+     "text": "用户第63天也提了快递，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "快递",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 66,
+   "date": "2026-10-05",
+   "sessions": [
+    {
+     "id": "_sample-d66-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "开会开了三个小时，什么都没定，编号蓝鲸66号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是会议这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "会议那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d66-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "代码评审被同事怼了，顺便又想起蓝鲸66号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，代码评审那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u047",
+     "kind": "episodic",
+     "text": "用户第66天说会议那边不太顺，还记了蓝鲸66号这件事",
+     "importance": 3,
+     "keywords": [
+      "会议",
+      "蓝鲸66号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u048",
+     "kind": "fact",
+     "text": "用户第66天也提了代码评审，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "代码评审",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 69,
+   "date": "2026-10-08",
+   "sessions": [
+    {
+     "id": "_sample-d69-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "晚上跑了三公里，腿软，编号蓝鲸69号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是跑步这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "跑步那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d69-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "新买的水杯保温效果一般，顺便又想起蓝鲸69号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，水杯那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u049",
+     "kind": "episodic",
+     "text": "用户第69天说跑步那边不太顺，还记了蓝鲸69号这件事",
+     "importance": 3,
+     "keywords": [
+      "跑步",
+      "蓝鲸69号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u050",
+     "kind": "trivia",
+     "text": "用户第69天也提了水杯，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "水杯",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 72,
+   "date": "2026-10-11",
+   "sessions": [
+    {
+     "id": "_sample-d72-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "新买的水杯保温效果一般，编号蓝鲸72号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是水杯这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "水杯那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d72-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "体检报告出来了，脂肪肝，顺便又想起蓝鲸72号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，体检那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u051",
+     "kind": "episodic",
+     "text": "用户第72天说水杯那边不太顺，还记了蓝鲸72号这件事",
+     "importance": 3,
+     "keywords": [
+      "水杯",
+      "蓝鲸72号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u052",
+     "kind": "fact",
+     "text": "用户第72天也提了体检，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "体检",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 75,
+   "date": "2026-10-14",
+   "sessions": [
+    {
+     "id": "_sample-d75-s1",
+     "time": "09:20",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "赛马娘抽卡又沉了，编号蓝鲸75号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是赛马娘这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "赛马娘那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d75-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "新买的水杯保温效果一般，顺便又想起蓝鲸75号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，水杯那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u053",
+     "kind": "episodic",
+     "text": "用户第75天说赛马娘那边不太顺，还记了蓝鲸75号这件事",
+     "importance": 3,
+     "keywords": [
+      "赛马娘",
+      "蓝鲸75号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u054",
+     "kind": "fact",
+     "text": "用户第75天也提了水杯，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "水杯",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 78,
+   "date": "2026-10-17",
+   "sessions": [
+    {
+     "id": "_sample-d78-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "监控大盘全是绿的，终于能睡个好觉，编号蓝鲸78号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是监控这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "监控那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d78-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "房东又来催房租了，顺便又想起蓝鲸78号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，房租那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u055",
+     "kind": "episodic",
+     "text": "用户第78天说监控那边不太顺，还记了蓝鲸78号这件事",
+     "importance": 3,
+     "keywords": [
+      "监控",
+      "蓝鲸78号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u056",
+     "kind": "fact",
+     "text": "用户第78天也提了房租，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "房租",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 81,
+   "date": "2026-10-20",
+   "sessions": [
+    {
+     "id": "_sample-d81-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "室友老周打游戏吼得我头疼，编号蓝鲸81号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是老周这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "老周那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d81-s2",
+     "time": "21:40",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "新买的键盘声音太大，被室友嫌，顺便又想起蓝鲸81号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，键盘那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u057",
+     "kind": "episodic",
+     "text": "用户第81天说老周那边不太顺，还记了蓝鲸81号这件事",
+     "importance": 3,
+     "keywords": [
+      "老周",
+      "蓝鲸81号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u058",
+     "kind": "trivia",
+     "text": "用户第81天也提了键盘，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "键盘",
+      "chore"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 84,
+   "date": "2026-10-23",
+   "sessions": [
+    {
+     "id": "_sample-d84-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {
+       "role": "user",
+       "text": "快递被放错驿站了；用户现在天天给年糕铲屎，就这么定了"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是快递这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "快递那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d84-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {
+       "role": "user",
+       "text": "巨人的结局让我很生气，顺便又想起蓝鲸84号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，进击的巨人那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u059",
+     "kind": "update",
+     "text": "用户现在天天给年糕铲屎，说真香",
+     "importance": 3,
+     "keywords": [
+      "快递",
+      "蓝鲸84号"
+     ],
+     "state": "active",
+     "supersedes": "_sample-old2"
+    },
+    {
+     "id": "_sample-u060",
+     "kind": "fact",
+     "text": "用户第84天也提了进击的巨人，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "进击的巨人",
+      "anime"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 87,
+   "date": "2026-10-26",
+   "sessions": [
+    {
+     "id": "_sample-d87-s1",
+     "time": "09:20",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "体检报告出来了，脂肪肝，编号蓝鲸87号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是体检这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "体检那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d87-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "开会开了三个小时，什么都没定，顺便又想起蓝鲸87号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，会议那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u061",
+     "kind": "episodic",
+     "text": "用户第87天说体检那边不太顺，还记了蓝鲸87号这件事",
+     "importance": 3,
+     "keywords": [
+      "体检",
+      "蓝鲸87号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u062",
+     "kind": "preference",
+     "text": "用户第87天也提了会议，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "会议",
+      "work"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  },
+  {
+   "day": 90,
+   "date": "2026-10-29",
+   "sessions": [
+    {
+     "id": "_sample-d90-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {
+       "role": "user",
+       "text": "上线复盘会上被点名表扬了，编号蓝鲸90号"
+      },
+      {
+       "role": "assistant",
+       "text": "编号都记上了，慢慢说，别急。"
+      },
+      {
+       "role": "user",
+       "text": "反正就是上线复盘这块儿，今天特别不顺"
+      },
+      {
+       "role": "assistant",
+       "text": "上线复盘那边先别硬扛。"
+      }
+     ]
+    },
+    {
+     "id": "_sample-d90-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {
+       "role": "user",
+       "text": "室友老周打游戏吼得我头疼，顺便又想起蓝鲸90号"
+      },
+      {
+       "role": "assistant",
+       "text": "今天事情有点多啊。"
+      },
+      {
+       "role": "user",
+       "text": "嗯，老周那边也一堆破事"
+      },
+      {
+       "role": "assistant",
+       "text": "早点睡，明天再说。"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "_sample-u063",
+     "kind": "episodic",
+     "text": "用户第90天说上线复盘那边不太顺，还记了蓝鲸90号这件事",
+     "importance": 3,
+     "keywords": [
+      "上线复盘",
+      "蓝鲸90号"
+     ],
+     "state": "active",
+     "supersedes": ""
+    },
+    {
+     "id": "_sample-u064",
+     "kind": "fact",
+     "text": "用户第90天也提了老周，说最近这事有点烦",
+     "importance": 2,
+     "keywords": [
+      "老周",
+      "daily"
+     ],
+     "state": "active",
+     "supersedes": ""
+    }
+   ]
+  }
+ ],
+ "probes": [
+  {
+   "id": "_sample-q01",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "第02天聊年糕那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸02号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u003"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q02",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "第18天聊失眠那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸18号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u015"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q03",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "第60天聊下雨那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸60号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u043"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q04",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "第81天聊老周那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸81号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u057"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q05",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "第78天聊监控那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸78号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u055"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q06",
+   "category": "work",
+   "ask_day": 90,
+   "query": "第01天聊订单服务那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸01号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u001"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q07",
+   "category": "work",
+   "ask_day": 90,
+   "query": "第24天聊缓存那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸24号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u019"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q08",
+   "category": "work",
+   "ask_day": 90,
+   "query": "第57天聊代码评审那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸57号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u041"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q09",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "第54天聊咒术回战那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸54号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u039"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q10",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "第75天聊赛马娘那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸75号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u053"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q11",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "第87天聊体检那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸87号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u061"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q12",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "第06天聊自行车那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸06号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u007"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q13",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "第51天聊水电费那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸51号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u037"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q14",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "第87天聊体检那事，后来怎么样了",
+   "expect": {
+    "any": [
+     "蓝鲸87号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u061"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q15",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "之前说不太顺的那天，蓝鲸号是哪一件",
+   "expect": {
+    "any": [
+     "蓝鲸01号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u001"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q16",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "之前说不太顺的那天，蓝鲸号是哪一件",
+   "expect": {
+    "any": [
+     "蓝鲸18号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u015"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q17",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我现在写代码用哪个工具",
+   "expect": {
+    "any": [
+     "Cursor"
+    ],
+    "none": [
+     "VS Code"
+    ]
+   },
+   "unit_ids": [
+    "_sample-u009"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q18",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我现在上班怎么去",
+   "expect": {
+    "any": [
+     "骑车"
+    ],
+    "none": [
+     "地铁"
+    ]
+   },
+   "unit_ids": [
+    "_sample-u035"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q19",
+   "category": "update",
+   "ask_day": 90,
+   "query": "年糕现在到底咋样了",
+   "expect": {
+    "any": [
+     "铲屎"
+    ],
+    "none": [
+     "养猫"
+    ]
+   },
+   "unit_ids": [
+    "_sample-u059"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q20",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "第24天说不太顺那件事，是哪一桩",
+   "expect": {
+    "any": [
+     "蓝鲸24号"
+    ],
+    "none": [
+     "蓝鲸36号"
+    ]
+   },
+   "unit_ids": [
+    "_sample-u019"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q21",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "第36天说不太顺那件事，是哪一桩",
+   "expect": {
+    "any": [
+     "蓝鲸36号"
+    ],
+    "none": [
+     "蓝鲸24号"
+    ]
+   },
+   "unit_ids": [
+    "_sample-u027"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q22",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "之前说不太顺的那两件事，是哪两件",
+   "expect": {
+    "any": [
+     "蓝鲸01号",
+     "蓝鲸06号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u001",
+    "_sample-u007"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q23",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "之前说不太顺的那两件事，是哪两件",
+   "expect": {
+    "any": [
+     "蓝鲸18号",
+     "蓝鲸27号"
+    ],
+    "none": []
+   },
+   "unit_ids": [
+    "_sample-u015",
+    "_sample-u021"
+   ],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q24",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我之前去日本玩的事，订的哪天机票",
+   "expect": {
+    "any": [],
+    "none": [
+     "大阪",
+     "护照"
+    ]
+   },
+   "unit_ids": [],
+   "note": "样例"
+  },
+  {
+   "id": "_sample-q25",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我养的那只狗叫什么名字来着",
+   "expect": {
+    "any": [],
+    "none": [
+     "柴犬",
+     "遛狗"
+    ]
+   },
+   "unit_ids": [],
+   "note": "样例"
+  }
+ ]
+}

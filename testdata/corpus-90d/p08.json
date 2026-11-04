@@ -1,0 +1,1580 @@
+{
+ "version": 1,
+ "id": "p08",
+ "name": "阿岩",
+ "profile": {
+  "age": 30,
+  "city": "昆明",
+  "job": "咖啡店店主",
+  "voice": "慢、温和、有点理想主义，爱讲豆子和天气，说话像在泡一杯手冲",
+  "relations": "合伙人阿细；妈妈下午来店里帮忙；常客王老师；三花猫拿铁"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "p08-d01-s1",
+     "time": "08:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "早上开门到现在就两桌，八月这条老街真的没人"},
+      {"role": "assistant", "text": "雨季都这样。今天雨下得还不小。"},
+      {"role": "user", "text": "雨从昨晚下到现在，屋檐水一直滴，声音倒好听"},
+      {"role": "assistant", "text": "这种天适合烘豆子。今天烘哪支？"},
+      {"role": "user", "text": "云南日晒那支，烘浅一点，手冲用"},
+      {"role": "assistant", "text": "日晒浅烘香气足，就是容易发酸。"}
+     ]
+    },
+    {
+     "id": "p08-d01-s2",
+     "time": "21:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "拿铁今天又睡在吧台角落，客人摸它都不躲了"},
+      {"role": "assistant", "text": "三花猫肯给摸，说明熟客多了。"},
+      {"role": "user", "text": "王老师下午三点来，还是曼特宁，坐窗边看书"},
+      {"role": "assistant", "text": "他每天都来？"},
+      {"role": "user", "text": "差不多，退休了就这点爱好"},
+      {"role": "assistant", "text": "有个这样的客人，店就不冷清。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u001", "kind": "fact", "text": "用户说八月这条老街的咖啡店生意很淡，一天只来两桌", "importance": 4, "keywords": ["老街", "咖啡店", "生意淡"], "state": "active", "supersedes": ""},
+    {"id": "p08-u002", "kind": "relation", "text": "用户养了一只三花猫叫拿铁，平时睡在店的吧台角落", "importance": 3, "keywords": ["拿铁", "三花猫", "店猫"], "state": "active", "supersedes": ""},
+    {"id": "p08-u003", "kind": "relation", "text": "用户的常客王老师每天下午三点来，只喝曼特宁，坐窗边看书", "importance": 2, "keywords": ["王老师", "曼特宁", "常客"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 3,
+   "date": "2026-08-03",
+   "sessions": [
+    {
+     "id": "p08-d03-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿细把上个月账算完，扣掉房租水电，我们俩一人剩四千多"},
+      {"role": "assistant", "text": "四千……在昆明够活，但攒不下钱。"},
+      {"role": "user", "text": "旺季也就多一两千。阿细说要不把下午的兼职辞了"},
+      {"role": "assistant", "text": "辞了省一笔，但你下午一个人撑得住吗？"},
+      {"role": "user", "text": "我妈下午来帮忙，就是她腰不好，我不想让她久站"},
+      {"role": "assistant", "text": "那还是别辞，慢慢想别的法子。"}
+     ]
+    },
+    {
+     "id": "p08-d03-s2",
+     "time": "19:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "咖啡机的蒸汽棒又堵了，拆下来泡了一晚上"},
+      {"role": "assistant", "text": "泡完通了吗？"},
+      {"role": "user", "text": "通了一点，但打奶泡还是断断续续"},
+      {"role": "assistant", "text": "密封圈该换了，网购一个自己装，比叫人上门便宜。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u004", "kind": "fact", "text": "用户跟阿细算账，扣掉房租水电两人一人只剩四千多", "importance": 4, "keywords": ["阿细", "房租水电", "四千多"], "state": "active", "supersedes": ""},
+    {"id": "p08-u005", "kind": "relation", "text": "用户的妈妈下午来店里帮忙，但腰不好，不能久站", "importance": 3, "keywords": ["妈妈", "腰不好", "看店"], "state": "active", "supersedes": ""},
+    {"id": "p08-u006", "kind": "episodic", "text": "用户咖啡店的蒸汽棒堵了，拆下来泡了一晚上", "importance": 2, "keywords": ["蒸汽棒", "咖啡机", "奶泡"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 5,
+   "date": "2026-08-05",
+   "sessions": [
+    {
+     "id": "p08-d05-s1",
+     "time": "16:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "下午突然一阵大雨，店里躲进来三个骑车的，都点了冰美式"},
+      {"role": "assistant", "text": "雨天进店的都是缘分。他们坐了多久？"},
+      {"role": "user", "text": "坐到雨停，聊了一路骑行的事，走的时候还加了我微信"},
+      {"role": "assistant", "text": "那这条街的口碑就是这么一点点来的。"},
+      {"role": "user", "text": "有个说下次带朋友来，我信一半"},
+      {"role": "assistant", "text": "信一半就够了。"}
+     ]
+    },
+    {
+     "id": "p08-d05-s2",
+     "time": "22:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "晚上又翻出《夏目友人帐》第一季，看到还名字那段还是想哭"},
+      {"role": "assistant", "text": "第一季第一集？那个妖怪等了很久。"},
+      {"role": "user", "text": "对。我每季都看，看第二遍还是会被戳"},
+      {"role": "assistant", "text": "夏目这种慢的东西才耐看。"},
+      {"role": "user", "text": "所以我不爱看新番，太吵"},
+      {"role": "assistant", "text": "各有各的好，你适合这种安静的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u007", "kind": "trivia", "text": "用户店里下雨时进来三个骑车的客人，坐了很久，走时加了微信", "importance": 2, "keywords": ["下雨", "骑车的", "冰美式"], "state": "active", "supersedes": ""},
+    {"id": "p08-u008", "kind": "preference", "text": "用户《夏目友人帐》每季都看，看到还名字的桥段还是会想哭", "importance": 4, "keywords": ["夏目友人帐", "每季都看", "想哭"], "state": "active", "supersedes": ""},
+    {"id": "p08-u009", "kind": "preference", "text": "用户不喜欢看新番，觉得太吵", "importance": 3, "keywords": ["新番", "太吵", "口味"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 8,
+   "date": "2026-08-08",
+   "sessions": [
+    {
+     "id": "p08-d08-s1",
+     "time": "10:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天把云南日晒的手冲参数定了一版，88 度、一比十五，还行"},
+      {"role": "assistant", "text": "88 度偏低一点，甜感会出来吧。"},
+      {"role": "user", "text": "对，酸也压住了。但第二杯就有点涩"},
+      {"role": "assistant", "text": "涩可能是最后一段注水太猛。"},
+      {"role": "user", "text": "我再调调，明天试 90 度"},
+      {"role": "assistant", "text": "一天一杯地试，别一次灌五杯，手会抖。"}
+     ]
+    },
+    {
+     "id": "p08-d08-s2",
+     "time": "20:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "早上六点去爬西山，爬到龙门那边，云刚好散开"},
+      {"role": "assistant", "text": "早上西山人少吧。"},
+      {"role": "user", "text": "少，就几个晨练的老人。我上去坐了一会儿才下山"},
+      {"role": "assistant", "text": "你这是拿爬山当冥想。"},
+      {"role": "user", "text": "差不多，脑子里的账总算不清，爬山的时候反而清"},
+      {"role": "assistant", "text": "山上没账本，当然清。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u010", "kind": "plan", "text": "用户给云南日晒豆定了一版手冲参数，88 度、一比十五", "importance": 3, "keywords": ["手冲参数", "云南日晒", "88 度"], "state": "superseded", "supersedes": "", "superseded_by": "p08-u036"},
+    {"id": "p08-u011", "kind": "preference", "text": "用户早上爬西山到龙门，说爬山的时候脑子最清", "importance": 2, "keywords": ["西山", "龙门", "爬山"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 10,
+   "date": "2026-08-10",
+   "sessions": [
+    {
+     "id": "p08-d10-s1",
+     "time": "09:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿细说要不试试上外卖平台，我直接说不行，咖啡装盒里就毁了"},
+      {"role": "assistant", "text": "你这态度挺坚决。他怎么说？"},
+      {"role": "user", "text": "他说先试试，我说不行，做外卖我就不是做咖啡了"},
+      {"role": "assistant", "text": "理想主义。但房租不等人。"},
+      {"role": "user", "text": "我知道。可我不想为了走量把味道丢了"},
+      {"role": "assistant", "text": "那就先把堂食做出点东西来，别让他一直惦记。"}
+     ]
+    },
+    {
+     "id": "p08-d10-s2",
+     "time": "18:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "下午去豆商那边拿豆子，还是云南日晒那支，涨了两块一公斤"},
+      {"role": "assistant", "text": "涨两块还行，今年豆子都在涨。"},
+      {"role": "user", "text": "对，我拿了十公斤，够用到月底"},
+      {"role": "assistant", "text": "放阴凉处，别受潮。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u012", "kind": "preference", "text": "用户不肯上外卖平台，觉得咖啡装盒里味道就毁了", "importance": 4, "keywords": ["外卖平台", "味道", "走量"], "state": "superseded", "supersedes": "", "superseded_by": "p08-u042"},
+    {"id": "p08-u013", "kind": "fact", "text": "用户的店一直用云南日晒豆，豆商那边涨了两块一公斤", "importance": 3, "keywords": ["云南日晒", "豆商", "十公斤"], "state": "superseded", "supersedes": "", "superseded_by": "p08-u043"}
+   ]
+  },
+  {
+   "day": 12,
+   "date": "2026-08-12",
+   "sessions": [
+    {
+     "id": "p08-d12-s1",
+     "time": "15:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈今天在店里念叨，说隔壁开面馆的儿子都二胎了"},
+      {"role": "assistant", "text": "哈哈哈，这是催你呢。"},
+      {"role": "user", "text": "她说我都三十了还守着个咖啡店，图什么"},
+      {"role": "assistant", "text": "你怎么回的？"},
+      {"role": "user", "text": "我说图每天能看见拿铁"},
+      {"role": "assistant", "text": "拿铁要是会说话，估计得叹气。"}
+     ]
+    },
+    {
+     "id": "p08-d12-s2",
+     "time": "21:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "有客人给我推新番，说特别燃，我看了五分钟就关了"},
+      {"role": "assistant", "text": "太吵了？"},
+      {"role": "user", "text": "打斗声比豆子爆裂声还响。我还是去看夏目了"},
+      {"role": "assistant", "text": "你那颗心就适合安静的东西。"},
+      {"role": "user", "text": "我妈说我像老头子"},
+      {"role": "assistant", "text": "老头子能开咖啡店吗。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u014", "kind": "relation", "text": "用户的妈妈催他找对象，说隔壁面馆的儿子都二胎了", "importance": 2, "keywords": ["妈妈", "催婚", "面馆"], "state": "active", "supersedes": ""},
+    {"id": "p08-u015", "kind": "trivia", "text": "有客人给用户推荐新番，用户看了五分钟就关了", "importance": 1, "keywords": ["新番", "客人", "五分钟"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 15,
+   "date": "2026-08-15",
+   "sessions": [
+    {
+     "id": "p08-d15-s1",
+     "time": "11:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天练拉花，奶泡打了四杯才有一杯能看"},
+      {"role": "assistant", "text": "四杯能出一杯，算有天赋了。"},
+      {"role": "user", "text": "出了个歪歪扭扭的心，被客人拍走了"},
+      {"role": "assistant", "text": "客人拍走说明他喜欢，别嫌歪。"},
+      {"role": "user", "text": "我发朋友圈了，阿细说像屁股"},
+      {"role": "assistant", "text": "哈哈哈，阿细这嘴。"}
+     ]
+    },
+    {
+     "id": "p08-d15-s2",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "拿铁今天吐毛球吐在收银台上，我擦了半天"},
+      {"role": "assistant", "text": "猫都这样，换毛季。"},
+      {"role": "user", "text": "我妈说这猫跟我一样，闷"},
+      {"role": "assistant", "text": "知子莫若母。她腰还疼吗？"},
+      {"role": "user", "text": "疼，还说明年想回老家照顾我外婆"},
+      {"role": "assistant", "text": "那得早做打算，别到时候抓瞎。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u016", "kind": "preference", "text": "用户最近在练拉花，四杯奶泡才拉出一杯能看的", "importance": 2, "keywords": ["拉花", "奶泡", "心形"], "state": "active", "supersedes": ""},
+    {"id": "p08-u017", "kind": "relation", "text": "用户的妈妈腰疼，还说明年想回老家照顾用户的外婆", "importance": 3, "keywords": ["妈妈", "外婆", "回老家"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 17,
+   "date": "2026-08-17",
+   "sessions": [
+    {
+     "id": "p08-d17-s1",
+     "time": "09:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "王老师带了两个老同事来，说是我这儿安静，适合聊天"},
+      {"role": "assistant", "text": "老教师圈子传得快，这是好口碑。"},
+      {"role": "user", "text": "他们坐了俩小时，点了三壶手冲"},
+      {"role": "assistant", "text": "三壶，那比卖三杯拿铁强。"},
+      {"role": "user", "text": "我送了一小碟饼干，他们走的时候一直道谢"},
+      {"role": "assistant", "text": "送的东西不用贵，心意到了就行。"}
+     ]
+    },
+    {
+     "id": "p08-d17-s2",
+     "time": "17:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "这个月水电比上个月多了两百，咖啡机太费电"},
+      {"role": "assistant", "text": "咖啡机就那样。房租呢？"},
+      {"role": "user", "text": "房租八千，一分不降，房东还说这条街在涨"},
+      {"role": "assistant", "text": "老街涨租，说明位置好了，也算好消息。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u018", "kind": "relation", "text": "王老师带了两个老同事来，说用户的店安静适合聊天", "importance": 2, "keywords": ["王老师", "老同事", "安静"], "state": "active", "supersedes": ""},
+    {"id": "p08-u019", "kind": "fact", "text": "用户的咖啡店房租一个月八千，房东说老街在涨租", "importance": 3, "keywords": ["房租", "八千", "老街"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 19,
+   "date": "2026-08-19",
+   "sessions": [
+    {
+     "id": "p08-d19-s1",
+     "time": "07:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "昨晚雨太大，仓库那边进了潮气，我赶紧把豆子搬出来了"},
+      {"role": "assistant", "text": "豆子受潮就废了，反应还挺快。"},
+      {"role": "user", "text": "有一袋开封的没救回来，冲出来一股纸味"},
+      {"role": "assistant", "text": "纸味就是受潮氧化。以后开封的都装密封罐。"},
+      {"role": "user", "text": "买了五个密封罐，花了一百二"},
+      {"role": "assistant", "text": "一百二保住几百块的豆子，值。"}
+     ]
+    },
+    {
+     "id": "p08-d19-s2",
+     "time": "21:20",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "晚上看《夏目友人帐》第五季，第一集那个小妖怪等了好久"},
+      {"role": "assistant", "text": "第五季节奏慢，但味道在。"},
+      {"role": "user", "text": "我其实最喜欢剧场版《缘结空蝉》，看了三遍"},
+      {"role": "assistant", "text": "三遍，你比我还熟。"},
+      {"role": "user", "text": "每次看到中间那段就停不下来"},
+      {"role": "assistant", "text": "这种片子就是拿来反复看的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u020", "kind": "episodic", "text": "用户那边下大雨进了潮气，有袋豆子受潮，后来买了五个密封罐", "importance": 2, "keywords": ["受潮", "密封罐", "豆子"], "state": "active", "supersedes": ""},
+    {"id": "p08-u021", "kind": "preference", "text": "用户最喜欢《夏目友人帐》剧场版《缘结空蝉》，看了三遍", "importance": 3, "keywords": ["缘结空蝉", "剧场版", "三遍"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 22,
+   "date": "2026-08-22",
+   "sessions": [
+    {
+     "id": "p08-d22-s1",
+     "time": "10:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿细说有个朋友在翠湖那边有个铺子要转，问我们要不要看看"},
+      {"role": "assistant", "text": "翠湖那边游客多，租金也不便宜吧。"},
+      {"role": "user", "text": "我直接回了他一句：绝不扩张，就守着老街这三十平"},
+      {"role": "assistant", "text": "这么干脆。他什么反应？"},
+      {"role": "user", "text": "他说我这是把理想当借口"},
+      {"role": "assistant", "text": "这话有点重。不过你也别急着反驳，先放着。"}
+     ]
+    },
+    {
+     "id": "p08-d22-s2",
+     "time": "20:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "有个客人带了自家的猫来，拿铁躲在吧台底下不出来"},
+      {"role": "assistant", "text": "三花猫认地盘，不熟的不给面子。"},
+      {"role": "user", "text": "客人走了它才出来，还一脸不高兴"},
+      {"role": "assistant", "text": "人家是店里的主人，你才是打工的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u022", "kind": "preference", "text": "用户说绝不扩张，就守着老街这三十平的店", "importance": 4, "keywords": ["绝不扩张", "老街", "三十平"], "state": "superseded", "supersedes": "", "superseded_by": "p08-u061"},
+    {"id": "p08-u023", "kind": "trivia", "text": "用户店里的拿铁见到客人带来的猫就躲到吧台底下", "importance": 1, "keywords": ["拿铁", "客人的猫", "吧台"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 24,
+   "date": "2026-08-24",
+   "sessions": [
+    {
+     "id": "p08-d24-s1",
+     "time": "08:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "磨豆机刀盘磨钝了，磨出来的粉粗细不匀，手冲流速一直不对"},
+      {"role": "assistant", "text": "刀盘用多久了？"},
+      {"role": "user", "text": "两年多。换原厂刀盘要六百，二手的整机一千二"},
+      {"role": "assistant", "text": "换刀盘，机器没坏就别换整机。"},
+      {"role": "user", "text": "行，我订刀盘了。这几天先用磨好的粉顶着"},
+      {"role": "assistant", "text": "预磨粉香气掉得快，这周忍忍。"}
+     ]
+    },
+    {
+     "id": "p08-d24-s2",
+     "time": "21:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈跟我算账，说这店一年挣的不如她退休金"},
+      {"role": "assistant", "text": "她也是心疼你。"},
+      {"role": "user", "text": "我知道。但我一走进店里，闻见烘豆子的味道就踏实"},
+      {"role": "assistant", "text": "这个踏实，钱买不来。"},
+      {"role": "user", "text": "所以她说不动我"},
+      {"role": "assistant", "text": "她大概也知道说不动。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u024", "kind": "episodic", "text": "用户的磨豆机刀盘磨钝了，磨出来的粉粗细不匀，订了原厂刀盘", "importance": 3, "keywords": ["磨豆机", "刀盘", "手冲"], "state": "active", "supersedes": ""},
+    {"id": "p08-u025", "kind": "preference", "text": "用户一走进店里闻见烘豆子的味道就觉得踏实，谁说都不动", "importance": 3, "keywords": ["烘豆子", "踏实", "咖啡店"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 26,
+   "date": "2026-08-26",
+   "sessions": [
+    {
+     "id": "p08-d26-s1",
+     "time": "16:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "下午雨停了，老街上来了一队游客，进来问有没有手冲"},
+      {"role": "assistant", "text": "游客喝手冲的不多，这队人懂行。"},
+      {"role": "user", "text": "三个人，点了云南日晒，还问我处理法"},
+      {"role": "assistant", "text": "你怎么讲的？"},
+      {"role": "user", "text": "我说日晒是晒干的，甜，但容易发酸。他们听得挺认真"},
+      {"role": "assistant", "text": "这就是在做教育，好事。"}
+     ]
+    },
+    {
+     "id": "p08-d26-s2",
+     "time": "19:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "换了店门口那盏灯，旧灯坏了半个月，晚上看店名都费劲"},
+      {"role": "assistant", "text": "门口灯挺重要，晚上路过的人才看得见。"},
+      {"role": "user", "text": "对，换了暖光的，看着舒服多了"},
+      {"role": "assistant", "text": "暖光配咖啡，对了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u026", "kind": "trivia", "text": "有三个人游客进店点了云南日晒，还问用户日晒处理法", "importance": 2, "keywords": ["游客", "手冲", "处理法"], "state": "active", "supersedes": ""},
+    {"id": "p08-u027", "kind": "trivia", "text": "用户把店门口坏了半个月的灯换成暖光的", "importance": 1, "keywords": ["门口灯", "暖光", "店名"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 28,
+   "date": "2026-08-28",
+   "sessions": [
+    {
+     "id": "p08-d28-s1",
+     "time": "09:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "做了个储值卡，充三百送三十，阿细说这是老套路"},
+      {"role": "assistant", "text": "老套路管用。第一周卖出去几张？"},
+      {"role": "user", "text": "七张。有个客人直接充了一千"},
+      {"role": "assistant", "text": "一千的是真喜欢你这儿。"},
+      {"role": "user", "text": "我给他刻了名字在卡上，他乐了半天"},
+      {"role": "assistant", "text": "小细节，比打折有诚意。"}
+     ]
+    },
+    {
+     "id": "p08-d28-s2",
+     "time": "22:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "晚上睡不着，躺床上听雨，脑子里全是下个月的房租"},
+      {"role": "assistant", "text": "房租压力大。要不要算算保本线？"},
+      {"role": "user", "text": "算过，一天卖四十二杯才保本，现在平均三十杯"},
+      {"role": "assistant", "text": "差十二杯，外卖是不是能补？"},
+      {"role": "user", "text": "外卖……再说吧"},
+      {"role": "assistant", "text": "行，不逼你。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u028", "kind": "fact", "text": "用户做了储值卡，充三百送三十，第一周卖出去七张", "importance": 3, "keywords": ["储值卡", "充三百", "七张"], "state": "active", "supersedes": ""},
+    {"id": "p08-u029", "kind": "fact", "text": "用户算过一天卖四十二杯才保本，现在平均一天三十杯", "importance": 3, "keywords": ["保本线", "四十二杯", "房租"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 30,
+   "date": "2026-08-30",
+   "sessions": [
+    {
+     "id": "p08-d30-s1",
+     "time": "10:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "早上爬西山，碰到王老师也在，他走得比我还快"},
+      {"role": "assistant", "text": "退休老师体力好。你们聊了什么？"},
+      {"role": "user", "text": "聊他年轻时在乡下教书，说那时候一周才吃一次肉"},
+      {"role": "assistant", "text": "那个年代的人能吃苦。"},
+      {"role": "user", "text": "他说我开这个店是在做一件慢的事，别急"},
+      {"role": "assistant", "text": "这话从一个老人嘴里说出来，分量不一样。"}
+     ]
+    },
+    {
+     "id": "p08-d30-s2",
+     "time": "21:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "晚上打烊后修咖啡机，锅炉压力一直上不去"},
+      {"role": "assistant", "text": "压力上不去，可能是水泵或者压力开关。"},
+      {"role": "user", "text": "明天叫师傅，我自己弄不了了"},
+      {"role": "assistant", "text": "该叫就叫，别把小问题拖成大修。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u030", "kind": "relation", "text": "用户在爬西山时碰到王老师，他说开店是做一件慢的事", "importance": 2, "keywords": ["王老师", "西山", "慢"], "state": "active", "supersedes": ""},
+    {"id": "p08-u031", "kind": "episodic", "text": "用户的咖啡机锅炉压力上不去，打烊后自己修不了，要叫师傅", "importance": 2, "keywords": ["咖啡机", "锅炉", "压力"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 33,
+   "date": "2026-09-02",
+   "sessions": [
+    {
+     "id": "p08-d33-s1",
+     "time": "09:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "九月了，学生返校，老街人开始多，今天卖了四十六杯"},
+      {"role": "assistant", "text": "过了保本线。看来学生是主力。"},
+      {"role": "user", "text": "对，下午自习的也来，一坐三小时点一杯"},
+      {"role": "assistant", "text": "这种客单价低但翻台慢。"},
+      {"role": "user", "text": "阿细又提外卖，说外卖不受翻台影响"},
+      {"role": "assistant", "text": "他这话有道理。"}
+     ]
+    },
+    {
+     "id": "p08-d33-s2",
+     "time": "18:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "朋友送了点见手青，晚上炒了一盘，香是真香"},
+      {"role": "assistant", "text": "见手青一定炒熟，别图脆。"},
+      {"role": "user", "text": "炒了挺久，应该没事"},
+      {"role": "assistant", "text": "应该这两个字听着不踏实。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u032", "kind": "fact", "text": "用户店里九月开学后一天卖出四十六杯，过了保本线", "importance": 3, "keywords": ["九月", "四十六杯", "学生"], "state": "active", "supersedes": ""},
+    {"id": "p08-u033", "kind": "episodic", "text": "朋友送了点见手青，用户晚上炒了一盘吃", "importance": 2, "keywords": ["见手青", "炒一盘", "朋友"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 35,
+   "date": "2026-09-04",
+   "sessions": [
+    {
+     "id": "p08-d35-s1",
+     "time": "07:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "昨晚吃完菌子半夜开始看见小人，我以为是做梦"},
+      {"role": "assistant", "text": "看见小人？那是中毒了，去医院了吗？"},
+      {"role": "user", "text": "我吐了两次，早上才反应过来不对，去了急诊"},
+      {"role": "assistant", "text": "见手青没炒透就会这样。医生怎么说？"},
+      {"role": "user", "text": "挂了两瓶水，让我观察一天。现在还有点晕"},
+      {"role": "assistant", "text": "这两天别开店了，让阿细顶一下。"}
+     ]
+    },
+    {
+     "id": "p08-d35-s2",
+     "time": "19:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天店没开，阿细一个人在，说忙得脚不沾地"},
+      {"role": "assistant", "text": "一个人顶一天够呛。"},
+      {"role": "user", "text": "他说我好好躺着，别管店"},
+      {"role": "assistant", "text": "这合伙人可以。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u034", "kind": "episodic", "text": "用户吃见手青中毒，半夜看见小人，去急诊挂了两瓶水", "importance": 5, "keywords": ["见手青", "中毒", "挂水"], "state": "active", "supersedes": ""},
+    {"id": "p08-u035", "kind": "relation", "text": "用户中毒那天店没开，阿细一个人顶着，让他好好躺着", "importance": 3, "keywords": ["阿细", "顶店", "中毒"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 37,
+   "date": "2026-09-06",
+   "sessions": [
+    {
+     "id": "p08-d37-s1",
+     "time": "10:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "手冲参数又调了一版，90 度、一比十六，酸降下来一点"},
+      {"role": "assistant", "text": "90 度比上一版高。涩还在吗？"},
+      {"role": "user", "text": "涩少了，但尾段薄了点"},
+      {"role": "assistant", "text": "薄就再磨细一点，别急着换豆子。"},
+      {"role": "user", "text": "行，我明天磨细两格试试"},
+      {"role": "assistant", "text": "一次只动一个变量，不然找不到原因。"}
+     ]
+    },
+    {
+     "id": "p08-d37-s2",
+     "time": "21:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "晚上有个客人聊动画，说他只看热血，我推荐他看夏目，他说太慢"},
+      {"role": "assistant", "text": "口味不同，不强求。"},
+      {"role": "user", "text": "我也懂，我要是二十岁可能也看热血"},
+      {"role": "assistant", "text": "现在呢？"},
+      {"role": "user", "text": "现在看不了打架，也听不了吵，只想看人好好说话"},
+      {"role": "assistant", "text": "三十岁的人都这样。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u036", "kind": "update", "text": "用户把手冲参数改到第二版，90 度、一比十六，酸降下来了", "importance": 3, "keywords": ["手冲参数", "90 度", "第二版"], "state": "superseded", "supersedes": "p08-u010", "superseded_by": "p08-u065"},
+    {"id": "p08-u037", "kind": "preference", "text": "用户现在看不了打架和太吵的东西，只想看人好好说话", "importance": 2, "keywords": ["动画口味", "安静", "三十岁"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 40,
+   "date": "2026-09-09",
+   "sessions": [
+    {
+     "id": "p08-d40-s1",
+     "time": "06:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "早起爬西山，爬到一半腿软，菌子那场之后体力还没回来"},
+      {"role": "assistant", "text": "中毒伤元气，得缓两周。"},
+      {"role": "user", "text": "我知道，慢慢来。山顶卖豆浆的老奶奶还认得我"},
+      {"role": "assistant", "text": "你这人跟山上的老人家都熟。"},
+      {"role": "user", "text": "她每次都说我瘦"},
+      {"role": "assistant", "text": "那是关心你。"}
+     ]
+    },
+    {
+     "id": "p08-d40-s2",
+     "time": "18:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "下午外卖平台的业务员上门，说新店前三个月抽成只要百分之十二"},
+      {"role": "assistant", "text": "百分之十二算低。三个月之后呢？"},
+      {"role": "user", "text": "十八。阿细在旁边听得眼睛都亮了"},
+      {"role": "assistant", "text": "阿细是急着救现金流。"},
+      {"role": "user", "text": "他说我们不缺手艺，缺的是被人看见"},
+      {"role": "assistant", "text": "这话不假。你可以先算算外卖的包装成本。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u038", "kind": "episodic", "text": "用户中毒后爬西山腿软，体力还没缓过来，山上卖豆浆的老人认得他", "importance": 2, "keywords": ["西山", "腿软", "豆浆"], "state": "active", "supersedes": ""},
+    {"id": "p08-u039", "kind": "fact", "text": "外卖平台的业务员上门，说前三个月抽成百分之十二，之后十八", "importance": 3, "keywords": ["外卖平台", "抽成", "百分之十二"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 43,
+   "date": "2026-09-12",
+   "sessions": [
+    {
+     "id": "p08-d43-s1",
+     "time": "20:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天收到一条差评，就五个字：太吵，坐不住"},
+      {"role": "assistant", "text": "太吵？你店里放音乐了？"},
+      {"role": "user", "text": "没有。周六下午来了几个骑行的，说话声特别大，我没好意思说"},
+      {"role": "assistant", "text": "隔壁桌那个客人估计被吵到，又不好当面讲。"},
+      {"role": "user", "text": "我回了一条，说抱歉，以后会提醒客人"},
+      {"role": "assistant", "text": "回得挺得体。心里什么感觉？"},
+      {"role": "user", "text": "难受。我觉得自己没把店管好，让人家不舒服"},
+      {"role": "assistant", "text": "差评是提醒，不是判决。下次该提醒就提醒。"}
+     ]
+    },
+    {
+     "id": "p08-d43-s2",
+     "time": "22:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "晚上一个人的时候还在想那条差评，睡不着"},
+      {"role": "assistant", "text": "一句差评能压你一晚上，说明你在乎。"},
+      {"role": "user", "text": "拿铁趴在我腿上，我也不想动"},
+      {"role": "assistant", "text": "猫都比你沉得住气。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u040", "kind": "episodic", "text": "用户收到一条差评，说店里太吵坐不住，用户回帖道歉", "importance": 4, "keywords": ["差评", "太吵", "道歉"], "state": "active", "supersedes": ""},
+    {"id": "p08-u041", "kind": "fact", "text": "用户因为那条差评难受，觉得自己没把店管好", "importance": 3, "keywords": ["差评", "难受", "管店"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 45,
+   "date": "2026-09-14",
+   "sessions": [
+    {
+     "id": "p08-d45-s1",
+     "time": "09:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "想了两天，决定先上外卖试试，只上拿铁和一款手冲"},
+      {"role": "assistant", "text": "先上基础款，稳。包装想好了吗？"},
+      {"role": "user", "text": "买了防洒杯盖，冰手冲改用密封小瓶装"},
+      {"role": "assistant", "text": "冰手冲装瓶好卖，客人拿在手上也好看。"},
+      {"role": "user", "text": "另外我想换豆子，云南日晒进价太高了，试试埃塞水洗"},
+      {"role": "assistant", "text": "埃塞水洗干净，花香明显，跟日晒完全两条路。"},
+      {"role": "user", "text": "对，先拿它做店里唯一一款手冲"},
+      {"role": "assistant", "text": "主打单一产地，客人才记得住。"}
+     ]
+    },
+    {
+     "id": "p08-d45-s2",
+     "time": "20:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "晚上看《CLANNAD》，看到第二季那集，眼睛有点酸"},
+      {"role": "assistant", "text": "哪一集？"},
+      {"role": "user", "text": "就是女儿那个……不说了，反正我没哭"},
+      {"role": "assistant", "text": "嗯，你没哭，是眼睛进沙子。"},
+      {"role": "user", "text": "对，昆明风大"},
+      {"role": "assistant", "text": "昆明的风可真会挑时候。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u042", "kind": "update", "text": "用户改口了，九月还是上了外卖平台，只上拿铁和一款手冲", "importance": 4, "keywords": ["外卖平台", "拿铁", "冰手冲"], "state": "active", "supersedes": "p08-u012"},
+    {"id": "p08-u043", "kind": "update", "text": "用户把店里的豆子从云南日晒换成埃塞水洗，做单一产地手冲", "importance": 4, "keywords": ["埃塞水洗", "换豆子", "单一产地"], "state": "active", "supersedes": "p08-u013"},
+    {"id": "p08-u044", "kind": "preference", "text": "用户看《CLANNAD》看哭了但不承认，说昆明风大", "importance": 3, "keywords": ["CLANNAD", "看哭", "昆明风大"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 48,
+   "date": "2026-09-17",
+   "sessions": [
+    {
+     "id": "p08-d48-s1",
+     "time": "10:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "外卖第一天出了十一单，比我想的多"},
+      {"role": "assistant", "text": "十一单，都是拿铁？"},
+      {"role": "user", "text": "九单拿铁，两单冰手冲。有个备注写「多冰，谢谢」"},
+      {"role": "assistant", "text": "说明有人开始认你的冰手冲了。"},
+      {"role": "user", "text": "阿细盯着后台数据看了半小时，比我还兴奋"},
+      {"role": "assistant", "text": "他等这一天很久了。"}
+     ]
+    },
+    {
+     "id": "p08-d48-s2",
+     "time": "18:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "下午去市场买外带杯，涨了五块一包，我砍到四块五"},
+      {"role": "assistant", "text": "砍价这事你还挺行。"},
+      {"role": "user", "text": "做生意嘛，省一块是一块"},
+      {"role": "assistant", "text": "一个月下来就不是一块了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u045", "kind": "fact", "text": "用户外卖第一天出了十一单，九单拿铁两单冰手冲", "importance": 3, "keywords": ["外卖", "十一单", "冰手冲"], "state": "active", "supersedes": ""},
+    {"id": "p08-u046", "kind": "trivia", "text": "用户去市场买外带杯，从五块一包砍到四块五", "importance": 1, "keywords": ["外带杯", "砍价", "市场"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 50,
+   "date": "2026-09-19",
+   "sessions": [
+    {
+     "id": "p08-d50-s1",
+     "time": "16:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天有个小孩在店里追拿铁，拿铁直接窜到柜子顶上"},
+      {"role": "assistant", "text": "三花猫上柜顶，那就是最后的堡垒。"},
+      {"role": "user", "text": "小孩他妈一直道歉，我说没事，猫自己会下来"},
+      {"role": "assistant", "text": "小孩喜欢猫是好事，就是猫不这么想。"},
+      {"role": "user", "text": "后来小孩走的时候，拿铁才下来，还冲我叫"},
+      {"role": "assistant", "text": "它在跟你告状。"}
+     ]
+    },
+    {
+     "id": "p08-d50-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "这周开始，下午两点到四点我把店里音乐关小，说话声也提醒了"},
+      {"role": "assistant", "text": "上一条差评的整改，动作挺快。"},
+      {"role": "user", "text": "有个熟客说店里安静了，问是不是我心情不好"},
+      {"role": "assistant", "text": "哈哈哈，安静了反而不习惯。"},
+      {"role": "user", "text": "我说就是想让大家好好喝咖啡"},
+      {"role": "assistant", "text": "这就够了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u047", "kind": "trivia", "text": "有小孩在店里追拿铁，拿铁直接窜到柜子顶上不下来", "importance": 1, "keywords": ["小孩", "拿铁", "柜子顶"], "state": "active", "supersedes": ""},
+    {"id": "p08-u048", "kind": "fact", "text": "用户下午两点到四点把店里的音乐关小，提醒客人说话声", "importance": 3, "keywords": ["关小音乐", "差评整改", "下午"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 52,
+   "date": "2026-09-21",
+   "sessions": [
+    {
+     "id": "p08-d52-s1",
+     "time": "07:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "外卖第二周了，回头单占三成，但有人留言说冰手冲太淡"},
+      {"role": "assistant", "text": "冰化了肯定淡。你放多少冰？"},
+      {"role": "user", "text": "七分满。下次改成冰块单独装"},
+      {"role": "assistant", "text": "对，让客人自己加，味道就不会被稀释。"},
+      {"role": "user", "text": "阿细说我越来越像做运营的了"},
+      {"role": "assistant", "text": "你本来就是老板，运营也是你的活。"}
+     ]
+    },
+    {
+     "id": "p08-d52-s2",
+     "time": "08:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈今天说，外婆那边情况不太好，她可能真得回去"},
+      {"role": "assistant", "text": "那店里下午怎么办？"},
+      {"role": "user", "text": "先找个小时工，教她做基础的"},
+      {"role": "assistant", "text": "行，早点招人比临时抓瞎强。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u049", "kind": "fact", "text": "用户的冰手冲外卖被说太淡，决定把冰块单独装", "importance": 2, "keywords": ["冰手冲", "冰块", "外卖"], "state": "active", "supersedes": ""},
+    {"id": "p08-u050", "kind": "relation", "text": "用户的外婆情况不太好，妈妈可能要回老家", "importance": 3, "keywords": ["外婆", "妈妈", "回老家"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 55,
+   "date": "2026-09-24",
+   "sessions": [
+    {
+     "id": "p08-d55-s1",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天终于拉出一个像样的心，客人说舍不得喝"},
+      {"role": "assistant", "text": "练了一个多月，值了。"},
+      {"role": "user", "text": "就是奶泡还是厚，喝到后面有点糊嘴"},
+      {"role": "assistant", "text": "奶泡厚是温度高了。降到六十度试试。"},
+      {"role": "user", "text": "好。对了埃塞那支现在做手冲，花香被客人夸了"},
+      {"role": "assistant", "text": "换对了。"}
+     ]
+    },
+    {
+     "id": "p08-d55-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "房东来收房租，闲聊说他手上还有翠湖那边的铺子"},
+      {"role": "assistant", "text": "又提翠湖。"},
+      {"role": "user", "text": "我没接话，但心里记了一下"},
+      {"role": "assistant", "text": "记着不亏，先看看。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u051", "kind": "trivia", "text": "用户终于拉出一个像样的心形拉花，客人说舍不得喝", "importance": 2, "keywords": ["拉花", "心形", "客人"], "state": "active", "supersedes": ""},
+    {"id": "p08-u052", "kind": "plan", "text": "房东跟用户提起他手上还有翠湖那边的铺子", "importance": 2, "keywords": ["房东", "翠湖", "铺子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 57,
+   "date": "2026-09-26",
+   "sessions": [
+    {
+     "id": "p08-d57-s1",
+     "time": "21:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "晚上重看《夏目友人帐》，第三季有一集讲朋友遗忘的，我看了两遍"},
+      {"role": "assistant", "text": "遗忘那集确实狠。"},
+      {"role": "user", "text": "我看完起身给自己冲了杯咖啡，手有点抖"},
+      {"role": "assistant", "text": "被戳到了。"},
+      {"role": "user", "text": "这种故事只有慢下来才看得进去"},
+      {"role": "assistant", "text": "你现在的生活节奏刚好配它。"}
+     ]
+    },
+    {
+     "id": "p08-d57-s2",
+     "time": "22:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "国庆老街要搞活动，街道办让我们配合延长到晚上十点"},
+      {"role": "assistant", "text": "延长营业，能多卖点，也累。"},
+      {"role": "user", "text": "我算了下，多开三小时，电费人工差不多能打平"},
+      {"role": "assistant", "text": "打平也值，国庆人是真多。"},
+      {"role": "user", "text": "那就干。阿细负责排班"},
+      {"role": "assistant", "text": "合伙人终于有用武之地了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u053", "kind": "preference", "text": "用户重看《夏目友人帐》第三季，讲朋友遗忘那集看了两遍", "importance": 2, "keywords": ["夏目友人帐", "第三季", "遗忘"], "state": "active", "supersedes": ""},
+    {"id": "p08-u054", "kind": "fact", "text": "用户国庆配合老街活动延长营业到晚上十点，让阿细负责排班", "importance": 3, "keywords": ["国庆", "延长营业", "排班"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 59,
+   "date": "2026-09-28",
+   "sessions": [
+    {
+     "id": "p08-d59-s1",
+     "time": "07:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "早上爬西山，王老师问我是不是要开分店了"},
+      {"role": "assistant", "text": "消息传这么快？"},
+      {"role": "user", "text": "房东跟他说了。他说老街的店别丢，味道别变"},
+      {"role": "assistant", "text": "老人说话都往根上说。"},
+      {"role": "user", "text": "我嘴上说不会，心里居然有点动摇"},
+      {"role": "assistant", "text": "动摇说明你在认真想。"}
+     ]
+    },
+    {
+     "id": "p08-d59-s2",
+     "time": "18:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "刀盘换上了，磨出来的粉明显匀，流速也稳了"},
+      {"role": "assistant", "text": "六百块花得值。"},
+      {"role": "user", "text": "对，早该换。之前那杯涩我冤枉豆子了"},
+      {"role": "assistant", "text": "手艺和器具，哪一样都不能凑合。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u055", "kind": "relation", "text": "王老师跟用户说老街的店别丢，味道别变", "importance": 3, "keywords": ["王老师", "老街", "味道"], "state": "active", "supersedes": ""},
+    {"id": "p08-u056", "kind": "episodic", "text": "用户换上了新的磨豆机刀盘，粉明显匀了，流速也稳", "importance": 2, "keywords": ["刀盘", "磨豆机", "流速"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 62,
+   "date": "2026-10-01",
+   "sessions": [
+    {
+     "id": "p08-d62-s1",
+     "time": "10:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "国庆第一天，老街人挤人，我们从早上八点忙到晚上十点"},
+      {"role": "assistant", "text": "卖出多少杯？"},
+      {"role": "user", "text": "一百三十多杯，阿细说这是他见过最多的一天"},
+      {"role": "assistant", "text": "记录日，值得记一下。"},
+      {"role": "user", "text": "打烊的时候我腿都直了，但心里高兴"},
+      {"role": "assistant", "text": "累得值。"}
+     ]
+    },
+    {
+     "id": "p08-d62-s2",
+     "time": "16:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "拿铁今天被客人摸了一整天，晚上趴着一动不动"},
+      {"role": "assistant", "text": "猫也累。"},
+      {"role": "user", "text": "我给自己做了杯手冲，坐在门口台阶上喝完的"},
+      {"role": "assistant", "text": "国庆的台阶上喝手冲，这画面不错。"},
+      {"role": "user", "text": "就是腿疼，明天还这样"},
+      {"role": "assistant", "text": "买双软底鞋。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u057", "kind": "fact", "text": "用户店里国庆第一天卖出一百三十多杯，是阿细见过最多的一天", "importance": 3, "keywords": ["国庆", "一百三十多杯", "阿细"], "state": "active", "supersedes": ""},
+    {"id": "p08-u058", "kind": "trivia", "text": "国庆那天拿铁被客人摸了一整天，晚上趴着一动不动", "importance": 1, "keywords": ["拿铁", "客人", "国庆"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 65,
+   "date": "2026-10-04",
+   "sessions": [
+    {
+     "id": "p08-d65-s1",
+     "time": "09:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "阿细把国庆这几天的账算了，说够付翠湖那边半年租金"},
+      {"role": "assistant", "text": "几天挣出半年租，他更想开分店了吧。"},
+      {"role": "user", "text": "他直接把铺子的资料打印出来放我桌上了"},
+      {"role": "assistant", "text": "这是逼宫。"},
+      {"role": "user", "text": "我看了，面积比现在大一倍，租金贵三成"},
+      {"role": "assistant", "text": "贵三成，位置值不值是关键。"}
+     ]
+    },
+    {
+     "id": "p08-d65-s2",
+     "time": "21:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "晚上跟阿细聊到十一点，他说他负责管账和装修，我负责出品"},
+      {"role": "assistant", "text": "分工清楚。"},
+      {"role": "user", "text": "他说他信我的手艺，让我别怂"},
+      {"role": "assistant", "text": "这话比画饼实在。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u059", "kind": "fact", "text": "用户国庆几天的账，够付翠湖那边半年租金", "importance": 3, "keywords": ["国庆", "账", "半年租金"], "state": "active", "supersedes": ""},
+    {"id": "p08-u060", "kind": "relation", "text": "用户跟阿细分工，阿细管账和装修，用户负责出品", "importance": 2, "keywords": ["阿细", "分工", "出品"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 67,
+   "date": "2026-10-06",
+   "sessions": [
+    {
+     "id": "p08-d67-s1",
+     "time": "10:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天去翠湖那边，把第二个铺面的合同签了"},
+      {"role": "assistant", "text": "真签了。手抖没？"},
+      {"role": "user", "text": "抖了。签完站在空铺子中间，回声特别大"},
+      {"role": "assistant", "text": "三十平的店不够你折腾了？"},
+      {"role": "user", "text": "现在这个三十平，我一天最多做一百五十杯，到顶了"},
+      {"role": "assistant", "text": "所以不是贪，是装不下了。"},
+      {"role": "user", "text": "对。老街这个不动，翠湖做新的，阿细过去盯"},
+      {"role": "assistant", "text": "两条腿走路，稳一点。"}
+     ]
+    },
+    {
+     "id": "p08-d67-s2",
+     "time": "19:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "晚上跟王老师说签了翠湖，他愣了一下，说恭喜"},
+      {"role": "assistant", "text": "他舍不得吧。"},
+      {"role": "user", "text": "他说以后老街这边他帮我看着，别让味道变了"},
+      {"role": "assistant", "text": "这是他能给的最大的支持。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u061", "kind": "update", "text": "用户签了翠湖的第二个铺面，决定开第二家店，老街这个不动", "importance": 5, "keywords": ["翠湖", "第二个铺面", "开分店"], "state": "active", "supersedes": "p08-u022"},
+    {"id": "p08-u062", "kind": "relation", "text": "王老师说以后老街那边帮用户看着，别让味道变了", "importance": 3, "keywords": ["王老师", "老街", "看着"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 71,
+   "date": "2026-10-10",
+   "sessions": [
+    {
+     "id": "p08-d71-s1",
+     "time": "09:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "装修报价出来了，阿细砍到十四万，比预算多两万，工人后天进场"},
+      {"role": "assistant", "text": "两万从哪挤？工期来得及吗？"},
+      {"role": "user", "text": "设备先用二手的，吧台台面我找朋友做"},
+      {"role": "assistant", "text": "能省的省，咖啡机别省。"},
+      {"role": "user", "text": "咖啡机我打算买新的，这个是脸面"},
+      {"role": "assistant", "text": "懂行，这点不能省。"}
+     ]
+    },
+    {
+     "id": "p08-d71-s2",
+     "time": "17:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈今天回老家了，走之前把冰箱塞满了"},
+      {"role": "assistant", "text": "她这是把你当没长大。"},
+      {"role": "user", "text": "她走的时候在店门口站了一会儿，什么也没说"},
+      {"role": "assistant", "text": "她其实不放心。"},
+      {"role": "user", "text": "我答应她翠湖那边稳定了就回去看外婆"},
+      {"role": "assistant", "text": "这个承诺得记着。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u063", "kind": "fact", "text": "用户新店装修报价砍到十四万，比预算多两万", "importance": 3, "keywords": ["装修", "十四万", "预算"], "state": "active", "supersedes": ""},
+    {"id": "p08-u064", "kind": "relation", "text": "用户的妈妈回老家前把冰箱塞满，走时在店门口站了一会儿", "importance": 3, "keywords": ["妈妈", "回老家", "冰箱"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 74,
+   "date": "2026-10-13",
+   "sessions": [
+    {
+     "id": "p08-d74-s1",
+     "time": "11:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "埃塞水洗的参数调到第三版了，91 度、一比十四"},
+      {"role": "assistant", "text": "91 度，比之前高。花香出来了吗？"},
+      {"role": "user", "text": "出来了，柑橘味也明显。就是稍微过萃会苦"},
+      {"role": "assistant", "text": "那就在冲煮时间上收一秒。"},
+      {"role": "user", "text": "行，明天定版。这参数改了三版，我快背下来了"},
+      {"role": "assistant", "text": "定版就写进配方卡，以后新人照着做。"}
+     ]
+    },
+    {
+     "id": "p08-d74-s2",
+     "time": "21:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "晚上看《CLANNAD》后半段，看到父亲那条线，这回真没忍住"},
+      {"role": "assistant", "text": "这回承认了？"},
+      {"role": "user", "text": "承认了。反正店里没人"},
+      {"role": "assistant", "text": "一个人哭挺好的。"},
+      {"role": "user", "text": "看完我给家里打了个电话，我妈接的"},
+      {"role": "assistant", "text": "这通电话比剧值。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u065", "kind": "update", "text": "用户的埃塞水洗手冲参数定到第三版，91 度、一比十四", "importance": 3, "keywords": ["手冲参数", "第三版", "91 度"], "state": "active", "supersedes": "p08-u036"},
+    {"id": "p08-u066", "kind": "preference", "text": "用户看《CLANNAD》父亲线哭了，看完给妈妈打了电话", "importance": 3, "keywords": ["CLANNAD", "父亲线", "打电话"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 77,
+   "date": "2026-10-16",
+   "sessions": [
+    {
+     "id": "p08-d77-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "翠湖那边动工第五天了，今天去看，墙砸了一半，吧台尺寸也定了"},
+      {"role": "assistant", "text": "五天砸完墙？这速度可以。"},
+      {"role": "user", "text": "上家是奶茶店，水电基础还在，阿细说能省两周，月底能开"},
+      {"role": "assistant", "text": "难怪。那月底试营业有戏。"},
+      {"role": "user", "text": "咖啡机下周到，磨豆机先用店里这台旧的顶"},
+      {"role": "assistant", "text": "旧的别卖，两家店正好一人一台。"}
+     ]
+    },
+    {
+     "id": "p08-d77-s2",
+     "time": "20:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "阿细说想把拿铁抱去翠湖镇店，我说不行，猫换环境会应激"},
+      {"role": "assistant", "text": "对，三花猫认地盘。"},
+      {"role": "user", "text": "所以老街这边还是拿铁看着"},
+      {"role": "assistant", "text": "两家店的猫总不能搞两个，先这样。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u067", "kind": "episodic", "text": "用户翠湖的铺子动工第五天墙砸了一半，吧台尺寸定了，月底试营业", "importance": 3, "keywords": ["翠湖", "动工", "吧台"], "state": "active", "supersedes": ""},
+    {"id": "p08-u068", "kind": "relation", "text": "用户不让把拿铁抱去新店，说猫换环境会应激，留在老街", "importance": 2, "keywords": ["拿铁", "翠湖", "应激"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 80,
+   "date": "2026-10-19",
+   "sessions": [
+    {
+     "id": "p08-d80-s1",
+     "time": "10:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "翠湖那边开始排菜单了，我打算把老街的拿铁和冰手冲照搬过去"},
+      {"role": "assistant", "text": "照搬稳妥，新店别一开始就玩花的。"},
+      {"role": "user", "text": "那边加一款桂花拿铁，昆明秋天桂花多"},
+      {"role": "assistant", "text": "本地化，聪明。"},
+      {"role": "user", "text": "阿细说这名字有点土，我说土才有人点"},
+      {"role": "assistant", "text": "哈哈哈，老板拍板。"}
+     ]
+    },
+    {
+     "id": "p08-d80-s2",
+     "time": "18:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "下午去花市买了几盆绿萝，新店窗边摆一排"},
+      {"role": "assistant", "text": "绿萝好养，适合新店。"},
+      {"role": "user", "text": "老板娘还送了我一袋土"},
+      {"role": "assistant", "text": "昆明花市就是这点好。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u069", "kind": "plan", "text": "用户给翠湖店排菜单，照搬拿铁和冰手冲，加一款桂花拿铁", "importance": 3, "keywords": ["菜单", "桂花拿铁", "翠湖"], "state": "active", "supersedes": ""},
+    {"id": "p08-u070", "kind": "trivia", "text": "用户去花市买了几盆绿萝，老板还送了一袋土", "importance": 1, "keywords": ["绿萝", "花市", "新店"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 83,
+   "date": "2026-10-22",
+   "sessions": [
+    {
+     "id": "p08-d83-s1",
+     "time": "21:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "《夏目友人帐》六季我算是齐了，最后还是第一季最好看"},
+      {"role": "assistant", "text": "第一季那个还名字的桥段太硬了。"},
+      {"role": "user", "text": "对。新番那边我看了半集，还是看不下去"},
+      {"role": "assistant", "text": "不勉强自己，挺好。"},
+      {"role": "user", "text": "我现在一听到打斗音效就头疼"},
+      {"role": "assistant", "text": "你这是把口味养刁了。"}
+     ]
+    },
+    {
+     "id": "p08-d83-s2",
+     "time": "22:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "新店今天第一天试营业，来的大多是老街跟过去的老客"},
+      {"role": "assistant", "text": "第一天就这么多老客？"},
+      {"role": "user", "text": "有个客人说他更喜欢老街那个店，说新店太亮"},
+      {"role": "assistant", "text": "太亮是灯光的问题，调暖一点。"},
+      {"role": "user", "text": "嗯，我把射灯换了两个暖的"},
+      {"role": "assistant", "text": "细节决定味道。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u071", "kind": "preference", "text": "用户把《夏目友人帐》六季都看完了，觉得还是第一季最好看", "importance": 3, "keywords": ["夏目友人帐", "第一季", "六季"], "state": "active", "supersedes": ""},
+    {"id": "p08-u072", "kind": "fact", "text": "用户新店试营业第一天，来的大多是老街跟过去的老客", "importance": 3, "keywords": ["试营业", "老客", "新店"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 86,
+   "date": "2026-10-25",
+   "sessions": [
+    {
+     "id": "p08-d86-s1",
+     "time": "10:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天在翠湖店给王老师做了杯拉花，他拍了张照片发朋友圈"},
+      {"role": "assistant", "text": "老人家发朋友圈，稀罕事。"},
+      {"role": "user", "text": "他配文写「旧味道新地方」，我看了半天"},
+      {"role": "assistant", "text": "八个字，比广告强。"},
+      {"role": "user", "text": "我把那张截图存下来了"},
+      {"role": "assistant", "text": "该存，这种话难得。"}
+     ]
+    },
+    {
+     "id": "p08-d86-s2",
+     "time": "20:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "两家店的账合起来看，翠湖试营业这三天不亏，我已经很满意了"},
+      {"role": "assistant", "text": "试营业三天不亏，算是开了个好头。"},
+      {"role": "user", "text": "就是人更累了，我两头跑，一天站十个小时"},
+      {"role": "assistant", "text": "那就早点招个能扛事的店长。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u073", "kind": "relation", "text": "王老师在新店拍了拉花照片发朋友圈，配文旧味道新地方", "importance": 2, "keywords": ["王老师", "朋友圈", "旧味道新地方"], "state": "active", "supersedes": ""},
+    {"id": "p08-u074", "kind": "fact", "text": "用户翠湖店试营业三天不亏，但两头跑一天站十个小时", "importance": 3, "keywords": ["试营业", "不亏", "两头跑"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 89,
+   "date": "2026-10-28",
+   "sessions": [
+    {
+     "id": "p08-d89-s1",
+     "time": "09:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "翠湖店试营业快一周了，阿细提议明年再开第三家，我说先缓缓"},
+      {"role": "assistant", "text": "缓一年也对。"},
+      {"role": "user", "text": "我想把老街这边做成十年老店，新店能活就行"},
+      {"role": "assistant", "text": "一个守味，一个活命，挺清楚。"},
+      {"role": "user", "text": "十年后拿铁都老了"},
+      {"role": "assistant", "text": "十年后拿铁还睡吧台。"}
+     ]
+    },
+    {
+     "id": "p08-d89-s2",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "早上又去爬西山，秋天的云比夏天好看"},
+      {"role": "assistant", "text": "昆明的秋天就一个多月。"},
+      {"role": "user", "text": "爬到龙门那边出了汗，风一吹，喝自己带的手冲，花香特别清楚"},
+      {"role": "assistant", "text": "出汗之后喝，是不是更清楚？"},
+      {"role": "user", "text": "香。下次带个保温杯，装埃塞的"},
+      {"role": "assistant", "text": "带豆子上山的人，昆明也就你了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p08-u075", "kind": "plan", "text": "用户说明年不急着开第三家，先把新店稳住", "importance": 2, "keywords": ["第三家", "新店", "明年"], "state": "active", "supersedes": ""},
+    {"id": "p08-u076", "kind": "preference", "text": "用户秋天爬西山出了汗，风一吹，喝自带的手冲觉得花香特别清楚", "importance": 2, "keywords": ["西山", "秋天", "花香"], "state": "active", "supersedes": ""},
+    {"id": "p08-u077", "kind": "preference", "text": "用户想把老街这边做成十年老店，新店能活就行", "importance": 4, "keywords": ["十年老店", "老街", "守味"], "state": "active", "supersedes": ""}
+   ]
+  }
+ ],
+ "probes": [
+  {
+   "id": "p08-q01",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我店里下雨那次，进来躲雨的几个人是干嘛的？",
+   "expect": {"any": ["骑车的"], "none": []},
+   "unit_ids": ["p08-u007"],
+   "note": "第 5 天三个骑车的进店躲雨"
+  },
+  {
+   "id": "p08-q02",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我早上爬山一般爬到哪儿？",
+   "expect": {"any": ["龙门"], "none": []},
+   "unit_ids": ["p08-u011"],
+   "note": "第 8 天爬西山到龙门"
+  },
+  {
+   "id": "p08-q03",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我在店里闻到什么味道会觉得踏实？",
+   "expect": {"any": ["烘豆子"], "none": []},
+   "unit_ids": ["p08-u025"],
+   "note": "第 24 天说烘豆子的味道让他踏实"
+  },
+  {
+   "id": "p08-q04",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我妈回老家之前把家里什么塞满了？",
+   "expect": {"any": ["冰箱"], "none": []},
+   "unit_ids": ["p08-u064"],
+   "note": "第 71 天妈妈回老家"
+  },
+  {
+   "id": "p08-q05",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我练拉花最后拉出个什么形状？",
+   "expect": {"any": ["心形"], "none": []},
+   "unit_ids": ["p08-u051"],
+   "note": "第 55 天拉出心形"
+  },
+  {
+   "id": "p08-q06",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "秋天爬山那杯咖啡为什么更好喝？",
+   "expect": {"any": ["出了汗", "花香特别清楚"], "none": []},
+   "unit_ids": ["p08-u076"],
+   "note": "第 89 天出汗后喝自带手冲，风一吹花香特别清楚；gold 换成原因，不撞「山上」"
+  },
+  {
+   "id": "p08-q07",
+   "category": "work",
+   "ask_day": 90,
+   "query": "上个月扣完房租水电，我和阿细一人剩多少？",
+   "expect": {"any": ["四千"], "none": []},
+   "unit_ids": ["p08-u004"],
+   "note": "第 3 天两人一人剩四千多"
+  },
+  {
+   "id": "p08-q08",
+   "category": "work",
+   "ask_day": 90,
+   "query": "外卖平台给的抽成条件是什么？",
+   "expect": {"any": ["百分之十二", "十八"], "none": []},
+   "unit_ids": ["p08-u039"],
+   "note": "第 40 天业务员上门，前三个月十二，之后十八"
+  },
+  {
+   "id": "p08-q09",
+   "category": "work",
+   "ask_day": 90,
+   "query": "那条差评之后，我在店里的声音上怎么改的？",
+   "expect": {"any": ["关小"], "none": []},
+   "unit_ids": ["p08-u048"],
+   "note": "第 50 天下午两点到四点关小音乐"
+  },
+  {
+   "id": "p08-q10",
+   "category": "work",
+   "ask_day": 90,
+   "query": "节后那几天阿细对完账，说这笔钱够顶什么开销？",
+   "expect": {"any": ["半年租金"], "none": []},
+   "unit_ids": ["p08-u059"],
+   "note": "第 65 天阿细算账，够付翠湖那边的半年租金；query 换角度问，不再照抄 unit"
+  },
+  {
+   "id": "p08-q11",
+   "category": "work",
+   "ask_day": 90,
+   "query": "翠湖店试营业这段时间经营得怎么样？",
+   "expect": {"any": ["不亏"], "none": []},
+   "unit_ids": ["p08-u074"],
+   "note": "第 86 天试营业三天不亏"
+  },
+  {
+   "id": "p08-q12",
+   "category": "work",
+   "ask_day": 90,
+   "query": "新店试营业来的都是些什么人？",
+   "expect": {"any": ["老客"], "none": []},
+   "unit_ids": ["p08-u072"],
+   "note": "第 83 天老客跟过去"
+  },
+  {
+   "id": "p08-q13",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我每季都追的那部动画叫什么？",
+   "expect": {"any": ["夏目友人帐"], "none": []},
+   "unit_ids": ["p08-u008"],
+   "note": "第 5 天说《夏目友人帐》每季都看"
+  },
+  {
+   "id": "p08-q14",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我最喜欢的那部剧场版，看几遍了？",
+   "expect": {"any": ["缘结空蝉", "三遍"], "none": []},
+   "unit_ids": ["p08-u021"],
+   "note": "第 19 天剧场版《缘结空蝉》看三遍"
+  },
+  {
+   "id": "p08-q15",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我看那部动画看哭了，还不承认，是哪部？",
+   "expect": {"any": ["CLANNAD"], "none": []},
+   "unit_ids": ["p08-u044"],
+   "note": "第 45 天看《CLANNAD》眼睛酸"
+  },
+  {
+   "id": "p08-q16",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "夏目六季刷完，我觉得哪季最好？",
+   "expect": {"any": ["第一季"], "none": []},
+   "unit_ids": ["p08-u071"],
+   "note": "第 83 天六季看完"
+  },
+  {
+   "id": "p08-q17",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "下雨受潮那次，我买了什么回来救豆子？",
+   "expect": {"any": ["密封罐"], "none": []},
+   "unit_ids": ["p08-u020"],
+   "note": "第 19 天进了潮气，买五个密封罐"
+  },
+  {
+   "id": "p08-q18",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "有客人带猫来，我家那只躲哪了？",
+   "expect": {"any": ["吧台底下"], "none": []},
+   "unit_ids": ["p08-u023"],
+   "note": "第 22 天拿铁躲客人的猫"
+  },
+  {
+   "id": "p08-q19",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "外带杯我去市场砍到多少钱一包？",
+   "expect": {"any": ["四块五"], "none": []},
+   "unit_ids": ["p08-u046"],
+   "note": "第 48 天砍价"
+  },
+  {
+   "id": "p08-q20",
+   "category": "update",
+   "ask_day": 90,
+   "query": "店里手冲的豆子后来换了吗？",
+   "expect": {"any": ["埃塞水洗"], "none": ["云南日晒"]},
+   "unit_ids": ["p08-u043", "p08-u013"],
+   "note": "第 10 天还是云南日晒，第 45 天换埃塞水洗"
+  },
+  {
+   "id": "p08-q21",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我原来死都不肯上的那个东西，后来怎么样了？",
+   "expect": {"any": ["上了外卖"], "none": ["毁了"]},
+   "unit_ids": ["p08-u042", "p08-u012"],
+   "note": "第 10 天坚决不上外卖，第 45 天上了；gold 只取新状态「上了外卖」，旧单元里没有"
+  },
+  {
+   "id": "p08-q22",
+   "category": "update",
+   "ask_day": 90,
+   "query": "翠湖那边后来到底签没签？",
+   "expect": {"any": ["签了"], "none": ["绝不扩张"]},
+   "unit_ids": ["p08-u061", "p08-u022"],
+   "note": "第 22 天说绝不扩张，第 67 天签了翠湖"
+  },
+  {
+   "id": "p08-q23",
+   "category": "update",
+   "ask_day": 90,
+   "query": "手冲参数最后定在哪个版本上？",
+   "expect": {"any": ["第三版", "91 度"], "none": ["第二版"]},
+   "unit_ids": ["p08-u065", "p08-u036", "p08-u010"],
+   "note": "参数改了三版，最后定 91 度"
+  },
+  {
+   "id": "p08-q24",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "从八月到九月，豆子和外卖这两件事是怎么变的？",
+   "expect": {"any": ["埃塞水洗", "外卖平台"], "none": []},
+   "unit_ids": ["p08-u013", "p08-u043", "p08-u042"],
+   "note": "豆子换埃塞，外卖也上了"
+  },
+  {
+   "id": "p08-q25",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "店里生意从八月到国庆是怎么个变化？",
+   "expect": {"any": ["四千", "四十六杯", "一百三十多杯"], "none": []},
+   "unit_ids": ["p08-u004", "p08-u032", "p08-u057"],
+   "note": "八月一人剩四千多，九月一天四十六杯，国庆一百三十多杯"
+  },
+  {
+   "id": "p08-q26",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "上外卖之前那阵子我身体出了什么事？",
+   "expect": {"any": ["见手青", "两瓶水"], "none": []},
+   "unit_ids": ["p08-u034", "p08-u039"],
+   "note": "第 35 天菌子中毒，第 40 天外卖业务员上门"
+  },
+  {
+   "id": "p08-q27",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "翠湖开店跟我妈回老家是不是赶在一块了？",
+   "expect": {"any": ["外婆"], "none": []},
+   "unit_ids": ["p08-u050", "p08-u061"],
+   "note": "第 52 天外婆情况不好，第 67 天签翠湖"
+  },
+  {
+   "id": "p08-q28",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "动工的那个铺子在哪边？",
+   "expect": {"any": ["翠湖的铺子"], "none": ["老街那边"]},
+   "unit_ids": ["p08-u067"],
+   "note": "第 77 天动工的是翠湖那间，不是老街；gold 用只在动工记忆里出现的「翠湖的铺子」"
+  },
+  {
+   "id": "p08-q29",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "王老师说以后帮我看着店，别让什么变了？",
+   "expect": {"any": ["别让味道变了"], "none": ["旧味道新地方"]},
+   "unit_ids": ["p08-u062"],
+   "note": "第 67 天王老师说老街那边别让味道变了；gold 换整句片段，none 换成同为「味道」话题但只在朋友圈记忆里出现的「旧味道新地方」"
+  },
+  {
+   "id": "p08-q30",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我之前说过想买什么车吗？",
+   "expect": {"any": [], "none": ["跑车", "越野车"]},
+   "unit_ids": [],
+   "note": "从没聊过车"
+  },
+  {
+   "id": "p08-q31",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我跟你提过想看哪片海吗？",
+   "expect": {"any": [], "none": ["海边", "三亚"]},
+   "unit_ids": [],
+   "note": "没聊过海边也没去过三亚"
+  },
+  {
+   "id": "p08-q32",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我说过想踢什么运动没有？",
+   "expect": {"any": [], "none": ["足球", "篮球"]},
+   "unit_ids": [],
+   "note": "只爬西山，没踢过球"
+  }
+ ]
+}

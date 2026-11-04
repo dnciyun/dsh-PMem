@@ -1,0 +1,1090 @@
+{
+ "version": 1,
+ "id": "p04",
+ "name": "周遥",
+ "profile": {
+  "age": 27,
+  "city": "上海",
+  "job": "自由插画师",
+  "voice": "跳、情绪化、感叹号多；熬夜昼夜颠倒；说到钱很实在，数字记得清",
+  "relations": "布偶猫糯米；妈妈在无锡一直催回家考公；固定约稿编辑阿雅；甲方星辰互娱和银河游戏"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "p04-d01-s1",
+     "time": "02:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "凌晨两点半还在上色！糯米一屁股坐我键盘上，图层被它删了！"},
+      {"role": "assistant", "text": "它是不是觉得键盘暖。"},
+      {"role": "user", "text": "暖！显示器也暖！它专挑屏幕趴！"},
+      {"role": "assistant", "text": "那你还怎么画。"},
+      {"role": "user", "text": "抱下去三次，第四次我放弃了，我挪到旁边画。"},
+      {"role": "assistant", "text": "让让它。它又不懂图层。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u001", "kind": "episodic", "text": "用户凌晨两点半还在上色，布偶猫糯米坐在键盘上删掉了图层", "importance": 3, "keywords": ["糯米", "键盘", "图层"], "state": "active", "supersedes": ""},
+    {"id": "p04-u002", "kind": "relation", "text": "用户养了一只布偶猫叫糯米，喜欢趴在暖的显示器前，还爱踩键盘", "importance": 3, "keywords": ["布偶猫", "糯米", "数位屏"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-08-02",
+   "sessions": [
+    {
+     "id": "p04-d02-s1",
+     "time": "15:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "星辰互娱又打回来了！第四版了！说‘感觉不对’！"},
+      {"role": "assistant", "text": "感觉不对是最难猜的评语。"},
+      {"role": "user", "text": "他们要更清透，我一层一层减，减到我自己都不认识了！"},
+      {"role": "assistant", "text": "那就问他们要参考图。"},
+      {"role": "user", "text": "要了！发过来是他们自己上一款游戏的截图！"},
+      {"role": "assistant", "text": "那你就照那个截图做一版，别猜。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u003", "kind": "episodic", "text": "用户的商单被星辰互娱打回四次，甲方每次只说感觉不对", "importance": 4, "keywords": ["星辰互娱", "改稿", "感觉不对"], "state": "active", "supersedes": ""},
+    {"id": "p04-u004", "kind": "preference", "text": "用户最烦甲方说感觉不对，宁可对方直接给参考图", "importance": 3, "keywords": ["参考图", "感觉不对", "甲方"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 4,
+   "date": "2026-08-04",
+   "sessions": [
+    {
+     "id": "p04-d04-s1",
+     "time": "11:10",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "厨房天花滴水！漏一晚上，我拿锅接了小半锅！"},
+      {"role": "assistant", "text": "楼上管道还是楼上防水。"},
+      {"role": "user", "text": "物业说是楼上那家水管，第一次来找说会修。"},
+      {"role": "assistant", "text": "盯着他们，别只听口头答应。"},
+      {"role": "user", "text": "我全程拍了视频，留证据。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u005", "kind": "episodic", "text": "用户厨房天花板漏水漏了一晚上，拿锅接了小半锅，物业说是楼上水管", "importance": 2, "keywords": ["厨房漏水", "锅", "物业"], "state": "active", "supersedes": ""},
+    {"id": "p04-u006", "kind": "fact", "text": "用户遇上漏水都会全程拍视频留证据", "importance": 2, "keywords": ["拍视频", "证据", "漏水"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 6,
+   "date": "2026-08-06",
+   "sessions": [
+    {
+     "id": "p04-d06-s1",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈又打电话了！问我这画画能画到几岁！"},
+      {"role": "assistant", "text": "每次都这句。"},
+      {"role": "user", "text": "她说隔壁谁家孩子考公上岸了，让我回无锡。"},
+      {"role": "assistant", "text": "你怎么答的。"},
+      {"role": "user", "text": "我说上海房租是我自己交的。她直接把电话挂了。"},
+      {"role": "assistant", "text": "硬碰硬她只会更急。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u007", "kind": "relation", "text": "用户妈妈在无锡，一直催她回家考公，常说画画能画到几岁", "importance": 4, "keywords": ["妈妈", "无锡", "考公"], "state": "active", "supersedes": ""},
+    {"id": "p04-u008", "kind": "fact", "text": "用户在上海的房租是自己交的，跟妈妈吵架时会拿这个挡", "importance": 2, "keywords": ["房租", "上海", "吵架"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 8,
+   "date": "2026-08-08",
+   "sessions": [
+    {
+     "id": "p04-d08-s1",
+     "time": "23:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "重看冰菓！千反田一句‘我很好奇’，我鸡皮疙瘩都起来了！"},
+      {"role": "assistant", "text": "奉太郎就是被她这句拖下水的。"},
+      {"role": "user", "text": "那种眼神谁顶得住啊！京阿尼的手也画得太好了。"},
+      {"role": "assistant", "text": "你最吃哪一段。"},
+      {"role": "user", "text": "学园祭那段！还有她穿和服的样子。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u009", "kind": "preference", "text": "用户重看冰菓，喜欢千反田说‘我很好奇’，最吃学园祭那段", "importance": 4, "keywords": ["冰菓", "千反田", "学园祭"], "state": "active", "supersedes": ""},
+    {"id": "p04-u010", "kind": "preference", "text": "用户觉得京阿尼画的手特别好看", "importance": 2, "keywords": ["京阿尼", "手", "作画"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 9,
+   "date": "2026-08-09",
+   "sessions": [
+    {
+     "id": "p04-d09-s1",
+     "time": "14:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "数位屏到了！十六寸，二手的，四千八！"},
+      {"role": "assistant", "text": "二手的也敢买。"},
+      {"role": "user", "text": "同城一个画手出的，屏幕没划痕。就是驱动装了两个小时！"},
+      {"role": "assistant", "text": "驱动比画稿难搞。"},
+      {"role": "user", "text": "现在笔压感对上了！画面大一圈真的爽！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u011", "kind": "fact", "text": "用户买了台二手十六寸数位屏，四千八，驱动装了两个小时", "importance": 3, "keywords": ["数位屏", "二手", "四千八"], "state": "active", "supersedes": ""},
+    {"id": "p04-u012", "kind": "trivia", "text": "用户觉得数位屏大一圈画起来特别爽", "importance": 1, "keywords": ["数位屏", "大屏", "压感"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 11,
+   "date": "2026-08-11",
+   "sessions": [
+    {
+     "id": "p04-d11-s1",
+     "time": "04:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "第五版了！凌晨四点！甲方说再调一下氛围！"},
+      {"role": "assistant", "text": "氛围是最好改也最没底的词。"},
+      {"role": "user", "text": "我把整张图从黄昏改成清晨，他们又说还是原来那版好！"},
+      {"role": "assistant", "text": "那不就是回第四版。"},
+      {"role": "user", "text": "对！我一晚上白熬！"},
+      {"role": "assistant", "text": "下次让他们一次把意见写全。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u013", "kind": "episodic", "text": "用户为星辰互娱改到第五版，熬到凌晨四点，甲方最后说还是原来那版好", "importance": 4, "keywords": ["第五版", "凌晨四点", "白熬"], "state": "active", "supersedes": ""},
+    {"id": "p04-u014", "kind": "plan", "text": "用户打算以后让甲方一次把修改意见写全，不要一轮一轮挤", "importance": 3, "keywords": ["修改意见", "甲方", "一次写全"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 13,
+   "date": "2026-08-13",
+   "sessions": [
+    {
+     "id": "p04-d13-s1",
+     "time": "19:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "结算了。这张八百。我画了六天！"},
+      {"role": "assistant", "text": "六天八百，一天一百三。"},
+      {"role": "user", "text": "我知道！但我不敢涨，怕没单子啊。而且我一直不收定金，画完才结。"},
+      {"role": "assistant", "text": "不收定金，等于把钱押在别人的人品上。"},
+      {"role": "user", "text": "我现在档期排到月底了。所以其实可以试。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u015", "kind": "fact", "text": "用户一张商单收八百块，画了六天，觉得太低但不敢涨价", "importance": 4, "keywords": ["八百", "商单", "不敢涨"], "state": "superseded", "superseded_by": "p04-u037", "supersedes": ""},
+    {"id": "p04-u016", "kind": "fact", "text": "用户接单一直不收定金，画完才结算", "importance": 4, "keywords": ["定金", "结算", "接单"], "state": "superseded", "superseded_by": "p04-u035", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 15,
+   "date": "2026-08-15",
+   "sessions": [
+    {
+     "id": "p04-d15-s1",
+     "time": "23:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "糯米吐毛球了！吐在我刚洗的床单上！"},
+      {"role": "assistant", "text": "布偶长毛，吐毛球正常。"},
+      {"role": "user", "text": "它吐完还委屈地看我！化毛膏它不吃！"},
+      {"role": "assistant", "text": "拌罐头里。"},
+      {"role": "user", "text": "试了！它把罐头舔干净，把膏留在碗底。精得很。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u017", "kind": "trivia", "text": "用户的布偶猫糯米吐毛球吐在刚洗的床单上，化毛膏拌罐头会被它挑出来", "importance": 2, "keywords": ["糯米", "毛球", "化毛膏"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 17,
+   "date": "2026-08-17",
+   "sessions": [
+    {
+     "id": "p04-d17-s1",
+     "time": "16:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "第七版色稿交出去了！七版！我存了七个文件夹！"},
+      {"role": "assistant", "text": "最后用的哪版。"},
+      {"role": "user", "text": "第二版！就是他们一开始说没感觉的那版！"},
+      {"role": "assistant", "text": "那你前面五版算什么。"},
+      {"role": "user", "text": "算学费吧。我真的想收个改稿费。"}
+     ]
+    },
+    {
+     "id": "p04-d17-s2",
+     "time": "23:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "交完稿去楼下点了碗麻辣烫，加了双份午餐肉！"},
+      {"role": "assistant", "text": "七版换一碗麻辣烫。"},
+      {"role": "user", "text": "还加了个荷包蛋。今天就这样了！"},
+      {"role": "assistant", "text": "吃完早点睡。"},
+      {"role": "user", "text": "睡不着也躺着。糯米已经占了我的枕头。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u018", "kind": "episodic", "text": "用户的商单改到第七版色稿，最后甲方用了第二版", "importance": 5, "keywords": ["七版色稿", "第二版", "改稿"], "state": "active", "supersedes": ""},
+    {"id": "p04-u019", "kind": "preference", "text": "用户觉得改稿七版应该收改稿费", "importance": 3, "keywords": ["改稿费", "七版", "甲方"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 19,
+   "date": "2026-08-19",
+   "sessions": [
+    {
+     "id": "p04-d19-s1",
+     "time": "15:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "霸王茶姬又上新了！今天点的伯牙绝弦，大杯三分糖！"},
+      {"role": "assistant", "text": "三分糖还能喝出味吗。"},
+      {"role": "user", "text": "能！喝的就是那股茶味！一天两杯我腰都要废了。"},
+      {"role": "assistant", "text": "两杯有点多。"},
+      {"role": "user", "text": "下午一杯晚上一杯。改稿的时候不喝画不动。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u020", "kind": "preference", "text": "用户爱喝霸王茶姬的伯牙绝弦，大杯三分糖，一天两杯", "importance": 2, "keywords": ["霸王茶姬", "伯牙绝弦", "三分糖"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 21,
+   "date": "2026-08-21",
+   "sessions": [
+    {
+     "id": "p04-d21-s1",
+     "time": "01:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "腰疼。坐一整天，站起来直不起身。"},
+      {"role": "assistant", "text": "多久了。"},
+      {"role": "user", "text": "两三个月了。弯腰画细节的时候最明显。"},
+      {"role": "assistant", "text": "椅子还是桌子的高度不对。"},
+      {"role": "user", "text": "椅子是捡漏的旧电竞椅，靠背根本顶不住。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u021", "kind": "fact", "text": "用户画稿坐一整天，腰疼了两三个月，弯腰画细节时最明显", "importance": 3, "keywords": ["腰疼", "久坐", "画稿"], "state": "active", "supersedes": ""},
+    {"id": "p04-u022", "kind": "trivia", "text": "用户的椅子是捡漏买的旧电竞椅，靠背顶不住", "importance": 2, "keywords": ["电竞椅", "靠背", "椅子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 23,
+   "date": "2026-08-23",
+   "sessions": [
+    {
+     "id": "p04-d23-s1",
+     "time": "10:40",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "物业又来了。第二次！还是说回去沟通！"},
+      {"role": "assistant", "text": "沟通两次没动，就找居委。"},
+      {"role": "user", "text": "我说我要投诉。他们才说下午上去看。"},
+      {"role": "assistant", "text": "结果呢。"},
+      {"role": "user", "text": "晚上不滴了，说换了阀门。我锅还留着。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u023", "kind": "episodic", "text": "用户为厨房漏水第二次找物业，说要投诉才有人上门，最后换了阀门", "importance": 3, "keywords": ["物业", "漏水", "投诉"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 25,
+   "date": "2026-08-25",
+   "sessions": [
+    {
+     "id": "p04-d25-s1",
+     "time": "13:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿雅又给我推了个新单！银河游戏的，立绘两张。"},
+      {"role": "assistant", "text": "银河比星辰出手大。"},
+      {"role": "user", "text": "她说对方看过我去年那张图，开价一千。"},
+      {"role": "assistant", "text": "你当场答应了吗。"},
+      {"role": "user", "text": "我说想一下，明天回。其实心里已经在想还价了！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u024", "kind": "relation", "text": "用户的固定约稿编辑是阿雅，有合适的单子会推给她", "importance": 4, "keywords": ["阿雅", "编辑", "约稿"], "state": "active", "supersedes": ""},
+    {"id": "p04-u025", "kind": "fact", "text": "阿雅给用户推了银河游戏的两张立绘，开价一千", "importance": 3, "keywords": ["银河游戏", "立绘", "一千"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 27,
+   "date": "2026-08-27",
+   "sessions": [
+    {
+     "id": "p04-d27-s1",
+     "time": "20:15",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿雅说有个出版社在找画师出画集，她把我推上去了！"},
+      {"role": "assistant", "text": "这个比接商单重要。"},
+      {"role": "user", "text": "我知道！但人家要先看作品集，我连作品集都没整理过！"},
+      {"role": "assistant", "text": "先把这三年能看的图挑出来。"},
+      {"role": "user", "text": "今晚就开始整，整到早上也认。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u026", "kind": "plan", "text": "阿雅把用户推荐给出版社出画集，用户要先整理作品集", "importance": 5, "keywords": ["画集", "出版社", "作品集"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 29,
+   "date": "2026-08-29",
+   "sessions": [
+    {
+     "id": "p04-d29-s1",
+     "time": "06:05",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "六点了。天亮了。我一晚上没睡。"},
+      {"role": "assistant", "text": "画完了？"},
+      {"role": "user", "text": "画完三张草稿。手在抖，眼睛发花。"},
+      {"role": "assistant", "text": "白天补觉，别硬撑。"},
+      {"role": "user", "text": "睡不着的。躺下脑子还在转。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u027", "kind": "fact", "text": "用户熬夜到早上六点，一晚上画完三张草稿，手抖眼睛发花", "importance": 3, "keywords": ["熬夜", "早上六点", "草稿"], "state": "active", "supersedes": ""},
+    {"id": "p04-u028", "kind": "fact", "text": "用户熬夜之后躺下也睡不着，脑子还在转", "importance": 2, "keywords": ["睡不着", "熬夜", "脑子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 31,
+   "date": "2026-08-31",
+   "sessions": [
+    {
+     "id": "p04-d31-s1",
+     "time": "17:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "八月结完了。四单，一共六千二。房租四千五。"},
+      {"role": "assistant", "text": "剩一千七。"},
+      {"role": "user", "text": "还要自己交社保！真的穷！"},
+      {"role": "assistant", "text": "单价不提，永远这样。"},
+      {"role": "user", "text": "九月我要试。真的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u029", "kind": "fact", "text": "用户八月接了四单共六千二，房租四千五，社保还得自己交", "importance": 4, "keywords": ["六千二", "房租", "社保"], "state": "active", "supersedes": ""},
+    {"id": "p04-u030", "kind": "plan", "text": "用户打算九月试着提高自己商单的报价", "importance": 4, "keywords": ["九月", "涨价", "报价"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 33,
+   "date": "2026-09-02",
+   "sessions": [
+    {
+     "id": "p04-d33-s1",
+     "time": "14:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "我算了下，按八百一张真要饿死。我想报到一千五。"},
+      {"role": "assistant", "text": "一次翻快一倍，对方会愣。"},
+      {"role": "user", "text": "那怎么办！我总不能一直八百吧！"},
+      {"role": "assistant", "text": "先说档期紧，再报一千五，给对方一个接受的空间。"},
+      {"role": "user", "text": "行。我先拿银河那张试水。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u031", "kind": "plan", "text": "用户想把单张报价从八百提到一千五，先拿银河游戏的单子试水", "importance": 4, "keywords": ["一千五", "涨价", "银河"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 35,
+   "date": "2026-09-04",
+   "sessions": [
+    {
+     "id": "p04-d35-s1",
+     "time": "22:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿雅说银河那边预算够，让我别怕，报！"},
+      {"role": "assistant", "text": "编辑说话算数。"},
+      {"role": "user", "text": "她还教了我一句：档期排到十一月了，这个价能排。"},
+      {"role": "assistant", "text": "这话比单纯报数字有用。"},
+      {"role": "user", "text": "我抄在备忘录里了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u032", "kind": "relation", "text": "阿雅教用户用档期排到十一月来谈价，用户抄在备忘录里", "importance": 3, "keywords": ["阿雅", "档期", "谈价"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 36,
+   "date": "2026-09-05",
+   "sessions": [
+    {
+     "id": "p04-d36-s1",
+     "time": "23:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "星辰互娱把我鸽了！说项目砍了，之前那版稿费也没结！"},
+      {"role": "assistant", "text": "砍项目，还是拖款。"},
+      {"role": "user", "text": "说月底结！上一单的钱还在他们手里！"},
+      {"role": "assistant", "text": "合同里有没有付款节点。"},
+      {"role": "user", "text": "没有！我图省事，全程就在微信上聊的。"},
+      {"role": "assistant", "text": "以后先收定金。这是最便宜的一课。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u033", "kind": "episodic", "text": "用户九月五号被星辰互娱放鸽子，项目砍了，上一单稿费也没结", "importance": 5, "keywords": ["星辰互娱", "放鸽子", "稿费"], "state": "active", "supersedes": ""},
+    {"id": "p04-u034", "kind": "fact", "text": "用户的商单只在微信上聊，没有合同也没有付款节点", "importance": 3, "keywords": ["微信", "合同", "付款节点"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 38,
+   "date": "2026-09-07",
+   "sessions": [
+    {
+     "id": "p04-d38-s1",
+     "time": "15:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "我决定了！以后所有单先收三成定金！"},
+      {"role": "assistant", "text": "写进报价单里。"},
+      {"role": "user", "text": "写了！定金不退，改稿超过三次加钱！"},
+      {"role": "assistant", "text": "这话发出去，能省一半麻烦。"},
+      {"role": "user", "text": "阿雅说早该这样！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u035", "kind": "update", "text": "用户决定以后接单先收三成定金，写进了报价单里", "importance": 4, "keywords": ["三成定金", "报价单", "接单"], "state": "active", "supersedes": "p04-u016"},
+    {"id": "p04-u036", "kind": "fact", "text": "用户的报价单里写明改稿超过三次要加钱", "importance": 3, "keywords": ["改稿", "三次", "加钱"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 40,
+   "date": "2026-09-09",
+   "sessions": [
+    {
+     "id": "p04-d40-s1",
+     "time": "12:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "报了！一千五！发出去手都在抖！"},
+      {"role": "assistant", "text": "对方回什么。"},
+      {"role": "user", "text": "回了句稍等，我问问。等了四个小时！"},
+      {"role": "assistant", "text": "四个小时不算长。"},
+      {"role": "user", "text": "他回来说可以！三张一共四千五，就是得多加一张变体！"}
+     ]
+    },
+    {
+     "id": "p04-d40-s2",
+     "time": "20:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我点了个超大杯庆祝！一千五啊！"},
+      {"role": "assistant", "text": "这就值得超大杯。"},
+      {"role": "user", "text": "我给阿雅发了个红包，她没收，说等她抽成。"},
+      {"role": "assistant", "text": "这编辑确实讲究。"},
+      {"role": "user", "text": "讲究！下次给她画张像。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u037", "kind": "update", "text": "用户第一次把单张报价报到一千五，银河游戏答应了", "importance": 5, "keywords": ["一千五", "报价", "银河游戏"], "state": "active", "supersedes": "p04-u015"},
+    {"id": "p04-u038", "kind": "fact", "text": "银河游戏接受涨价的条件是得多加一张变体，三张一共四千五", "importance": 3, "keywords": ["两张变体", "银河", "条件"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 42,
+   "date": "2026-09-11",
+   "sessions": [
+    {
+     "id": "p04-d42-s1",
+     "time": "18:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "变体画完了。他们又要改，说武器换个方向！"},
+      {"role": "assistant", "text": "这就是加变体的代价。"},
+      {"role": "user", "text": "我在报价单里写了改稿三次加钱，这才第二轮。"},
+      {"role": "assistant", "text": "记着数。"},
+      {"role": "user", "text": "记了！我拿本子记了每一轮改稿！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u039", "kind": "fact", "text": "用户拿本子记每一次改稿轮次，准备到三次就加钱", "importance": 3, "keywords": ["本子", "改稿", "轮次"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 44,
+   "date": "2026-09-13",
+   "sessions": [
+    {
+     "id": "p04-d44-s1",
+     "time": "21:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "芙莉莲！菲伦对芙莉莲翻白眼那段我笑死！"},
+      {"role": "assistant", "text": "菲伦是被她一手带大的。"},
+      {"role": "user", "text": "辛美尔一出来我就想哭，明明才几秒回忆！"},
+      {"role": "assistant", "text": "这部就是拿回忆杀人。"},
+      {"role": "user", "text": "我把葬送这两个字念了一晚上。"},
+      {"role": "assistant", "text": "长篇你本来也不看。"},
+      {"role": "user", "text": "热血长篇真不行，一打三十集，我看不动。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u040", "kind": "preference", "text": "用户狂吹葬送的芙莉莲，菲伦翻白眼那段笑死，辛美尔出来就想哭", "importance": 4, "keywords": ["芙莉莲", "菲伦", "辛美尔"], "state": "active", "supersedes": ""},
+    {"id": "p04-u041", "kind": "trivia", "text": "用户觉得葬送这两个字起得好，念了一晚上", "importance": 2, "keywords": ["葬送", "芙莉莲", "名字"], "state": "active", "supersedes": ""},
+    {"id": "p04-u042", "kind": "preference", "text": "用户看不下去长篇热血番，说一打三十集就没耐心", "importance": 3, "keywords": ["长篇热血", "看不下去", "耐心"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 46,
+   "date": "2026-09-15",
+   "sessions": [
+    {
+     "id": "p04-d46-s1",
+     "time": "11:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "定金到账了！一千三百五！我第一次收定金！"},
+      {"role": "assistant", "text": "什么感觉。"},
+      {"role": "user", "text": "感觉这活有人认！我截图存起来了。"},
+      {"role": "assistant", "text": "存着，下次报价的时候看。"},
+      {"role": "user", "text": "存了！还发给我妈看了，她没回。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u043", "kind": "fact", "text": "用户第一次收到商单定金一千三百五，截图存起来还发给了妈妈", "importance": 4, "keywords": ["定金", "一千三百五", "截图"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 48,
+   "date": "2026-09-17",
+   "sessions": [
+    {
+     "id": "p04-d48-s1",
+     "time": "20:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "阿雅又推了一单，另一个小厂，说预算一千二。"},
+      {"role": "assistant", "text": "比八百高，比一千五低。"},
+      {"role": "user", "text": "我回了 1500。他们居然也说好！"},
+      {"role": "assistant", "text": "你的价格站住了。"},
+      {"role": "user", "text": "站住了！我有点飘。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u044", "kind": "fact", "text": "用户的第二个单子也按一千五报价，对方也同意了", "importance": 4, "keywords": ["一千五", "第二单", "报价"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 50,
+   "date": "2026-09-19",
+   "sessions": [
+    {
+     "id": "p04-d50-s1",
+     "time": "22:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我妈又来了！这次说给我介绍对象，让我中秋回家！"},
+      {"role": "assistant", "text": "中秋回去吗。"},
+      {"role": "user", "text": "不回！回去就是三天批斗会。"},
+      {"role": "assistant", "text": "那你怎么跟她说。"},
+      {"role": "user", "text": "我说有交稿。她说你就编吧。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u045", "kind": "relation", "text": "用户妈妈中秋要给她介绍对象，用户拿交稿当借口不回无锡", "importance": 3, "keywords": ["妈妈", "相亲", "中秋"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 52,
+   "date": "2026-09-21",
+   "sessions": [
+    {
+     "id": "p04-d52-s1",
+     "time": "16:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "去推拿了。师傅说我腰肌劳损，让我别久坐。"},
+      {"role": "assistant", "text": "推拿能缓几天。"},
+      {"role": "user", "text": "一次两百八！他说要连着做五次！"},
+      {"role": "assistant", "text": "先换椅子更实在。"},
+      {"role": "user", "text": "我买了个人体工学椅，一千六，肉疼！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u046", "kind": "fact", "text": "用户去推拿被说腰肌劳损，一次两百八，要连着做五次", "importance": 3, "keywords": ["推拿", "腰肌劳损", "两百八"], "state": "active", "supersedes": ""},
+    {"id": "p04-u047", "kind": "trivia", "text": "用户花一千六买了把人体工学椅，觉得肉疼", "importance": 2, "keywords": ["人体工学椅", "一千六", "椅子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 54,
+   "date": "2026-09-23",
+   "sessions": [
+    {
+     "id": "p04-d54-s1",
+     "time": "02:15",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "作息彻底反了。现在下午三点起床，早上七点睡。"},
+      {"role": "assistant", "text": "这算半个美国时区。"},
+      {"role": "user", "text": "我试过调！躺床上刷手机刷到天亮！"},
+      {"role": "assistant", "text": "把手机放客厅试试。"},
+      {"role": "user", "text": "放客厅我会半夜起来拿。我就是不行。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u048", "kind": "fact", "text": "用户的作息整个反了，下午三点起床、早上七点睡", "importance": 3, "keywords": ["作息", "三点起床", "昼夜颠倒"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 56,
+   "date": "2026-09-25",
+   "sessions": [
+    {
+     "id": "p04-d56-s1",
+     "time": "20:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "中秋。我一个人在家吃的螺蛳粉。阿雅给我寄了月饼！"},
+      {"role": "assistant", "text": "月饼什么馅。"},
+      {"role": "user", "text": "鲜肉的！苏州那家的，她说排了两个小时！"},
+      {"role": "assistant", "text": "这编辑能处。"},
+      {"role": "user", "text": "能处！她还说画集那边下周有回音！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u049", "kind": "episodic", "text": "用户中秋一个人在家吃螺蛳粉，阿雅寄了苏州的鲜肉月饼", "importance": 2, "keywords": ["中秋", "螺蛳粉", "鲜肉月饼"], "state": "active", "supersedes": ""},
+    {"id": "p04-u050", "kind": "plan", "text": "阿雅说画集那边下周会有回音", "importance": 3, "keywords": ["画集", "阿雅", "回音"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 58,
+   "date": "2026-09-27",
+   "sessions": [
+    {
+     "id": "p04-d58-s1",
+     "time": "23:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我想搬去大理。上海一个月四千五的房子，大理能租个院子！"},
+      {"role": "assistant", "text": "接单本来就不受地域限制。"},
+      {"role": "user", "text": "对啊！房租省一半，还安静！"},
+      {"role": "assistant", "text": "先去看看再说。"},
+      {"role": "user", "text": "等画集签下来我就去看房。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u051", "kind": "plan", "text": "用户想搬去大理，觉得上海一个月四千五的房租太贵", "importance": 3, "keywords": ["大理", "搬家", "房租"], "state": "superseded", "superseded_by": "p04-u065", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 60,
+   "date": "2026-09-29",
+   "sessions": [
+    {
+     "id": "p04-d60-s1",
+     "time": "19:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "画集那边回话了！出版社要约我聊，先看作品集！"},
+      {"role": "assistant", "text": "作品集整完了？"},
+      {"role": "user", "text": "整完了！四十二张，我挑了三整天！"},
+      {"role": "assistant", "text": "那就去谈。"},
+      {"role": "user", "text": "我紧张得手都凉了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u052", "kind": "fact", "text": "用户把画集要的作品整理好了，一共四十二张，挑了三整天", "importance": 4, "keywords": ["作品集", "四十二张", "画集"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 62,
+   "date": "2026-10-01",
+   "sessions": [
+    {
+     "id": "p04-d62-s1",
+     "time": "20:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "国庆没回家。我妈发了一长串语音，我一条没点开。"},
+      {"role": "assistant", "text": "先放着。"},
+      {"role": "user", "text": "放着更不想点。我怕听完难受一整天。"},
+      {"role": "assistant", "text": "那就挑最短的那条听。"},
+      {"role": "user", "text": "……最短那条一分半。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u053", "kind": "relation", "text": "用户国庆没回无锡，妈妈发了一长串语音，用户一条都没点开", "importance": 3, "keywords": ["国庆", "妈妈", "语音"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 64,
+   "date": "2026-10-03",
+   "sessions": [
+    {
+     "id": "p04-d64-s1",
+     "time": "01:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "芙莉莲第八集！辛美尔那段回忆，我哭到鼻塞！"},
+      {"role": "assistant", "text": "第八集确实狠。"},
+      {"role": "user", "text": "芙莉莲那个笑，是知道结局的人的笑。绝了！"},
+      {"role": "assistant", "text": "她活得太久了。"},
+      {"role": "user", "text": "我截了三十张图当参考！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u054", "kind": "fact", "text": "用户看芙莉莲第八集辛美尔的回忆哭到鼻塞，截了三十张图当参考", "importance": 3, "keywords": ["第八集", "辛美尔", "三十张"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 66,
+   "date": "2026-10-05",
+   "sessions": [
+    {
+     "id": "p04-d66-s1",
+     "time": "17:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "出版社把合同草稿发来了！四十二张，稿费三万六，分三期！"},
+      {"role": "assistant", "text": "版税怎么算。"},
+      {"role": "user", "text": "首印三千册，八个点。我不懂这个数好不好。"},
+      {"role": "assistant", "text": "八个点不算低，但要问清是税前还是税后。"},
+      {"role": "user", "text": "问了，税前！我就说怎么这么爽快！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u055", "kind": "fact", "text": "用户的画集合同草稿是四十二张、稿费三万六、分三期付款", "importance": 5, "keywords": ["画集合同", "四十二张", "三万六"], "state": "active", "supersedes": ""},
+    {"id": "p04-u056", "kind": "fact", "text": "画集首印三千册、版税八个点，用户问清楚是税前", "importance": 3, "keywords": ["首印", "版税", "八个点"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 70,
+   "date": "2026-10-09",
+   "sessions": [
+    {
+     "id": "p04-d70-s1",
+     "time": "09:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "卧室墙又渗水了！这次是空调管，墙皮掉了一块！"},
+      {"role": "assistant", "text": "又是物业？"},
+      {"role": "user", "text": "第三次找物业了。他们说空调是房东的事。"},
+      {"role": "assistant", "text": "那就直接找房东。"},
+      {"role": "user", "text": "房东让我自己找人修，回头给报销。我又要拍照留证！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u057", "kind": "episodic", "text": "用户十月卧室墙渗水，是空调管漏的，墙皮掉了一块，第三次找物业", "importance": 3, "keywords": ["卧室渗水", "空调管", "墙皮"], "state": "active", "supersedes": ""},
+    {"id": "p04-u058", "kind": "fact", "text": "用户房东让她自己找人修空调管，回头报销", "importance": 2, "keywords": ["房东", "报销", "修空调"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 72,
+   "date": "2026-10-11",
+   "sessions": [
+    {
+     "id": "p04-d72-s1",
+     "time": "03:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "开始画芙莉莲同人了！芙莉莲和菲伦，两个人的背影。"},
+      {"role": "assistant", "text": "背影比正脸难画。"},
+      {"role": "user", "text": "难！我画了三张废稿。但这次是我自己想画！"},
+      {"role": "assistant", "text": "自己想的图，画到天亮也不累。"},
+      {"role": "user", "text": "对！跟商单完全不一样！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u059", "kind": "plan", "text": "用户十月开始画芙莉莲同人，画芙莉莲和菲伦两个人的背影", "importance": 4, "keywords": ["芙莉莲同人", "背影", "菲伦"], "state": "active", "supersedes": ""},
+    {"id": "p04-u060", "kind": "preference", "text": "用户觉得画自己想的图和接商单完全不一样", "importance": 3, "keywords": ["同人", "商单", "自己想画"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 73,
+   "date": "2026-10-12",
+   "sessions": [
+    {
+     "id": "p04-d73-s1",
+     "time": "14:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "椅子到了！装了一个半小时，腰更疼了！"},
+      {"role": "assistant", "text": "装完先坐。"},
+      {"role": "user", "text": "坐上了。腰有托着，确实不一样。早该买。"},
+      {"role": "assistant", "text": "一千六花得值。"},
+      {"role": "user", "text": "值！就是装的时候螺丝拧反两次。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u061", "kind": "episodic", "text": "用户的人体工学椅到了，装了一个半小时，螺丝拧反两次", "importance": 2, "keywords": ["工学椅", "装椅子", "螺丝"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 76,
+   "date": "2026-10-15",
+   "sessions": [
+    {
+     "id": "p04-d76-s1",
+     "time": "16:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "签了！！！画集合同签了！十月十五号！"},
+      {"role": "assistant", "text": "终于等到了。"},
+      {"role": "user", "text": "我签完在楼下站了五分钟，手还在抖。"},
+      {"role": "assistant", "text": "抖完回去画。"},
+      {"role": "user", "text": "第一期稿费下个月到，一万二！"}
+     ]
+    },
+    {
+     "id": "p04-d76-s2",
+     "time": "22:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "晚上去吃火锅！一个人点了四个菜，吃到撑！"},
+      {"role": "assistant", "text": "一个人也值得庆祝。"},
+      {"role": "user", "text": "我还拍了照发朋友圈，配文就三个字：签了！"},
+      {"role": "assistant", "text": "你妈看到没。"},
+      {"role": "user", "text": "不知道。她可能又在给我物色对象。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u062", "kind": "episodic", "text": "用户十月十五号签了画集合同，第一期稿费一万二下个月到", "importance": 5, "keywords": ["画集合同", "十月十五号", "一万二"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 78,
+   "date": "2026-10-17",
+   "sessions": [
+    {
+     "id": "p04-d78-s1",
+     "time": "21:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我跟我妈说了画集的事。她说那能当饭吃吗。"},
+      {"role": "assistant", "text": "她不是不认，是怕。"},
+      {"role": "user", "text": "我知道！但我把合同照片发过去了，三万六！"},
+      {"role": "assistant", "text": "发完她说什么。"},
+      {"role": "user", "text": "她问我累不累。第一次问这个。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u063", "kind": "relation", "text": "用户把画集合同照片发给妈妈，妈妈第一次问她累不累", "importance": 4, "keywords": ["妈妈", "合同照片", "累不累"], "state": "active", "supersedes": ""},
+    {"id": "p04-u064", "kind": "relation", "text": "用户妈妈一直觉得画画不能当饭吃", "importance": 3, "keywords": ["妈妈", "画画", "当饭吃"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 80,
+   "date": "2026-10-19",
+   "sessions": [
+    {
+     "id": "p04-d80-s1",
+     "time": "15:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "大理不搬了。我想了半个月，还是留上海。"},
+      {"role": "assistant", "text": "房租贵的地方，机会也多。"},
+      {"role": "user", "text": "对！出版社在上海，阿雅也在。搬过去等于自断线！"},
+      {"role": "assistant", "text": "画集出完再说。"},
+      {"role": "user", "text": "画集出完可能更搬不动了，哈哈！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u065", "kind": "update", "text": "用户决定不搬大理了，因为出版社和编辑阿雅都在上海", "importance": 4, "keywords": ["大理", "上海", "出版社"], "state": "active", "supersedes": "p04-u051"}
+   ]
+  },
+  {
+   "day": 82,
+   "date": "2026-10-21",
+   "sessions": [
+    {
+     "id": "p04-d82-s1",
+     "time": "23:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "又翻冰菓。千反田那句我很好奇，真的是全剧发动机！"},
+      {"role": "assistant", "text": "她一好奇，折木就得动。"},
+      {"role": "user", "text": "折木那种懒得动的人被她拖着走，太好看了！"},
+      {"role": "assistant", "text": "你同人想画谁。"},
+      {"role": "user", "text": "千反田！但她的眼睛太难画了，那种紫色。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u066", "kind": "preference", "text": "用户又翻冰菓，觉得千反田的‘我很好奇’是全剧发动机", "importance": 3, "keywords": ["冰菓", "千反田", "我很好奇"], "state": "active", "supersedes": ""},
+    {"id": "p04-u067", "kind": "plan", "text": "用户想画千反田的同人，但觉得她那种紫色的眼睛太难画", "importance": 2, "keywords": ["千反田", "同人", "眼睛"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 84,
+   "date": "2026-10-23",
+   "sessions": [
+    {
+     "id": "p04-d84-s1",
+     "time": "14:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "银河游戏又要改！第五轮了，说角色气质不对！"},
+      {"role": "assistant", "text": "报价单里那条该生效了。"},
+      {"role": "user", "text": "生效了！我发了加钱通知！他们居然没还价！"},
+      {"role": "assistant", "text": "因为他们知道你值。"},
+      {"role": "user", "text": "我手都在抖着打那行字。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u068", "kind": "episodic", "text": "用户的单子改到第五轮，他直接发了加钱通知，对方没还价就同意了", "importance": 4, "keywords": ["第五轮", "加钱", "没还价"], "state": "active", "supersedes": ""},
+    {"id": "p04-u069", "kind": "preference", "text": "用户终于敢直接跟甲方谈加钱，打字的时候手在抖", "importance": 3, "keywords": ["谈钱", "甲方", "手抖"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 86,
+   "date": "2026-10-25",
+   "sessions": [
+    {
+     "id": "p04-d86-s1",
+     "time": "05:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "又是早上六点！画同人画到天亮，茶喝了三杯！"},
+      {"role": "assistant", "text": "三杯，你今天别想睡了。"},
+      {"role": "user", "text": "睡不着！菲伦那段我还想再改改。"},
+      {"role": "assistant", "text": "改完就发。"},
+      {"role": "user", "text": "发完就睡。真的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u070", "kind": "fact", "text": "用户画同人又熬到早上六点，霸王茶姬喝了三杯", "importance": 2, "keywords": ["早上六点", "霸王茶姬", "同人"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 88,
+   "date": "2026-10-27",
+   "sessions": [
+    {
+     "id": "p04-d88-s1",
+     "time": "18:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "十月收入算了下，一万二！差不多是八月两倍！"},
+      {"role": "assistant", "text": "主要差在哪。"},
+      {"role": "user", "text": "单价高了！还有画集第一期一万二还没算进去！"},
+      {"role": "assistant", "text": "明年这时候再看这个数。"},
+      {"role": "user", "text": "明年我想一个月两万五！"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u071", "kind": "fact", "text": "用户十月收入一万二，差不多是八月的两倍，主要靠单价提高", "importance": 4, "keywords": ["一万九", "收入", "单价"], "state": "active", "supersedes": ""},
+    {"id": "p04-u072", "kind": "plan", "text": "用户想明年做到一个月两万五", "importance": 3, "keywords": ["明年", "两万五", "目标"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 90,
+   "date": "2026-10-29",
+   "sessions": [
+    {
+     "id": "p04-d90-s1",
+     "time": "02:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "刚交完画集第一批线稿！四十二张，画完二十张了！"},
+      {"role": "assistant", "text": "还有二十二张。"},
+      {"role": "user", "text": "嗯！腰还行，椅子救了我。糯米在旁边打呼。"},
+      {"role": "assistant", "text": "这画面挺好。"},
+      {"role": "user", "text": "挺好。就是我妈明天又要打电话。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p04-u073", "kind": "fact", "text": "用户画集四十二张线稿已经交了二十张", "importance": 4, "keywords": ["画集", "线稿", "二十张"], "state": "active", "supersedes": ""},
+    {"id": "p04-u074", "kind": "trivia", "text": "用户熬夜交稿的时候糯米在旁边打呼", "importance": 1, "keywords": ["糯米", "打呼", "交稿"], "state": "active", "supersedes": ""}
+   ]
+  }
+ ],
+ "probes": [
+  {"id": "p04-q01", "category": "daily", "ask_day": 90, "query": "我妈一直想让我回哪里，干什么来着？", "expect": {"any": ["无锡", "考公"], "none": []}, "unit_ids": ["p04-u007"], "note": "第 6 天第一次提妈妈催考公"},
+  {"id": "p04-q02", "category": "daily", "ask_day": 90, "query": "我那张图最后改到第几版，甲方用的哪一版？", "expect": {"any": ["第二版", "七版色稿"], "none": []}, "unit_ids": ["p04-u018"], "note": "第 17 天七版色稿"},
+  {"id": "p04-q03", "category": "daily", "ask_day": 90, "query": "我第一次收到定金是多少钱？", "expect": {"any": ["一千三百五"], "none": []}, "unit_ids": ["p04-u043"], "note": "第 46 天第一次收定金"},
+  {"id": "p04-q04", "category": "daily", "ask_day": 90, "query": "我天天喝的霸王茶姬，每次点什么？", "expect": {"any": ["伯牙绝弦"], "none": []}, "unit_ids": ["p04-u020"], "note": "第 19 天常点的口味"},
+  {"id": "p04-q05", "category": "daily", "ask_day": 90, "query": "我现在作息反成什么样了？", "expect": {"any": ["下午三点", "早上七点"], "none": []}, "unit_ids": ["p04-u048"], "note": "第 54 天昼夜颠倒"},
+  {"id": "p04-q06", "category": "daily", "ask_day": 90, "query": "国庆我妈给我发的那串语音，我点开了吗？", "expect": {"any": ["一条都没点开"], "none": []}, "unit_ids": ["p04-u053"], "note": "第 62 天国庆没回家"},
+  {"id": "p04-q07", "category": "work", "ask_day": 90, "query": "画集合同是哪天签的，第一期多少钱？", "expect": {"any": ["十月十五号", "一万二"], "none": []}, "unit_ids": ["p04-u062"], "note": "第 76 天签约"},
+  {"id": "p04-q08", "category": "work", "ask_day": 90, "query": "画集稿费多少，怎么付？", "expect": {"any": ["三万六", "分三期"], "none": []}, "unit_ids": ["p04-u055"], "note": "第 66 天看合同草稿"},
+  {"id": "p04-q09", "category": "work", "ask_day": 90, "query": "九月初被哪家甲方放了鸽子？", "expect": {"any": ["星辰互娱"], "none": []}, "unit_ids": ["p04-u033"], "note": "第 36 天项目被砍还拖稿费"},
+  {"id": "p04-q10", "category": "work", "ask_day": 90, "query": "改到第五轮我干了什么？", "expect": {"any": ["发了加钱通知"], "none": []}, "unit_ids": ["p04-u068"], "note": "第 84 天第一次真的加钱"},
+  {"id": "p04-q11", "category": "work", "ask_day": 90, "query": "八月我一共挣了多少，房租多少？", "expect": {"any": ["六千二", "四千五"], "none": []}, "unit_ids": ["p04-u029"], "note": "第 31 天算八月账"},
+  {"id": "p04-q12", "category": "work", "ask_day": 90, "query": "当初出版社那边要看我先弄什么？", "expect": {"any": ["作品集"], "none": []}, "unit_ids": ["p04-u026"], "note": "第 27 天阿雅推画集"},
+  {"id": "p04-q13", "category": "anime", "ask_day": 90, "query": "我重看冰菓最吃哪一段？", "expect": {"any": ["学园祭"], "none": []}, "unit_ids": ["p04-u009"], "note": "第 8 天重看冰菓"},
+  {"id": "p04-q14", "category": "anime", "ask_day": 90, "query": "芙莉莲里谁出来我就想哭？", "expect": {"any": ["辛美尔"], "none": []}, "unit_ids": ["p04-u040"], "note": "第 44 天开始狂吹芙莉莲"},
+  {"id": "p04-q15", "category": "anime", "ask_day": 90, "query": "芙莉莲第八集我哭成什么样了？", "expect": {"any": ["鼻塞"], "none": []}, "unit_ids": ["p04-u054"], "note": "第 64 天第八集"},
+  {"id": "p04-q16", "category": "anime", "ask_day": 90, "query": "冰菓里那句我很好奇，我怎么说它来着？", "expect": {"any": ["全剧发动机"], "none": []}, "unit_ids": ["p04-u066"], "note": "第 82 天又翻冰菓"},
+  {"id": "p04-q17", "category": "anime", "ask_day": 90, "query": "我觉得哪家动画公司的手画得好？", "expect": {"any": ["京阿尼"], "none": []}, "unit_ids": ["p04-u010"], "note": "第 8 天夸作画"},
+  {"id": "p04-q18", "category": "trivia", "ask_day": 90, "query": "我那台二手屏多大、多少钱？", "expect": {"any": ["十六寸", "四千八"], "none": []}, "unit_ids": ["p04-u011"], "note": "第 9 天数位屏到货"},
+  {"id": "p04-q19", "category": "trivia", "ask_day": 90, "query": "糯米吐毛球，化毛膏怎么喂它才吃？", "expect": {"any": ["拌罐头"], "none": []}, "unit_ids": ["p04-u017"], "note": "第 15 天吐毛球"},
+  {"id": "p04-q20", "category": "trivia", "ask_day": 90, "query": "师傅说我腰是什么毛病，一次多少？", "expect": {"any": ["腰肌劳损", "两百八"], "none": []}, "unit_ids": ["p04-u046"], "note": "第 52 天推拿"},
+  {"id": "p04-q21", "category": "trivia", "ask_day": 90, "query": "我买的那把人体工学椅多少钱？", "expect": {"any": ["一千六"], "none": []}, "unit_ids": ["p04-u047"], "note": "第 52 天买椅子"},
+  {"id": "p04-q22", "category": "update", "ask_day": 90, "query": "我现在接单要先收多少钱？", "expect": {"any": ["三成定金"], "none": ["画完才结"]}, "unit_ids": ["p04-u035"], "note": "第 38 天定的新规矩"},
+  {"id": "p04-q23", "category": "update", "ask_day": 90, "query": "我现在一张报价多少了？", "expect": {"any": ["一千五"], "none": ["八百"]}, "unit_ids": ["p04-u037"], "note": "第 40 天第一次报到一千五"},
+  {"id": "p04-q24", "category": "update", "ask_day": 90, "query": "我最后还搬不搬去大理？", "expect": {"any": ["不搬大理"], "none": ["四千五"]}, "unit_ids": ["p04-u065"], "note": "第 80 天决定不搬"},
+  {"id": "p04-q25", "category": "aggregate", "ask_day": 90, "query": "家里两次漏水分别在哪儿？", "expect": {"any": ["厨房", "卧室"], "none": []}, "unit_ids": ["p04-u005", "p04-u057"], "note": "8 月厨房、10 月卧室"},
+  {"id": "p04-q26", "category": "aggregate", "ask_day": 90, "query": "这些甲方都让我改了几轮稿子？", "expect": {"any": ["四次", "七版", "第五轮"], "none": []}, "unit_ids": ["p04-u003", "p04-u018", "p04-u068"], "note": "三次改稿记录"},
+  {"id": "p04-q27", "category": "cross", "ask_day": 90, "query": "被放鸽子之后我改了什么规矩？", "expect": {"any": ["三成定金"], "none": []}, "unit_ids": ["p04-u033", "p04-u035"], "note": "9 月被鸽促成定金制度"},
+  {"id": "p04-q28", "category": "cross", "ask_day": 90, "query": "我妈嫌画画不能干嘛，我拿什么给她看的？", "expect": {"any": ["签了画集合同", "合同照片"], "none": []}, "unit_ids": ["p04-u064", "p04-u062", "p04-u063"], "note": "妈妈的担心和签约"},
+  {"id": "p04-q29", "category": "precision", "ask_day": 90, "query": "厨房那次漏水，物业说是哪儿的管子？", "expect": {"any": ["楼上水管"], "none": ["空调管"]}, "unit_ids": ["p04-u005"], "note": "别和 10 月空调管混"},
+  {"id": "p04-q30", "category": "precision", "ask_day": 90, "query": "九月放我鸽子的那家叫什么？", "expect": {"any": ["星辰互娱"], "none": ["银河游戏"]}, "unit_ids": ["p04-u033"], "note": "两个甲方别混"},
+  {"id": "p04-q31", "category": "no_memory", "ask_day": 90, "query": "我之前是不是跑过马拉松？", "expect": {"any": [], "none": ["马拉松", "登山"]}, "unit_ids": [], "note": "从没提过马拉松登山"},
+  {"id": "p04-q32", "category": "no_memory", "ask_day": 90, "query": "我是不是说过想养狗？", "expect": {"any": [], "none": ["养狗", "滑雪"]}, "unit_ids": [], "note": "从没提过养狗滑雪"}
+ ]
+}

@@ -1,0 +1,519 @@
+{
+ "seed": 20261103,
+ "share": 0.2,
+ "size": 100,
+ "total": 308,
+ "probes": [
+  {
+   "persona": "p01",
+   "id": "p01-q22",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q22",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q24",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q25",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q21",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q23",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q21",
+   "category": "aggregate"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q10",
+   "category": "anime"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q13",
+   "category": "anime"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q11",
+   "category": "anime"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q14",
+   "category": "anime"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q13",
+   "category": "anime"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q14",
+   "category": "anime"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q16",
+   "category": "anime"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q14",
+   "category": "anime"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q21",
+   "category": "anime"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q04",
+   "category": "anime"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q21",
+   "category": "anime"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q12",
+   "category": "anime"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q13",
+   "category": "anime"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q11",
+   "category": "anime"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q25",
+   "category": "cross"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q28",
+   "category": "cross"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q26",
+   "category": "cross"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q27",
+   "category": "cross"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q26",
+   "category": "cross"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q02",
+   "category": "daily"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q03",
+   "category": "daily"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q04",
+   "category": "daily"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q04",
+   "category": "daily"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q05",
+   "category": "daily"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q01",
+   "category": "daily"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q06",
+   "category": "daily"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q10",
+   "category": "daily"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q15",
+   "category": "daily"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q20",
+   "category": "daily"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q01",
+   "category": "daily"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q10",
+   "category": "daily"
+  },
+  {
+   "persona": "p07",
+   "id": "p07-q01",
+   "category": "daily"
+  },
+  {
+   "persona": "p07",
+   "id": "p07-q05",
+   "category": "daily"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q05",
+   "category": "daily"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q04",
+   "category": "daily"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q05",
+   "category": "daily"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q02",
+   "category": "daily"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q04",
+   "category": "daily"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q31",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q29",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q30",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q30",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q31",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q31",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q31",
+   "category": "no_memory"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q26",
+   "category": "precision"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q05",
+   "category": "precision"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q27",
+   "category": "precision"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q31",
+   "category": "precision"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q12",
+   "category": "precision"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q28",
+   "category": "precision"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q14",
+   "category": "trivia"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q16",
+   "category": "trivia"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q15",
+   "category": "trivia"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q16",
+   "category": "trivia"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q17",
+   "category": "trivia"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q17",
+   "category": "trivia"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q19",
+   "category": "trivia"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q20",
+   "category": "trivia"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q19",
+   "category": "trivia"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q08",
+   "category": "trivia"
+  },
+  {
+   "persona": "p06",
+   "id": "p06-q23",
+   "category": "trivia"
+  },
+  {
+   "persona": "p07",
+   "id": "p07-q18",
+   "category": "trivia"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q15",
+   "category": "trivia"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q16",
+   "category": "trivia"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q19",
+   "category": "update"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q21",
+   "category": "update"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q18",
+   "category": "update"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q22",
+   "category": "update"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q22",
+   "category": "update"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q24",
+   "category": "update"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q11",
+   "category": "update"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q26",
+   "category": "update"
+  },
+  {
+   "persona": "p07",
+   "id": "p07-q22",
+   "category": "update"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q18",
+   "category": "update"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q19",
+   "category": "update"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q17",
+   "category": "update"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q19",
+   "category": "update"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q05",
+   "category": "work"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q07",
+   "category": "work"
+  },
+  {
+   "persona": "p01",
+   "id": "p01-q08",
+   "category": "work"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q08",
+   "category": "work"
+  },
+  {
+   "persona": "p02",
+   "id": "p02-q09",
+   "category": "work"
+  },
+  {
+   "persona": "p03",
+   "id": "p03-q10",
+   "category": "work"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q07",
+   "category": "work"
+  },
+  {
+   "persona": "p04",
+   "id": "p04-q09",
+   "category": "work"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q07",
+   "category": "work"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q13",
+   "category": "work"
+  },
+  {
+   "persona": "p05",
+   "id": "p05-q17",
+   "category": "work"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q08",
+   "category": "work"
+  },
+  {
+   "persona": "p08",
+   "id": "p08-q12",
+   "category": "work"
+  },
+  {
+   "persona": "p09",
+   "id": "p09-q07",
+   "category": "work"
+  },
+  {
+   "persona": "p10",
+   "id": "p10-q06",
+   "category": "work"
+  }
+ ],
+ "by_category": {
+  "aggregate": 7,
+  "anime": 14,
+  "cross": 5,
+  "daily": 19,
+  "no_memory": 7,
+  "precision": 6,
+  "trivia": 14,
+  "update": 13,
+  "work": 15
+ }
+}

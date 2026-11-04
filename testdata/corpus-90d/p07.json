@@ -1,0 +1,1522 @@
+{
+ "version": 1,
+ "id": "p07",
+ "name": "许岚",
+ "profile": {
+  "age": 36,
+  "city": "北京",
+  "job": "市场总监",
+  "voice": "干练、节奏快、偶尔爆粗，不说废话，对内对外两副嗓子",
+  "relations": "离婚两年；儿子七岁跟爸爸住，周末接；前夫老陈；下属小唐"
+ },
+ "window": {
+  "start": "2026-08-01",
+  "end": "2026-10-29",
+  "days": 90
+ },
+ "days": [
+  {
+   "day": 1,
+   "date": "2026-08-01",
+   "sessions": [
+    {
+     "id": "p07-d01-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "早上九点开会，秋季 campaign 预算被砍了三分之一，市场总监就是背锅的"},
+      {"role": "assistant", "text": "砍这么狠？整体按比例砍，还是只砍投放这块？"},
+      {"role": "user", "text": "整体砍，TVC 那块基本没了，老板说要靠内容自然发酵"},
+      {"role": "assistant", "text": "TVC 没了，年初拍的素材就白瞎了。你打算怎么补这个洞？"},
+      {"role": "user", "text": "先把短视频和达人这块加起来，硬凑一个完整方案，周三要交"},
+      {"role": "assistant", "text": "周三交，今天周六。你今晚就把框架列出来吧，别拖到周一。"},
+      {"role": "user", "text": "行，我今晚列。每次这种破事最后都是我来兜"},
+      {"role": "assistant", "text": "先别烦，兜底这事你干了五年，不是第一次了。"}
+     ]
+    },
+    {
+     "id": "p07-d01-s2",
+     "time": "22:35",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "刚跑完五公里回来，膝盖外侧一按就疼，下楼梯有点发软"},
+      {"role": "assistant", "text": "五公里不算少，跑前热身了吗？"},
+      {"role": "user", "text": "没热，我都是直接下楼就跑，图省事"},
+      {"role": "assistant", "text": "那膝盖是替你省事。先冰敷，明天上下楼疼就别跑了。"},
+      {"role": "user", "text": "好。儿子这周没接过来，老陈说他发烧了"},
+      {"role": "assistant", "text": "多少度？你要不要过去看一眼？"},
+      {"role": "user", "text": "38 度多，他说不用我过去，我明天还是去一趟"},
+      {"role": "assistant", "text": "去吧，看一眼心里踏实。方案可以等他睡了再写。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u001", "kind": "fact", "text": "用户是消费品品牌的市场总监，秋季 campaign 预算被整体砍掉三分之一", "importance": 5, "keywords": ["市场总监", "秋季campaign", "预算被砍"], "state": "active", "supersedes": ""},
+    {"id": "p07-u002", "kind": "episodic", "text": "用户跑完五公里，膝盖外侧一按就疼，下楼梯发软，怕是跑太狠", "importance": 2, "keywords": ["跑步", "膝盖外侧", "下楼梯"], "state": "active", "supersedes": ""},
+    {"id": "p07-u003", "kind": "relation", "text": "用户儿子发烧 38 度多，由前夫老陈带着，用户第二天要过去看", "importance": 3, "keywords": ["儿子", "老陈", "发烧"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-08-02",
+   "sessions": [
+    {
+     "id": "p07-d02-s1",
+     "time": "10:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "昨晚把框架列完了，今天补竞品数据，头都大了"},
+      {"role": "assistant", "text": "先别改框架。竞品看了几家？"},
+      {"role": "user", "text": "三家。有一家全投短剧，评论区一水儿的软广"},
+      {"role": "assistant", "text": "短剧便宜，转化不一定认。老板看得明白吗？"},
+      {"role": "user", "text": "看不明白，他就看别人投什么。下午我跟小唐碰达人名单"},
+      {"role": "assistant", "text": "小唐稳吗？上次报价表不是搞错过。数字这块你亲自核。"}
+     ]
+    },
+    {
+     "id": "p07-d02-s2",
+     "time": "20:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "从老陈家回来，儿子退烧了，就是赖着不让我走"},
+      {"role": "assistant", "text": "这招最狠。走的时候哭了吗？"},
+      {"role": "user", "text": "没哭，抱着我胳膊不撒手，我差点没绷住"},
+      {"role": "assistant", "text": "绷不住也正常。下次带点他喜欢的东西过去。"},
+      {"role": "user", "text": "买了泽塔奥特曼的卡，六十块十包，他高兴坏了"},
+      {"role": "assistant", "text": "六十块换他高兴，值。开出来好卡了吗？"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u004", "kind": "fact", "text": "用户在做秋季 campaign 方案，竞品主要投短剧，用户觉得转化未必好", "importance": 4, "keywords": ["campaign方案", "竞品", "短剧"], "state": "active", "supersedes": ""},
+    {"id": "p07-u005", "kind": "relation", "text": "用户儿子七岁，喜欢泽塔奥特曼，用户买了六十块的卡包哄他", "importance": 2, "keywords": ["儿子", "泽塔奥特曼", "卡包"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 5,
+   "date": "2026-08-05",
+   "sessions": [
+    {
+     "id": "p07-d05-s1",
+     "time": "18:40",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "家里空调不制冷了，师傅上门说加氟四百"},
+      {"role": "assistant", "text": "四百？夏天这价正常，他没让你顺带洗个机吧。"},
+      {"role": "user", "text": "报了清洗两百加氟两百，我说只做加氟"},
+      {"role": "assistant", "text": "对，清洗自己拿刷子弄弄就行。加完凉了吗？"},
+      {"role": "user", "text": "凉是凉了，但外机声音大得吓人，我怀疑被坑了"},
+      {"role": "assistant", "text": "把上门单留着，一周内还响就叫他回来。"}
+     ]
+    },
+    {
+     "id": "p07-d05-s2",
+     "time": "22:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "同事给我推了个国产动画叫《中国奇谭》，说第一集一定要看"},
+      {"role": "assistant", "text": "看了吗？第一集《小妖怪的夏天》，最近挺多人提。"},
+      {"role": "user", "text": "看了，讲一只小猪妖，看到最后我居然有点鼻子酸"},
+      {"role": "assistant", "text": "那个结尾确实狠。第二集还看吗？"},
+      {"role": "user", "text": "看，但说实话节奏太慢，我这急性子受不了"},
+      {"role": "assistant", "text": "慢是它的味道。一天一集，别当任务刷。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u006", "kind": "preference", "text": "用户被同事安利看《中国奇谭》，喜欢第一集但觉得节奏太慢", "importance": 3, "keywords": ["中国奇谭", "小妖怪的夏天", "节奏慢"], "state": "active", "supersedes": ""},
+    {"id": "p07-u007", "kind": "episodic", "text": "用户家空调不制冷，找师傅加氟花了四百，觉得可能被坑", "importance": 2, "keywords": ["空调", "加氟", "四百"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 7,
+   "date": "2026-08-07",
+   "sessions": [
+    {
+     "id": "p07-d07-s1",
+     "time": "13:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "小唐把达人报价单又算错了，一个头部达人差了小三万"},
+      {"role": "assistant", "text": "三万？这表发出去财务直接卡死。"},
+      {"role": "user", "text": "我让她重做了，这次我一条条核。她哭了，我可能骂重了"},
+      {"role": "assistant", "text": "骂完得收拾。中午请她吃个饭，给个台阶。"},
+      {"role": "user", "text": "请了，她也认。说以后先发我过一遍"},
+      {"role": "assistant", "text": "这就对了。带人比写方案难。"}
+     ]
+    },
+    {
+     "id": "p07-d07-s2",
+     "time": "23:50",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "方案第三版刚写完，凌晨了，今天咖啡喝了四杯"},
+      {"role": "assistant", "text": "四杯有点多。心脏没突突跳吧？"},
+      {"role": "user", "text": "跳，手也有点抖。但不写完我睡不着"},
+      {"role": "assistant", "text": "写完就停，别再开电脑。眼睛还干吗？"},
+      {"role": "user", "text": "干，滴了眼药水。一直说去配新眼镜也没去"},
+      {"role": "assistant", "text": "这周抽半天去查一下，别拖成习惯。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u008", "kind": "relation", "text": "用户的下属小唐算错过达人报价，用户骂完又请她吃饭缓和", "importance": 3, "keywords": ["小唐", "达人报价", "下属"], "state": "active", "supersedes": ""},
+    {"id": "p07-u009", "kind": "fact", "text": "用户熬夜写 campaign 方案到凌晨，一天喝了四杯咖啡", "importance": 2, "keywords": ["熬夜", "咖啡", "方案"], "state": "active", "supersedes": ""},
+    {"id": "p07-u010", "kind": "preference", "text": "用户眼睛干，一直说要去配新眼镜，拖着没去", "importance": 2, "keywords": ["眼睛干", "配眼镜", "眼药水"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 9,
+   "date": "2026-08-09",
+   "sessions": [
+    {
+     "id": "p07-d09-s1",
+     "time": "10:20",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "洗衣机脱水的时候跟要起飞一样，我忍了俩月了"},
+      {"role": "assistant", "text": "俩月……先看看地脚平不平，或者衣服是不是偏一边。"},
+      {"role": "user", "text": "都试过，还是响。物业说上门费一百，修另算"},
+      {"role": "assistant", "text": "一百就一百，不然哪天它真蹦出来。"},
+      {"role": "user", "text": "约了明天下午。对了物业费也该交，一年四千八"},
+      {"role": "assistant", "text": "一块办了，省得再跑一趟。"}
+     ]
+    },
+    {
+     "id": "p07-d09-s2",
+     "time": "21:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今晚在奥森跑了六公里，配速比上周快了半分钟"},
+      {"role": "assistant", "text": "这进步不小。膝盖这次没闹？"},
+      {"role": "user", "text": "没有，我按你说的先热身十分钟，膝盖就老实了"},
+      {"role": "assistant", "text": "热身别省。跑完拉伸了吗？"},
+      {"role": "user", "text": "拉了几分钟。对了儿子这周还是没过来，老陈带他去上钢琴课"},
+      {"role": "assistant", "text": "钢琴课？学多久了？"},
+      {"role": "user", "text": "半年了，据说最近老找借口不练"},
+      {"role": "assistant", "text": "七岁坐不住正常，真不行换个动的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u011", "kind": "episodic", "text": "用户家洗衣机脱水时响得厉害，约了师傅明天上门修", "importance": 2, "keywords": ["洗衣机", "上门费", "物业"], "state": "active", "supersedes": ""},
+    {"id": "p07-u012", "kind": "plan", "text": "用户每周跑三次，这次在奥森跑了六公里，配速快了半分钟", "importance": 3, "keywords": ["跑步", "奥森", "六公里"], "state": "active", "supersedes": ""},
+    {"id": "p07-u013", "kind": "relation", "text": "用户儿子学钢琴半年了，最近总找借口不练", "importance": 3, "keywords": ["儿子", "钢琴", "老陈"], "state": "superseded", "supersedes": "", "superseded_by": "p07-u037"}
+   ]
+  },
+  {
+   "day": 13,
+   "date": "2026-08-13",
+   "sessions": [
+    {
+     "id": "p07-d13-s1",
+     "time": "09:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "预算有转机，老板批回来一半，但要我保证 ROI 不低于 2.5"},
+      {"role": "assistant", "text": "一半也行，先跑起来。2.5 你们去年做到过？"},
+      {"role": "user", "text": "去年双十一做到 2.8，但那是全渠道一起砸出来的"},
+      {"role": "assistant", "text": "今年少一半钱还要 2.5，这不是要你命么。"},
+      {"role": "user", "text": "所以要动结构。我打算把线下砍掉，钱全压线上"},
+      {"role": "assistant", "text": "线下砍掉老板能点头？这可不是小调整。"},
+      {"role": "user", "text": "他点了。线下今年本来就难看，他巴不得"},
+      {"role": "assistant", "text": "行，那你就放手干。"}
+     ]
+    },
+    {
+     "id": "p07-d13-s2",
+     "time": "22:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "老陈说想把儿子钢琴课停了，一节五百太贵"},
+      {"role": "assistant", "text": "五百一节确实不便宜。他怎么突然提？"},
+      {"role": "user", "text": "说儿子不练，钱白花。我说当初是谁非要报的"},
+      {"role": "assistant", "text": "然后吵起来了？"},
+      {"role": "user", "text": "吵了两句，最后说再观察一个月。真烦"},
+      {"role": "assistant", "text": "钱的事说明白比憋着好。一个月后看孩子状态。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u014", "kind": "fact", "text": "用户把 campaign 预算争取回来一半，老板要求 ROI 不低于 2.5", "importance": 5, "keywords": ["预算", "ROI", "2.5"], "state": "active", "supersedes": ""},
+    {"id": "p07-u015", "kind": "plan", "text": "用户打算把线下预算砍掉，钱全压到线上", "importance": 4, "keywords": ["线下", "线上", "预算"], "state": "active", "supersedes": ""},
+    {"id": "p07-u016", "kind": "episodic", "text": "用户因为儿子钢琴课一节五百太贵跟前夫老陈吵了两句", "importance": 3, "keywords": ["钢琴课", "老陈", "五百"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 17,
+   "date": "2026-08-17",
+   "sessions": [
+    {
+     "id": "p07-d17-s1",
+     "time": "10:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "达人定了，林小满报价十五万，周大顺便宜但数据虚"},
+      {"role": "assistant", "text": "数据虚是怎么看出来的？"},
+      {"role": "user", "text": "互动全是抽奖评论，一看就是买的。林小满贵但粉丝黏"},
+      {"role": "assistant", "text": "那就她。十五万占你现在的预算多少？"},
+      {"role": "user", "text": "三分之一。我压到十二万，加一条按效果补款"},
+      {"role": "assistant", "text": "结构稳了。合同里把效果条款写死。"}
+     ]
+    },
+    {
+     "id": "p07-d17-s2",
+     "time": "21:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "今晚陪儿子看《泽塔奥特曼》第十二集，打斗居然挺燃"},
+      {"role": "assistant", "text": "泽塔那段口碑不错。你看得进去？"},
+      {"role": "user", "text": "前半段我在回消息，后半段真看进去了，就是名字太中二"},
+      {"role": "assistant", "text": "小孩就吃这套。他最喜欢哪个形态？"},
+      {"role": "user", "text": "红色那个，名字记不住。反正他说了算"},
+      {"role": "assistant", "text": "你不用记，跟着他喊就行。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u017", "kind": "fact", "text": "用户定了达人林小满，报价从十五万压到十二万，加了按效果补款", "importance": 4, "keywords": ["林小满", "达人", "十二万"], "state": "active", "supersedes": ""},
+    {"id": "p07-u018", "kind": "trivia", "text": "用户陪儿子看《泽塔奥特曼》第十二集，觉得打斗挺燃", "importance": 2, "keywords": ["泽塔奥特曼", "第十二集", "儿子"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 19,
+   "date": "2026-08-19",
+   "sessions": [
+    {
+     "id": "p07-d19-s1",
+     "time": "08:40",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "早上出门忘带伞，走到地铁站淋透了，今天这雨真邪门"},
+      {"role": "assistant", "text": "这季节就爱下午下。到公司有干衣服换吗？"},
+      {"role": "user", "text": "外套搭椅背上吹了半天。中午去买把折叠伞"},
+      {"role": "assistant", "text": "买两把，公司一把家里一把，你就不会忘。"}
+     ]
+    },
+    {
+     "id": "p07-d19-s2",
+     "time": "23:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "连着三天十二点后睡，今天同事问我是不是没睡好"},
+      {"role": "assistant", "text": "你自己也知道。是在改大促选品表吧？"},
+      {"role": "user", "text": "对，改到第五版了。去年那个尾货策略今年不灵"},
+      {"role": "assistant", "text": "尾货容易伤品牌。你打算换什么结构？"},
+      {"role": "user", "text": "主推两个新品，尾货压到最后三天清"},
+      {"role": "assistant", "text": "这个思路对，把节奏写进排期里。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u019", "kind": "fact", "text": "用户在改 9 月大促选品表，已经到第五版，改用主推新品清尾货", "importance": 4, "keywords": ["大促", "选品表", "第五版"], "state": "active", "supersedes": ""},
+    {"id": "p07-u020", "kind": "trivia", "text": "用户早上忘带伞淋了雨，打算买两把折叠伞，公司一把家里一把", "importance": 1, "keywords": ["忘带伞", "折叠伞", "淋雨"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 22,
+   "date": "2026-08-22",
+   "sessions": [
+    {
+     "id": "p07-d22-s1",
+     "time": "11:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "大促启动会开完了，各渠道都认指标，就内容这块没人接"},
+      {"role": "assistant", "text": "没人接是怕背锅。你接？"},
+      {"role": "user", "text": "我接。我带的线我不接谁接。我跟老板要了两个人"},
+      {"role": "assistant", "text": "要人比要钱实在。给的谁？"},
+      {"role": "user", "text": "小唐算一个，还塞了个实习生，啥也不会但便宜"},
+      {"role": "assistant", "text": "实习生带好了省事，带不好更累。你有空带？"},
+      {"role": "user", "text": "没空也得抽。总不能让我一个人写八版文案"},
+      {"role": "assistant", "text": "那就把活拆碎，一次给一小块，别指望他自己长。"},
+      {"role": "user", "text": "对了，猎头前天打电话来我都没回，这摊子没做完我不走"},
+      {"role": "assistant", "text": "你这话说了几年了。不过今年确实走不开。"}
+     ]
+    },
+    {
+     "id": "p07-d22-s2",
+     "time": "20:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "我下了个日语 App，准备学日语，五十音先背起来"},
+      {"role": "assistant", "text": "学日语？怎么突然想起这个。"},
+      {"role": "user", "text": "儿子天天喊奥特曼，我想以后带他去日本看一次"},
+      {"role": "assistant", "text": "这理由好。一天五个，别想着三天啃完。"},
+      {"role": "user", "text": "先平假名，年底前把五十音背完再说"},
+      {"role": "assistant", "text": "行，慢慢来，别又三天半热度。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u021", "kind": "fact", "text": "用户在大促启动会上主动接了内容这块，跟老板要了两个人，其中一个点名要小唐", "importance": 4, "keywords": ["大促", "启动会", "小唐"], "state": "active", "supersedes": ""},
+    {"id": "p07-u022", "kind": "plan", "text": "用户开始学日语，说年底前要把五十音背完，好带儿子去日本看奥特曼", "importance": 3, "keywords": ["日语", "五十音", "日本"], "state": "superseded", "supersedes": "", "superseded_by": "p07-u041"},
+    {"id": "p07-u023", "kind": "fact", "text": "用户说猎头打来也懒得回，暂时不打算跳槽", "importance": 3, "keywords": ["猎头", "跳槽", "五年"], "state": "superseded", "supersedes": "", "superseded_by": "p07-u042"}
+   ]
+  },
+  {
+   "day": 26,
+   "date": "2026-08-26",
+   "sessions": [
+    {
+     "id": "p07-d26-s1",
+     "time": "09:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "短视频第一批投出去了，曝光还行，点击率只有 1.2%"},
+      {"role": "assistant", "text": "1.2 在短视频里不算丢人，得看人群准不准。"},
+      {"role": "user", "text": "投的 25 到 35 岁女性，评论里一堆男的"},
+      {"role": "assistant", "text": "定向漏了。改人群包，明天小量再测。"},
+      {"role": "user", "text": "我让小唐今晚改。对了，这批素材我看了十遍，要吐了"},
+      {"role": "assistant", "text": "看吐说明你够细。测完看数据说话。"}
+     ]
+    },
+    {
+     "id": "p07-d26-s2",
+     "time": "22:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天跑了七公里，中间岔气，硬撑着跑完的"},
+      {"role": "assistant", "text": "岔气别硬撑，走两分钟再跑。你跑量加太快了。"},
+      {"role": "user", "text": "想着十月份跑个半马，有点急"},
+      {"role": "assistant", "text": "半马得慢慢来。你现在这样容易伤。"},
+      {"role": "user", "text": "行，那我隔天跑。对了体重好像涨了"},
+      {"role": "assistant", "text": "隔天跑对。体重先别管，先把膝盖养住。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u024", "kind": "fact", "text": "用户第一批短视频投放点击率只有 1.2%，人群定向漏了男性", "importance": 3, "keywords": ["短视频", "点击率", "投放"], "state": "active", "supersedes": ""},
+    {"id": "p07-u025", "kind": "plan", "text": "用户想 10 月跑半马，最近加跑量，岔气也硬撑着跑", "importance": 3, "keywords": ["半马", "跑量", "岔气"], "state": "superseded", "supersedes": "", "superseded_by": "p07-u067"}
+   ]
+  },
+  {
+   "day": 28,
+   "date": "2026-08-28",
+   "sessions": [
+    {
+     "id": "p07-d28-s1",
+     "time": "19:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "周末把窗帘拆了洗，装回去才发现装反了"},
+      {"role": "assistant", "text": "反了？遮光层朝外了？"},
+      {"role": "user", "text": "对，屋里白天跟晚上一样黑"},
+      {"role": "assistant", "text": "那你这是给自己造夜班。懒就懒吧，晚上睡好就行。"}
+     ]
+    },
+    {
+     "id": "p07-d28-s2",
+     "time": "23:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "主视觉又被打回来了，老板说不够年轻，我都不知道怎么改"},
+      {"role": "assistant", "text": "「不够年轻」最没用。他说哪里老气了？"},
+      {"role": "user", "text": "没有，就一句没感觉。我真是服了"},
+      {"role": "assistant", "text": "拿两版去让他选，别让他空口说。"},
+      {"role": "user", "text": "只能这样，明天让设计出两个方向"},
+      {"role": "assistant", "text": "对，让他二选一，省得来回。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u026", "kind": "episodic", "text": "用户的主视觉被老板打回，说不够年轻，用户打算出两版让他选", "importance": 3, "keywords": ["主视觉", "老板", "两版"], "state": "active", "supersedes": ""},
+    {"id": "p07-u027", "kind": "trivia", "text": "用户洗窗帘装反了，遮光层朝外，屋里白天也黑", "importance": 1, "keywords": ["窗帘", "遮光层", "装反"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 30,
+   "date": "2026-08-30",
+   "sessions": [
+    {
+     "id": "p07-d30-s1",
+     "time": "10:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "周六接儿子上钢琴课，老师全程在摇头"},
+      {"role": "assistant", "text": "摇头是说孩子不练，还是教的问题？"},
+      {"role": "user", "text": "说坐不住，十分钟就要起来。儿子也说不喜欢"},
+      {"role": "assistant", "text": "那何必硬撑。跟老陈商量过别的吗？"},
+      {"role": "user", "text": "我提了游泳，他说再想想。一个月期限也快到了"},
+      {"role": "assistant", "text": "看他这次怎么想吧，孩子自己愿意才学得下去。"}
+     ]
+    },
+    {
+     "id": "p07-d30-s2",
+     "time": "21:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "大促客服排班也归我了，怎么什么都能往我身上堆"},
+      {"role": "assistant", "text": "客服也归你？这是拿你当总包。"},
+      {"role": "user", "text": "去年客服出事，老板说今年市场部得盯"},
+      {"role": "assistant", "text": "那至少把话术和赔付标准提前定死，别现场拍脑袋。"},
+      {"role": "user", "text": "明天我跟客服开个会，先把红线拉出来"},
+      {"role": "assistant", "text": "把红线写成纸，谁越线谁签字。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u028", "kind": "relation", "text": "用户儿子钢琴老师说他不专注，用户跟老陈提了改学游泳", "importance": 3, "keywords": ["钢琴老师", "游泳", "老陈"], "state": "active", "supersedes": ""},
+    {"id": "p07-u029", "kind": "fact", "text": "用户的大促项目把客服排班也揽了，准备先定话术和赔付标准", "importance": 4, "keywords": ["客服", "排班", "话术"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 33,
+   "date": "2026-09-02",
+   "sessions": [
+    {
+     "id": "p07-d33-s1",
+     "time": "09:10",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "大促预热第一天，一个单品库存标错了，卖出去三百单没货"},
+      {"role": "assistant", "text": "三百单缺口？怎么补的？"},
+      {"role": "user", "text": "先联系客户换颜色，能换的换，不能换的退。道歉发了两百条"},
+      {"role": "assistant", "text": "这态度比赔钱管用。谁标错？"},
+      {"role": "user", "text": "运营。我没骂，拉了个群把流程重走一遍"},
+      {"role": "assistant", "text": "你最近脾气可以啊，居然没骂。"},
+      {"role": "user", "text": "骂有用的话我天天骂"},
+      {"role": "assistant", "text": "哈哈哈，这话我记下了。"}
+     ]
+    },
+    {
+     "id": "p07-d33-s2",
+     "time": "20:40",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "儿子在商场看见泽塔的变身器，站那不走，最后买了"},
+      {"role": "assistant", "text": "多少钱？这种玩具不便宜。"},
+      {"role": "user", "text": "二百八。我肉疼，他抱着盒子笑了一路"},
+      {"role": "assistant", "text": "二百八换一路笑，行。回家有没有拆开变身？"},
+      {"role": "user", "text": "拆了，声音大得我头疼"},
+      {"role": "assistant", "text": "接下来一个月你会听着这声音睡着。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u030", "kind": "episodic", "text": "用户大促预热时单品库存标错，卖出去三百单没货，忙着换货道歉", "importance": 4, "keywords": ["大促", "库存", "三百单"], "state": "active", "supersedes": ""},
+    {"id": "p07-u031", "kind": "trivia", "text": "用户给儿子买了二百八的泽塔变身器，声音大得她头疼", "importance": 2, "keywords": ["泽塔", "变身器", "二百八"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 37,
+   "date": "2026-09-06",
+   "sessions": [
+    {
+     "id": "p07-d37-s1",
+     "time": "08:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "连着四天睡五个小时，今天起来喉咙疼，感觉要感冒"},
+      {"role": "assistant", "text": "大促最容易倒。今天能请半天吗？"},
+      {"role": "user", "text": "不能，明天更忙。中午去药店买点药顶着"},
+      {"role": "assistant", "text": "药别混着吃。先量体温。"},
+      {"role": "user", "text": "没发烧，就是干。体重还掉了三斤"},
+      {"role": "assistant", "text": "三斤多半是水。等大促过了再补。"}
+     ]
+    },
+    {
+     "id": "p07-d37-s2",
+     "time": "22:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天数据终于好看，ROI 到 2.9，比预期高"},
+      {"role": "assistant", "text": "2.9 不错。哪条线拉起来的？"},
+      {"role": "user", "text": "直播那个达人爆了一场，单场卖了一百多万"},
+      {"role": "assistant", "text": "下一场盯紧库存，别再标错。"},
+      {"role": "user", "text": "已经锁死了。现在愁后面几天怎么稳住"},
+      {"role": "assistant", "text": "稳比爆难。把节奏排细，别一天看八次数据。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u032", "kind": "episodic", "text": "用户大促期间连续四天睡五个小时，喉咙疼，体重掉了三斤", "importance": 3, "keywords": ["大促", "喉咙疼", "睡五小时"], "state": "active", "supersedes": ""},
+    {"id": "p07-u033", "kind": "episodic", "text": "用户大促数据好转，ROI 到 2.9，直播单场卖了一百多万", "importance": 4, "keywords": ["大促", "ROI", "直播"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 40,
+   "date": "2026-09-09",
+   "sessions": [
+    {
+     "id": "p07-d40-s1",
+     "time": "12:30",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "中午去财务报销，一沓发票被退回三张，说抬头写错"},
+      {"role": "assistant", "text": "抬头少了什么字？"},
+      {"role": "user", "text": "少了「北京」两个字。财务那个小姑娘一点情面不给"},
+      {"role": "assistant", "text": "她也没办法。电子票重开就行，比贴票轻松。"}
+     ]
+    },
+    {
+     "id": "p07-d40-s2",
+     "time": "23:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天那场直播结束，ROI 出来 3.2，老板在群里发了个大拇指"},
+      {"role": "assistant", "text": "3.2！这个数字能写进年终了。你自己满意吗？"},
+      {"role": "user", "text": "满意。但我知道是达人那条线爆的，不是我方案多牛"},
+      {"role": "assistant", "text": "能分清这个的人不多。"},
+      {"role": "user", "text": "明天复盘，我想把那条线单拆出来算"},
+      {"role": "assistant", "text": "对，拆出来才知道能不能复制。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u034", "kind": "fact", "text": "用户大促的 ROI 做到 3.2，老板在群里发了个大拇指", "importance": 5, "keywords": ["ROI", "3.2", "大促"], "state": "active", "supersedes": ""},
+    {"id": "p07-u035", "kind": "trivia", "text": "用户的报销被财务退回三张发票，因为抬头少写了「北京」", "importance": 1, "keywords": ["报销", "发票", "财务"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 44,
+   "date": "2026-09-13",
+   "sessions": [
+    {
+     "id": "p07-d44-s1",
+     "time": "09:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "大促昨天收官，最后一版数据还没出，但大盘肯定超额"},
+      {"role": "assistant", "text": "超额的话奖金有指望？"},
+      {"role": "user", "text": "有一笔，不多。倒是老陈松口了，同意儿子改游泳"},
+      {"role": "assistant", "text": "怎么突然同意了？"},
+      {"role": "user", "text": "儿子自己跑游泳池边看了半小时，回来就说要学"},
+      {"role": "assistant", "text": "自己选的才坚持得下去。那钢琴就停了吧。"}
+     ]
+    },
+    {
+     "id": "p07-d44-s2",
+     "time": "21:00",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "《中国奇谭》第二集看了十分钟就关了，鹅鹅鹅那个画风我吃不下"},
+      {"role": "assistant", "text": "第二集是有点实验。那第一集算白看了？"},
+      {"role": "user", "text": "不算，第一集是真喜欢。但这个画风太怪了"},
+      {"role": "assistant", "text": "那就别硬看，挑喜欢的集数。"},
+      {"role": "user", "text": "儿子倒是看得很开心，他根本不管剧情"},
+      {"role": "assistant", "text": "小孩看颜色和动作，你就当陪他。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u036", "kind": "preference", "text": "用户看《中国奇谭》第二集鹅鹅鹅，十分钟就弃了，觉得画风太怪", "importance": 2, "keywords": ["中国奇谭", "鹅鹅鹅", "画风"], "state": "active", "supersedes": ""},
+    {"id": "p07-u037", "kind": "update", "text": "用户儿子钢琴课停了，改上游泳班，因为儿子自己看了游泳池就闹着要学", "importance": 4, "keywords": ["游泳班", "钢琴课", "儿子"], "state": "active", "supersedes": "p07-u013"}
+   ]
+  },
+  {
+   "day": 46,
+   "date": "2026-09-15",
+   "sessions": [
+    {
+     "id": "p07-d46-s1",
+     "time": "10:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "复盘报告交上去了，ROI 3.2 写进总结，老板看完说年底有戏"},
+      {"role": "assistant", "text": "「年底有戏」是升职还是画饼？"},
+      {"role": "user", "text": "原话是「明年给你个更大的盘子」，一听就是他妈画饼"},
+      {"role": "assistant", "text": "这话术你太熟了。你怎么回的？"},
+      {"role": "user", "text": "我说谢谢老板，心里在想明年我还在不在"},
+      {"role": "assistant", "text": "这句狠。你是不是有别的心思了？"},
+      {"role": "user", "text": "有点。猎头最近联系得挺勤，我先聊聊"},
+      {"role": "assistant", "text": "聊可以，别用公司电脑聊。"}
+     ]
+    },
+    {
+     "id": "p07-d46-s2",
+     "time": "21:15",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天六点下班，去楼下吃了碗牛肉面，加了两份肉"},
+      {"role": "assistant", "text": "两份肉，是真饿。最近没好好吃饭？"},
+      {"role": "user", "text": "大促那阵靠咖啡和三明治撑着，胃有点烧"},
+      {"role": "assistant", "text": "明天早饭吃点热的，胃要养。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u038", "kind": "fact", "text": "用户复盘交完，老板说明年给个更大的盘子，用户觉得是画饼", "importance": 4, "keywords": ["复盘", "老板", "画饼"], "state": "active", "supersedes": ""},
+    {"id": "p07-u039", "kind": "preference", "text": "用户大促期间靠咖啡和三明治撑着，胃有点烧，得养一养", "importance": 2, "keywords": ["胃", "三明治", "咖啡"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 48,
+   "date": "2026-09-17",
+   "sessions": [
+    {
+     "id": "p07-d48-s1",
+     "time": "09:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "双十一的盘子又要我做。去年那套我不想再重复"},
+      {"role": "assistant", "text": "去年双十一你不是做到 2.8 吗？为什么不想重复？"},
+      {"role": "user", "text": "太靠折扣，伤品牌。今年预算又少，不想再砸一波"},
+      {"role": "assistant", "text": "那你想怎么改？"},
+      {"role": "user", "text": "主推内容，折扣留到最后。风险是前期数据难看"},
+      {"role": "assistant", "text": "老板能接受前期难看吗？"},
+      {"role": "user", "text": "悬。所以我先做个小的跑数据给他看"},
+      {"role": "assistant", "text": "用数据说服老板，比用嘴有用。"}
+     ]
+    },
+    {
+     "id": "p07-d48-s2",
+     "time": "22:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "日语那个 App 我删了，五十音背到第三天就记不住"},
+      {"role": "assistant", "text": "哈哈，第三天。一天五个那位呢？"},
+      {"role": "user", "text": "当天背下来了，第二天全忘，太挫败"},
+      {"role": "assistant", "text": "语言得天天碰。要不先放放？"},
+      {"role": "user", "text": "放了。现在看到平假名都头大"},
+      {"role": "assistant", "text": "放就放吧，等真想学了再说。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u040", "kind": "fact", "text": "用户不想再靠折扣做双十一，决定主推内容，折扣留到最后", "importance": 4, "keywords": ["双十一", "折扣", "内容"], "state": "active", "supersedes": ""},
+    {"id": "p07-u041", "kind": "update", "text": "用户不学日语了，五十音背到第三天就把 App 删了", "importance": 2, "keywords": ["日语", "五十音", "App"], "state": "active", "supersedes": "p07-u022"}
+   ]
+  },
+  {
+   "day": 50,
+   "date": "2026-09-19",
+   "sessions": [
+    {
+     "id": "p07-d50-s1",
+     "time": "11:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天跟一家做宠物食品的创业公司聊了，聊了快两个小时"},
+      {"role": "assistant", "text": "宠物食品？怎么聊到这家。"},
+      {"role": "user", "text": "猎头推的。他们缺一个市场负责人，从零搭品牌"},
+      {"role": "assistant", "text": "从零搭，累但有意思。你感觉怎么样？"},
+      {"role": "user", "text": "有点心动。老板是女的，说话很直接，我喜欢"},
+      {"role": "assistant", "text": "直接的人好共事。薪水提了吗？"},
+      {"role": "user", "text": "提了，比现在高一点，但没有期权"},
+      {"role": "assistant", "text": "没期权就谈现金，别被故事画进去。"}
+     ]
+    },
+    {
+     "id": "p07-d50-s2",
+     "time": "20:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天带儿子上第一节游泳课，他喝了好几口水"},
+      {"role": "assistant", "text": "喝几口正常。他喜欢吗？"},
+      {"role": "user", "text": "喜欢，下课了还不肯走。教练说他胆子大"},
+      {"role": "assistant", "text": "那就对了。你小时候是不是也这么野？"},
+      {"role": "user", "text": "我没学过游泳，是在老家河里扑腾会的"},
+      {"role": "assistant", "text": "野出来的胆子，他现在也有了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u042", "kind": "update", "text": "用户对猎头推的宠物食品创业公司心动了，聊了快两个小时", "importance": 4, "keywords": ["宠物食品", "创业公司", "心动"], "state": "active", "supersedes": "p07-u023"},
+    {"id": "p07-u043", "kind": "relation", "text": "用户儿子第一节游泳课喝了好几口水，下课还不肯走", "importance": 3, "keywords": ["游泳课", "儿子", "教练"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 52,
+   "date": "2026-09-21",
+   "sessions": [
+    {
+     "id": "p07-d52-s1",
+     "time": "08:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "凌晨两点睡不着，脑子里全是双十一排期"},
+      {"role": "assistant", "text": "第二天起来是不是更累。"},
+      {"role": "user", "text": "写了张纸，写完更精神，熬到四点"},
+      {"role": "assistant", "text": "这招不行。下次起来看点无聊的，别刷手机。"}
+     ]
+    },
+    {
+     "id": "p07-d52-s2",
+     "time": "21:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天跟老板谈，他说给我涨 15%，但盘子要加两个"},
+      {"role": "assistant", "text": "涨 15% 加两个盘子，这账怎么算都亏。"},
+      {"role": "user", "text": "可不么。我听出来他是在为年底留人铺路"},
+      {"role": "assistant", "text": "那宠物食品那家还聊吗？"},
+      {"role": "user", "text": "聊，两边一起走。我现在不急着定"},
+      {"role": "assistant", "text": "行，手里有牌才好谈。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u044", "kind": "fact", "text": "用户跟老板谈涨薪 15%，但要多加两个盘子，用户觉得亏", "importance": 4, "keywords": ["涨薪", "15%", "盘子"], "state": "active", "supersedes": ""},
+    {"id": "p07-u045", "kind": "episodic", "text": "用户因为双十一排期失眠到凌晨四点", "importance": 2, "keywords": ["失眠", "排期", "凌晨"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 55,
+   "date": "2026-09-24",
+   "sessions": [
+    {
+     "id": "p07-d55-s1",
+     "time": "09:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "体检报告出来了，甲状腺有个小结节，医生说先观察"},
+      {"role": "assistant", "text": "多大？观察一般就是没事。"},
+      {"role": "user", "text": "四毫米，让我半年复查一次。我还是有点慌"},
+      {"role": "assistant", "text": "四毫米很小，别自己吓自己。"},
+      {"role": "user", "text": "还有血脂偏高，让我别老熬夜"},
+      {"role": "assistant", "text": "这个是真要管。咖啡也别当水喝。"}
+     ]
+    },
+    {
+     "id": "p07-d55-s2",
+     "time": "19:40",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "手机摔了，屏裂了一道，换原厂屏要八百"},
+      {"role": "assistant", "text": "什么机子？八百算正常价。"},
+      {"role": "user", "text": "犹豫了一下，先贴了个膜，等年终奖再换"},
+      {"role": "assistant", "text": "贴膜能顶一阵，裂的地方别进水。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u046", "kind": "fact", "text": "用户体检发现甲状腺有个四毫米结节，医生让半年后复查", "importance": 4, "keywords": ["体检", "甲状腺", "结节"], "state": "active", "supersedes": ""},
+    {"id": "p07-u047", "kind": "trivia", "text": "用户手机屏摔裂了，换原厂屏要八百，先贴膜凑合", "importance": 2, "keywords": ["手机", "换屏", "贴膜"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 57,
+   "date": "2026-09-26",
+   "sessions": [
+    {
+     "id": "p07-d57-s1",
+     "time": "10:40",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "小范围跑的数据出来了，内容主推那版转化比折扣版低"},
+      {"role": "assistant", "text": "低多少？"},
+      {"role": "user", "text": "低三成。但退货率也低，算下来差不太多"},
+      {"role": "assistant", "text": "那就有得聊，看老板看不看长期。"},
+      {"role": "user", "text": "他不看。今天跟他争了一次，最后各让一步"},
+      {"role": "assistant", "text": "怎么让的？"},
+      {"role": "user", "text": "内容占七成，折扣留三成，双十一看结果"},
+      {"role": "assistant", "text": "七三开，你争到的比我想的多。"}
+     ]
+    },
+    {
+     "id": "p07-d57-s2",
+     "time": "22:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "老陈今天来接儿子，多说了两句，气氛居然还行"},
+      {"role": "assistant", "text": "离婚两年还能这样，挺难得。"},
+      {"role": "user", "text": "他说儿子游泳进步快，我说你多带他来"},
+      {"role": "assistant", "text": "听着像破冰。你自己舒服吗？"},
+      {"role": "user", "text": "舒服。就是觉得这两年我们俩都挺累"},
+      {"role": "assistant", "text": "累过之后能好好说话，也不容易。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u048", "kind": "fact", "text": "用户跟老板争双十一方案，最后内容占七成，折扣留三成", "importance": 4, "keywords": ["双十一", "内容", "各让一步"], "state": "active", "supersedes": ""},
+    {"id": "p07-u049", "kind": "relation", "text": "用户跟前夫老陈关系缓和了，他接儿子时多聊了两句", "importance": 3, "keywords": ["老陈", "前夫", "缓和"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 60,
+   "date": "2026-09-29",
+   "sessions": [
+    {
+     "id": "p07-d60-s1",
+     "time": "20:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "儿子生日，他爸买了个泽塔的变身器，跟我买重了"},
+      {"role": "assistant", "text": "哈哈哈，他家现在有两个？"},
+      {"role": "user", "text": "两个。我让儿子留一个在这边，他说好"},
+      {"role": "assistant", "text": "那就当两个基地。他几岁？"},
+      {"role": "user", "text": "七岁，非要请全班同学来家里，我头大"},
+      {"role": "assistant", "text": "七八个小孩，你家那天会很热闹。"}
+     ]
+    },
+    {
+     "id": "p07-d60-s2",
+     "time": "21:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "早上翻衣柜，去年买的毛衣起球了，今年得买新的"},
+      {"role": "assistant", "text": "起球的在家穿，出门再买。"},
+      {"role": "user", "text": "没时间逛街，周末也排满了"},
+      {"role": "assistant", "text": "下班路上顺路逛十分钟，比指望周末靠谱。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u050", "kind": "relation", "text": "用户儿子七岁生日，爸爸和用户买的泽塔变身器撞了", "importance": 3, "keywords": ["生日", "泽塔", "变身器"], "state": "active", "supersedes": ""},
+    {"id": "p07-u051", "kind": "trivia", "text": "用户儿子生日要请全班同学来家里", "importance": 2, "keywords": ["生日会", "全班同学", "儿子"], "state": "active", "supersedes": ""},
+    {"id": "p07-u052", "kind": "trivia", "text": "用户发现去年买的毛衣起球了，打算再买新的", "importance": 1, "keywords": ["毛衣", "起球", "衣柜"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 62,
+   "date": "2026-10-01",
+   "sessions": [
+    {
+     "id": "p07-d62-s1",
+     "time": "09:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "国庆三天假，我两天在公司，这行业真是服了"},
+      {"role": "assistant", "text": "大促和双十一夹中间，你也没法休。"},
+      {"role": "user", "text": "儿子放假去他奶奶家了，我这三天反而清净"},
+      {"role": "assistant", "text": "清净就好好睡一觉，别再熬。"},
+      {"role": "user", "text": "昨天睡足十小时，起来头脑清醒"},
+      {"role": "assistant", "text": "十小时，你这身体在补债。"}
+     ]
+    },
+    {
+     "id": "p07-d62-s2",
+     "time": "22:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "晚上在公司写双十一物料清单，写着写着手停了"},
+      {"role": "assistant", "text": "停了是困了还是不想写？"},
+      {"role": "user", "text": "不想写。做这些跟去年一模一样，没劲"},
+      {"role": "assistant", "text": "这个信号不小。你最近本来就在看机会。"},
+      {"role": "user", "text": "嗯。宠物食品那家催我第二次了"},
+      {"role": "assistant", "text": "催就说明他们急。你可以再等等看条件。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u053", "kind": "episodic", "text": "用户国庆三天假上了两天班，儿子去奶奶家，用户难得清净", "importance": 2, "keywords": ["国庆", "上班", "奶奶家"], "state": "active", "supersedes": ""},
+    {"id": "p07-u054", "kind": "plan", "text": "用户觉得现在的活干着没意思，宠物食品那边催了第二次", "importance": 4, "keywords": ["宠物食品", "没意思", "催"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 66,
+   "date": "2026-10-05",
+   "sessions": [
+    {
+     "id": "p07-d66-s1",
+     "time": "10:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天二面，跟他们团队聊完，我基本决定了"},
+      {"role": "assistant", "text": "基本是几成？"},
+      {"role": "user", "text": "八成。剩下两成怕创业公司年底没钱"},
+      {"role": "assistant", "text": "这怕得对。问过他们现金流吗？"},
+      {"role": "user", "text": "问了，说融到 B 轮，一年没问题"},
+      {"role": "assistant", "text": "那就行。剩下的想好怎么体面交接。"},
+      {"role": "user", "text": "我想双十一之后提，不然对不起这场大促"},
+      {"role": "assistant", "text": "靠谱。别在忙的时候撂挑子。"}
+     ]
+    },
+    {
+     "id": "p07-d66-s2",
+     "time": "21:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天跑了五公里，第一次跑完不觉得累"},
+      {"role": "assistant", "text": "状态回来了。最近睡得好了？"},
+      {"role": "user", "text": "好一点，十二点前能睡，咖啡减到两杯"},
+      {"role": "assistant", "text": "两杯就对了。那半马还跑吗？"},
+      {"role": "user", "text": "悬，先跑着看"},
+      {"role": "assistant", "text": "别急，先把作息稳住。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u055", "kind": "plan", "text": "用户对宠物食品那家基本确定，打算双十一之后提离职", "importance": 5, "keywords": ["宠物食品", "二面", "双十一"], "state": "active", "supersedes": ""},
+    {"id": "p07-u056", "kind": "preference", "text": "用户把咖啡减到两杯，十二点前能睡，跑步状态回来了", "importance": 2, "keywords": ["咖啡", "两杯", "跑步"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 69,
+   "date": "2026-10-08",
+   "sessions": [
+    {
+     "id": "p07-d69-s1",
+     "time": "08:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "昨天去学校开家长会，老师问我儿子最近怎么回事"},
+      {"role": "assistant", "text": "老师说了什么？"},
+      {"role": "user", "text": "说他上课老走神，但游泳班那边特别认真"},
+      {"role": "assistant", "text": "有喜欢的就行。走神也可能是课太难。"},
+      {"role": "user", "text": "周末我打算跟他聊一次，不骂他"},
+      {"role": "assistant", "text": "对，先问他自己怎么想。"}
+     ]
+    },
+    {
+     "id": "p07-d69-s2",
+     "time": "19:10",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "物业贴条让交暖气费，三千二一个季度"},
+      {"role": "assistant", "text": "北京这价正常。交了没？"},
+      {"role": "user", "text": "直接转了，省得又忘"},
+      {"role": "assistant", "text": "交了就踏实。冬天屋里能到二十六度。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u057", "kind": "relation", "text": "用户儿子上课老走神，但在游泳班特别认真", "importance": 3, "keywords": ["家长会", "走神", "游泳班"], "state": "active", "supersedes": ""},
+    {"id": "p07-u058", "kind": "trivia", "text": "用户交了三千二的暖气费", "importance": 1, "keywords": ["暖气费", "物业", "三千二"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 71,
+   "date": "2026-10-10",
+   "sessions": [
+    {
+     "id": "p07-d71-s1",
+     "time": "09:30",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "跟儿子说了换工作的事，他问是不是以后不加班了"},
+      {"role": "assistant", "text": "你怎么答的？"},
+      {"role": "user", "text": "我说不一定，但会尽量早点回家"},
+      {"role": "assistant", "text": "这个答案挺诚实。他懂吗？"},
+      {"role": "user", "text": "他说那你早点回来陪我拼乐高"},
+      {"role": "assistant", "text": "乐高这要求不高，答应他。"}
+     ]
+    },
+    {
+     "id": "p07-d71-s2",
+     "time": "21:50",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "今天跟老板提了离职，签字之前手抖了一下"},
+      {"role": "assistant", "text": "抖是正常的。他什么反应？"},
+      {"role": "user", "text": "愣了几秒，然后开始画饼，说涨 25% 加明年 VP"},
+      {"role": "assistant", "text": "25% 加 VP。你怎么接？"},
+      {"role": "user", "text": "我说我不是为了这个走的，他就不说话了"},
+      {"role": "assistant", "text": "这话有劲。说完你自己什么感觉？"},
+      {"role": "user", "text": "轻松，又有点怕。五年了，真要走反而舍不得"},
+      {"role": "assistant", "text": "舍不得是正常的。决定是对的就行。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u059", "kind": "episodic", "text": "用户 10 月 10 日提了离职，老板说涨 25% 加明年 VP，用户拒绝了", "importance": 5, "keywords": ["离职", "10月10日", "VP"], "state": "active", "supersedes": ""},
+    {"id": "p07-u060", "kind": "relation", "text": "用户跟儿子说要换工作，儿子问她是不是以后不加班了", "importance": 3, "keywords": ["儿子", "换工作", "加班"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 73,
+   "date": "2026-10-12",
+   "sessions": [
+    {
+     "id": "p07-d73-s1",
+     "time": "10:15",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "老板又找我，说年终奖照发，还让我自己挑接手的人"},
+      {"role": "assistant", "text": "他这是把你当资产。"},
+      {"role": "user", "text": "我推荐了小唐，他嫌年轻，我说看她敢不敢扛"},
+      {"role": "assistant", "text": "这话说得对。扛过一次就长起来了。"},
+      {"role": "user", "text": "客户和达人资源我都留给她了"},
+      {"role": "assistant", "text": "交接做到这份上，够体面。"}
+     ]
+    },
+    {
+     "id": "p07-d73-s2",
+     "time": "22:40",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "晚上跟几个前同事吃饭，都劝我去，说创业累但开眼界"},
+      {"role": "assistant", "text": "你自己怎么想？"},
+      {"role": "user", "text": "听自己。他们不知道我这两年累到什么程度"},
+      {"role": "assistant", "text": "那就按自己的来。换个累法，至少是你选的。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u061", "kind": "fact", "text": "用户向老板推荐小唐接手，老板嫌小唐太年轻", "importance": 3, "keywords": ["小唐", "接手", "年轻"], "state": "active", "supersedes": ""},
+    {"id": "p07-u062", "kind": "preference", "text": "用户觉得这两年累够了，跳槽是换个累法，宠物食品确实想试", "importance": 3, "keywords": ["跳槽", "宠物食品", "累"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 75,
+   "date": "2026-10-14",
+   "sessions": [
+    {
+     "id": "p07-d75-s1",
+     "time": "09:20",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "一整天在写交接文档，写了三十页，写完还挺佩服自己"},
+      {"role": "assistant", "text": "三十页，你这五年攒了多少东西。"},
+      {"role": "user", "text": "是。有几个项目我现在还记得每一个坑"},
+      {"role": "assistant", "text": "文档留下就是你的字据。"},
+      {"role": "user", "text": "写完翻到刚来北京那几年的记录，坐了半天"},
+      {"role": "assistant", "text": "要走的人都会翻旧账。翻完就往前看。"},
+      {"role": "user", "text": "对了，这几天都没加班，晚上也睡不着，脑子停不下来"},
+      {"role": "assistant", "text": "离职前都这样。把睡不着写下来，写完就合本。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u063", "kind": "episodic", "text": "用户写了一天交接文档，写了三十页，写到想起刚来北京那几年", "importance": 2, "keywords": ["交接", "文档", "三十页"], "state": "active", "supersedes": ""},
+    {"id": "p07-u064", "kind": "fact", "text": "用户离职前没加班也睡不着，脑子里全是散的", "importance": 2, "keywords": ["失眠", "离职", "睡不着"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 79,
+   "date": "2026-10-18",
+   "sessions": [
+    {
+     "id": "p07-d79-s1",
+     "time": "10:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "下周入职，新公司让我先看他们的产品资料"},
+      {"role": "assistant", "text": "宠物食品那份？看完什么感觉？"},
+      {"role": "user", "text": "比我想的卷，猫粮狗粮都要做内容"},
+      {"role": "assistant", "text": "哈哈哈，那你的活更重。你行。"}
+     ]
+    },
+    {
+     "id": "p07-d79-s2",
+     "time": "20:30",
+     "topic": "anime",
+     "turns": [
+      {"role": "user", "text": "陪儿子把《泽塔奥特曼》最后一集看完了，我居然看进去了"},
+      {"role": "assistant", "text": "最后那集挺煽的。他哭了吗？"},
+      {"role": "user", "text": "没哭，安静了一会儿，说想再看一遍"},
+      {"role": "assistant", "text": "这是他舍不得的方式。"},
+      {"role": "user", "text": "我现在懂他为什么天天喊变身了"},
+      {"role": "assistant", "text": "小孩喜欢的东西，陪久了就懂了。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u065", "kind": "preference", "text": "用户陪儿子把《泽塔奥特曼》最后一集看完，居然看进去了", "importance": 3, "keywords": ["泽塔奥特曼", "最后一集", "儿子"], "state": "active", "supersedes": ""},
+    {"id": "p07-u066", "kind": "plan", "text": "用户下周入职新公司，开始看宠物食品的产品资料", "importance": 4, "keywords": ["入职", "宠物食品", "产品资料"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 82,
+   "date": "2026-10-21",
+   "sessions": [
+    {
+     "id": "p07-d82-s1",
+     "time": "19:00",
+     "topic": "chore",
+     "turns": [
+      {"role": "user", "text": "双十一预售买了一堆，今天退了三个快递"},
+      {"role": "assistant", "text": "买了啥？"},
+      {"role": "user", "text": "两件衣服一个锅。衣服色差，锅太小"},
+      {"role": "assistant", "text": "预售就是坑。运费贴了多少？"},
+      {"role": "user", "text": "贴了十二块。以后预售不点了"},
+      {"role": "assistant", "text": "十二块买个教训，不贵。"}
+     ]
+    },
+    {
+     "id": "p07-d82-s2",
+     "time": "21:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "半马我不跑了，最近这状态连十公里都费劲"},
+      {"role": "assistant", "text": "那就别跑。半马什么时候都能跑，膝盖只有一个。"},
+      {"role": "user", "text": "嗯，改成每周三次五公里，图个舒服"},
+      {"role": "assistant", "text": "这个目标实在。跑舒服比配速重要。"},
+      {"role": "user", "text": "我以前老想着要证明什么"},
+      {"role": "assistant", "text": "现在不用证明了，你已经知道自己是哪种人。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u067", "kind": "update", "text": "用户放弃半马计划，改成每周三次五公里，觉得舒服更重要", "importance": 3, "keywords": ["半马", "五公里", "膝盖"], "state": "active", "supersedes": "p07-u025"},
+    {"id": "p07-u068", "kind": "trivia", "text": "用户双十一预售冲动买了衣服和锅，退了三件快递，贴了十二块运费", "importance": 1, "keywords": ["快递", "退货", "运费"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 84,
+   "date": "2026-10-23",
+   "sessions": [
+    {
+     "id": "p07-d84-s1",
+     "time": "10:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "离职手续办完了，工牌交上去那一刻有点空"},
+      {"role": "assistant", "text": "五年，一张卡。空是正常的。"},
+      {"role": "user", "text": "小唐哭了，我让她别哭，自己差点没绷住"},
+      {"role": "assistant", "text": "你俩这两年没白搭。"},
+      {"role": "user", "text": "客户和达人资源我都留给她了，她接得住"},
+      {"role": "assistant", "text": "这就是最好的交接。"}
+     ]
+    },
+    {
+     "id": "p07-d84-s2",
+     "time": "22:10",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "为了入职买了两件衬衫，试了一下有点紧"},
+      {"role": "assistant", "text": "紧是最近没怎么跑吧。"},
+      {"role": "user", "text": "也可能坐太久。算了，穿宽松点"},
+      {"role": "assistant", "text": "新公司看你能带多少销量，不看你衬衫。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u069", "kind": "episodic", "text": "用户办完离职手续交工牌时有点空，小唐哭了", "importance": 4, "keywords": ["离职手续", "工牌", "小唐"], "state": "active", "supersedes": ""},
+    {"id": "p07-u070", "kind": "trivia", "text": "用户为入职买了两件衬衫，试穿有点紧", "importance": 1, "keywords": ["衬衫", "入职", "新工作"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 87,
+   "date": "2026-10-26",
+   "sessions": [
+    {
+     "id": "p07-d87-s1",
+     "time": "08:20",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "新公司在望京，我早上坐地铁比原来快二十分钟"},
+      {"role": "assistant", "text": "能多睡二十分钟，挺好。"},
+      {"role": "user", "text": "对，我现在七点二十起，还能给儿子打个视频"},
+      {"role": "assistant", "text": "这二十分钟用得值。"}
+     ]
+    },
+    {
+     "id": "p07-d87-s2",
+     "time": "23:00",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "新公司第一天，开了六个会，比原来还忙"},
+      {"role": "assistant", "text": "六个会，第一天就上强度。"},
+      {"role": "user", "text": "但他们开会不说废话，这点我认"},
+      {"role": "assistant", "text": "那就比原来强一半。团队呢？"},
+      {"role": "user", "text": "一共八个人，最年轻的 24，叫我许姐"},
+      {"role": "assistant", "text": "许姐，听着就稳。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u071", "kind": "fact", "text": "用户入职新公司第一天开了六个会，团队八个人都叫她许姐", "importance": 3, "keywords": ["入职", "六个会", "团队"], "state": "active", "supersedes": ""},
+    {"id": "p07-u072", "kind": "fact", "text": "用户新公司在望京，坐地铁比原来快二十分钟", "importance": 2, "keywords": ["望京", "地铁", "通勤"], "state": "active", "supersedes": ""}
+   ]
+  },
+  {
+   "day": 90,
+   "date": "2026-10-29",
+   "sessions": [
+    {
+     "id": "p07-d90-s1",
+     "time": "08:00",
+     "topic": "daily",
+     "turns": [
+      {"role": "user", "text": "今天带儿子去游泳，他现在能游二十五米了"},
+      {"role": "assistant", "text": "二十五米，进步不小。"},
+      {"role": "user", "text": "他非要游给我看，一口气游完，上来喘得不行"},
+      {"role": "assistant", "text": "哈哈，小孩要面子。你看着高兴吧？"},
+      {"role": "user", "text": "高兴。这三个月折腾成这样，居然还有点值"},
+      {"role": "assistant", "text": "折腾出来的东西，都算数。"}
+     ]
+    },
+    {
+     "id": "p07-d90-s2",
+     "time": "22:30",
+     "topic": "work",
+     "turns": [
+      {"role": "user", "text": "新公司让我下周出品牌方案，三个月内要看到东西"},
+      {"role": "assistant", "text": "三个月出东西，标准不低。有思路吗？"},
+      {"role": "user", "text": "有一点。先做主粮那条线，别一上来就全铺"},
+      {"role": "assistant", "text": "稳。这个节奏才是你。"},
+      {"role": "user", "text": "希望吧。这次我想慢一点，别又把自己熬干"},
+      {"role": "assistant", "text": "慢一点，才能走得远。"}
+     ]
+    }
+   ],
+   "units": [
+    {"id": "p07-u073", "kind": "relation", "text": "用户儿子现在能游二十五米，游完喘得不行", "importance": 2, "keywords": ["游泳", "二十五米", "儿子"], "state": "active", "supersedes": ""},
+    {"id": "p07-u074", "kind": "plan", "text": "用户下周要给新公司出品牌方案，打算先做主粮线", "importance": 4, "keywords": ["品牌方案", "主粮", "新公司"], "state": "active", "supersedes": ""},
+    {"id": "p07-u075", "kind": "preference", "text": "用户这次想慢一点做，不想再把自己熬干", "importance": 4, "keywords": ["节奏", "熬干", "慢一点"], "state": "active", "supersedes": ""}
+   ]
+  }
+ ],
+ "probes": [
+  {
+   "id": "p07-q01",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我最早跟你聊跑步那次，膝盖是怎么不舒服的？",
+   "expect": {"any": ["膝盖外侧", "下楼梯发软"], "none": []},
+   "unit_ids": ["p07-u002"],
+   "note": "第 1 天跑完五公里说膝盖外侧一按就疼、下楼梯发软"
+  },
+  {
+   "id": "p07-q02",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我儿子那次发烧，是谁在带着他？",
+   "expect": {"any": ["老陈", "38 度"], "none": []},
+   "unit_ids": ["p07-u003"],
+   "note": "第 1 天儿子发烧 38 度多，在前夫那边"
+  },
+  {
+   "id": "p07-q03",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我体检那个结节有多大，医生让多久复查？",
+   "expect": {"any": ["四毫米", "半年"], "none": []},
+   "unit_ids": ["p07-u046"],
+   "note": "第 55 天体检报告，甲状腺结节"
+  },
+  {
+   "id": "p07-q04",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我写交接文档写到多少页来着？",
+   "expect": {"any": ["三十页"], "none": []},
+   "unit_ids": ["p07-u063"],
+   "note": "第 75 天写交接文档"
+  },
+  {
+   "id": "p07-q05",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我儿子现在游泳一口气能游多远？",
+   "expect": {"any": ["二十五米"], "none": []},
+   "unit_ids": ["p07-u073"],
+   "note": "第 90 天儿子游泳进步"
+  },
+  {
+   "id": "p07-q06",
+   "category": "daily",
+   "ask_day": 90,
+   "query": "我新公司通勤比原来快多久来着？",
+   "expect": {"any": ["二十分钟"], "none": []},
+   "unit_ids": ["p07-u072"],
+   "note": "第 87 天说新公司在望京，地铁更快"
+  },
+  {
+   "id": "p07-q07",
+   "category": "work",
+   "ask_day": 90,
+   "query": "预算最后批回来多少，老板提了什么硬指标？",
+   "expect": {"any": ["一半", "2.5"], "none": []},
+   "unit_ids": ["p07-u014"],
+   "note": "第 13 天预算批回一半，ROI 要求 2.5"
+  },
+  {
+   "id": "p07-q08",
+   "category": "work",
+   "ask_day": 90,
+   "query": "大促预热那次库存是怎么出岔子的？",
+   "expect": {"any": ["标错", "三百单"], "none": []},
+   "unit_ids": ["p07-u030"],
+   "note": "第 33 天单品库存标错，卖出去三百单"
+  },
+  {
+   "id": "p07-q09",
+   "category": "work",
+   "ask_day": 90,
+   "query": "双十一的方案最后怎么折中定的？",
+   "expect": {"any": ["七成", "三成"], "none": []},
+   "unit_ids": ["p07-u048"],
+   "note": "第 57 天跟老板争到内容七成折扣三成"
+  },
+  {
+   "id": "p07-q10",
+   "category": "work",
+   "ask_day": 90,
+   "query": "我提离职那天老板开什么条件留我？",
+   "expect": {"any": ["涨 25%", "VP"], "none": []},
+   "unit_ids": ["p07-u059"],
+   "note": "第 71 天提离职，老板画饼"
+  },
+  {
+   "id": "p07-q11",
+   "category": "work",
+   "ask_day": 90,
+   "query": "9 月大促最后那个 ROI 是多少？",
+   "expect": {"any": ["3.2"], "none": []},
+   "unit_ids": ["p07-u034"],
+   "note": "第 40 天大促 ROI 3.2"
+  },
+  {
+   "id": "p07-q12",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "你记得我被同事安利的那部国产动画叫什么吗？",
+   "expect": {"any": ["中国奇谭"], "none": []},
+   "unit_ids": ["p07-u006"],
+   "note": "第 5 天同事安利《中国奇谭》"
+  },
+  {
+   "id": "p07-q13",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我陪儿子看的那个奥特曼，是哪一集这么燃？",
+   "expect": {"any": ["第十二集", "泽塔"], "none": []},
+   "unit_ids": ["p07-u018"],
+   "note": "第 17 天陪儿子看泽塔 12 集"
+  },
+  {
+   "id": "p07-q14",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "我陪儿子看到最后，对那个奥特曼的感觉变了吗？",
+   "expect": {"any": ["看进去"], "none": []},
+   "unit_ids": ["p07-u065"],
+   "note": "第 79 天看完泽塔最后一集"
+  },
+  {
+   "id": "p07-q15",
+   "category": "anime",
+   "ask_day": 90,
+   "query": "中国奇谭第二集我为什么弃了？",
+   "expect": {"any": ["鹅鹅鹅", "画风"], "none": []},
+   "unit_ids": ["p07-u036"],
+   "note": "第 44 天第二集看十分钟就关"
+  },
+  {
+   "id": "p07-q16",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我早上淋雨那次，后来决定怎么解决伞的事？",
+   "expect": {"any": ["两把", "折叠伞"], "none": []},
+   "unit_ids": ["p07-u020"],
+   "note": "第 19 天忘带伞，决定买两把"
+  },
+  {
+   "id": "p07-q17",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我报销被退回来，是因为发票上哪里错了？",
+   "expect": {"any": ["抬头", "北京"], "none": []},
+   "unit_ids": ["p07-u035"],
+   "note": "第 40 天报销发票抬头错"
+  },
+  {
+   "id": "p07-q18",
+   "category": "trivia",
+   "ask_day": 90,
+   "query": "我双十一退了几个快递，贴了多少运费？",
+   "expect": {"any": ["十二块", "退了三件"], "none": []},
+   "unit_ids": ["p07-u068"],
+   "note": "第 82 天退快递"
+  },
+  {
+   "id": "p07-q19",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我那个日语学到最后坚持下来了吗？",
+   "expect": {"any": ["App 删了"], "none": ["年底前"]},
+   "unit_ids": ["p07-u041", "p07-u022"],
+   "note": "第 22 天说年底前背完五十音，第 48 天把 App 删了；gold 取新状态，不再用「放弃」"
+  },
+  {
+   "id": "p07-q20",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我后来对猎头推的那家公司是什么态度？",
+   "expect": {"any": ["宠物食品"], "none": ["懒得回"]},
+   "unit_ids": ["p07-u042", "p07-u023"],
+   "note": "第 22 天说不打算跳槽，第 50 天心动"
+  },
+  {
+   "id": "p07-q21",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我儿子那个钢琴后来怎么处理的？",
+   "expect": {"any": ["游泳班"], "none": ["借口"]},
+   "unit_ids": ["p07-u037", "p07-u013"],
+   "note": "第 9 天说儿子学钢琴，第 44 天改游泳"
+  },
+  {
+   "id": "p07-q22",
+   "category": "update",
+   "ask_day": 90,
+   "query": "我原来想跑半马那个计划后来怎么样了？",
+   "expect": {"any": ["放弃半马"], "none": ["加跑量"]},
+   "unit_ids": ["p07-u067", "p07-u025"],
+   "note": "第 26 天想跑半马，第 82 天放弃；gold 只取「放弃半马」，不撞其它跑步记忆"
+  },
+  {
+   "id": "p07-q23",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "从大促中段到最后，ROI 是怎么一步步上去的？",
+   "expect": {"any": ["2.9", "3.2"], "none": []},
+   "unit_ids": ["p07-u033", "p07-u034"],
+   "note": "第 37 天 2.9，第 40 天 3.2"
+  },
+  {
+   "id": "p07-q24",
+   "category": "aggregate",
+   "ask_day": 90,
+   "query": "我儿子兴趣班这事折腾了多久，中间都发生了什么？",
+   "expect": {"any": ["游泳"], "none": []},
+   "unit_ids": ["p07-u013", "p07-u028", "p07-u037"],
+   "note": "钢琴半年不练 → 提游泳 → 改游泳班"
+  },
+  {
+   "id": "p07-q25",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "我跳槽那事跟儿子学游泳是不是撞在同一个月？",
+   "expect": {"any": ["宠物食品", "游泳课"], "none": []},
+   "unit_ids": ["p07-u042", "p07-u043"],
+   "note": "第 50 天白天聊新公司，晚上带儿子第一节游泳课"
+  },
+  {
+   "id": "p07-q26",
+   "category": "cross",
+   "ask_day": 90,
+   "query": "大促最忙那几天我的身体撑成什么样了？",
+   "expect": {"any": ["喉咙疼", "四天"], "none": []},
+   "unit_ids": ["p07-u032", "p07-u033"],
+   "note": "第 37 天大促连轴转，身体和数据的双重记忆"
+  },
+  {
+   "id": "p07-q27",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "9 月大促那个头部达人，我最后签的是谁？",
+   "expect": {"any": ["林小满"], "none": ["周大顺"]},
+   "unit_ids": ["p07-u017"],
+   "note": "第 17 天林小满 vs 周大顺选人"
+  },
+  {
+   "id": "p07-q28",
+   "category": "precision",
+   "ask_day": 90,
+   "query": "我走之前推荐谁接手我那块？",
+   "expect": {"any": ["小唐"], "none": ["实习生"]},
+   "unit_ids": ["p07-u061"],
+   "note": "第 73 天推荐小唐，不是那个实习生"
+  },
+  {
+   "id": "p07-q29",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我以前跟你说过想搬到哪个城市吗？",
+   "expect": {"any": [], "none": ["成都", "大理"]},
+   "unit_ids": [],
+   "note": "从没聊过搬去别的城市；避开被「带儿子去日本看奥特曼」推翻的出国旅行话题"
+  },
+  {
+   "id": "p07-q30",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我提过自己养什么宠物吗？",
+   "expect": {"any": [], "none": ["柯基", "布偶猫"]},
+   "unit_ids": [],
+   "note": "只聊过新公司做宠物食品，没养过宠物"
+  },
+  {
+   "id": "p07-q31",
+   "category": "no_memory",
+   "ask_day": 90,
+   "query": "我说过想学什么乐器没有？",
+   "expect": {"any": [], "none": ["吉他", "小提琴"]},
+   "unit_ids": [],
+   "note": "儿子学钢琴不算她自己想学乐器"
+  }
+ ]
+}

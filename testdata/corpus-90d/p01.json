@@ -1,0 +1,980 @@
+{
+  "version": 1,
+  "id": "p01",
+  "name": "林放",
+  "profile": {
+    "age": 29,
+    "city": "杭州",
+    "job": "后端工程师",
+    "voice": "短句、爱吐槽、嘴硬心软，靠冰美式续命，经常一句话回完",
+    "relations": "妈妈每周日固定打电话催婚；合租室友老周，一起打游戏；橘猫叫年糕"
+  },
+  "window": { "start": "2026-08-01", "end": "2026-10-29", "days": 90 },
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-08-01",
+      "sessions": [
+        {
+          "id": "p01-d01-s1",
+          "time": "10:20",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "今天立项会，订单服务重构这事落我头上了，Java 全迁 Go，说 Q3 就要干完" },
+            { "role": "assistant", "text": "好家伙，直接给你一个大活，这是要把你焊在工位上" },
+            { "role": "user", "text": "我在会上说直接大爆炸式迁移，一把梭，省得两套系统跑半年" },
+            { "role": "assistant", "text": "想得挺美，出事了怎么回滚，你想过吗" },
+            { "role": "user", "text": "被你这么一问有点虚，不过我还是觉得全量搬过去最省事" },
+            { "role": "assistant", "text": "先摸摸体量吧，别光想着省事" }
+          ]
+        },
+        {
+          "id": "p01-d01-s2",
+          "time": "22:40",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "年糕今天把我的鼠标线咬断了，我正准备回工作消息呢" },
+            { "role": "assistant", "text": "猫：谁让你不陪我玩" },
+            { "role": "user", "text": "它还蹲在我腿上睡觉，我一点都不想赶它下来" },
+            { "role": "assistant", "text": "行吧，你已经被它管得死死的了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u001", "kind": "fact", "text": "用户被安排负责订单服务重构，要把 Java 版本迁到 Go，目标是下单成功率做到 99.95%", "importance": 5, "keywords": ["订单服务", "重构", "Java", "Go", "下单成功率"], "state": "active", "supersedes": "" },
+        { "id": "p01-u002", "kind": "plan", "text": "用户起初打算大爆炸式迁移，一次把订单服务全量搬过去", "importance": 4, "keywords": ["大爆炸式迁移", "全量", "订单服务"], "state": "superseded", "superseded_by": "p01-u038", "supersedes": "" },
+        { "id": "p01-u003", "kind": "relation", "text": "用户养了一只橘猫叫年糕，被它咬断鼠标线都舍不得赶它", "importance": 4, "keywords": ["年糕", "橘猫", "鼠标线"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-08-02",
+      "sessions": [
+        {
+          "id": "p01-d02-s1",
+          "time": "20:10",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我妈刚打完电话，二十分钟里问了八遍对象的事，我耳朵还是热的" },
+            { "role": "assistant", "text": "每周日固定节目是吧" },
+            { "role": "user", "text": "从我二十七岁开始就这样，我说在忙项目她也不信" },
+            { "role": "assistant", "text": "当妈的都这样，你先糊弄过去" },
+            { "role": "user", "text": "最后答应她国庆回家，说完就后悔了，我不想回去被围观" },
+            { "role": "assistant", "text": "答应都答应了，到时候再想办法" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u004", "kind": "relation", "text": "用户妈妈每周日固定打电话，主要内容是催他找对象", "importance": 3, "keywords": ["妈妈", "催婚", "周日"], "state": "active", "supersedes": "" },
+        { "id": "p01-u005", "kind": "episodic", "text": "用户被妈妈问烦了，顺口答应国庆回老家", "importance": 2, "keywords": ["国庆", "回老家", "妈妈"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2026-08-05",
+      "sessions": [
+        {
+          "id": "p01-d05-s1",
+          "time": "22:30",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "我在补命运石之门，看到第九集，助手这个角色有点东西" },
+            { "role": "assistant", "text": "红莉栖？她那种嘴硬心软的劲儿确实抓人" },
+            { "role": "user", "text": "等等你居然知道，我还以为你要问我这是啥番" },
+            { "role": "assistant", "text": "我又不是不看番的人，你看到哪儿最上头" },
+            { "role": "user", "text": "凶真那些中二台词我居然看得津津有味，有点羞耻" },
+            { "role": "assistant", "text": "中二是会传染的，后面更上头" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u006", "kind": "preference", "text": "用户在补《命运石之门》，看到第九集最喜欢牧濑红莉栖", "importance": 4, "keywords": ["命运石之门", "牧濑红莉栖", "补番"], "state": "active", "supersedes": "" },
+        { "id": "p01-u007", "kind": "trivia", "text": "用户觉得冈部伦太郎的中二台词羞耻，但看得津津有味", "importance": 2, "keywords": ["冈部伦太郎", "中二", "命运石之门"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 8,
+      "date": "2026-08-08",
+      "sessions": [
+        {
+          "id": "p01-d08-s1",
+          "time": "23:50",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "又失眠了，这周第四天熬到两点，白天全靠冰美式撑着" },
+            { "role": "assistant", "text": "四天？你这是把作息当仇人养" },
+            { "role": "user", "text": "我一天三杯起步，奶咖我一口都不碰，只认冰美式" },
+            { "role": "assistant", "text": "胃还好吗" },
+            { "role": "user", "text": "好不好另说，明天还有个大的方案评审，想想就烦" },
+            { "role": "assistant", "text": "评审完早点睡，别再刷手机了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u008", "kind": "preference", "text": "用户只喝冰美式，一天三杯起步，完全不碰奶咖", "importance": 3, "keywords": ["冰美式", "奶咖", "咖啡"], "state": "superseded", "superseded_by": "p01-u024", "supersedes": "" },
+        { "id": "p01-u009", "kind": "trivia", "text": "用户夏天失眠严重，这一周有四天都熬到两点", "importance": 2, "keywords": ["失眠", "熬夜", "两点"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 9,
+      "date": "2026-08-09",
+      "sessions": [
+        {
+          "id": "p01-d09-s1",
+          "time": "11:20",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "老周拉我打游戏到早上五点，现在脑子是木的" },
+            { "role": "assistant", "text": "你们这作息，谁先猝死谁尴尬" },
+            { "role": "user", "text": "他说周末不打游戏对不起自己，我居然被说服了" },
+            { "role": "assistant", "text": "俩人住一起就是互相带坏" },
+            { "role": "user", "text": "中午起来点了个片儿川，吃完又想睡" },
+            { "role": "assistant", "text": "你这一天就是从床上挪到沙发上" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u010", "kind": "relation", "text": "用户室友老周周末总拉他通宵打游戏", "importance": 2, "keywords": ["老周", "室友", "游戏"], "state": "active", "supersedes": "" },
+        { "id": "p01-u011", "kind": "trivia", "text": "用户中午起来点了一碗片儿川，吃完又困了", "importance": 1, "keywords": ["片儿川", "午饭", "外卖"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 11,
+      "date": "2026-08-11",
+      "sessions": [
+        {
+          "id": "p01-d11-s1",
+          "time": "09:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "明天去成都出差，客户现场对订单服务的老系统，要待三天" },
+            { "role": "assistant", "text": "成都这个季节闷得很，多带两件换洗的" },
+            { "role": "user", "text": "老徐说这次主要摸清楚他们怎么调我们的接口" },
+            { "role": "assistant", "text": "顺便看看他们监控做到什么程度" },
+            { "role": "user", "text": "已经塞了半个包的东西，笔记本电源都带上了" },
+            { "role": "assistant", "text": "行，别到现场没电就行" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u012", "kind": "episodic", "text": "用户 8 月中旬去成都出差，在客户现场对接订单服务的老系统", "importance": 4, "keywords": ["成都", "出差", "客户现场", "订单服务"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 12,
+      "date": "2026-08-12",
+      "sessions": [
+        {
+          "id": "p01-d12-s1",
+          "time": "14:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "到了客户现场，他们还在用 Java 8，连日志都是手写进文件的" },
+            { "role": "assistant", "text": "这现场够原生态的" },
+            { "role": "user", "text": "我原来的方案里好多东西在这跑不起来，得重想" },
+            { "role": "assistant", "text": "所以大爆炸那套更悬了，你心里有数吧" },
+            { "role": "user", "text": "有数了，回去先改一版方案再说" },
+            { "role": "assistant", "text": "多拍点现场照片，回头汇报用" }
+          ]
+        },
+        {
+          "id": "p01-d12-s2",
+          "time": "23:10",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "酒店太无聊，我把命运石之门补到十八集了" },
+            { "role": "assistant", "text": "一口气看到十八？你明天不用开会？" },
+            { "role": "user", "text": "看到凶真一次次跳回去救真由理，我有点绷不住" },
+            { "role": "assistant", "text": "那段确实让人心里堵" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u013", "kind": "fact", "text": "用户出差发现客户还在用 Java 8，原来的迁移方案很多地方跑不起来", "importance": 4, "keywords": ["Java 8", "客户现场", "迁移方案"], "state": "active", "supersedes": "" },
+        { "id": "p01-u014", "kind": "episodic", "text": "用户出差晚上在酒店把《命运石之门》补到第 18 集", "importance": 3, "keywords": ["命运石之门", "酒店", "出差", "补番"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 15,
+      "date": "2026-08-15",
+      "sessions": [
+        {
+          "id": "p01-d15-s1",
+          "time": "03:20",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "补完了，凌晨三点，我现在人是飘的但心里堵得慌" },
+            { "role": "assistant", "text": "三点？明天你还起得来吗" },
+            { "role": "user", "text": "周六啊，为了真由理和助手这条线我认了" },
+            { "role": "assistant", "text": "所以封神了吗" },
+            { "role": "user", "text": "封了，命运石之门就是我的本命番，以后谁问我都这么说" },
+            { "role": "assistant", "text": "行，我记下了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u015", "kind": "preference", "text": "用户把《命运石之门》补完到凌晨三点，直接封为本命番", "importance": 5, "keywords": ["命运石之门", "本命番", "凌晨三点"], "state": "active", "supersedes": "" },
+        { "id": "p01-u016", "kind": "preference", "text": "用户是《命运石之门》的助手党，最吃牧濑红莉栖这条线", "importance": 4, "keywords": ["牧濑红莉栖", "助手党", "命运石之门"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 16,
+      "date": "2026-08-16",
+      "sessions": [
+        {
+          "id": "p01-d16-s1",
+          "time": "14:30",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "补完番睡到下午两点，年糕踩我脸把我叫醒的" },
+            { "role": "assistant", "text": "猫肉垫闹钟，挺准时" },
+            { "role": "user", "text": "起来发现冰箱空的，煮了包泡面凑合" },
+            { "role": "assistant", "text": "这顿算早饭还是午饭" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u017", "kind": "trivia", "text": "用户补番后睡到下午两点，被年糕踩脸叫醒", "importance": 2, "keywords": ["年糕", "补番", "下午两点"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 19,
+      "date": "2026-08-19",
+      "sessions": [
+        {
+          "id": "p01-d19-s1",
+          "time": "20:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "方案评审又被老徐问住了，他问我灰度怎么切，我答得稀烂" },
+            { "role": "assistant", "text": "老徐是懂怎么让人当场社死的" },
+            { "role": "user", "text": "他还说大爆炸式迁移不是不行，是出了事谁背" },
+            { "role": "assistant", "text": "这话没毛病" },
+            { "role": "user", "text": "晚上回来我用 VS Code 翻以前的迁移文档，Java 那几个插件还留着，越看越虚" },
+            { "role": "assistant", "text": "先把风险拆小，别硬上" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u018", "kind": "fact", "text": "用户方案评审被主管老徐问住，意识到大爆炸式迁移风险太大", "importance": 4, "keywords": ["老徐", "方案评审", "大爆炸式迁移", "风险"], "state": "active", "supersedes": "" },
+        { "id": "p01-u019", "kind": "preference", "text": "用户主力编辑器一直是 VS Code，Java 插件装了一堆", "importance": 3, "keywords": ["VS Code", "编辑器", "Java 插件"], "state": "superseded", "superseded_by": "p01-u054", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 22,
+      "date": "2026-08-22",
+      "sessions": [
+        {
+          "id": "p01-d22-s1",
+          "time": "08:40",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "早上挤地铁挤成照片了，单程五十多分钟，到公司一身汗" },
+            { "role": "assistant", "text": "夏天通勤是这样的，忍忍" },
+            { "role": "user", "text": "旁边大哥的包一直顶着我后背，我忍了一路" },
+            { "role": "assistant", "text": "地铁生存第一条，别回头" }
+          ]
+        },
+        {
+          "id": "p01-d22-s2",
+          "time": "16:00",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "厨房水龙头漏水，我自己拧了半天没拧好，跑了两趟五金店" },
+            { "role": "assistant", "text": "两趟？第一趟买错尺寸了？" },
+            { "role": "user", "text": "对，买大了一圈，老板看我的眼神都慈祥了" },
+            { "role": "assistant", "text": "笑死，最后修好了吗" },
+            { "role": "user", "text": "修好了，就是台面被我弄得全是水" },
+            { "role": "assistant", "text": "能出水就行" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u020", "kind": "fact", "text": "用户早上挤地铁上班，单程五十多分钟，到公司一身汗", "importance": 3, "keywords": ["地铁", "通勤", "单程"], "state": "superseded", "superseded_by": "p01-u028", "supersedes": "" },
+        { "id": "p01-u021", "kind": "trivia", "text": "用户周末自己修厨房水龙头，买错尺寸跑了两趟五金店", "importance": 2, "keywords": ["水龙头", "五金店", "修东西"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 26,
+      "date": "2026-08-26",
+      "sessions": [
+        {
+          "id": "p01-d26-s1",
+          "time": "22:00",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "在追孤独摇滚，看到第六集，波奇那社恐简直在演我" },
+            { "role": "assistant", "text": "社恐人士的互联网嘴替" },
+            { "role": "user", "text": "她一躲进壁橱我就笑，然后想到自己也这样" },
+            { "role": "assistant", "text": "笑着笑着就沉默了" },
+            { "role": "user", "text": "顺便说一句异世界开后宫那种我是真看不下去，一集都嫌多" },
+            { "role": "assistant", "text": "懂了，以后不给你推这种" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u022", "kind": "preference", "text": "用户在追《孤独摇滚》，觉得后藤一里社恐的样子像自己", "importance": 4, "keywords": ["孤独摇滚", "后藤一里", "社恐"], "state": "active", "supersedes": "" },
+        { "id": "p01-u023", "kind": "preference", "text": "用户明确讨厌异世界开后宫题材，一集都看不下去", "importance": 3, "keywords": ["异世界", "后宫", "弃番"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 30,
+      "date": "2026-08-30",
+      "sessions": [
+        {
+          "id": "p01-d30-s1",
+          "time": "21:10",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我妈又打电话来，问我什么时候带人回家，我说项目上线再说" },
+            { "role": "assistant", "text": "这理由用第三次就不好使了" },
+            { "role": "user", "text": "今天还试了同事买的生椰拿铁，奶咖好像也没那么难喝" },
+            { "role": "assistant", "text": "哟，冰美式叛徒" },
+            { "role": "user", "text": "就一杯，别到处说" },
+            { "role": "assistant", "text": "放心，我这嘴严" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u024", "kind": "update", "text": "用户试了生椰拿铁，说奶咖其实也没那么难喝", "importance": 3, "keywords": ["生椰拿铁", "奶咖", "口味变化"], "state": "active", "supersedes": "p01-u008" },
+        { "id": "p01-u025", "kind": "relation", "text": "用户拿项目上线当挡箭牌，敷衍妈妈催他带人回家", "importance": 2, "keywords": ["催婚", "项目上线", "妈妈"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 32,
+      "date": "2026-09-01",
+      "sessions": [
+        {
+          "id": "p01-d32-s1",
+          "time": "10:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "今天灰度第一批，先切 5% 流量，我盯着大盘手心出汗" },
+            { "role": "assistant", "text": "5% 也够看出一堆毛病了" },
+            { "role": "user", "text": "暂时还行，延迟多了一点点，在可接受范围" },
+            { "role": "assistant", "text": "稳住，别高兴太早" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u026", "kind": "fact", "text": "用户 9 月 1 日开始灰度第一批 5% 流量到 Go 版本", "importance": 4, "keywords": ["灰度", "5%", "流量", "Go"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 34,
+      "date": "2026-09-03",
+      "sessions": [
+        {
+          "id": "p01-d34-s1",
+          "time": "19:30",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "花一千二买了辆二手公路车，明天开始试试骑车上班" },
+            { "role": "assistant", "text": "一千二？车况靠谱吗" },
+            { "role": "user", "text": "刹车有点软，老板说调一下就好" },
+            { "role": "assistant", "text": "先把刹车调好再上路，别省这个" },
+            { "role": "user", "text": "知道，周末去修车摊让师傅看看" },
+            { "role": "assistant", "text": "行，记得让老板给张收据" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u027", "kind": "episodic", "text": "用户花 1200 买了辆二手公路车，打算骑车上班", "importance": 3, "keywords": ["公路车", "通勤", "二手"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 37,
+      "date": "2026-09-06",
+      "sessions": [
+        {
+          "id": "p01-d37-s1",
+          "time": "09:20",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "试骑了两天，单程二十五分钟，比地铁快了快半小时" },
+            { "role": "assistant", "text": "真香现场" },
+            { "role": "user", "text": "就是到公司一身汗，得在工位吹十分钟空调" },
+            { "role": "assistant", "text": "公司有淋浴间吗" },
+            { "role": "user", "text": "想得美，后勤连纸巾都要申请" },
+            { "role": "assistant", "text": "那还是早点出门吧" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u028", "kind": "update", "text": "用户 9 月起改骑车上班，单程 25 分钟，比地铁快半小时", "importance": 4, "keywords": ["骑车", "通勤", "单程"], "state": "active", "supersedes": "p01-u020" },
+        { "id": "p01-u029", "kind": "trivia", "text": "用户骑车到公司一身汗，得在工位吹十分钟空调", "importance": 2, "keywords": ["骑车", "空调", "工位"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 40,
+      "date": "2026-09-09",
+      "sessions": [
+        {
+          "id": "p01-d40-s1",
+          "time": "21:40",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "灰度到 20% 了，高峰期 Go 那版的 CPU 比预期高一大截" },
+            { "role": "assistant", "text": "高多少，几个点" },
+            { "role": "user", "text": "单机快 40%，压测环境根本测不出来" },
+            { "role": "assistant", "text": "那就是压测的流量模型不对" },
+            { "role": "user", "text": "对，老徐说明天拉个会重做压测模型" },
+            { "role": "assistant", "text": "先别急着扩机器，找着原因再说" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u030", "kind": "fact", "text": "用户灰度到 20% 时发现 Go 版本高峰期 CPU 比预期高四成", "importance": 4, "keywords": ["灰度", "CPU", "高峰期", "Go"], "state": "active", "supersedes": "" },
+        { "id": "p01-u031", "kind": "fact", "text": "用户发现压测环境的流量模型不对，没测出真问题", "importance": 3, "keywords": ["压测环境", "流量模型", "性能"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 42,
+      "date": "2026-09-11",
+      "sessions": [
+        {
+          "id": "p01-d42-s1",
+          "time": "23:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "连着两天加班到十一点，今晚终于把那块性能瓶颈刨出来了" },
+            { "role": "assistant", "text": "什么问题，说说" },
+            { "role": "user", "text": "连接池参数配小了，一到高峰全在那儿排队" },
+            { "role": "assistant", "text": "经典坑，改起来大吗" },
+            { "role": "user", "text": "改起来不大，就是得重新灰度验证一遍，发版又要往后拖" },
+            { "role": "assistant", "text": "拖就拖吧，总比带病上强" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u032", "kind": "episodic", "text": "用户连续两天加班到十一点，查出连接池参数配小了", "importance": 3, "keywords": ["加班", "连接池", "性能瓶颈"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 44,
+      "date": "2026-09-13",
+      "sessions": [
+        {
+          "id": "p01-d44-s1",
+          "time": "18:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "今天骑车摔了，雨后路滑，右膝盖擦破一大块" },
+            { "role": "assistant", "text": "人怎么样，骨头没事吧" },
+            { "role": "user", "text": "骨头没事，车把歪了，我推着走了两公里回家" },
+            { "role": "assistant", "text": "先去把伤口处理了，别硬撑" },
+            { "role": "user", "text": "回家年糕还闻我膝盖，一脸嫌弃" },
+            { "role": "assistant", "text": "猫：怎么带伤回来" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u033", "kind": "episodic", "text": "用户骑车摔了一跤，右膝盖擦破一大块，车把也摔歪了", "importance": 3, "keywords": ["骑车", "摔跤", "右膝盖"], "state": "active", "supersedes": "" },
+        { "id": "p01-u034", "kind": "trivia", "text": "用户摔车后推着车走了两公里回家", "importance": 1, "keywords": ["摔车", "推车", "两公里"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 46,
+      "date": "2026-09-15",
+      "sessions": [
+        {
+          "id": "p01-d46-s1",
+          "time": "20:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "十七号发正式版本，今天评审过了，我反而更紧张" },
+            { "role": "assistant", "text": "正常，越到上线越怕" },
+            { "role": "user", "text": "准备了回滚脚本，老徐说演练一遍" },
+            { "role": "assistant", "text": "这个必须演练，别只是写着好看" },
+            { "role": "user", "text": "演练完了，切回老版本花了四分钟" },
+            { "role": "assistant", "text": "四分钟还行，能接受" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u035", "kind": "plan", "text": "用户 9 月 17 日要发正式版本，提前准备了回滚脚本", "importance": 4, "keywords": ["发版", "回滚脚本", "9月17日"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 48,
+      "date": "2026-09-17",
+      "sessions": [
+        {
+          "id": "p01-d48-s1",
+          "time": "22:10",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "回滚了，发出去不到半小时，下单成功率直接掉两个点" },
+            { "role": "assistant", "text": "掉两个点？什么原因" },
+            { "role": "user", "text": "缓存击穿，老版本有个本地缓存，Go 这版没接住" },
+            { "role": "assistant", "text": "所以监控之前没提前报警？" },
+            { "role": "user", "text": "报了，但我看到的时候已经切完了" },
+            { "role": "assistant", "text": "先回滚是对的，别想了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u036", "kind": "episodic", "text": "用户 9 月 17 日发版后不到半小时就回滚，下单成功率掉了两个点", "importance": 5, "keywords": ["回滚", "9月17日", "下单成功率"], "state": "active", "supersedes": "" },
+        { "id": "p01-u037", "kind": "episodic", "text": "用户回滚原因是缓存击穿，Go 版本没接住本地缓存", "importance": 5, "keywords": ["缓存击穿", "本地缓存", "Go"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 49,
+      "date": "2026-09-18",
+      "sessions": [
+        {
+          "id": "p01-d49-s1",
+          "time": "21:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "复盘会开完，我在会上说了一句：大爆炸式迁移这事我不干了" },
+            { "role": "assistant", "text": "哦？打算怎么改" },
+            { "role": "user", "text": "改成绞杀者模式，一个模块一个模块切，切完把老代码删掉" },
+            { "role": "assistant", "text": "这思路稳多了，就是慢" },
+            { "role": "user", "text": "慢点就慢点，我宁愿多花一个月也不想再回滚一次" },
+            { "role": "assistant", "text": "行，这次算想明白了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u038", "kind": "update", "text": "用户决定不做大爆炸式迁移，改用绞杀者模式一个模块一个模块切", "importance": 5, "keywords": ["绞杀者模式", "大爆炸式迁移", "模块"], "state": "active", "supersedes": "p01-u002" },
+        { "id": "p01-u039", "kind": "episodic", "text": "用户复盘会上主动认了监控没提前发现缓存问题", "importance": 3, "keywords": ["复盘", "监控", "缓存"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 51,
+      "date": "2026-09-20",
+      "sessions": [
+        {
+          "id": "p01-d51-s1",
+          "time": "12:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "周末来重庆玩了两天，昨天那顿火锅辣得我胃疼" },
+            { "role": "assistant", "text": "重庆的锅底，微辣都是骗人的" },
+            { "role": "user", "text": "我点了特辣，现在还在后悔" },
+            { "role": "assistant", "text": "勇士，今天回去？" },
+            { "role": "user", "text": "下午的高铁，回去还得改方案" },
+            { "role": "assistant", "text": "玩归玩，活还得干" }
+          ]
+        },
+        {
+          "id": "p01-d51-s2",
+          "time": "21:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我妈刚打电话问国庆到底回不回，我说回，她说那正好见个人" },
+            { "role": "assistant", "text": "见人？相亲预警" },
+            { "role": "user", "text": "我装信号不好挂了，不知道还能拖几天" },
+            { "role": "assistant", "text": "你这招用不了两回" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u040", "kind": "episodic", "text": "用户 9 月周末去重庆玩了两天，吃了特辣火锅辣到胃疼", "importance": 4, "keywords": ["重庆", "火锅", "特辣", "旅游"], "state": "active", "supersedes": "" },
+        { "id": "p01-u041", "kind": "episodic", "text": "用户妈妈国庆要安排他见人，他装信号不好挂了电话", "importance": 3, "keywords": ["妈妈", "国庆", "相亲", "信号"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 54,
+      "date": "2026-09-23",
+      "sessions": [
+        {
+          "id": "p01-d54-s1",
+          "time": "10:20",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "绞杀者第一刀切的是下单确认模块，先切 10% 流量" },
+            { "role": "assistant", "text": "小步快跑，这回节奏对了" },
+            { "role": "user", "text": "老徐说这次要是再回滚，他就不让我碰线上" },
+            { "role": "assistant", "text": "压力给到了" },
+            { "role": "user", "text": "我加了个新旧对比面板，结果不一致就报警" },
+            { "role": "assistant", "text": "这个细节做得对" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u042", "kind": "fact", "text": "用户用绞杀者模式先切下单确认模块 10% 流量", "importance": 4, "keywords": ["绞杀者模式", "下单确认模块", "灰度"], "state": "active", "supersedes": "" },
+        { "id": "p01-u043", "kind": "fact", "text": "用户加了新旧结果对比面板，不一致就报警", "importance": 3, "keywords": ["对比面板", "报警", "灰度"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 58,
+      "date": "2026-09-27",
+      "sessions": [
+        {
+          "id": "p01-d58-s1",
+          "time": "10:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我妈今天又打来，说国庆见人那事定下来了，我说不一定有空" },
+            { "role": "assistant", "text": "开始打太极了" },
+            { "role": "user", "text": "她说人家姑娘是老师，我听听就算了" },
+            { "role": "assistant", "text": "老师挺好的啊，你别先抵触" }
+          ]
+        },
+        {
+          "id": "p01-d58-s2",
+          "time": "22:30",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "孤独摇滚追完了，最后一集 live 我看了三遍" },
+            { "role": "assistant", "text": "三遍？这么上头" },
+            { "role": "user", "text": "结尾她们在台上那一段，我居然有点感动" },
+            { "role": "assistant", "text": "社恐乐队番能拍成这样，确实牛" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u044", "kind": "preference", "text": "用户把《孤独摇滚》追完了，最后一集 live 看了三遍", "importance": 4, "keywords": ["孤独摇滚", "完结", "live"], "state": "active", "supersedes": "" },
+        { "id": "p01-u045", "kind": "relation", "text": "用户妈妈国庆要给他介绍一个当老师的姑娘", "importance": 2, "keywords": ["妈妈", "国庆", "相亲", "老师"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 62,
+      "date": "2026-10-01",
+      "sessions": [
+        {
+          "id": "p01-d62-s1",
+          "time": "15:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "国庆没回家，在杭州宅着，打了三天游戏，人都废了" },
+            { "role": "assistant", "text": "七天假期就这么交代了？" },
+            { "role": "user", "text": "年糕倒是挺开心，天天趴我腿上" },
+            { "role": "assistant", "text": "猫赢麻了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u046", "kind": "episodic", "text": "用户国庆没回家，在杭州宅着打了三天游戏", "importance": 2, "keywords": ["国庆", "宅家", "游戏"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 64,
+      "date": "2026-10-03",
+      "sessions": [
+        {
+          "id": "p01-d64-s1",
+          "time": "20:40",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "同事一直推葬送的芙莉莲，我看了两集，说实话没太大感觉" },
+            { "role": "assistant", "text": "节奏慢？" },
+            { "role": "user", "text": "不是慢，就是那种淡淡的感觉抓不住我，可能我吃不了这口" },
+            { "role": "assistant", "text": "也正常，你这种重剧情的" },
+            { "role": "user", "text": "再给两集机会吧，不行就弃了" },
+            { "role": "assistant", "text": "行，别勉强" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u047", "kind": "preference", "text": "用户被同事安利《葬送的芙莉莲》，看了两集没太大感觉", "importance": 3, "keywords": ["葬送的芙莉莲", "安利", "弃番"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 66,
+      "date": "2026-10-05",
+      "sessions": [
+        {
+          "id": "p01-d66-s1",
+          "time": "09:50",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "假期回来灰度切到 60% 了，我现在看大屏比上班还紧张" },
+            { "role": "assistant", "text": "心率多少" },
+            { "role": "user", "text": "开玩笑的，不过这次稳，两天没报警" },
+            { "role": "assistant", "text": "那全量可以排期了" },
+            { "role": "user", "text": "老徐说再压一周，我服从" },
+            { "role": "assistant", "text": "稳妥点好" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u048", "kind": "fact", "text": "用户国庆后把灰度切到 60%，两天没报警", "importance": 3, "keywords": ["灰度", "60%", "监控"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 69,
+      "date": "2026-10-08",
+      "sessions": [
+        {
+          "id": "p01-d69-s1",
+          "time": "15:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "定了，十月十二号全量，回滚脚本我又重写了一遍" },
+            { "role": "assistant", "text": "这次心里有底吗" },
+            { "role": "user", "text": "比九月那次强，至少知道哪块会疼" },
+            { "role": "assistant", "text": "行，那就上" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u049", "kind": "plan", "text": "用户定了 10 月 12 日全量切，重新写了一遍回滚脚本", "importance": 4, "keywords": ["全量", "10月12日", "回滚脚本"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 72,
+      "date": "2026-10-11",
+      "sessions": [
+        {
+          "id": "p01-d72-s1",
+          "time": "23:40",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "明天全量，我现在躺在床上盯着监控面板，一点睡意没有" },
+            { "role": "assistant", "text": "别看了，数据不会因为你盯着就变好" },
+            { "role": "user", "text": "道理都懂，就是手不听使唤，一刷新一次" },
+            { "role": "assistant", "text": "定个闹钟，明早七点再看" },
+            { "role": "user", "text": "我妈今天还打电话来问国庆见人的事，我说改天" },
+            { "role": "assistant", "text": "先忙你的正事" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u050", "kind": "episodic", "text": "用户全量前一晚翻来覆去睡不着，反复刷新监控面板", "importance": 3, "keywords": ["全量", "失眠", "监控面板"], "state": "active", "supersedes": "" },
+        { "id": "p01-u051", "kind": "episodic", "text": "用户又推掉了国庆见人的安排，说改天", "importance": 2, "keywords": ["国庆", "见人", "推掉"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 73,
+      "date": "2026-10-12",
+      "sessions": [
+        {
+          "id": "p01-d73-s1",
+          "time": "23:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "全量切完了，从现在开始订单服务跑的全是 Go 版本" },
+            { "role": "assistant", "text": "恭喜，三个月熬出来了" },
+            { "role": "user", "text": "成功率 99.91，比之前还高了一点，我盯着看了二十分钟才敢信" },
+            { "role": "assistant", "text": "值了，三个月没白熬" }
+          ]
+        },
+        {
+          "id": "p01-d73-s2",
+          "time": "23:40",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "老周拉我下楼喝酒，说给我庆功，我现在有点上头" },
+            { "role": "assistant", "text": "该喝，今晚别想工作了" },
+            { "role": "user", "text": "他说明天开始叫我总监，我说滚" },
+            { "role": "assistant", "text": "哈哈，他这人就这样" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u052", "kind": "episodic", "text": "用户 10 月 12 日把订单服务全量切到 Go 版本，下单成功率 99.91", "importance": 5, "keywords": ["全量", "Go", "下单成功率", "10月12日"], "state": "active", "supersedes": "" },
+        { "id": "p01-u053", "kind": "episodic", "text": "用户全量当晚跟老周下楼喝酒庆功", "importance": 2, "keywords": ["老周", "喝酒", "庆功"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 74,
+      "date": "2026-10-13",
+      "sessions": [
+        {
+          "id": "p01-d74-s1",
+          "time": "14:20",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "老周一直念叨 Cursor，我今天装上试了，补全确实香" },
+            { "role": "assistant", "text": "叛变 VS Code 了？" },
+            { "role": "user", "text": "我用了五年的 VS Code，本来觉得不可能换，结果一天就真香" },
+            { "role": "assistant", "text": "打脸来得挺快" },
+            { "role": "user", "text": "主要是它能把整个模块读进去，写 Go 顺手多了" },
+            { "role": "assistant", "text": "行，工具而已，好用就用" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u054", "kind": "update", "text": "用户 10 月把主力编辑器从 VS Code 换成 Cursor，说补全真香", "importance": 4, "keywords": ["Cursor", "VS Code", "编辑器", "补全"], "state": "active", "supersedes": "p01-u019" },
+        { "id": "p01-u055", "kind": "trivia", "text": "用户说 Cursor 能把整个模块读进去，写 Go 顺手很多", "importance": 2, "keywords": ["Cursor", "Go", "补全"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 77,
+      "date": "2026-10-16",
+      "sessions": [
+        {
+          "id": "p01-d77-s1",
+          "time": "19:00",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "买了个 87 键的机械键盘，桌面终于清爽了" },
+            { "role": "assistant", "text": "不带小键盘，你敲数字不难受吗" },
+            { "role": "user", "text": "我写代码又不敲数字，就是房租要晚两天交" },
+            { "role": "assistant", "text": "钱花刀背上了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u056", "kind": "trivia", "text": "用户买了个 87 键机械键盘，说桌面清爽了", "importance": 2, "keywords": ["机械键盘", "87键", "桌面"], "state": "active", "supersedes": "" },
+        { "id": "p01-u057", "kind": "trivia", "text": "用户买完键盘手头紧，房租要晚两天交", "importance": 2, "keywords": ["键盘", "房租", "手头紧"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 80,
+      "date": "2026-10-19",
+      "sessions": [
+        {
+          "id": "p01-d80-s1",
+          "time": "18:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "全量一周了，下单成功率稳在 99.92，我每天看三遍" },
+            { "role": "assistant", "text": "看三遍有点病态了" },
+            { "role": "user", "text": "主要是九月那次把我吓怕了" },
+            { "role": "assistant", "text": "正常，过了这周就好了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u058", "kind": "fact", "text": "用户全量后一周下单成功率稳在 99.92，他每天看三遍", "importance": 3, "keywords": ["下单成功率", "99.92", "监控"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 81,
+      "date": "2026-10-20",
+      "sessions": [
+        {
+          "id": "p01-d81-s1",
+          "time": "16:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "出事了，线上少收了一笔钱，金额计算那块溢出，少收三千多" },
+            { "role": "assistant", "text": "三千多？账对不上吗" },
+            { "role": "user", "text": "财务下午对账发现的，我现在手都是凉的" },
+            { "role": "assistant", "text": "先别慌，查原因、止损、再写报告" },
+            { "role": "user", "text": "那笔订单是满减叠加优惠券，压测的时候根本没覆盖这个组合" },
+            { "role": "assistant", "text": "那就是测试用例的锅" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u059", "kind": "episodic", "text": "用户 10 月 20 日发现线上少收了一笔钱，金额计算溢出少收三千多", "importance": 5, "keywords": ["少收", "金额计算", "溢出", "线上"], "state": "active", "supersedes": "" },
+        { "id": "p01-u060", "kind": "fact", "text": "事故原因是满减叠加优惠券的组合没被压测覆盖", "importance": 4, "keywords": ["满减", "优惠券", "压测", "组合"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 82,
+      "date": "2026-10-21",
+      "sessions": [
+        {
+          "id": "p01-d82-s1",
+          "time": "22:40",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "写了三千字复盘报告，把事故从头到尾捋了一遍" },
+            { "role": "assistant", "text": "写完心里好点没" },
+            { "role": "user", "text": "我给那笔订单的客户补了券，人家还回了个好评" },
+            { "role": "assistant", "text": "至少态度到位了" },
+            { "role": "user", "text": "老徐说这次不追责，但监控要加，我认" },
+            { "role": "assistant", "text": "该认，监控这块确实欠着" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u061", "kind": "episodic", "text": "用户因为少收钱的事故写了三千字复盘报告，还给客户补了券", "importance": 4, "keywords": ["复盘报告", "补偿", "事故"], "state": "active", "supersedes": "" },
+        { "id": "p01-u062", "kind": "fact", "text": "用户主管老徐说这次不追责，但要求补监控", "importance": 3, "keywords": ["老徐", "监控", "追责"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 85,
+      "date": "2026-10-24",
+      "sessions": [
+        {
+          "id": "p01-d85-s1",
+          "time": "21:30",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "周末重看命运石之门，看到真由理那段又破防了" },
+            { "role": "assistant", "text": "第二遍还哭？" },
+            { "role": "user", "text": "知道结局之后再看，前面那些日常全是刀" },
+            { "role": "assistant", "text": "这就是命运石之门后劲大的地方" },
+            { "role": "user", "text": "顺手把芙莉莲弃了，实在看不进去" },
+            { "role": "assistant", "text": "弃就弃，不欠番剧什么" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u063", "kind": "preference", "text": "用户周末重看《命运石之门》，看到真由理那段又破防", "importance": 3, "keywords": ["命运石之门", "真由理", "重看"], "state": "active", "supersedes": "" },
+        { "id": "p01-u064", "kind": "preference", "text": "用户把同事安利的《葬送的芙莉莲》弃了，说实在看不进去", "importance": 2, "keywords": ["葬送的芙莉莲", "弃番", "看不进去"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 87,
+      "date": "2026-10-26",
+      "sessions": [
+        {
+          "id": "p01-d87-s1",
+          "time": "12:00",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "房东续租要涨两百，说是行情涨了，我连价都没还" },
+            { "role": "assistant", "text": "不还价？不像你" },
+            { "role": "user", "text": "最近心力交瘁，能续上就行" },
+            { "role": "assistant", "text": "行吧，长租的话也省心" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u065", "kind": "trivia", "text": "用户续租时房租被涨了两百，他懒得还价", "importance": 2, "keywords": ["房租", "续租", "涨价"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 90,
+      "date": "2026-10-29",
+      "sessions": [
+        {
+          "id": "p01-d90-s1",
+          "time": "23:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "今天刚好三个月，重构从立项到现在全量上线半个多月，像做了场梦" },
+            { "role": "assistant", "text": "三个月干完一个大活，可以吹了" },
+            { "role": "user", "text": "中间回滚那次我其实想过辞职，现在想想还好没跑" },
+            { "role": "assistant", "text": "熬过去就是故事" },
+            { "role": "user", "text": "年糕在旁边打呼，我准备睡了，明天还得看监控" },
+            { "role": "assistant", "text": "晚安，明天绿着" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p01-u066", "kind": "fact", "text": "用户三个月内把订单服务从立项做到全量上线，自己说起像做了场梦", "importance": 4, "keywords": ["三个月", "订单服务", "全量上线"], "state": "active", "supersedes": "" },
+        { "id": "p01-u067", "kind": "episodic", "text": "用户说回滚那次想过辞职，最后没跑", "importance": 3, "keywords": ["回滚", "辞职", "三个月"], "state": "active", "supersedes": "" }
+      ]
+    }
+  ],
+  "probes": [
+    { "id": "p01-q01", "category": "daily", "ask_day": 90, "query": "我家那只橘猫叫什么名字来着？", "expect": { "any": ["年糕"], "none": [] }, "unit_ids": ["p01-u003"], "note": "第 1 天说橘猫咬断鼠标线" },
+    { "id": "p01-q02", "category": "daily", "ask_day": 90, "query": "我夏天失眠那阵子一周有几天熬到两点？", "expect": { "any": ["四天"], "none": [] }, "unit_ids": ["p01-u009"], "note": "第 8 天说这周第四天熬到两点" },
+    { "id": "p01-q03", "category": "daily", "ask_day": 90, "query": "国庆七天我到底有没有回老家？", "expect": { "any": ["没回家"], "none": [] }, "unit_ids": ["p01-u046"], "note": "第 62 天说国庆宅在杭州" },
+    { "id": "p01-q04", "category": "daily", "ask_day": 90, "query": "我续租的时候房东涨了多少？", "expect": { "any": ["两百"], "none": [] }, "unit_ids": ["p01-u065"], "note": "第 87 天说续租被涨两百" },
+    { "id": "p01-q05", "category": "work", "ask_day": 90, "query": "订单服务重构的目标成功率到底是多少来着？", "expect": { "any": ["99.95"], "none": [] }, "unit_ids": ["p01-u001"], "note": "第 1 天立项会定的目标" },
+    { "id": "p01-q06", "category": "work", "ask_day": 90, "query": "九月中旬那次发版最后是什么结果？", "expect": { "any": ["回滚"], "none": [] }, "unit_ids": ["p01-u036"], "note": "9 月 17 日发版回滚" },
+    { "id": "p01-q07", "category": "work", "ask_day": 90, "query": "我们最后定的几号做全量切换？", "expect": { "any": ["10月12日"], "none": [] }, "unit_ids": ["p01-u049"], "note": "第 69 天定下全量日期" },
+    { "id": "p01-q08", "category": "work", "ask_day": 90, "query": "上周线上那笔钱到底是怎么少收的？", "expect": { "any": ["溢出"], "none": [] }, "unit_ids": ["p01-u059"], "note": "10 月 20 日少收钱事故" },
+    { "id": "p01-q09", "category": "work", "ask_day": 90, "query": "全量之后那个成功率数字稳在多少？", "expect": { "any": ["99.92"], "none": [] }, "unit_ids": ["p01-u058"], "note": "第 80 天说稳在 99.92" },
+    { "id": "p01-q10", "category": "anime", "ask_day": 90, "query": "我八月里熬夜补完、后来逢人就吹的那部番是啥？", "expect": { "any": ["命运石之门"], "none": [] }, "unit_ids": ["p01-u015"], "note": "8 月中补完封本命" },
+    { "id": "p01-q11", "category": "anime", "ask_day": 90, "query": "我说哪部番的社恐女主像我？", "expect": { "any": ["孤独摇滚"], "none": [] }, "unit_ids": ["p01-u022"], "note": "第 26 天说波奇像自己" },
+    { "id": "p01-q12", "category": "anime", "ask_day": 90, "query": "那部乐队番追完之后那集 live 我看了几遍？", "expect": { "any": ["三遍"], "none": [] }, "unit_ids": ["p01-u044"], "note": "9 月 27 日孤独摇滚追完" },
+    { "id": "p01-q13", "category": "anime", "ask_day": 90, "query": "十月被安利的那部新番我最后看下去没？", "expect": { "any": ["看不进去"], "none": [] }, "unit_ids": ["p01-u064"], "note": "10 月 24 日弃芙莉莲" },
+    { "id": "p01-q14", "category": "trivia", "ask_day": 90, "query": "修厨房水龙头我跑了几趟店？", "expect": { "any": ["两趟"], "none": [] }, "unit_ids": ["p01-u021"], "note": "8 月 22 日修水龙头买错尺寸" },
+    { "id": "p01-q15", "category": "trivia", "ask_day": 90, "query": "新买的机械键盘是多少键的？", "expect": { "any": ["87"], "none": [] }, "unit_ids": ["p01-u056"], "note": "10 月 16 日买 87 键键盘" },
+    { "id": "p01-q16", "category": "trivia", "ask_day": 90, "query": "我在重庆吃的那顿火锅辣到什么程度？", "expect": { "any": ["特辣"], "none": [] }, "unit_ids": ["p01-u040"], "note": "9 月去重庆旅游吃火锅" },
+    { "id": "p01-q17", "category": "trivia", "ask_day": 90, "query": "补番那阵子我是被谁踩脸叫醒的？", "expect": { "any": ["年糕"], "none": [] }, "unit_ids": ["p01-u017"], "note": "8 月 16 日被猫踩脸" },
+    { "id": "p01-q18", "category": "update", "ask_day": 90, "query": "我后来是不是开始喝奶咖了？", "expect": { "any": ["生椰拿铁"], "none": ["冰美式"] }, "unit_ids": ["p01-u024", "p01-u008"], "note": "8 月只喝冰美式，8 月底试了生椰拿铁" },
+    { "id": "p01-q19", "category": "update", "ask_day": 90, "query": "我早上不挤那趟车之后改成了什么？", "expect": { "any": ["骑车"], "none": ["地铁"] }, "unit_ids": ["p01-u028", "p01-u020"], "note": "8 月挤地铁，9 月改骑车" },
+    { "id": "p01-q20", "category": "update", "ask_day": 90, "query": "当初想一把全量搬完的方案后来改成什么打法？", "expect": { "any": ["绞杀者"], "none": ["大爆炸式迁移"] }, "unit_ids": ["p01-u038", "p01-u002"], "note": "8 月想大爆炸，9 月回滚后改绞杀者" },
+    { "id": "p01-q21", "category": "update", "ask_day": 90, "query": "我现在写代码用的编辑器换成啥了？", "expect": { "any": ["Cursor"], "none": ["VS Code"] }, "unit_ids": ["p01-u054", "p01-u019"], "note": "8 月用 VS Code，10 月换 Cursor" },
+    { "id": "p01-q22", "category": "aggregate", "ask_day": 90, "query": "这三个月为了上线我踩过哪两个大坑？", "expect": { "any": ["回滚", "少收"], "none": [] }, "unit_ids": ["p01-u036", "p01-u059"], "note": "9 月 17 回滚 + 10 月 20 少收钱" },
+    { "id": "p01-q23", "category": "aggregate", "ask_day": 90, "query": "我这段时间上班方式和写代码的工具各换了什么？", "expect": { "any": ["骑车", "Cursor"], "none": [] }, "unit_ids": ["p01-u028", "p01-u054"], "note": "骑车通勤 + Cursor 两个变化" },
+    { "id": "p01-q24", "category": "cross", "ask_day": 90, "query": "我在成都出差那晚在酒店补的番叫啥？", "expect": { "any": ["命运石之门"], "none": [] }, "unit_ids": ["p01-u014", "p01-u012"], "note": "8 月成都出差晚上补番" },
+    { "id": "p01-q25", "category": "cross", "ask_day": 90, "query": "全量上线那晚我是跟谁喝的酒？", "expect": { "any": ["老周"], "none": [] }, "unit_ids": ["p01-u052", "p01-u053"], "note": "10 月 12 日全量后下楼喝酒" },
+    { "id": "p01-q26", "category": "precision", "ask_day": 90, "query": "我八月去出差的那个城市是哪儿？", "expect": { "any": ["成都"], "none": ["重庆"] }, "unit_ids": ["p01-u012"], "note": "成都出差 vs 重庆旅游易混" },
+    { "id": "p01-q27", "category": "precision", "ask_day": 90, "query": "十月十二号那次全量完，成功率数字是多少来着？", "expect": { "any": ["99.91"], "none": ["回滚"] }, "unit_ids": ["p01-u052"], "note": "10 月 12 日 99.91 vs 一周后 99.92、9 月 17 日回滚易混" },
+    { "id": "p01-q28", "category": "no_memory", "ask_day": 90, "query": "我之前是不是说过想办护照去日本滑雪？", "expect": { "any": [], "none": ["日本", "护照", "滑雪"] }, "unit_ids": [], "note": "从未提过日本/护照/滑雪" },
+    { "id": "p01-q29", "category": "no_memory", "ask_day": 90, "query": "我是不是提过要考驾照买辆车？", "expect": { "any": [], "none": ["驾照", "买车"] }, "unit_ids": [], "note": "从未提过驾照/买车" }
+  ]
+}

@@ -1,0 +1,952 @@
+{
+  "version": 1,
+  "id": "p02",
+  "name": "苏晴",
+  "profile": {
+    "age": 24,
+    "city": "成都",
+    "job": "小学语文老师",
+    "voice": "语气软、爱用呀和啦、焦虑但会自嘲，句子偏长，爱讲细节",
+    "relations": "妈妈在老家自贡；男朋友阿哲是程序员，异地；养了一阳台多肉；闺蜜小满"
+  },
+  "window": { "start": "2026-08-01", "end": "2026-10-29", "days": 90 },
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-08-01",
+      "sessions": [
+        {
+          "id": "p02-d01-s1",
+          "time": "09:40",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "成都今天热得离谱，我在家躺着都出汗，只能靠冰粉续命" },
+            { "role": "assistant", "text": "冰粉配红糖，神仙日子" },
+            { "role": "user", "text": "我一天能吃两碗，减肥这事先放放啦" },
+            { "role": "assistant", "text": "那你那个减肥计划第几次搁置了" },
+            { "role": "user", "text": "别问了，问就是下周开始。晚上点了凉面还特意备注不要香菜，闻着都难受" },
+            { "role": "assistant", "text": "香菜党看了要生气" }
+          ]
+        },
+        {
+          "id": "p02-d01-s2",
+          "time": "20:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "暑假过一半了，我公开课的课文定下来了，秋天的雨" },
+            { "role": "assistant", "text": "三年级上册那篇？挺适合上的" },
+            { "role": "user", "text": "对呀，要上四十分钟，我现在连导入怎么写都没想好" },
+            { "role": "assistant", "text": "先别做课件，先把这节课要教什么想清楚" },
+            { "role": "user", "text": "道理都懂，就是一坐下去就焦虑" },
+            { "role": "assistant", "text": "焦虑就先写三句话，写给自己看" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u001", "kind": "fact", "text": "用户是三年级语文老师，8 月在准备《秋天的雨》公开课", "importance": 4, "keywords": ["三年级", "语文老师", "秋天的雨", "公开课"], "state": "active", "supersedes": "" },
+        { "id": "p02-u002", "kind": "preference", "text": "用户超爱冰粉，夏天一天能吃两碗", "importance": 3, "keywords": ["冰粉", "夏天", "吃"], "state": "active", "supersedes": "" },
+        { "id": "p02-u003", "kind": "preference", "text": "用户讨厌香菜，点凉面都要特意备注不要香菜", "importance": 2, "keywords": ["香菜", "凉面", "口味"], "state": "superseded", "superseded_by": "p02-u028", "supersedes": "" },
+        { "id": "p02-u004", "kind": "preference", "text": "用户嘴上说要减肥，其实总说下周才开始", "importance": 2, "keywords": ["减肥", "下周开始"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-08-02",
+      "sessions": [
+        {
+          "id": "p02-d02-s1",
+          "time": "20:30",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我妈从自贡打电话来，问我暑假怎么不回家，我说要备课" },
+            { "role": "assistant", "text": "自贡到成都也不远吧" },
+            { "role": "user", "text": "两个小时高铁，但我一想到回去要被念就懒得动" },
+            { "role": "assistant", "text": "念你什么呀" },
+            { "role": "user", "text": "对象、考编、存钱，三件套，每次都是这三样" },
+            { "role": "assistant", "text": "经典套餐" },
+            { "role": "user", "text": "阿哲晚上还视频了，说他项目忙，下个月可能来不了" },
+            { "role": "assistant", "text": "异地就是这样，能视频就不错了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u005", "kind": "relation", "text": "用户妈妈在自贡，每次打电话都问对象、考编、存钱三件事", "importance": 4, "keywords": ["妈妈", "自贡", "考编", "催婚"], "state": "active", "supersedes": "" },
+        { "id": "p02-u006", "kind": "relation", "text": "用户男朋友阿哲是程序员，两人异地，见面很少", "importance": 4, "keywords": ["阿哲", "异地", "程序员"], "state": "active", "supersedes": "" },
+        { "id": "p02-u007", "kind": "plan", "text": "用户本来打算暑假回自贡，因为要备课一直没回", "importance": 2, "keywords": ["暑假", "自贡", "备课"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2026-08-05",
+      "sessions": [
+        {
+          "id": "p02-d05-s1",
+          "time": "21:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "备了一下午，《秋天的雨》越备越乱，网上教案看得我眼花" },
+            { "role": "assistant", "text": "别人的教案只能参考，不能照搬" },
+            { "role": "user", "text": "我知道呀，可是一到自己写就不知道重点放哪" },
+            { "role": "assistant", "text": "这节课你最想让娃学会什么" },
+            { "role": "user", "text": "学会感受秋雨的颜色吧，可是怎么写才能不空" },
+            { "role": "assistant", "text": "那就先想一个他们能摸到的东西" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u008", "kind": "fact", "text": "用户备公开课卡住了，不知道《秋天的雨》重点该放在哪", "importance": 3, "keywords": ["公开课", "秋天的雨", "备课"], "state": "active", "supersedes": "" },
+        { "id": "p02-u009", "kind": "episodic", "text": "用户下午翻了一下午网上教案，越看越乱", "importance": 2, "keywords": ["教案", "备课", "下午"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 7,
+      "date": "2026-08-07",
+      "sessions": [
+        {
+          "id": "p02-d07-s1",
+          "time": "22:00",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "间谍过家家新一集看了吗，阿尼亚那段我笑到打鸣" },
+            { "role": "assistant", "text": "她那个表情又要满天飞了" },
+            { "role": "user", "text": "我每集都追，看到她我就想起班里那些小鬼" },
+            { "role": "assistant", "text": "把学生代入了是吧" },
+            { "role": "user", "text": "有个学生跟阿尼亚一样爱说大话，特别可爱" },
+            { "role": "assistant", "text": "老师视角果然不一样" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u010", "kind": "preference", "text": "用户每集都追《间谍过家家》，最喜欢阿尼亚", "importance": 4, "keywords": ["间谍过家家", "阿尼亚", "追番"], "state": "active", "supersedes": "" },
+        { "id": "p02-u011", "kind": "relation", "text": "用户觉得班里有学生像阿尼亚，爱说大话又可爱", "importance": 2, "keywords": ["阿尼亚", "学生", "说大话"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 9,
+      "date": "2026-08-09",
+      "sessions": [
+        {
+          "id": "p02-d09-s1",
+          "time": "10:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "小满来我家看多肉，说我把桃蛋养成了干瘪小土豆" },
+            { "role": "assistant", "text": "多肉也能养出仇恨值" },
+            { "role": "user", "text": "我阳台十几盆，只有玉露活得最好" },
+            { "role": "assistant", "text": "那就是它命硬" },
+            { "role": "user", "text": "我还给她打包了两棵，让她别再吐槽我啦" },
+            { "role": "assistant", "text": "以物堵嘴" }
+          ]
+        },
+        {
+          "id": "p02-d09-s2",
+          "time": "20:40",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "我妈又念叨考编，我翻了翻书，发现教综忘得差不多了" },
+            { "role": "assistant", "text": "真要考？" },
+            { "role": "user", "text": "嘴上答应着，心里其实有点虚，先看着吧" },
+            { "role": "assistant", "text": "那就当复习" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u012", "kind": "relation", "text": "用户闺蜜小满常来她家看多肉，还吐槽她养得不好", "importance": 2, "keywords": ["小满", "闺蜜", "多肉"], "state": "active", "supersedes": "" },
+        { "id": "p02-u013", "kind": "trivia", "text": "用户阳台养了十几盆多肉，玉露活得最好", "importance": 2, "keywords": ["多肉", "玉露", "阳台"], "state": "active", "supersedes": "" },
+        { "id": "p02-u014", "kind": "plan", "text": "用户答应了妈妈准备考编，但教综早就忘得差不多了", "importance": 4, "keywords": ["考编", "教综", "妈妈"], "state": "superseded", "superseded_by": "p02-u067", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 12,
+      "date": "2026-08-12",
+      "sessions": [
+        {
+          "id": "p02-d12-s1",
+          "time": "20:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "我们班两个子轩，王子轩和李子轩，今天点名点得我头大" },
+            { "role": "assistant", "text": "同音不同姓？" },
+            { "role": "user", "text": "对呀，一个坐第一排一个坐最后一排，我一喊子轩俩人一起抬头" },
+            { "role": "assistant", "text": "那就连姓喊" },
+            { "role": "user", "text": "问题是我一急就只喊名字，全班都笑" },
+            { "role": "assistant", "text": "笑完就记住了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u015", "kind": "fact", "text": "用户班里有两个同名的学生，王子轩和李子轩", "importance": 4, "keywords": ["王子轩", "李子轩", "同名", "学生"], "state": "active", "supersedes": "" },
+        { "id": "p02-u016", "kind": "trivia", "text": "用户点名只喊子轩会两个学生一起抬头，全班都笑", "importance": 2, "keywords": ["点名", "子轩", "全班"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 14,
+      "date": "2026-08-14",
+      "sessions": [
+        {
+          "id": "p02-d14-s1",
+          "time": "19:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "新买的烤箱第一次烤曲奇，烤糊了，黑得跟炭一样" },
+            { "role": "assistant", "text": "温度太高？" },
+            { "role": "user", "text": "我按食谱 180 度，结果我家烤箱好像脾气大" },
+            { "role": "assistant", "text": "先买个温度计吧" },
+            { "role": "user", "text": "阿哲笑我说不如直接买现成的，气死" },
+            { "role": "assistant", "text": "他懂什么，下次烤成功打他脸" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u017", "kind": "preference", "text": "用户买了烤箱想学烘焙，第一次烤曲奇就烤糊了", "importance": 3, "keywords": ["烤箱", "曲奇", "烤糊"], "state": "active", "supersedes": "" },
+        { "id": "p02-u018", "kind": "episodic", "text": "用户烤糊曲奇被阿哲笑，说不如买现成的", "importance": 2, "keywords": ["阿哲", "曲奇", "烤糊"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 17,
+      "date": "2026-08-17",
+      "sessions": [
+        {
+          "id": "p02-d17-s1",
+          "time": "21:20",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "今天在组里试讲，讲到一半被组长打断，说我太急了" },
+            { "role": "assistant", "text": "哪里急了" },
+            { "role": "user", "text": "我十分钟就把生字词讲完了，后面全在赶" },
+            { "role": "assistant", "text": "那说明你内容塞太多" },
+            { "role": "user", "text": "组长让我把三课时的内容压到一节课，我有点不服" },
+            { "role": "assistant", "text": "不服就先按她说的改一版看看" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u019", "kind": "fact", "text": "用户公开课试讲被组长打断，说她节奏太急、内容塞太多", "importance": 4, "keywords": ["试讲", "组长", "节奏"], "state": "active", "supersedes": "" },
+        { "id": "p02-u020", "kind": "episodic", "text": "用户有点不服，还是决定按组长意见改一版", "importance": 3, "keywords": ["组长", "改课件", "试讲"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 19,
+      "date": "2026-08-19",
+      "sessions": [
+        {
+          "id": "p02-d19-s1",
+          "time": "21:30",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "咒术回战我看到涩谷事变实在看不下去了，太压抑" },
+            { "role": "assistant", "text": "涩谷那段确实狠" },
+            { "role": "user", "text": "我不是怕虐，是那种喘不过气的感觉，看得我胸口闷" },
+            { "role": "assistant", "text": "那就别硬看" },
+            { "role": "user", "text": "弃了弃了，我还是去看点轻松的吧" },
+            { "role": "assistant", "text": "这决定健康" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u021", "kind": "preference", "text": "用户看《咒术回战》看到涩谷事变弃了，觉得太压抑", "importance": 4, "keywords": ["咒术回战", "涩谷事变", "弃番"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 22,
+      "date": "2026-08-22",
+      "sessions": [
+        {
+          "id": "p02-d22-s1",
+          "time": "16:00",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "房东来收房租，又提了一嘴明年可能涨价，我听得有点心慌" },
+            { "role": "assistant", "text": "涨多少呀" },
+            { "role": "user", "text": "没说，就说随行就市，我现在租的这个一室一厅三千二" },
+            { "role": "assistant", "text": "成都这个价还行" },
+            { "role": "user", "text": "还行是还行，但涨起来也是真肉疼" },
+            { "role": "assistant", "text": "先住着吧" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u022", "kind": "fact", "text": "用户在成都租一室一厅，月租三千二", "importance": 3, "keywords": ["租房", "一室一厅", "三千二"], "state": "superseded", "superseded_by": "p02-u069", "supersedes": "" },
+        { "id": "p02-u023", "kind": "episodic", "text": "房东跟用户说明年房租可能随行就市涨", "importance": 2, "keywords": ["房东", "房租", "涨价"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 25,
+      "date": "2026-08-25",
+      "sessions": [
+        {
+          "id": "p02-d25-s1",
+          "time": "20:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我好像感冒了，下午开始喉咙痛，放学回家量了 38 度 7" },
+            { "role": "assistant", "text": "38 度 7 挺高了，吃药没" },
+            { "role": "user", "text": "吃了退烧药，明天准备请假，实在撑不住" },
+            { "role": "assistant", "text": "必须请假，别硬扛" },
+            { "role": "user", "text": "班里最近好几个孩子也感冒，估计是被传染的" },
+            { "role": "assistant", "text": "那更得休息" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u024", "kind": "episodic", "text": "用户 8 月底感冒发烧到 38 度 7，准备跟学校请假", "importance": 4, "keywords": ["感冒", "发烧", "38度7", "请假"], "state": "active", "supersedes": "" },
+        { "id": "p02-u025", "kind": "fact", "text": "用户班里有好几个孩子也在感冒，怀疑是被学生传染", "importance": 3, "keywords": ["学生", "感冒", "传染"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 27,
+      "date": "2026-08-27",
+      "sessions": [
+        {
+          "id": "p02-d27-s1",
+          "time": "10:30",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "请了两天假，现在烧退了但嗓子还是哑的，说话像鸭子" },
+            { "role": "assistant", "text": "那就少说话" },
+            { "role": "user", "text": "我担心落下的课，公开课还有一个月就到了" },
+            { "role": "assistant", "text": "身体先好，课能补" },
+            { "role": "user", "text": "我妈知道了，一天三个电话问吃药没" },
+            { "role": "assistant", "text": "妈妈式关怀" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u026", "kind": "episodic", "text": "用户感冒请了两天假，落下的课让她焦虑", "importance": 3, "keywords": ["请假", "落下的课", "公开课"], "state": "active", "supersedes": "" },
+        { "id": "p02-u027", "kind": "relation", "text": "用户生病时妈妈一天打三个电话问吃药", "importance": 2, "keywords": ["妈妈", "电话", "吃药"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 31,
+      "date": "2026-08-31",
+      "sessions": [
+        {
+          "id": "p02-d31-s1",
+          "time": "19:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "今天吃牛肉面，我居然主动加了香菜，我自己都惊了" },
+            { "role": "assistant", "text": "以前不是很讨厌吗" },
+            { "role": "user", "text": "对呀，以前闻到香菜味都皱眉，现在觉得还挺香" },
+            { "role": "assistant", "text": "口味真的会变" },
+            { "role": "user", "text": "可能是被阿哲带的，他吃什么都要放香菜" },
+            { "role": "assistant", "text": "这就算同化了" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u028", "kind": "update", "text": "用户现在能吃香菜了，口味变了，以前闻到味都皱眉", "importance": 3, "keywords": ["香菜", "口味", "阿哲"], "state": "active", "supersedes": "p02-u003" }
+      ]
+    },
+    {
+      "day": 33,
+      "date": "2026-09-02",
+      "sessions": [
+        {
+          "id": "p02-d33-s1",
+          "time": "21:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "今天借班试上了一遍，四十分钟根本不够，结尾仓促得要命" },
+            { "role": "assistant", "text": "那就砍内容" },
+            { "role": "user", "text": "组长说我导入太绕，建议直接从图片进" },
+            { "role": "assistant", "text": "对，三年级吃直观的" },
+            { "role": "user", "text": "我把课件重做了一半，感觉比以前清楚点了" },
+            { "role": "assistant", "text": "有进步就行" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u029", "kind": "fact", "text": "用户借班试上公开课，四十分钟不够用，结尾很仓促", "importance": 3, "keywords": ["试上", "公开课", "四十分钟"], "state": "active", "supersedes": "" },
+        { "id": "p02-u030", "kind": "fact", "text": "用户按组长建议改导入，从图片直接进课文", "importance": 3, "keywords": ["导入", "图片", "课件"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 35,
+      "date": "2026-09-04",
+      "sessions": [
+        {
+          "id": "p02-d35-s1",
+          "time": "18:30",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "为了公开课去买了彩色卡纸和磁贴，还打印了四十份学习单" },
+            { "role": "assistant", "text": "备课备到采购环节了" },
+            { "role": "user", "text": "打印店老板都认识我了，说我这周第三次来" },
+            { "role": "assistant", "text": "学校没打印机" },
+            { "role": "user", "text": "有是有，一到开学就排队，等不起呀" },
+            { "role": "assistant", "text": "理解，开学都这样" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u031", "kind": "trivia", "text": "用户为公开课买了彩色卡纸和磁贴，打印了四十份学习单", "importance": 2, "keywords": ["卡纸", "磁贴", "学习单", "打印"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 36,
+      "date": "2026-09-05",
+      "sessions": [
+        {
+          "id": "p02-d36-s1",
+          "time": "21:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "今天被我妈安排的相亲去了，坐在咖啡店尬聊了四十分钟" },
+            { "role": "assistant", "text": "怎么样呀" },
+            { "role": "user", "text": "人家是银行工作的，聊得还行但完全没有感觉" },
+            { "role": "assistant", "text": "阿哲知道吗" },
+            { "role": "user", "text": "知道呀，我提前跟他说了，他嘴上说没事，晚上视频明显不高兴" },
+            { "role": "assistant", "text": "那得哄哄" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u032", "kind": "episodic", "text": "用户 9 月被妈妈安排去相亲，和银行工作的男生尬聊四十分钟", "importance": 3, "keywords": ["相亲", "银行", "咖啡店"], "state": "active", "supersedes": "" },
+        { "id": "p02-u033", "kind": "relation", "text": "用户相亲前告诉阿哲，阿哲嘴上说没事但晚上视频明显不高兴", "importance": 2, "keywords": ["阿哲", "相亲", "视频"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 38,
+      "date": "2026-09-07",
+      "sessions": [
+        {
+          "id": "p02-d38-s1",
+          "time": "20:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "小满说我傻，相亲回来还跟阿哲报备，属于自找麻烦" },
+            { "role": "assistant", "text": "她说的也不算错" },
+            { "role": "user", "text": "但我觉得瞒着更麻烦呀，异地的信任就是这么一点点攒的" },
+            { "role": "assistant", "text": "能这么想就挺好" },
+            { "role": "user", "text": "阿哲昨天突然说想调回成都，我又怕他为了我放弃机会" },
+            { "role": "assistant", "text": "这个得聊清楚" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u034", "kind": "relation", "text": "用户觉得异地恋的信任要一点点攒，所以相亲的事主动跟阿哲报备", "importance": 3, "keywords": ["异地", "信任", "报备", "相亲"], "state": "active", "supersedes": "" },
+        { "id": "p02-u035", "kind": "plan", "text": "用户男朋友阿哲说想调回成都，她怕他为自己放弃机会", "importance": 3, "keywords": ["阿哲", "调回成都", "异地"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 41,
+      "date": "2026-09-10",
+      "sessions": [
+        {
+          "id": "p02-d41-s1",
+          "time": "21:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "公开课还有六天，我今晚改课件改到十一点，越改越没底" },
+            { "role": "assistant", "text": "最后一版别再大动了" },
+            { "role": "user", "text": "我已经改了七版了，看到第一版觉得比现在好" },
+            { "role": "assistant", "text": "正常，改到最后都会怀疑自己" },
+            { "role": "user", "text": "小满说我就是太想完美，可是公开课要打分呀" },
+            { "role": "assistant", "text": "尽力就行" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u036", "kind": "episodic", "text": "用户公开课课件改了七版，越改越没底", "importance": 3, "keywords": ["课件", "七版", "公开课"], "state": "active", "supersedes": "" },
+        { "id": "p02-u037", "kind": "episodic", "text": "用户闺蜜小满说她太想完美", "importance": 2, "keywords": ["小满", "完美", "公开课"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 43,
+      "date": "2026-09-12",
+      "sessions": [
+        {
+          "id": "p02-d43-s1",
+          "time": "15:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "周六在学校加班做课件，碰到班里王子轩他奶奶来接他补作业" },
+            { "role": "assistant", "text": "周六还补作业" },
+            { "role": "user", "text": "他老是不交作业，我让他补，奶奶说家里最近有点事" },
+            { "role": "assistant", "text": "出什么事了" },
+            { "role": "user", "text": "没细说，我也没敢多问，就是觉得有点不对劲" },
+            { "role": "assistant", "text": "先留心看看" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u038", "kind": "fact", "text": "用户班的王子轩总不交作业，周六他奶奶来接他补作业说家里有事", "importance": 4, "keywords": ["王子轩", "不交作业", "奶奶"], "state": "active", "supersedes": "" },
+        { "id": "p02-u039", "kind": "episodic", "text": "用户觉得子轩家里不对劲，但没敢多问", "importance": 2, "keywords": ["子轩", "家里", "不对劲"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 45,
+      "date": "2026-09-14",
+      "sessions": [
+        {
+          "id": "p02-d45-s1",
+          "time": "22:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "刚跟阿哲视频吵了一架，他说我最近满脑子公开课，都不听他说话" },
+            { "role": "assistant", "text": "你最近确实压力大" },
+            { "role": "user", "text": "我知道呀，可我哪有精力，公开课就剩两天了" },
+            { "role": "assistant", "text": "先各自冷静一下吧" },
+            { "role": "user", "text": "他说他项目也忙，两个人都在硬撑" },
+            { "role": "assistant", "text": "异地都难" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u040", "kind": "episodic", "text": "用户公开课前两天跟阿哲视频吵架，他说她满脑子公开课", "importance": 3, "keywords": ["阿哲", "吵架", "公开课"], "state": "active", "supersedes": "" },
+        { "id": "p02-u041", "kind": "fact", "text": "用户和阿哲两个人工作都忙，都在硬撑", "importance": 2, "keywords": ["阿哲", "工作", "硬撑"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 47,
+      "date": "2026-09-16",
+      "sessions": [
+        {
+          "id": "p02-d47-s1",
+          "time": "12:10",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "完了，公开课投影在导入的时候黑屏了，下面坐着十几个老师" },
+            { "role": "assistant", "text": "黑屏？彻底不亮" },
+            { "role": "user", "text": "对呀，我按了两下没反应，脑子嗡的一下" },
+            { "role": "assistant", "text": "后来怎么办的" },
+            { "role": "user", "text": "我直接放下课件，带学生读课文，硬讲了三分钟" },
+            { "role": "assistant", "text": "那三分钟够你记一辈子" }
+          ]
+        },
+        {
+          "id": "p02-d47-s2",
+          "time": "21:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "下午那节课最后救回来了，评课老师说临场反应好" },
+            { "role": "assistant", "text": "所以翻车变成了加分项" },
+            { "role": "user", "text": "算一半吧，投影后来修好了，后半节正常上完了" },
+            { "role": "assistant", "text": "那真不容易" },
+            { "role": "user", "text": "我回办公室手还在抖，喝了半杯水才缓过来" },
+            { "role": "assistant", "text": "换谁都得抖" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u042", "kind": "episodic", "text": "用户公开课那天投影仪在导入环节黑屏，她放下课件带学生读课文救场", "importance": 5, "keywords": ["公开课", "投影", "黑屏", "救场"], "state": "active", "supersedes": "" },
+        { "id": "p02-u043", "kind": "episodic", "text": "公开课后半节投影修好正常上完，评课老师夸她临场反应好", "importance": 4, "keywords": ["投影", "评课", "临场反应"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 48,
+      "date": "2026-09-17",
+      "sessions": [
+        {
+          "id": "p02-d48-s1",
+          "time": "20:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "今天组长让我把公开课写个反思，我写了三页，写着写着有点想哭" },
+            { "role": "assistant", "text": "累的，写反思最耗人" },
+            { "role": "user", "text": "不是委屈，是那种终于结束了的松劲" },
+            { "role": "assistant", "text": "那就好好睡一觉" },
+            { "role": "user", "text": "晚上阿哲给我点了奶茶，说视频里看我脸色差" },
+            { "role": "assistant", "text": "这男友还能要" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u044", "kind": "episodic", "text": "用户公开课后写了三页反思，写着写着松劲想哭", "importance": 3, "keywords": ["反思", "三页", "公开课"], "state": "active", "supersedes": "" },
+        { "id": "p02-u045", "kind": "relation", "text": "用户跟阿哲吵架后，阿哲点奶茶来和解", "importance": 2, "keywords": ["阿哲", "奶茶", "和解"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 50,
+      "date": "2026-09-19",
+      "sessions": [
+        {
+          "id": "p02-d50-s1",
+          "time": "21:00",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "今晚补了两集间谍过家家，阿尼亚考试那段笑死我了" },
+            { "role": "assistant", "text": "她考不好那集" },
+            { "role": "user", "text": "对呀，她写答案的时候那个纠结脸，我直接笑出声" },
+            { "role": "assistant", "text": "你看番怎么跟看学生一样" },
+            { "role": "user", "text": "当老师的职业病，看到小孩就想点评" },
+            { "role": "assistant", "text": "没救了真的" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u046", "kind": "preference", "text": "用户补《间谍过家家》，阿尼亚考试那集笑到出声", "importance": 3, "keywords": ["间谍过家家", "阿尼亚", "考试"], "state": "active", "supersedes": "" },
+        { "id": "p02-u047", "kind": "trivia", "text": "用户看番总忍不住点评小孩，说是当老师的职业病", "importance": 1, "keywords": ["看番", "点评", "职业病"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 53,
+      "date": "2026-09-22",
+      "sessions": [
+        {
+          "id": "p02-d53-s1",
+          "time": "18:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "王子轩又没交作业，这周第三次了，我把他叫到办公室" },
+            { "role": "assistant", "text": "他怎么说" },
+            { "role": "user", "text": "低着头不说话，问急了就掉眼泪，我一下子没脾气了" },
+            { "role": "assistant", "text": "可能有别的原因" },
+            { "role": "user", "text": "我打算找他家长聊聊，可又怕说重了" },
+            { "role": "assistant", "text": "先了解再说" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u048", "kind": "episodic", "text": "用户这周第三次抓到王子轩不交作业，把他叫到办公室他只掉眼泪", "importance": 4, "keywords": ["王子轩", "不交作业", "办公室"], "state": "active", "supersedes": "" },
+        { "id": "p02-u049", "kind": "plan", "text": "用户打算找子轩家长聊聊，又怕说重了", "importance": 3, "keywords": ["子轩", "家长", "家访"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 56,
+      "date": "2026-09-25",
+      "sessions": [
+        {
+          "id": "p02-d56-s1",
+          "time": "16:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "今天去王子轩家家访，才知道他爸妈上个月离婚了，他跟奶奶住" },
+            { "role": "assistant", "text": "难怪他这样" },
+            { "role": "user", "text": "他奶奶一边说一边抹眼泪，我坐那儿特别难受" },
+            { "role": "assistant", "text": "孩子是心里有事" },
+            { "role": "user", "text": "我回来路上一直在想，之前还批评他不交作业" },
+            { "role": "assistant", "text": "你也不知道" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u050", "kind": "fact", "text": "用户家访发现王子轩爸妈上个月离婚，他跟奶奶住", "importance": 5, "keywords": ["王子轩", "家访", "离婚", "奶奶"], "state": "active", "supersedes": "" },
+        { "id": "p02-u051", "kind": "episodic", "text": "用户为之前批评子轩不交作业感到难受", "importance": 4, "keywords": ["子轩", "批评", "不交作业"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 58,
+      "date": "2026-09-27",
+      "sessions": [
+        {
+          "id": "p02-d58-s1",
+          "time": "22:00",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "间谍过家家这周的日常回我也看得很开心，阿尼亚太治愈了" },
+            { "role": "assistant", "text": "日常回才是这部的灵魂" },
+            { "role": "user", "text": "看她跟爸爸一起犯傻，我一天的累都没了" },
+            { "role": "assistant", "text": "老师下班就靠这个回血" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u052", "kind": "trivia", "text": "用户说《间谍过家家》日常回最治愈，看父女犯傻一天的累都没了", "importance": 2, "keywords": ["间谍过家家", "日常回", "治愈"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 59,
+      "date": "2026-09-28",
+      "sessions": [
+        {
+          "id": "p02-d59-s1",
+          "time": "20:30",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "区里教案比赛通知下来了，组长让我报名，我有点想躲" },
+            { "role": "assistant", "text": "为什么不报" },
+            { "role": "user", "text": "刚翻车完又去比赛，万一又出事" },
+            { "role": "assistant", "text": "翻车你都救回来了，怕什么" },
+            { "role": "user", "text": "行吧，我把公开课那节改改交上去" },
+            { "role": "assistant", "text": "现成的素材，冲" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u053", "kind": "plan", "text": "用户报名了区里的教案比赛，准备拿公开课那节课改一改交上去", "importance": 4, "keywords": ["教案比赛", "公开课", "报名"], "state": "active", "supersedes": "" },
+        { "id": "p02-u054", "kind": "episodic", "text": "用户一开始想躲着不报名，因为怕再出事", "importance": 2, "keywords": ["教案比赛", "害怕", "报名"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 62,
+      "date": "2026-10-01",
+      "sessions": [
+        {
+          "id": "p02-d62-s1",
+          "time": "15:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "国庆回自贡了，我妈做了一大桌菜，还叫了亲戚来" },
+            { "role": "assistant", "text": "回家就被围观了吧" },
+            { "role": "user", "text": "对呀，一上桌就被问什么时候结婚，我埋头吃饭" },
+            { "role": "assistant", "text": "经典流程" },
+            { "role": "user", "text": "晚上跟阿哲打电话，他说他国庆在加班，我听着有点心疼" },
+            { "role": "assistant", "text": "程序员嘛" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u055", "kind": "episodic", "text": "用户国庆回自贡，被亲戚围着问什么时候结婚", "importance": 3, "keywords": ["国庆", "自贡", "亲戚", "结婚"], "state": "active", "supersedes": "" },
+        { "id": "p02-u056", "kind": "relation", "text": "用户国庆时阿哲在加班，她有点心疼", "importance": 3, "keywords": ["阿哲", "加班", "国庆"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 64,
+      "date": "2026-10-03",
+      "sessions": [
+        {
+          "id": "p02-d64-s1",
+          "time": "20:00",
+          "topic": "anime",
+          "turns": [
+            { "role": "user", "text": "假期在家重看紫罗兰永恒花园，第九集又哭得不行" },
+            { "role": "assistant", "text": "那集是挺要命的" },
+            { "role": "user", "text": "我明明讨厌 BE 结局，可这部我就是能接受" },
+            { "role": "assistant", "text": "因为它的美不靠结局" },
+            { "role": "user", "text": "对呀，每一集都像诗，哭完心里还是暖的" },
+            { "role": "assistant", "text": "懂了，难怪你哭" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u057", "kind": "preference", "text": "用户重看《紫罗兰永恒花园》，第九集又哭，说自己明明讨厌 BE 结局", "importance": 4, "keywords": ["紫罗兰永恒花园", "BE结局", "重看"], "state": "active", "supersedes": "" },
+        { "id": "p02-u058", "kind": "preference", "text": "用户觉得紫罗兰每一集都像诗，哭完心里是暖的", "importance": 3, "keywords": ["紫罗兰", "像诗", "感动"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 66,
+      "date": "2026-10-05",
+      "sessions": [
+        {
+          "id": "p02-d66-s1",
+          "time": "21:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "教案比赛初稿写完了，三千多字，写到后面手都麻了" },
+            { "role": "assistant", "text": "三千字？评委会看吗" },
+            { "role": "user", "text": "会呀，还得配课件和作业设计，我准备再打磨一周" },
+            { "role": "assistant", "text": "别又改七版" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u059", "kind": "fact", "text": "用户教案比赛初稿写了三千多字，准备打磨一周", "importance": 3, "keywords": ["教案比赛", "三千字", "初稿"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 69,
+      "date": "2026-10-08",
+      "sessions": [
+        {
+          "id": "p02-d69-s1",
+          "time": "22:30",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "阿哲从昨天开始就没怎么回消息，说项目上线，我有点慌" },
+            { "role": "assistant", "text": "忙起来确实会这样" },
+            { "role": "user", "text": "我知道不该多想，可异地就是这样，一没消息就开始脑补" },
+            { "role": "assistant", "text": "直接问，别自己猜" },
+            { "role": "user", "text": "问了，他说没事，让我别想太多" },
+            { "role": "assistant", "text": "那就先信他" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u060", "kind": "episodic", "text": "用户因为阿哲两天没怎么回消息而慌，异地让她容易脑补", "importance": 3, "keywords": ["阿哲", "异地", "回消息"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 74,
+      "date": "2026-10-13",
+      "sessions": [
+        {
+          "id": "p02-d74-s1",
+          "time": "20:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "第二次烤曲奇，这次没糊，但是烤成了石头，咬都咬不动" },
+            { "role": "assistant", "text": "至少进步了" },
+            { "role": "user", "text": "进步什么呀，我怀疑我天生不适合烘焙" },
+            { "role": "assistant", "text": "温度时间再调调" },
+            { "role": "user", "text": "算了，我把烤箱拿来热剩饭好了。减肥也失败了，这周胖了一斤" },
+            { "role": "assistant", "text": "一码归一码" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u061", "kind": "episodic", "text": "用户第二次烤曲奇烤成了硬石头，说自己不适合烘焙", "importance": 2, "keywords": ["曲奇", "烤糊", "烤箱"], "state": "active", "supersedes": "" },
+        { "id": "p02-u062", "kind": "trivia", "text": "用户减肥又失败，这周胖了一斤", "importance": 2, "keywords": ["减肥", "体重", "一斤"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 79,
+      "date": "2026-10-18",
+      "sessions": [
+        {
+          "id": "p02-d79-s1",
+          "time": "22:00",
+          "topic": "work",
+          "turns": [
+            { "role": "user", "text": "比赛结果出来了，二等奖，我在办公室看到消息差点叫出来" },
+            { "role": "assistant", "text": "二等奖很厉害啊" },
+            { "role": "user", "text": "我本来只想着别垫底，结果评委说我那节课有巧思" },
+            { "role": "assistant", "text": "公开课翻车的经验值啊" },
+            { "role": "user", "text": "对呀，谁能想到投影黑屏那次反而帮了我" },
+            { "role": "assistant", "text": "人生就是这样" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u063", "kind": "episodic", "text": "用户 10 月 18 日区里教案比赛拿了二等奖", "importance": 5, "keywords": ["教案比赛", "二等奖", "10月18日"], "state": "active", "supersedes": "" },
+        { "id": "p02-u064", "kind": "fact", "text": "评委说用户的教案有巧思，她觉得跟公开课翻车的经历有关", "importance": 4, "keywords": ["评委", "巧思", "公开课"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 81,
+      "date": "2026-10-20",
+      "sessions": [
+        {
+          "id": "p02-d81-s1",
+          "time": "19:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我又感冒了，这次是嗓子疼，没发烧，但说话费劲" },
+            { "role": "assistant", "text": "上次是八月底吧" },
+            { "role": "user", "text": "对呀，那次发烧请了两天假，这次就嗓子疼，可能天气凉了" },
+            { "role": "assistant", "text": "也去开点药" },
+            { "role": "user", "text": "我懒得去医院，先喝两天水看看" },
+            { "role": "assistant", "text": "别拖，去看看" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u065", "kind": "episodic", "text": "用户 10 月又感冒了，这次是嗓子疼，说话费劲", "importance": 3, "keywords": ["感冒", "嗓子疼", "十月"], "state": "active", "supersedes": "" },
+        { "id": "p02-u066", "kind": "trivia", "text": "用户两次感冒不一样，八月底那次发烧请假，十月这次只有嗓子疼", "importance": 2, "keywords": ["感冒", "发烧", "嗓子疼"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 82,
+      "date": "2026-10-21",
+      "sessions": [
+        {
+          "id": "p02-d82-s1",
+          "time": "21:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "我想了好几天，决定不考编了，跟我妈说了" },
+            { "role": "assistant", "text": "她什么反应" },
+            { "role": "user", "text": "先骂了我一顿，后来又说随我，我反而鼻子有点酸" },
+            { "role": "assistant", "text": "想清楚就好" },
+            { "role": "user", "text": "这一年一边教书一边考编，两边都没做好，我不想再骗自己了" },
+            { "role": "assistant", "text": "那就专心教书" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u067", "kind": "update", "text": "用户决定不考编了，跟妈妈说了，虽然被骂但心里松了", "importance": 4, "keywords": ["考编", "决定", "妈妈"], "state": "active", "supersedes": "p02-u014" },
+        { "id": "p02-u068", "kind": "episodic", "text": "用户说这一年一边教书一边考编，两边都没做好", "importance": 3, "keywords": ["教书", "考编", "一年"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 84,
+      "date": "2026-10-23",
+      "sessions": [
+        {
+          "id": "p02-d84-s1",
+          "time": "15:00",
+          "topic": "chore",
+          "turns": [
+            { "role": "user", "text": "今天下了班跟小满去看房了，看了三套，最便宜的首付也要四十多万" },
+            { "role": "assistant", "text": "想买了呀" },
+            { "role": "user", "text": "租了三年，房东说明年涨价，我有点想买了，虽然钱还差得远" },
+            { "role": "assistant", "text": "先看看不亏" },
+            { "role": "user", "text": "阿哲说他也存点，可我还没想好要不要跟他一起买" },
+            { "role": "assistant", "text": "这可是大事" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u069", "kind": "update", "text": "用户 10 月开始看房想买，看了三套，最便宜的首付四十多万", "importance": 4, "keywords": ["看房", "首付", "买房"], "state": "active", "supersedes": "p02-u022" },
+        { "id": "p02-u070", "kind": "relation", "text": "阿哲说要一起存钱买房，用户还没想好要不要一起买", "importance": 3, "keywords": ["阿哲", "存钱", "买房"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 87,
+      "date": "2026-10-26",
+      "sessions": [
+        {
+          "id": "p02-d87-s1",
+          "time": "20:30",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "阳台那盆桃蛋居然缓过来了，我给它换了个土，胖了一点" },
+            { "role": "assistant", "text": "植物生命力" },
+            { "role": "user", "text": "小满说我是把自己养不活，就养植物" },
+            { "role": "assistant", "text": "扎心了这是" },
+            { "role": "user", "text": "阿哲说等他调回成都就来看我的多肉，我居然有点期待" },
+            { "role": "assistant", "text": "那是好事" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u071", "kind": "trivia", "text": "用户给桃蛋换土后它缓过来了，被小满吐槽养不好自己", "importance": 2, "keywords": ["桃蛋", "换土", "小满"], "state": "active", "supersedes": "" },
+        { "id": "p02-u072", "kind": "relation", "text": "用户期待阿哲调回成都来看她的多肉", "importance": 2, "keywords": ["阿哲", "调回成都", "多肉"], "state": "active", "supersedes": "" }
+      ]
+    },
+    {
+      "day": 90,
+      "date": "2026-10-29",
+      "sessions": [
+        {
+          "id": "p02-d90-s1",
+          "time": "22:00",
+          "topic": "daily",
+          "turns": [
+            { "role": "user", "text": "今天忽然觉得这三个月好长，公开课、比赛、感冒，像过了半学期" },
+            { "role": "assistant", "text": "确实挺满的" },
+            { "role": "user", "text": "但我好像没那么慌了，以前一有事就整夜睡不着" },
+            { "role": "assistant", "text": "有成长就好" },
+            { "role": "user", "text": "教案比赛奖状贴在办公桌上，小满说我傻乐了半天" },
+            { "role": "assistant", "text": "该乐，值得" }
+          ]
+        }
+      ],
+      "units": [
+        { "id": "p02-u073", "kind": "fact", "text": "用户三个月里经历了公开课翻车、教案比赛二等奖和两次感冒，觉得自己没那么慌了", "importance": 4, "keywords": ["三个月", "公开课", "二等奖", "感冒"], "state": "active", "supersedes": "" },
+        { "id": "p02-u074", "kind": "episodic", "text": "用户把教案比赛奖状贴在办公桌，小满说她傻乐", "importance": 2, "keywords": ["奖状", "办公桌", "小满"], "state": "active", "supersedes": "" }
+      ]
+    }
+  ],
+  "probes": [
+    { "id": "p02-q01", "category": "daily", "ask_day": 90, "query": "我夏天最爱吃的那口凉的是啥？", "expect": { "any": ["冰粉"], "none": [] }, "unit_ids": ["p02-u002"], "note": "第 1 天说靠冰粉续命" },
+    { "id": "p02-q02", "category": "daily", "ask_day": 90, "query": "八月底那次我烧到多少度？", "expect": { "any": ["38度7"], "none": [] }, "unit_ids": ["p02-u024"], "note": "8 月 25 日感冒发烧" },
+    { "id": "p02-q03", "category": "daily", "ask_day": 90, "query": "国庆回自贡那几天，亲戚都问我什么呀？", "expect": { "any": ["结婚"], "none": [] }, "unit_ids": ["p02-u055"], "note": "10 月 1 日回自贡被围观" },
+    { "id": "p02-q04", "category": "daily", "ask_day": 90, "query": "我给哪盆多肉换了土之后它缓过来了？", "expect": { "any": ["桃蛋"], "none": [] }, "unit_ids": ["p02-u071"], "note": "10 月 26 日给桃蛋换土" },
+    { "id": "p02-q05", "category": "work", "ask_day": 90, "query": "我暑假备的那节公开课是哪篇课文？", "expect": { "any": ["秋天的雨"], "none": [] }, "unit_ids": ["p02-u001"], "note": "8 月定下公开课课文" },
+    { "id": "p02-q06", "category": "work", "ask_day": 90, "query": "我公开课那天开场就出了什么岔子？", "expect": { "any": ["投影"], "none": [] }, "unit_ids": ["p02-u042"], "note": "9 月 16 日公开课投影黑屏" },
+    { "id": "p02-q07", "category": "work", "ask_day": 90, "query": "区里那个教案比赛我最后拿了什么奖？", "expect": { "any": ["二等奖"], "none": [] }, "unit_ids": ["p02-u063"], "note": "10 月 18 日比赛二等奖" },
+    { "id": "p02-q08", "category": "work", "ask_day": 90, "query": "那个总不交作业的孩子家里出了什么事？", "expect": { "any": ["离婚"], "none": [] }, "unit_ids": ["p02-u050", "p02-u048"], "note": "家访发现王子轩父母离婚" },
+    { "id": "p02-q09", "category": "work", "ask_day": 90, "query": "我们班两个同名的小孩分别叫什么？", "expect": { "any": ["王子轩", "李子轩"], "none": [] }, "unit_ids": ["p02-u015"], "note": "班里两个子轩" },
+    { "id": "p02-q10", "category": "anime", "ask_day": 90, "query": "我每集都追的那部番里我最喜欢哪个角色？", "expect": { "any": ["阿尼亚"], "none": [] }, "unit_ids": ["p02-u010"], "note": "每集都追间谍过家家" },
+    { "id": "p02-q11", "category": "anime", "ask_day": 90, "query": "哪部番我看到涩谷事变就弃了？", "expect": { "any": ["咒术回战"], "none": [] }, "unit_ids": ["p02-u021"], "note": "8 月 19 日弃咒术回战" },
+    { "id": "p02-q12", "category": "anime", "ask_day": 90, "query": "假期我重看哪部番又哭了？", "expect": { "any": ["紫罗兰永恒花园"], "none": [] }, "unit_ids": ["p02-u057"], "note": "10 月 3 日重看紫罗兰" },
+    { "id": "p02-q13", "category": "anime", "ask_day": 90, "query": "阿尼亚考试那集我笑成什么样来着？", "expect": { "any": ["笑到出声"], "none": [] }, "unit_ids": ["p02-u046"], "note": "9 月 19 日补间谍过家家" },
+    { "id": "p02-q14", "category": "trivia", "ask_day": 90, "query": "我阳台多肉里活得最好的是哪个品种呀？", "expect": { "any": ["玉露"], "none": [] }, "unit_ids": ["p02-u013"], "note": "8 月 9 日说玉露活得最好" },
+    { "id": "p02-q15", "category": "trivia", "ask_day": 90, "query": "为公开课我打印了多少份学习单？", "expect": { "any": ["四十份"], "none": [] }, "unit_ids": ["p02-u031"], "note": "9 月 4 日买教具打印学习单" },
+    { "id": "p02-q16", "category": "trivia", "ask_day": 90, "query": "我看番的时候老忍不住干什么？", "expect": { "any": ["点评"], "none": [] }, "unit_ids": ["p02-u047"], "note": "看番点评小孩是职业病" },
+    { "id": "p02-q17", "category": "trivia", "ask_day": 90, "query": "我的教案比赛奖状贴哪儿了？", "expect": { "any": ["办公桌"], "none": [] }, "unit_ids": ["p02-u074"], "note": "10 月 29 日奖状贴办公桌" },
+    { "id": "p02-q18", "category": "update", "ask_day": 90, "query": "我十月那会儿对考编这事最后怎么决定的？", "expect": { "any": ["不考编"], "none": ["教综"] }, "unit_ids": ["p02-u067", "p02-u014"], "note": "8 月答应考编，10 月决定不考" },
+    { "id": "p02-q19", "category": "update", "ask_day": 90, "query": "我以前点面时特意不要的那样东西，现在是不是能吃了？", "expect": { "any": ["能吃香菜了"], "none": ["不要香菜"] }, "unit_ids": ["p02-u028", "p02-u003"], "note": "8 月讨厌香菜，8 月底能吃" },
+    { "id": "p02-q20", "category": "update", "ask_day": 90, "query": "我十月开始做的跟房子有关的那件大事是什么？", "expect": { "any": ["看房"], "none": ["三千二"] }, "unit_ids": ["p02-u069", "p02-u022"], "note": "8 月租房三千二，10 月看房想买" },
+    { "id": "p02-q21", "category": "aggregate", "ask_day": 90, "query": "我这一年一直在忙的两件事，最后各是什么结果？", "expect": { "any": ["不考编", "二等奖"], "none": [] }, "unit_ids": ["p02-u068", "p02-u067", "p02-u063"], "note": "考编放弃 + 比赛二等奖" },
+    { "id": "p02-q22", "category": "aggregate", "ask_day": 90, "query": "我口味和想法上都有什么变化呀？", "expect": { "any": ["香菜", "不考编"], "none": [] }, "unit_ids": ["p02-u028", "p02-u067"], "note": "香菜能吃 + 放弃考编" },
+    { "id": "p02-q23", "category": "cross", "ask_day": 90, "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？", "expect": { "any": ["奶茶"], "none": [] }, "unit_ids": ["p02-u040", "p02-u045"], "note": "公开课前吵架，阿哲点奶茶和解" },
+    { "id": "p02-q24", "category": "cross", "ask_day": 90, "query": "我回自贡那几天，阿哲在干什么？", "expect": { "any": ["加班"], "none": [] }, "unit_ids": ["p02-u055", "p02-u056"], "note": "国庆回自贡，阿哲加班" },
+    { "id": "p02-q25", "category": "precision", "ask_day": 90, "query": "那个爱掉眼泪、不交作业的子轩全名是哪个？", "expect": { "any": ["王子轩"], "none": ["李子轩"] }, "unit_ids": ["p02-u048", "p02-u050"], "note": "两个子轩易混" },
+    { "id": "p02-q26", "category": "precision", "ask_day": 90, "query": "八月那次感冒我发烧请假，十月这次是什么症状？", "expect": { "any": ["嗓子疼"], "none": ["发烧"] }, "unit_ids": ["p02-u065"], "note": "两次感冒易混" },
+    { "id": "p02-q27", "category": "no_memory", "ask_day": 90, "query": "我是不是说过想养狗，还想去滑雪？", "expect": { "any": [], "none": ["养狗", "滑雪", "出国"] }, "unit_ids": [], "note": "从未提过养狗/滑雪/出国" },
+    { "id": "p02-q28", "category": "no_memory", "ask_day": 90, "query": "我是不是说过要学游泳？", "expect": { "any": [], "none": ["游泳", "潜水"] }, "unit_ids": [], "note": "从未提过游泳/潜水" }
+  ]
+}
