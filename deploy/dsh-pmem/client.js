@@ -175,6 +175,8 @@ window.__ModuleLoader__.load({
       const [items, setItems] = useState([])
       const [query, setQuery] = useState('')
       const [busy, setBusy] = useState('')
+      const [night, setNight] = useState(null)
+      const [sleeping, setSleeping] = useState(false)
       const [err, setErr] = useState('')
       const [toast, setToast] = useState('')
       const [debug, setDebug] = useState(null)
@@ -247,6 +249,35 @@ window.__ModuleLoader__.load({
         api('/starmap/url')
           .then(data => { if (data?.url) setBrowserUrl(data.url) })
           .catch(() => {})
+      }, [tab])
+
+      const loadNight = async () => {
+        try {
+          setNight(await api('/sleep'))
+        } catch {
+          setNight(null)
+        }
+      }
+
+      // 主动入睡：跑一轮 sleep（默认处理昨天，自动续跑未完成的 run）。可能几十秒。
+      const sleepNow = async () => {
+        setSleeping(true)
+        setErr('')
+        try {
+          const data = await api('/sleep/now', { method: 'POST', body: '{}' })
+          if (!data?.ok) setErr(`入睡失败：${data?.error || '未知'}`)
+          else notify(data?.data?.status === 'ok' ? '跑完了' : `跑完：${data?.data?.status ?? '未知'}`)
+          await loadNight()
+        } catch (error) {
+          setErr(`入睡失败：${error.message}`)
+        } finally {
+          setSleeping(false)
+        }
+      }
+
+      useEffect(() => {
+        if (tab !== 'overview') return
+        void loadNight()
       }, [tab])
 
       const saveRuntime = async patch => {
@@ -374,6 +405,31 @@ window.__ModuleLoader__.load({
             title: '醒来卡',
             sub: status?.wake ? `${status.wake.chars} 字 · ${status.wake.head || ''}` : '—',
           }, h('button', { className: 'pmem-btn', onClick: () => setTab('wake') }, '看看')),
+          // 夜间：八阶段睡眠的「看得见」入口。最近一次的状态直接写在这行，
+          // 想看每一步细节就打开夜间页；不想等夜里，也可以现在手动入睡。
+          h(Row, {
+            title: '夜间',
+            sub: (() => {
+              const runs = night?.data?.runs || []
+              if (!runs.length) return '还没有睡眠记录（夜里会自动跑；也可以现在入睡）'
+              const run = runs[0]
+              const done = (run.stages || []).filter(stage => stage && stage.skipped !== true).length
+              return `${run.day} · ${run.status} · ${done}/8 阶段 · ${fmtTime(run.started_at)}`
+            })(),
+          }, h(
+            'div',
+            { style: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' } },
+            h('button', {
+              className: 'pmem-btn',
+              onClick: () => window.open('/dsh-pmem/night', '_blank'),
+            }, '夜间页'),
+            h('button', {
+              className: 'pmem-btn',
+              disabled: sleeping,
+              onClick: () => void sleepNow(),
+            }, sleeping ? '入睡中…' : '现在入睡'),
+            h('span', { className: 'pmem-row-sub', style: { opacity: .7 } }, '八阶段：收集→去重→关系→冲突→规律→特质→反思→快照'),
+          )),
         ),
       )
 
