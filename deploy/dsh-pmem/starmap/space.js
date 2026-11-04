@@ -1378,7 +1378,10 @@
     }
 
     function buildLinks(nodes, links, adj) {
-      var segs = 10;
+      // 连线用单段直连：10 段贝塞尔拼出来的细带在关节处有 V 形缝隙，
+    // 远看就是一串点（虚线）。改成单段 = 线一定连续；要弯可以后续改成
+    // 带共享顶点的 triangle strip（miter 法线），现在先保证「实线」。
+    var segs = 1;
       var list = [];
       var byId = new Map();
       nodes.forEach(function (n) { byId.set(n.id, n); });
