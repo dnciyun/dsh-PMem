@@ -1908,7 +1908,7 @@
         gl.uniformMatrix4fv(uLine.uView, false, viewMat);
         gl.uniformMatrix4fv(uLine.uProj, false, projMat);
         gl.uniform2f(uLine.uViewport, viewport.w, viewport.h);
-        gl.uniform1f(uLine.uAlphaMul, 1.6);
+        gl.uniform1f(uLine.uAlphaMul, 0.85);
         gl.bindVertexArray(lineVao);
         gl.drawArrays(gl.TRIANGLES, 0, scene.lineVerts);
       }
