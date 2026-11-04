@@ -21,7 +21,9 @@ probes[]     回头问的题：query + expect.any（答对片段）/ expect.none
 
 ## 怎么用
 
-- **跑评测**：`python -m pmem.geval …`（内置的合成集评测），或写脚本读 JSON 自己回放；
+- **一行跑评测**（本仓库自带）：`python scripts/eval_testdata.py`——10 个人全跑一遍，
+  输出可答率 / MRR / 长时程 / 时效 / 抗干扰 / 检索延迟 / 每题注入；
+  也可以 `--personas p01,p02` 只跑几个人；
 - **做实验**：把语料按天喂进任意记忆系统，第 90 天用 `probes` 问一遍，
   看「可答率 / 排序 / 长时程保持 / 时效 / 抗干扰」；
 - **看格式**：想自己造语料，照着 `_sample.json` 的结构写就行。
