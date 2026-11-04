@@ -1,0 +1,38 @@
+# PMem MCP 注册片段（DSH / cordis）—— **手工安装的备用片段**
+#
+# 首选：`pmem dsh install`
+#   它会按**本机实际路径**把同样的内容写进
+#   ~/.dsh/profiles/<profile>/cordis.patch.yml，带 BEGIN/END 标记，
+#   可以用 `pmem dsh status` 体检、`pmem dsh uninstall` 整段摘掉。
+#
+# 这个文件只在两种情况下用：
+#   1. 没有 python 环境，只能手写 YAML；
+#   2. 想看看安装器到底往 profile 里写了什么形状。
+#
+# 用法：把下面这一个 `- insert:` 条目整段复制到 profile 的
+#   ~/.dsh/profiles/desktop/cordis.patch.yml
+# 的 # === qq-bridge MCP BEGIN/END === 区块**之外**，然后重启 DSH。
+#
+# 复制之前**必须**把 <仓库> 换成你自己 clone 下来的绝对路径。
+# 这就是为什么它不该是被写死的那一份。
+#
+# 回滚：删除这个 `- insert:` 条目（只删 pmem 这一段），重启 DSH。
+# 不要改 qq-bridge 区块内部，它会被 scripts/setup-dsh.mjs 整体重写。
+- insert:
+    - id: mcp-pmem
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: pmem
+        transport: stdio
+        command: 'python'
+        args:
+          - '-m'
+          - 'pmem.gate.mcp_server'
+          - '--db'
+          - '<仓库>/data/pmem.db'
+        cwd: '<仓库>'
+        env:
+          PYTHONPATH: '<仓库>/src'
+          PYTHONIOENCODING: 'utf-8'
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false

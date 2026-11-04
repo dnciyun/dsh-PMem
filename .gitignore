@@ -1,0 +1,34 @@
+# 运行数据与本地环境（不进仓库）
+data/
+.tmp/
+tmp/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+node_modules/
+
+# 个人记忆与备份：永远不进仓库
+backups/
+*.db
+*.db-wal
+*.db-shm
+*.zip
+wake-card.txt
+wake-live.txt
+
+# 基准与对比材料（本地跑，不随仓库发布）
+bench/
+
+# 设计文档只放行两篇（其余是开发过程记录，含本地跑分与对比，不发布）
+docs/*
+!docs/07-hippocampus.md
+!docs/archive-semantics.md
+
+# 开发草稿
+tools/
+.rename-backup/
+_qa_tmp/
+tests/test_holdout.py

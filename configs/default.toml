@@ -1,0 +1,302 @@
+# PMem 默认配置（由 src/pmem/base/config.py 的 DEFAULTS 生成，值必须与之一致）。
+# 优先级：用户配置 > 本文件 > 代码 DEFAULTS。改这里的值等于改默认值，
+# 想临时试验请用自己的 config 文件，不要把实验值写回默认。
+
+[storage]
+# 库文件位置；SQLite WAL + FTS5。
+path = "data/pmem.db"
+
+[retrieval]
+# 检索：三路词法/trigram/语文范围 + 向量 + 实体桥 + 关联扩散，RRF 融合后覆盖率排序。
+rrf_k = 60
+top_k = 8
+token_budget = 600
+w_rrf = 0.55
+w_importance = 0.15
+w_confidence = 0.12
+w_recency = 0.1
+w_graph = 0.08
+mmr_lambda = 0.7
+mmr_pool = 16
+candidate_pool = 64
+drought_days = 14
+raw_fallback = true
+raw_fallback_coverage = 0.3
+raw_fallback_max = 3
+
+[retrieval.graph]
+# 关联扩散（M12）：稀有词共现图 + PPR。补候选默认开、重排默认关（实测重排 -2 题）。
+enabled = true
+max_df = 24
+neighbours = 8
+min_weight = 0.12
+hops = 2
+seeds = 5
+alpha = 0.5
+iterations = 3
+append = true
+min_share = 0.3
+max_items = 2
+rerank = false
+trigger_coverage = 0.45
+evict = "zero_cover"
+
+[retrieval.entity]
+# 实体桥（M22）：问句里的已知实体 → entity_mention 反查 + 词法种子一跳共现，再进 RRF。
+# 实测 10 人 × 308 题：可答 96.9%→98.6%（+5、零回退），9 道多跳漏题捞回 5 道；
+# 代价是抗干扰 89.1%→84.8%（两条真实记忆被抬进 precision 题 top3）。降权更差，不降。
+enabled = true
+weight = 1.0
+limit = 16
+hop = true
+hop_seeds = 8
+hop_entities = 6
+hop_min_mentions = 2
+hop_limit = 16
+append = false
+append_max = 2
+evict = "score"
+
+[retrieval.temporal]
+# 时效语义（M14）：打分用 valid_from（现实时间轴）；旧说法命中时沿 superseded_by 链补替代版本。
+enabled = true
+axis = "valid_from"
+chain = true
+chain_only_update = true
+chain_hops = 3
+chain_max_old = 60
+chain_max_items = 2
+chain_head = 0
+chain_score = 0.72
+chain_score_noupdate = 0.58
+chain_step = 0.02
+chain_min = 0.55
+fresh_bonus = 0.08
+invert_recency_on_old = true
+fresh_half_life_days = 30
+stale_penalty = 0.0
+expired_penalty = 0.15
+pending_penalty = 0.06
+valid_grace_days = 0.0
+
+[retrieval.scope]
+# 语文范围（M15）：问句里的角色词/自称/「名字+她他」决定候选该是「本人」还是「家属」。
+enabled = true
+role_bonus = 0.035
+name_bonus = 0.04
+other_owner_penalty = 0.06
+owner_conflict_penalty = 0.22
+recall = true
+
+[retrieval.vector]
+# 向量通道（M13）：本地 bge-small-zh-v1.5 ONNX int8，词法没把握时的第二手段。
+# 模型文件不放仓库：scripts/fetch_model.py 下到 ~/.dsh/pmem/models/。
+# M23 提速：threads 0=自动 min(4,CPU)（实测 4 线程比 1 线程快一倍）；
+# query_prefix 关（v1.5 不再需要指令前缀，21 token 的代价是短查询推理 4.0→2.2ms）。
+enabled = true
+model = "bge-small-zh-v1.5"
+model_dir = "~/.dsh/pmem/models/bge-small-zh-v1.5"
+onnx_file = "onnx/model_int8.onnx"
+dim = 512
+batch = 16
+max_tokens = 256
+threads = 0
+query_prefix = false
+min_score = 0.55
+trigger = "coverage"
+trigger_coverage = 0.55
+append = true
+max_items = 2
+policy = "score"
+head = 4
+limit = 8
+backfill = 4000
+
+[retrieval.half_life_days]
+episodic = 45
+semantic = 365
+person = 365
+relation = 365
+experience = 365
+goal = 90
+meta = 365
+
+[identity]
+# 自我层（M17）：宪法 + 叙事 + 未闭环承诺，文件在 ~/.dsh/pmem/soul/，逐字注入新会话。
+# budget = 880 是**自我层卡**上限（M22 实测：5 条根 + 3 条常驻席 + 叙事四段 = 879）；
+# 「关于你」画像块 profile_budget 在它之外另算。整卡只在会话开始/交接时给一次。
+# live_budget = 每轮背景条（我是谁两行 / 关系一行 / 停在哪一行 / 最新一条增补）。
+# 常驻席（M22）：[pin] 分两级——带 [根] 的永驻；普通 [pin] seat_days 到期或 seat_max 超编就退席，
+# 退席只是不进卡，内容仍在 `pmem soul show`。
+enabled = true
+dir = "~/.dsh/pmem/soul"
+budget = 880
+live_budget = 220
+profile_budget = 110
+seat_days = 30
+seat_max = 4
+
+[surface]
+# 浮现预算：会话开始最多一次身份卡，之后只有线索命中才发一条。
+session_budget = 220
+turn_budget = 80
+max_items = 6
+due_days = 30
+snippet_chars = 40
+
+[context]
+# 上下文水位（M19）：不指望拿到真实 usage，用「即将发送的 messages」估算 + base_tokens 底座。
+# 按模型名覆盖窗口可在 [context.windows] 里加（例："deepseek-chat" = 128000）。
+# 到 auto_at 不再只是提醒：先写「停在哪」再压缩（设置页可关）。
+enabled = true
+window_tokens = 1000000
+base_tokens = 6000
+warn_at = 0.65
+urgent_at = 0.85
+auto = true
+auto_at = 0.8
+
+# 按模型名覆盖窗口（默认空；键名小写子串匹配）
+# [context.windows."deepseek-chat"]
+# window_tokens = 128000
+
+[sleep]
+# 夜间睡眠（M4）：8 阶段 replay；at 只是计划值，实际由调度器触发。
+at = "03:30"
+backfill_days = 7
+max_new = 3000
+budget_seconds = 60
+snapshot = true
+verify_snapshot = true
+stale_days = 30
+window_days = 90
+report_dir = ""
+backup_dir = ""
+
+[journal]
+# 日记（M10）：把当天原话消化成一篇 episode；抽出来的事实进记忆库才会进星图。
+enabled = true
+model = ""
+max_lines = 200
+keep_days = 30
+idle_minutes = 45
+min_lines = 3
+recent_days = 2
+recent_items = 2
+
+[net]
+# 关系网络（M3）：写入时抽实体/关系，供实体桥与图查询用。
+auto_extract = true
+rel_dormant_days = 90
+rel_dormant_weight = 0.3
+pmi_min_count = 5
+pmi_min = 1.5
+transitive_max_new = 5000
+
+[score]
+# 打分：证据、可信度、矛盾因子，以及 session 证据上限。
+active_threshold = 0.45
+evidence_k = 0.45
+contradiction_factor = 0.5
+max_session_evidence = 1
+cap_confidence = 0.95
+
+[dedup]
+# 去重：三档判定（exact / near / cluster）的阈值。
+near = 0.92
+cluster = 0.88
+
+[limits]
+# 硬上限：批量条数、返回条数、单条文本长度。
+max_text_chars = 8000
+max_k = 50
+max_batch = 200
+
+[policy]
+# 策略：跨 subject、secret 的默认处理。
+allow_secret = false
+allow_cross_subject = false
+subject = "self"
+
+[sanitize]
+# 入库前的清洗（密钥/路径等）。
+enabled = true
+
+[evolve]
+# 进化引擎（M5）：规律/经验/冲突/调参，只标注、不静默改事实。
+auto_resolve_conflicts = true
+conflict_escalate_days = 14
+experience_match_threshold = 0.55
+
+[evolve.tuning]
+min_labels = 50
+accept_gain = 0.02
+max_drop = 0.01
+days = 30
+
+[trait]
+# 特质（M6）：四维强度 + 证据全量重算，只对已确立的进「关于你」画像。
+max_active = 30
+promote_days = 3
+promote_strength = 0.65
+min_confidence = 0.7
+demote_strength = 0.45
+stale_days = 180
+recency_half_life_days = 120
+churn_days = 30
+
+[reflect]
+# 反思（M7）：六维质量分 + 缺陷码 + 周报。
+freshness_days = 90
+recall_days = 30
+due_days = 30
+
+[runtime]
+# 长期运行（M9/M22）：调度器 / 备份 / 监控 / 月报。
+# backup_keep 只作用于手动备份；daily_keep 是日快照（daemon 04:00 离线备份与睡眠每日副本分池各留）。
+# maintenance_* 是维护窗口：窗口内调度器只登记/恢复任务、不执行，手动命令不受影响。
+enabled = true
+tick_seconds = 60
+reflect_weekday = 1
+reflect_at = "03:45"
+backup_at = "04:00"
+monitor_at = "04:30"
+monthly_day = 1
+monthly_at = "04:15"
+max_attempts = 3
+retry_minutes = 10
+stale_minutes = 120
+backup_keep = 14
+daily_keep = 7
+backup_dir = ""
+maintenance_minutes = 30
+maintenance_file = ""
+report_dir = ""
+max_db_mb = 2048
+growth_mb_30d = 256
+recall_drop_tolerance = 0.02
+sleep_stale_hours = 36
+backup_stale_days = 8
+quality_min = 50
+
+[gate]
+# 门（M8）：MCP/REST 出口的 token、限流与导出上限。
+token = ""
+rate_limit_per_min = 120
+rest_enabled = false
+rest_host = "127.0.0.1"
+rest_port = 8765
+max_export_mb = 16
+
+[retrieval.episode]
+# 日记通道（M18）：问「上周/前几天都干嘛了」时，答案是一天的经过，不是一条事实。
+# 只在时间窗问句、或词法一条都没给的时候插；不参与重排（日记和记忆不是一个量纲）。
+enabled = true
+max = 3
+gate_coverage = 0.55
+
+[retrieval.doubt]
+# 不确定信号（M18）：覆盖率低/头两名咬得紧时在召回块末尾加一句「⚠ 不确定」。
+enabled = true
+coverage = 0.35
+margin = 0.02

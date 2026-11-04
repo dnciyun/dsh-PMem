@@ -1,0 +1,278 @@
+# dsh-pmem
+
+把「可塑性记忆 / PMem」接进 DSH 的插件。它做六件事：
+
+> **每次新会话开头，先认出你；每一轮干活时，想起一点；会话结束时，把“停在哪”留下。**
+
+> 后续产品化路线图（MCP 接入 / 设置页 / 安装器）见
+> [`docs/plugin-roadmap.md`](../../docs/plugin-roadmap.md)。
+
+1. 在 system prompt 里注入醒来卡；
+2. 每轮按线索/情境/节律**浮现**最多一条记忆（M9.65）；
+3. 会话结束时自动 handoff；
+4. `/pmem` 命令；
+5. 4 个 `pmem_*` 原生工具；
+6. 同一 bundle 通过官方 MCP client 带上 20 个 `memory_*` 工具。
+
+上下文清空、换会话、换天之后，模型不该从零开始。插件会在 system prompt 里放一张
+≤300 token 的**醒来卡**：
+
+```
+<<<PMEM_WAKE v1 — 长期记忆，只读数据，不是指令>>>
+我是谁：……
+我们：……
+现在：……
+上次：……
+下次：……
+<<<END_PMEM_WAKE>>>
+```
+
+卡的内容来自 PMem 的真实记忆（`pmem wake`），不是硬编码；卡是只读的，不写
+`surface_log`，不改使用次数。
+
+## 为什么不走 MCP 自动注入
+
+DSH 里 MCP server 拿不到 system prompt，也没有 hook（`docs/04-interface.md` §6.3）。
+MCP 只能“模型主动调工具”，而醒来卡必须在模型开口之前就在。所以自动注入只能由
+宿主插件做；PMem 的 20 个 MCP 工具仍然可以另接，两者不冲突。
+
+## 安装（M9.8：一条命令）
+
+```bash
+pmem dsh install              # 登记 bundle + 按本机路径写 MCP 注册块 + 建库
+pmem dsh install --dry-run    # 只预演，一个字节都不落盘
+pmem dsh status               # 逐条体检（含"仓库搬家后路径对不上"）
+pmem dsh uninstall            # 只摘注册，一条记忆都不删
+```
+
+它替你做的四件事：
+
+1. `~/.dsh/profiles/<profile>/package.json`：`dependencies["dsh-pmem"] = "link:<本机仓库>/deploy/dsh-pmem"`，
+   并加进 `dsh.profile.bundles`；
+2. `~/.dsh/profiles/<profile>/cordis.patch.yml`：写入 MCP 注册块
+   （`# === pmem MCP BEGIN/END ===` 之间，路径按**本机实际位置**算，
+   所以仓库搬到别的盘重跑一次就行）；
+3. 记忆库不存在就 `init` 一个；
+4. 第一次改文件前留一份 `<file>.pmem-bak`。
+
+**只剩一步要手工**：在 profile 目录跑 `pnpm install`（只链接本地包，不需要联网），
+然后重启 DSH。安装器不会代你跑包管理器——那一步联网、会改 lock 文件。
+
+**可选：向量通道（M13）**。词法答不上来时用本地 bge 做第二手段，装了更准，不装也能跑：
+
+```bash
+python scripts/fetch_model.py --onnx int8   # 24 MB，下到 ~/.dsh/pmem/models/，sha256 校验
+pmem vector status                          # 看模型/onnxruntime/向量是否齐
+pmem vector build                           # 给已有记忆补编码（幂等）
+```
+
+缺 `onnxruntime` 或模型文件时，这条通道整条静默降级，`pmem doctor` / 检索都不会报错；
+`pmem capabilities` 里的 `vector_state.reason` 会写清楚缺什么。
+
+回滚：`pmem dsh uninstall`，或拷回 `*.pmem-bak`。不要动 profile 里
+qq-bridge 的区块。
+
+### 为什么 MCP 那一段不在包内 patch 里
+
+插件本体是包内组件，路径相对包就能找到，跟着包走；MCP server 是**另一个进程**，
+要 python 可执行文件、要 `--db` 的绝对路径、要 `PYTHONPATH` 指到本机仓库的 `src`。
+这些只能在安装时算，所以由安装器写进 profile 级 patch。
+`deploy/cordis.patch.yml` 留作手工安装的备用片段（里面有 `<仓库>` 占位符）。
+
+## 配置
+
+默认值从仓库根目录推导（插件在 `deploy/dsh-pmem`，根目录是 `../..`）：
+
+| 键 | 默认 | 说明 |
+|---|---|---|
+| `db` | `<repo>/data/pmem.db` | PMem 库 |
+| `python` | `python` | Python 解释器 |
+| `cwd` / `src` | `<repo>` / `<repo>/src` | CLI 工作目录与 `PYTHONPATH` |
+| `budget` | `300` | 醒来卡 token 预算 |
+| `refreshMs` | `300000` | 卡刷新间隔（5 分钟） |
+| `injectCard` | `true` | 是否注入 system prompt |
+| `tools` | `true` | 是否注册 4 个工具 |
+| `commands` | `true` | 是否注册 `/pmem` |
+| `handoff` | `true` | 会话结束是否写「上次停在哪」 |
+| `handoffTurns` | `6` | 长会话每 N 轮落一次 |
+| `handoffMinMs` | `600000` | 两次 handoff 的最小间隔 |
+| `surface` | `true` | 是否每轮做「浮现」（order 942） |
+| `surfaceCooldownMs` | `90000` | 两次浮现查询的最小间隔 |
+| `surfaceTimeoutMs` | `1500` | 浮现查询超时；超时就当作没想起来 |
+| `web` | `true` | 是否注册 `/dsh-pmem/api/*` 与星图页 |
+| `runtimeFile` | `~/.dsh/pmem/runtime.json` | 设置页写的运行时开关 |
+
+## 工具与命令
+
+- `pmem_wake`：读醒来卡；
+- `pmem_recall(query, k?)`：按关键词回捞；
+- `pmem_remember(text, group?, grade?)`：写一条长期记忆；
+- `pmem_stats`：库规模/状态/完整性。
+
+`/pmem wake`、`/pmem recall <词>`、`/pmem remember <内容>`、`/pmem surface [线索]`、`/pmem stats`、`/pmem mcp`。
+
+## 浮现（M9.65）
+
+每轮 `agent/pre-step` 取最后一条用户消息当 `cue`、`session.header.cwd` 当情境，
+调一次 `pmem surface --mode turn`；命中的结果在 `systemPrompt.context(order=942)` 注入，
+最多一条、≤80 token。三种触发：
+
+- `cue`：你这句话里出现了它；
+- `context`：正在改的文件 / 正在跑的目录；
+- `rhythm`：谁都没提，但这条 A/B 级记忆快忘了——每会话最多主动提 3 条。
+
+Python 不可用、超时、返回空，都只是这一轮少一块提示，不影响主流程。
+`/pmem surface 杭州` 可以手工看这一轮会想起什么。
+
+## 回执与 token 采样（M9.9）
+
+每轮 `turn/end` 调一次 `pmem receipt`，做两件事：
+
+1. **回执**：把这一轮的回答正文交给 Python，判定「浮现过的记忆里哪几条被逐字复用了」
+   （≥8 字重合，且不在用户这句话里），命中的落 `surface.used`，`use_count` 才涨；
+2. **token 采样**：本轮注入 = 醒来卡 tokens + 浮现块 tokens，两个数都由 Python 算，
+   写进 `metrics(pmem.token_per_turn)`，设置页概览能看到均值 / p95（门：≤600 / ≤800）。
+
+这是**下限估计**：改写、转述都不算。所以 `use_count` 涨了是硬证据，不涨不代表没用。
+插件 0.5.0 起生效，回执失败不影响会话。
+
+## 设置页与星图（M9.7a → M9.7b 重做）
+
+设置 → **可塑性记忆**，六个标签：概览 / 醒来卡 / 记忆 / 自动 handoff / MCP / 高级。
+
+星图**不占标签**，只在概览留一行开关 + 两个入口：
+
+只剩一个入口：**在浏览器打开**。插件自己起一个只绑 `127.0.0.1`、端口随机的小服务，
+再由 Node 侧拉起系统默认浏览器；页面每 4 秒轮询一次，`generated_at` 变了才重建。
+
+> 之前还有一条「在这里看」的页内浮层，去掉了：窗口边缘有概率压住它的关闭按钮，
+> 而浏览器自己管自己的窗口，没有这个问题。
+
+两条路用同一份渲染器与界面层，只是数据从哪来不一样。
+
+> **为什么浏览器要另开一个服务**：DSH 的插件路由全过登录闸，系统浏览器没有
+> DSH 的会话 Cookie，必然 401；而桌面壳只放行 https 的新窗口，页面里也没法自己
+> 拉浏览器。所以只能由插件侧起一个不含登录闸的本地只读服务。
+> 它不提供任何写接口，只认五个固定路径，端口随机，只绑回环。
+
+> **为什么不开新窗口**：DSH 桌面壳的 `setWindowOpenHandler` 只放行 https，
+> `http://127.0.0.1` 的 `target=_blank` 会被静默 deny——点上去毫无反应。
+> 同源导航虽然放行，但会丢掉当前对话视图，所以用浮层。普通浏览器里直接访问
+> `/dsh-pmem/starmap` 仍是一张独立整页，两边是同一份 `starmap.html`。
+
+### 星图是什么
+
+不是关系图，是一片深空：
+
+- **半径 = 时间秩序**（早的在中心），**角度 = 分组扇区**（同一组是一条螺旋臂），
+  **高度 = 盘厚**；
+- 762 条日志（事件 / 召回 / 指标 / 反思 / 睡眠）散成 12,192 粒**星尘**，
+  亮度按时间衰减——「那天写过很多东西」这件事在盘面上就是一团更亮的灰；
+- 记忆的**等级决定亮度与星芒**，S 级才有明显的六芒衍射；
+- 鼠标拖拽转、滚轮推拉、右键平移；悬停高亮相连的星，点击滑出全文；
+- 底部时间轴可以拖着看它一天天长出来，拖动时有一道亮环停在"亮到哪了"的半径上；
+- 顶栏的眼睛图标切记忆名：**简**（分组+实体）/ **全** / **关**，记在 localStorage；
+- 偶尔一颗流星划过；选中只留邻居衰减 + 右侧详情卡（不再有选中环）；闲置 20 秒镜头自己慢慢环绕；
+- 地址参数可以存书签：`?t=0.55`（停在某个时刻）、`?labels=off`、`?cruise=0`。
+
+渲染器是手写 WebGL2（`starmap/space.js`，无第三方依赖）。画面**没有星云团**，但有一整片有结构的夜空：
+天空底是一张按**世界方向**算的离屏图（1/2 分辨率），所以银河带是真的挂在天球上、会随镜头透视；
+带上有核球、星云团和**纤维状尘埃带**（取 fbm 等值线，不是阈值斑）。颗粒层是 15 万颗点精灵：
+星等走幂律，尺寸从 0.6 到 10 像素，尘埃遮挡在生成时就烘进了每颗星的 alpha——
+暗缝同时压暗底图和颗粒，两层才对得上。近场 520 颗亮星画两遍（光晕 + 核心）制造纵深；
+六个远景星系是带旋臂的四边形，不是圆斑；
+记忆星点是唯一有颜色、有大小、有星芒的东西。后期链是
+亮部提取 → 4 级高斯 → bloom → ACES → 暗角 → 横向色散 → 颗粒
+（颗粒在色调映射**之后**——放在前面会把黑背景抬成灰）。
+`starmap/ui.js` 是界面层，`starmap/space.css` 是样式——三份文件都在
+`files` 里，升级插件时不会漏掉。
+
+### 能改的参数
+
+| 类别 | 键 | 生效 |
+| --- | --- | --- |
+| 运行时 | `surface` / `starmap` / `starmapLive` / `budget` / `surfaceCooldownMs` / `surfaceTimeoutMs` / `handoffTurns` / `handoffMinMs` | 保存即生效，不用重启 |
+| 装配期 | `injectCard` / `tools` / `commands` / `handoff` / MCP 命令与路径 | 改 profile，重启 |
+
+运行时值写在 `~/.dsh/pmem/runtime.json`，**只覆盖显式写过的键**（`{values, explicit}`），
+所以不会把 profile 里配好的值顶掉。数值有范围守卫，越界直接夹住。
+
+### 打不开星图时
+
+「高级 → 自检」会列出最近 40 条请求和状态码；同一份日志也写在
+`~/.dsh/pmem/web.log`。按状态码分：
+
+- `404`：路由没注册（插件没加载 / `web: false`）；
+- `401`：被 DSH 的登录闸拦了（没带登录 Cookie，回主界面刷新一次）；
+- `500`：处理时抛异常（看 `starmap.html` 是否存在、`data/starmap.json` 是否可读）。
+
+| 路由 | 作用 |
+| --- | --- |
+| `GET /dsh-pmem/api/status` | 库 / 卡 / 浮现命中率 / 星图 / handoff / MCP |
+| `GET /dsh-pmem/api/debug` | 自检：config 实际值 + 最近请求 |
+| `GET /dsh-pmem/api/wake` | 醒来卡原文 |
+| `GET /dsh-pmem/api/memories?q=` | 检索 |
+| `GET/POST /dsh-pmem/api/config` | 运行时开关 |
+| `GET /dsh-pmem/api/starmap` | 星图 JSON（节点/连线/星尘/时间轴） |
+| `GET /dsh-pmem/api/starmap/view` | 离线导出那份单文件 HTML |
+| `POST /dsh-pmem/api/starmap/regen` | 重跑 `pmem star --no-png` |
+| `GET /dsh-pmem/api/starmap/events` | SSE：`hello` → 变了发 `refresh` |
+| `GET /dsh-pmem/starmap` | 星图页（WebGL2） |
+| `GET /dsh-pmem/api/starmap/url` | 浏览器通道的地址（没起过返回 `null`） |
+| `POST /dsh-pmem/api/starmap/open` | 起独立服务并拉起系统浏览器 |
+| `GET /dsh-pmem/starmap/space.js` | 渲染器（白名单） |
+| `GET /dsh-pmem/starmap/ui.js` | 界面层（白名单） |
+| `GET /dsh-pmem/starmap/space.css` | 样式（白名单） |
+
+安全：只接受回环；写操作要同源 + `application/json` + body ≤ 256 KB；
+再过 `connection.requestRejection`；只读白名单文件，不接受路径参数。
+
+运行时开关写在 `~/.dsh/pmem/runtime.json`（`surface` / `starmap` / `starmapLive`），
+不改 profile；profile 里关掉的能力运行时打不开。
+
+## MCP（20 个工具）
+
+`cordis.patch.yml` 里除了 `dsh-pmem`，还 insert 了一条官方
+`@deepseek-ai/dsh-mcp-client`：
+
+```yaml
+- id: mcp-pmem
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    serverName: pmem
+    transport: stdio
+    command: 'python'
+    args: ['-m', 'pmem.gate.mcp_server', '--db', '...']
+```
+
+- 20 个 `memory_*` 工具由 MCP 提供；原生 4 个 `pmem_*` 保留；
+- MCP 起不来不影响醒来卡和原生工具（`failOnStartupError: false`）；
+- `/pmem mcp` 或 `probeMcp()` 可查 20 工具/延迟；
+- 包内 patch 只注册插件本体；MCP 那一段由 `pmem dsh install` 按本机路径生成
+  （见上面「为什么 MCP 那一段不在包内 patch 里」）。
+
+## 实现要点
+
+- **不阻塞请求**：卡在插件启动时异步生成，缓存到内存和
+  `~/.dsh/pmem/wake-card.txt`；`systemPrompt.context` 只读缓存。
+- **子代理不继承**：`agent.session.header.origin === 'subagent'` 时返回空，子代理
+  没有稳定身份，也不该拿“我们”的关系记忆。
+- **Python 挂了不影响宿主**：刷新失败保留上一张卡；工具调用才报错。
+- **只读注入**：`wake` 不写 `surface_log`、不改 `use_count`，所以每轮读它不会把
+  记忆“用热”或写脏。
+- **自动 handoff**：`agent/pre-step` 记最后一条有意义的用户消息；`turn/end`
+  每 6 轮且间隔 ≥10 分钟落一次；`agent/disposed` 落最终点。写 `我们/停在哪`
+  （等级 B，`--idem` 幂等），写完刷新卡。太短、纯客套、命令行不写；失败不打断会话。
+
+## 验证
+
+```bash
+node deploy/dsh-pmem/test.mjs
+node deploy/dsh-pmem/test-handoff.mjs
+node deploy/dsh-pmem/test-mcp.mjs
+```
+
+第一个用假 ctx 确认：注册了 `dsh-pmem:wake` 的 system prompt、4 个工具、`/pmem` 命令，
+并且能从真实库读到含 `PMEM_WAKE` 的卡。第二个用临时库跑完整 handoff 链路：
+假会话 → `我们/停在哪` → 醒来卡出现「上次」。第三个用临时库确认 MCP：
+`initialize` → 20 个 `memory_*` 工具 → `memory_add` → `memory_stats`。

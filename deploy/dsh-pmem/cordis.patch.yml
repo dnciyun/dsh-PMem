@@ -1,0 +1,28 @@
+# dsh-pmem 的自我注册片段。
+#
+# 这个文件由包自己的 dsh.bundle.patch 指向；profile 只要把 dsh-pmem 加进
+# package.json 的 dsh.profile.bundles，DSH 就会读到这里，不需要再手写
+# cordis.patch.yml 条目。
+#
+# 为什么这里只注册插件本体、不注册 MCP：
+#   插件本体是「包内」的，路径相对包就够；
+#   MCP server 是**另一个进程**，要 python 可执行文件、要 --db 的绝对路径、
+#   要 PYTHONPATH 指向本机仓库的 src。写死在这里，仓库一搬家它就哑了。
+#   所以 MCP 那一段由 `pmem dsh install` 按本机实际路径写进 profile 的
+#   cordis.patch.yml（带 BEGIN/END 标记，可整体替换、可整体摘掉）。
+- insert:
+    - id: dsh-pmem
+      name: dsh-pmem
+      inject: [systemPrompt, tools, commands, webServer, connection]
+      config:
+        # 醒来卡：每轮 system prompt 注入，≤300 token
+        injectCard: true
+        # 4 个工具：pmem_wake / pmem_recall / pmem_remember / pmem_stats
+        tools: true
+        # /pmem 命令
+        commands: true
+        # 会话结束时自动写「上次停在哪」到 我们/停在哪
+        handoff: true
+        # 每轮浮现（order 942）+ /dsh-pmem/api/* + /dsh-pmem/starmap
+        surface: true
+        web: true

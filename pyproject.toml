@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pmem"
+version = "0.24.3"
+description = "可塑性记忆 PMemories —— 给 AI 用的长期记忆体：记得住、想得起、说得清、有自我"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "PolyForm-Noncommercial-1.0.0" }
+authors = [{ name = "dnciyun", url = "https://github.com/dnciyun" }]
+dependencies = []
+
+[project.optional-dependencies]
+# 核心零依赖；以下按需安装
+embed = ["sentence-transformers>=2.2", "jieba>=0.42"]
+dev = ["pytest>=7", "ruff>=0.4"]
+
+[project.scripts]
+pmem = "pmem.gate.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>PMem · 海马体星图</title>
+<link rel="stylesheet" href="./starmap/space.css" />
+</head>
+<body>
+<div id="sm-root" class="sm-shell"></div>
+<noscript>
+  <div style="padding:40px;color:#dbe4f5;font:14px system-ui">
+    星图需要 JavaScript：它是一张实时绘制的三维星图，不是图片。
+  </div>
+</noscript>
+
+<!-- 兜底：插件还是旧版本时 /starmap/space.js 会是 404，这时候不能只留一块黑屏。 -->
+<div id="sm-fallback" class="sm-fallback" role="alert">
+  <div class="sm-fallback-title">渲染器没有加载</div>
+  <div class="sm-fallback-body">
+    这个页面要的三份资源（<code>space.js</code> / <code>ui.js</code> / <code>space.css</code>）
+    还没被插件提供——多半是插件仍是旧版本。
+  </div>
+  <div class="sm-fallback-body">重启一次 DSH 就会好；实在不行看「高级 → 自检」，那里有每条请求的状态码。</div>
+  <div class="sm-fallback-hint">或者在终端跑 <code>pmem star</code>，双击生成的那个 HTML 也能看。</div>
+</div>
+
+<script src="./starmap/space.js"></script>
+<script src="./starmap/ui.js"></script>
+<script>
+  // 只做一件事：确认渲染器真的挂上了。挂不上就把话说清楚。
+  setTimeout(function () {
+    if (window.PMemStar) return;
+    var box = document.getElementById('sm-fallback');
+    if (box) box.classList.add('is-on');
+  }, 1600);
+</script>
+</body>
+</html>
