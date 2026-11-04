@@ -15,6 +15,8 @@ from pathlib import Path
 from pmem import PMem
 from pmem.memory import journal
 
+from .support import InProcessMcp, drop_dir, temp_dir
+
 
 class JournalRetractTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -134,6 +136,43 @@ class MemoryRetractTest(unittest.TestCase):
         result = self.app.retract(self.mem["id"])
         self.assertFalse(result["ok"])
         self.assertEqual(result["error"]["code"], "E_VALIDATION")
+
+
+class McpRetractTest(unittest.TestCase):
+    """走一遍真正的对外通道：JSON-RPC → dispatch → SDK → 库。"""
+
+    def setUp(self) -> None:
+        self._dir = temp_dir("retract-mcp")
+        self.client = InProcessMcp(Path(self._dir) / "pmem.db")
+
+    def tearDown(self) -> None:
+        self.client.close()
+        drop_dir(self._dir)
+
+    def test_retract_tool_roundtrip(self) -> None:
+        line = self.client.app.journal_append(
+            "刚才那句是开玩笑的", role="user", session_id="s1"
+        )["data"]
+        before = self.client.tool("memory_trace", {"query": "刚才那句是开玩笑的"})
+        self.assertEqual(before["data"]["count"], 1)
+        gone = self.client.tool("memory_retract", {"target": line["id"], "reason": "说错了"})
+        self.assertTrue(gone["ok"])
+        self.assertEqual(gone["data"]["target"], "journal_line")
+        self.assertFalse(gone["data"]["already"])
+        after = self.client.tool("memory_trace", {"query": "刚才那句是开玩笑的"})
+        self.assertEqual(after["data"]["count"], 0)
+        shown = self.client.tool(
+            "memory_trace", {"query": "刚才那句是开玩笑的", "include_retracted": True}
+        )
+        self.assertTrue(shown["data"]["items"][0]["retracted"])
+
+    def test_retract_memory_tool(self) -> None:
+        mem = self.client.tool("memory_add", {"text": "我们周三下午三点开会"})["data"]
+        gone = self.client.tool("memory_retract", {"target": mem["id"], "reason": "时间改了"})
+        self.assertTrue(gone["ok"])
+        self.assertEqual(gone["data"]["target"], "memory")
+        hit = self.client.tool("memory_search", {"query": "周三 开会"})
+        self.assertEqual(hit["data"]["items"], [])
 
 
 if __name__ == "__main__":
