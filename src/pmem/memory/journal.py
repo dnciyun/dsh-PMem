@@ -82,24 +82,54 @@ class DayDraft:
 # 以及 ``Background subagent … finished`` 这类**子代理通知**——它们都不是用户说的话，
 # 一旦进了流水就会派生出「用户You are the Team Lead…」这种记忆，比漏记更糟。
 _RUNTIME_LINE = re.compile(
-    r"^(Current |Approval prompts|Browser time zone|Time sampled|"
+    r"^(Current |Approval prompts|Approval policy|Browser time zone|Time sampled|"
     r"\[骨架\]|\[索引\]|\[提示\]|<<<PMEM_WAKE|"
     r"You are the Team Lead|You are an AI agent powered|Use list_agents\(|The Team Lead named|"
     r"Agent Teams is available|Background subagent |- )"
+)
+# 另一类漏网：**后台任务完成通知**（大小写都有，还带 [status: …]）。
+# 实测它们会被当成「用户说的话」写进日记，派生出「用户background job … finished」这种记忆。
+_RUNTIME_JOB = re.compile(
+    r"^(?:background|Background) (?:job|task) "
+    r"|finished \[status: |Read its output with job_output|Read the output with job_output"
+)
+
+
+# QQ/B站桥接的**唤醒包装**：它们不是用户说的话，是桥接每轮塞给 agent 的说明
+# （时间/角色/身份/唤醒原因 + 人设卡）。一条消息里出现两个以上这类标记，整条都不记——
+# 实测它们会以 160 字截断的形式进流水，消化后派生出「用户【当前时间】…」这种记忆。
+_ENVELOPE_MARKERS = (
+    "【当前时间】",
+    "【当前角色】",
+    "【你的身份】",
+    "【当前唤醒】",
+    "【引导唤醒】",
+    "【回复检查】",
+    "【主动机会】",
+    "【上线补历史】",
+    "【来源判断】",
+    "［统一人设卡",
 )
 
 
 def _strip_runtime(text: str) -> str:
     """剥掉开头的运行时行，只留真消息。全被剥光就返回空串（那这行本来就不该记）。"""
+    body = str(text or "")
+    if sum(1 for marker in _ENVELOPE_MARKERS if marker in body) >= 2:
+        return ""
     lines = str(text or "").splitlines()
     start = 0
     while start < len(lines):
         line = lines[start].strip()
-        if line == "" or _RUNTIME_LINE.match(line):
+        if line == "" or _RUNTIME_LINE.match(line) or _RUNTIME_JOB.match(line):
             start += 1
             continue
         break
-    return chr(10).join(lines[start:]).strip()
+    body = chr(10).join(lines[start:]).strip()
+    # 整条都是后台任务通知（正文里含 finished [status:…]）也算噪声，直接丢。
+    if body and _RUNTIME_JOB.search(body) and len(body) < 400:
+        return ""
+    return body
 
 
 
@@ -896,6 +926,59 @@ def search_episodes(
         score = max(0.55, 0.80 - 0.05 * index)
         out.append(episode_item(row, score=score))
     return out
+
+
+def purge_noise(db: Any, *, subject: str = "self", dry_run: bool = False) -> dict[str, Any]:
+    """清掉流水里的「脚手架台词」（还没消化的那些）。
+
+    为什么要单独一个动作：`_strip_runtime` 只在**写入时**生效，历史流水里已经混进来的
+    运行时行（审批提示、后台任务通知、宿主人格提示）还躺在库里，一消化就会变成
+    「用户Approval policy: ask…」这种记忆。它们从来不是用户说的话，删掉不算违背「原文只追加」。
+    """
+    rows = db.conn.execute(
+        "SELECT seq, id, text FROM journal_line WHERE subject_id=? AND episode_id IS NULL",
+        (subject,),
+    ).fetchall()
+    noise: list[Any] = []
+    for row in rows:
+        body = str(row["text"] or "")
+        if not body.strip():
+            noise.append(row)
+            continue
+        if _strip_runtime(body) == "":
+            noise.append(row)
+            continue
+        if _RUNTIME_JOB.search(body) and len(body) < 400:
+            noise.append(row)
+    stats = {
+        "scanned": len(rows),
+        "noise": len(noise),
+        "deleted": 0,
+        "dry_run": bool(dry_run),
+        "sample": [str(r["text"] or "")[:60] for r in noise[:5]],
+    }
+    if dry_run or not noise:
+        return stats
+    seqs = [int(row["seq"]) for row in noise]
+    seqs = seqs[:5000]
+    marks = ",".join("?" for _ in seqs)
+    with db.tx() as conn:
+        try:
+            conn.execute(f"DELETE FROM journal_fts WHERE rowid IN ({marks})", seqs)
+        except Exception:  # noqa: BLE001 没有 FTS 表也不影响清行
+            pass
+        cur = conn.execute(f"DELETE FROM journal_line WHERE seq IN ({marks})", seqs)
+        stats["deleted"] = int(cur.rowcount or 0)
+        events.append(
+            conn,
+            actor="maintenance",
+            op="journal.purge_noise",
+            target_tbl="journal_line",
+            target_id=None,
+            subject_id=subject,
+            payload={"deleted": stats["deleted"], "scanned": len(rows)},
+        )
+    return stats
 
 
 # -- 读 --------------------------------------------------------------------

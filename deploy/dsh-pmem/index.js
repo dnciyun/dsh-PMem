@@ -304,9 +304,24 @@ export function estimateMessages(messages) {
  * 只按「时区尾行」切会漏掉这种顺序：于是「上次停在哪」里出现
  * `Current DSH file policy: danger-full-access…`，日记流水也记进了这一段。
  */
-const RUNTIME_LINE = /^(Current |Approval prompts|Browser time zone|Time sampled|\[骨架\]|\[索引\]|\[提示\]|<<<PMEM_WAKE|- )/
+const RUNTIME_LINE = /^(Current |Approval prompts|Approval policy|Browser time zone|Time sampled|\[骨架\]|\[索引\]|\[提示\]|<<<PMEM_WAKE|- )/
+
+// QQ/B站桥接的唤醒包装：不是用户说的话，是每轮塞给 agent 的说明（时间/角色/身份/唤醒原因）。
+// 一条消息里出现两个以上这类标记就当噪声——否则 160 字截断后会以「用户【当前时间】…」进流水。
+const ENVELOPE_MARKERS = [
+  '【当前时间】', '【当前角色】', '【你的身份】', '【当前唤醒】', '【引导唤醒】',
+  '【回复检查】', '【主动机会】', '【上线补历史】', '【来源判断】', '［统一人设卡',
+]
+
+function looksLikeEnvelope(text) {
+  const body = String(text ?? '')
+  let hits = 0
+  for (const marker of ENVELOPE_MARKERS) if (body.includes(marker)) hits += 1
+  return hits >= 2
+}
 
 export function stripRuntimeContext(text) {
+  if (looksLikeEnvelope(text)) return ''
   let clean = String(text ?? '')
   const marker = 'Browser time zone for this request'
   const cut = clean.lastIndexOf(marker)

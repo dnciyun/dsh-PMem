@@ -766,6 +766,8 @@ def main(argv: list[str] | None = None) -> int:
     p_jd.add_argument("--sleep-check", action="store_true", help="只在空闲/跨天时消化（daemon 用）")
     p_jd.add_argument("--idle", type=int, default=None, help="空闲多少分钟算该睡，默认读配置")
     p_jn.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    p_pn = jn_sub.add_parser("purge-noise", help="清掉流水里的脚手架台词（只删还没消化的）")
+    p_pn.add_argument("--dry-run", action="store_true", help="只报会删多少，不动库")
     p_js = jn_sub.add_parser("status", help="有几篇日记、积压多少流水、该不该睡")
     p_js.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     p_jr = jn_sub.add_parser("recent", help="最近几天的日记")
@@ -1542,6 +1544,20 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"✗ 没记下来：{line.get('reason')}", file=sys.stderr)
                     return 2
                 print(f"✓ 流水 +1（{line['day_key']} · {line['role']}）")
+                return 0
+
+            if action == "purge-noise":
+                result = journal_mod.purge_noise(
+                    app.db, subject=app.subject, dry_run=bool(args.dry_run)
+                )
+                if args.json:
+                    return _emit({"ok": True, "data": result}, True)
+                verb = "会删" if result["dry_run"] else "已删"
+                print(
+                    f"— 扫了 {result['scanned']} 行未消化流水，{verb} {result['noise'] if result['dry_run'] else result['deleted']} 行脚手架台词"
+                )
+                for line in result.get("sample") or []:
+                    print(f"    {line}")
                 return 0
 
             if action == "digest":
