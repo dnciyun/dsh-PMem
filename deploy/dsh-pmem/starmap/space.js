@@ -341,7 +341,7 @@
     '  vec2 offsetPx = nrm * side * w;',
     // 关节补口：A 端往回、B 端往前各伸 0.75 个线宽，让相邻段在接缝处叠上。
     // 不补的话每段两头各留一条 1px 缝，长连线看起来就是一串虚线。
-    '  vec2 capPx = dir * (useB ? 0.75 : -0.75) * w;',
+    '  vec2 capPx = dir * (useB ? 0.35 : -0.35) * w;',
     '  clip.xy += ((offsetPx + capPx) / (uViewport * 0.5)) * clip.w;',
     '  gl_Position = clip;',
     '  float t01 = useB ? 1.0 : 0.0;',
@@ -1905,7 +1905,7 @@
         gl.uniformMatrix4fv(uLine.uView, false, viewMat);
         gl.uniformMatrix4fv(uLine.uProj, false, projMat);
         gl.uniform2f(uLine.uViewport, viewport.w, viewport.h);
-        gl.uniform1f(uLine.uAlphaMul, 2.0);
+        gl.uniform1f(uLine.uAlphaMul, 1.6);
         gl.bindVertexArray(lineVao);
         gl.drawArrays(gl.TRIANGLES, 0, scene.lineVerts);
       }
