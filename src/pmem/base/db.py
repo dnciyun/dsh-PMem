@@ -83,6 +83,7 @@ class Database:
         conn = self.conn
         self._migrate_entity_org(conn)
         self._migrate_last_surfaced(conn)
+        self._migrate_event_log_run(conn)
         for stmt in schema.DDL:
             conn.execute(stmt)
         conn.execute(f"PRAGMA application_id = {APPLICATION_ID}")
@@ -133,6 +134,23 @@ class Database:
             "CREATE INDEX IF NOT EXISTS idx_mem_last_surfaced ON memory(last_surfaced_at)"
         )
 
+    def _migrate_event_log_run(self, conn: object) -> None:
+        """老库兜底：event_log 缺 ``run_id`` 列就先补列。
+
+        ``run_id`` 是「一次运行改了什么」的因果链键，schema.DDL 里的
+        ``idx_event_run`` 依赖它。0.24.3 引入 event_log 时列就一起在了，
+        正常库不会走到这里；但早期开发库/手改库一旦缺列，直接建索引会让
+        整个库打不开——先补列，再让 DDL 幂等建索引。
+        """
+        exists = conn.execute(  # type: ignore[attr-defined]
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='event_log'"
+        ).fetchone()
+        if exists is None:
+            return
+        cols = {row["name"] for row in conn.execute("PRAGMA table_info(event_log)")}  # type: ignore[attr-defined]
+        if "run_id" not in cols:
+            conn.execute("ALTER TABLE event_log ADD COLUMN run_id TEXT")  # type: ignore[attr-defined]
+
     def _migrate_entity_org(self, conn: object) -> None:
         """1.0.0 → 1.1.0：实体表补 ``org`` 类型。
 
@@ -177,6 +195,31 @@ class Database:
         message = str(error).lower()
         return "locked" in message or "busy" in message
 
+    def _reset_after_failed_tx(self, conn: sqlite3.Connection) -> None:
+        """事务失败后收尸：连接不能停在「事务还开着」的不确定状态。
+
+        为什么要有这一步：SQLite 的 COMMIT 撞 SQLITE_BUSY 时事务仍然活着。
+        如果原样把连接留下，下一次 ``tx()`` 会看到 ``in_transaction=True``、
+        把它当成嵌套事务复用，于是后续写入全挂在这个旧事务里、再也不会提交
+        ——长驻进程（MCP / REST / scheduler）会「写成功但永不落盘」，还一直
+        占着写锁挡住别的进程。
+
+        所以：还有事务就先补一次 ``ROLLBACK``；ROLLBACK 也失败就把连接丢掉
+        （``self._conn = None``，下次访问 ``conn`` 属性按 ``_open()`` 重建），
+        把错误收敛成「这一轮失败」，而不是「从此静默丢写」。
+        """
+        try:
+            if not conn.in_transaction:
+                return
+        except sqlite3.DatabaseError:  # 连接已经关了/不可用：没有事务状态可收
+            return
+        try:
+            conn.execute("ROLLBACK")
+        except sqlite3.DatabaseError:
+            with contextlib.suppress(sqlite3.DatabaseError):
+                conn.close()
+            self._conn = None
+
     def _begin_with_retry(self, conn: sqlite3.Connection) -> None:
         import random
         import time
@@ -209,7 +252,13 @@ class Database:
                     raise
                 delay = min(self.BUSY_BASE_DELAY * (2**attempt), self.BUSY_MAX_DELAY)
                 time.sleep(delay + random.uniform(0, self.BUSY_BASE_DELAY))
-        conn.execute("COMMIT")
+        # 重试耗尽：最后一次 COMMIT 还可能抛（BUSY 之外也可能是 I/O）。
+        # 无论哪种，都不能把「事务还开着」的连接原样还回去（见 _reset_after_failed_tx）。
+        try:
+            conn.execute("COMMIT")
+        except BaseException:
+            self._reset_after_failed_tx(conn)
+            raise
 
     @contextlib.contextmanager
     def tx(self) -> Iterator[sqlite3.Connection]:
@@ -217,6 +266,9 @@ class Database:
 
         抢锁失败（SQLITE_BUSY / database is locked）会带抖动重试：
         并发写的正确语义是「等一会儿」，不是「丢这一条」。
+
+        失败（含 COMMIT 重试耗尽）时会把连接收回到干净状态，
+        必要时丢弃重开，避免后续写入挂在一个永不提交的旧事务上。
         """
         conn = self.conn
         if conn.in_transaction:
@@ -226,11 +278,16 @@ class Database:
         try:
             yield conn
         except BaseException:
-            with contextlib.suppress(sqlite3.DatabaseError):
-                conn.execute("ROLLBACK")
+            self._reset_after_failed_tx(conn)
             raise
         else:
-            self._commit_with_retry(conn)
+            try:
+                self._commit_with_retry(conn)
+            except BaseException:
+                # 非 busy 的 COMMIT 失败不会走到 _commit_with_retry 的收尸分支，
+                # 在这里再兜一次（helper 幂等：事务已清就什么都不做）。
+                self._reset_after_failed_tx(conn)
+                raise
 
     # -- 元信息 ------------------------------------------------------------
     def meta(self, key: str, default: str | None = None) -> str | None:

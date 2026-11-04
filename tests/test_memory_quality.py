@@ -267,7 +267,7 @@ class TestInvariants(Case):
 
     def test_summary_shape(self) -> None:
         summary = invariants.summary(invariants.check_all(self.db))
-        self.assertEqual(summary["total"], 16)
+        self.assertEqual(summary["total"], 17)  # 1.11.0 加了 I20（日记事实完整性）
         self.assertTrue(summary["ok"])
 
 

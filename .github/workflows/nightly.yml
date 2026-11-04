@@ -1,0 +1,36 @@
+name: Nightly
+
+# 每晚跑一次「慢测试」：多进程并发写 + 崩溃恢复。
+# 这两个文件默认规模（4×100 / 3 轮）也会在 ci.yml 的全量 pytest 里跑；
+# 这里用 PMEM_SLOW=1 放大（8×200 / 8 轮 + 超 busy_timeout 的锁等待），
+# 只跑这两个文件，不重复全量、不影响 PR 阻断。
+
+on:
+  schedule:
+    # 每天 18:47 UTC（北京时间 02:47），错开整点高峰。
+    - cron: "47 18 * * *"
+  workflow_dispatch:
+
+jobs:
+  pressure:
+    name: pressure (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install pytest
+      - name: Slow pressure tests
+        env:
+          PMEM_SLOW: "1"
+        run: python -m pytest tests/test_pressure_concurrency.py tests/test_durability.py -q

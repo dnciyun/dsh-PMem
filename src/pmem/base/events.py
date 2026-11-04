@@ -80,6 +80,16 @@ def verify_chain(conn: sqlite3.Connection) -> tuple[bool, str]:
 
 # ---- 幂等 ----------------------------------------------------------------
 
+def find_by_idem_key(conn: sqlite3.Connection, key: str) -> sqlite3.Row | None:
+    """按幂等键取**已提交**事件（``event_log.idem_key`` 唯一）。
+
+    用途：睡眠阶段的跨进程单飞。阶段事件带 ``idem_key=f"{run_id}:{stage}"``，
+    同一 run 的同一阶段全局只有一条；后到的进程据此判断"这个阶段已经有人提交了"
+    ——先查再跳过，抢跑撞键则整段事务回滚，不产生第二份副作用。
+    """
+    return conn.execute("SELECT * FROM event_log WHERE idem_key=?", (key,)).fetchone()
+
+
 def idem_lookup(conn: sqlite3.Connection, key: str) -> sqlite3.Row | None:
     return conn.execute("SELECT * FROM idem WHERE key=?", (key,)).fetchone()
 

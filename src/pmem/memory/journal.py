@@ -492,7 +492,9 @@ def digest(
         return {"ok": False, "reason": "too_few_lines", "day_key": day, "lines": len(rows)}
 
     draft = (writer or template_draft)(rows)
-    return _finish(db, subject=subject, day=day, rows=rows, draft=draft, store=store, dry_run=dry_run)
+    return _finish(
+        db, subject=subject, day=day, rows=rows, draft=draft, store=store, dry_run=dry_run, config=config
+    )
 
 
 def write_episode(
@@ -527,7 +529,9 @@ def write_episode(
     )
     if not draft.lines:
         return {"ok": False, "reason": "empty", "day_key": day}
-    return _finish(db, subject=subject, day=day, rows=rows, draft=draft, store=store, dry_run=dry_run)
+    return _finish(
+        db, subject=subject, day=day, rows=rows, draft=draft, store=store, dry_run=dry_run, config=config
+    )
 
 
 def _finish(
@@ -539,8 +543,16 @@ def _finish(
     draft: DayDraft,
     store: Any,
     dry_run: bool,
+    config: Any = None,
 ) -> dict[str, Any]:
-    """校验 → 回落 → 落 episode → 原文打上 episode_id → 事实进记忆库。"""
+    """校验 → 回落 → 落 episode → 原文打上 episode_id → 事实进记忆库。
+
+    事实写入是**事务外逐条**的（``store.add`` 自带事务，套大事务会锁死整库），
+    所以这里额外做两件事，保证「半截失败」不静默：
+
+    1. 自己这篇写完立刻对账：还缺的用同一个 ``idem_key`` 重放补齐；
+    2. 顺手扫最近 ``REPAIR_WINDOW`` 篇（上次进程被杀留下的缺口，原文还在）。
+    """
     problems = validate(draft, rows)
     if problems:
         # 编造就整篇回落：宁可流水账，也不要假日记。
@@ -616,23 +628,40 @@ def _finish(
         for index, text in enumerate(facts):
             try:
                 saved = store.add(
-                    text,
-                    kind="episodic",
-                    grade="C",
-                    grade_reason="日记派生：日常流水，按时间留着，不抢常驻位",
-                    provenance=("user_explicit" if draft.mode == "template" else "observed"),
-                    source_kind="journal",
-                    source_ref=episode_id,
-                    episode_id=episode_id,
-                    session_id=None,
-                    idem_key=f"journal:{episode_id}:{index}",
-                    valid_from=rows[0]["ts"],
+                    text, **_fact_kwargs(episode_id, index, mode=draft.mode, valid_from=rows[0]["ts"])
                 )
             except Exception as exc:  # 一条事实写不进去，不能带崩整篇日记
                 result.setdefault("errors", []).append({"text": text, "error": str(exc)})
                 continue
             if isinstance(saved, dict) and saved.get("id"):
                 result["memory_ids"].append(saved["id"])
+
+        # 对账（1.11.0）：上面任何一条没写进去，立刻按幂等键补一次。补不齐就把缺口
+        # 摆到明面上——``incomplete`` 会进返回值、I20 会一直红着，不静默。
+        if _fact_gap(db, episode_id, len(facts)) > 0:
+            fixed = repair(db, subject=subject, episode_id=episode_id, store=store, config=config)
+            result["repair"] = fixed
+            for item in fixed.get("items") or []:
+                memory_id = item.get("memory_id")
+                if memory_id and memory_id not in result["memory_ids"]:
+                    result["memory_ids"].append(memory_id)
+            gap = _fact_gap(db, episode_id, len(facts))
+            if gap > 0:
+                result["incomplete"] = gap
+                result.setdefault("errors", []).append(
+                    {
+                        "episode_id": episode_id,
+                        "missing": gap,
+                        "hint": "原文还在的话跑 `pmem journal repair` 可补齐；跑完仍红就是原料没了",
+                    }
+                )
+
+        # 顺手扫最近几篇：上一次 digest 可能在本行之前就被杀掉（episode 已提交、
+        # 事实没写完），那批流水已经消费掉，只靠当天重跑永远补不到。
+        window = int(_cfg(config).get("repair_window", REPAIR_WINDOW) or REPAIR_WINDOW)
+        swept = repair(db, subject=subject, limit=max(1, window), store=store, config=config)
+        if swept.get("added") or swept.get("failed") or swept.get("unrepairable"):
+            result["repaired_previous"] = swept
     return result
 
 
@@ -687,6 +716,273 @@ def _facts(draft: DayDraft, *, rows: list[Any]) -> list[str]:
         seen.add(body)
         out.append(body[:80])
     return out
+
+
+# -- 派生事实的写入与补写（digest / repair 共用）-----------------------------
+#
+# 为什么需要补写：``_finish`` 是**先提交日记**（一个 tx），再在事务外逐条
+# ``store.add`` 派生事实。单条失败只记进 ``result["errors"]`` 就 continue，
+# 而流水此时已经打上 ``episode_id``（= 已消费），``digest`` 不会再碰这一天——
+# 于是那天的事实会永久缺几条，而且 I1–I19 全都看不出来（1.10.0 的真实漏洞）。
+#
+# 修法不是把 digest 包成一个大事务：``store.add`` 自带事务与外键/图/关系写入，
+# 外面再套一个大事务会长时间占着写锁。正解是**幂等重放**：每条事实的
+# ``idem_key`` 是 ``journal:{episode_id}:{index}``（写进 store 的同一个事务），
+# 重放已经写成的那几条只会拿到 ``idempotent_replay``，不会重复。
+# 所以「补齐」是安全的、可重入的；补不齐就让它一直红着（I20），不允许静默。
+
+REPAIR_WINDOW = 5  # digest 收尾时顺手检查最近几篇日记
+
+
+def fact_idem_key(episode_id: str, index: int) -> str:
+    """第 ``index`` 条派生事实的幂等键。digest 与 repair 必须用同一个。"""
+    return f"journal:{episode_id}:{index}"
+
+
+def _fact_kwargs(
+    episode_id: str, index: int, *, mode: str, valid_from: str | None
+) -> dict[str, Any]:
+    """派生事实的 ``store.add`` 参数（只在一处构造，两边不会慢慢走偏）。"""
+    return {
+        "kind": "episodic",
+        "grade": "C",
+        "grade_reason": "日记派生：日常流水，按时间留着，不抢常驻位",
+        "provenance": ("user_explicit" if mode == "template" else "observed"),
+        "source_kind": "journal",
+        "source_ref": episode_id,
+        "episode_id": episode_id,
+        "session_id": None,
+        "idem_key": fact_idem_key(episode_id, index),
+        "valid_from": valid_from,
+    }
+
+
+def derived_count(db: Any, episode_id: str) -> int:
+    """这篇日记现在**还活着**的事实条数（软删/真删都不算）。"""
+    row = db.conn.execute(
+        "SELECT COUNT(*) c FROM memory WHERE episode_id=? AND status<>'deleted'",
+        (episode_id,),
+    ).fetchone()
+    return int(row["c"]) if row else 0
+
+
+def _derived_counts(db: Any) -> dict[str, int]:
+    """一次分组扫出每篇日记还活着的事实数（``memory.episode_id`` 没有索引）。"""
+    rows = db.conn.execute(
+        "SELECT episode_id, COUNT(*) c FROM memory WHERE episode_id IS NOT NULL "
+        "AND status<>'deleted' GROUP BY episode_id"
+    ).fetchall()
+    return {str(row["episode_id"]): int(row["c"]) for row in rows}
+
+
+def _attempted_counts(db: Any) -> dict[str, int]:
+    """一次扫出每篇日记「提交成功过」的事实数：``{episode_id: n}``。
+
+    幂等键是 ``store.add`` 成功时在**同一个事务**里写的，所以：键在 = 那条事实
+    曾经真的写进过库（哪怕后来被停放/真删）；键不在 = 从没写成功过。
+    为什么不逐篇 ``LIKE 'journal:{id}:%'``：LIKE 前缀在大小写不敏感时用不上主键
+    索引，逐篇扫会把 doctor 拖成 O(篇数 × 幂等行数)。整表扫一遍按前缀分组就够便宜。
+    """
+    out: dict[str, int] = {}
+    for row in db.conn.execute("SELECT key FROM idem WHERE key LIKE 'journal:%'"):
+        parts = str(row["key"]).split(":")
+        if len(parts) >= 3 and parts[1]:
+            out[parts[1]] = out.get(parts[1], 0) + 1
+    return out
+
+
+def _fact_gap(
+    db: Any, episode_id: str, claimed: int, *, derived: int | None = None, attempted: int | None = None
+) -> int:
+    """声称派生 ``claimed`` 条，实际最多只成功过几条，还差多少。"""
+    live = derived_count(db, episode_id) if derived is None else derived
+    tried = _attempted_counts(db).get(episode_id, 0) if attempted is None else attempted
+    return max(0, int(claimed) - max(live, tried))
+
+
+def _idem_live_memory(db: Any, key: str) -> str | None:
+    """幂等键对应的记忆还活着就返回 id（活着 = 不算缺）。"""
+    prior = db.conn.execute("SELECT target_id FROM idem WHERE key=?", (key,)).fetchone()
+    if prior is None or not prior["target_id"]:
+        return None
+    row = db.conn.execute(
+        "SELECT id FROM memory WHERE id=? AND status<>'deleted'", (prior["target_id"],)
+    ).fetchone()
+    return str(row["id"]) if row else None
+
+
+def _episode_facts(
+    db: Any, episode: Any
+) -> tuple[list[str], str | None, str] | None:
+    """重建一篇日记「当时应该派生」的事实清单；原料没了就返回 None。
+
+    为什么从原文重建、而不是把事实清单存进 ``episode.extra_json``：清单就是事实
+    正文的副本，存进去会让「删掉一条记忆」删不干净（日记里还留着一份），
+    那就是审计里另一个洞。代价是原文流水只活 ``keep_days`` 天——但 digest 失败
+    到 repair 之间通常只有几分钟；真救不回来就报 ``unrepairable``，不瞎补。
+    """
+    try:
+        derivation = json.loads(episode["derivation"] or "{}")
+    except (json.JSONDecodeError, TypeError):
+        derivation = {}
+    line_ids = [str(item) for item in (derivation.get("lines") or []) if item]
+    if not line_ids:
+        return None
+    marks = ",".join("?" for _ in line_ids)
+    rows = db.conn.execute(
+        f"SELECT id, role, text, ts FROM journal_line WHERE id IN ({marks})", line_ids
+    ).fetchall()
+    by_id = {str(row["id"]): row for row in rows}
+    if len(by_id) < len(line_ids):
+        return None  # 原文被 prune 了，重放不出来
+    ordered = [by_id[line_id] for line_id in line_ids]
+    draft = DayDraft(
+        title=str(episode["title"] or ""),
+        lines=[line for line in str(episode["summary"] or "").splitlines() if line],
+        mode=str(derivation.get("mode") or "template"),
+    )
+    return _facts(draft, rows=ordered), ordered[0]["ts"], str(derivation.get("mode") or "template")
+
+
+def repair(
+    db: Any,
+    subject: str = "self",
+    *,
+    episode_id: str | None = None,
+    dry_run: bool = False,
+    limit: int = 50,
+    store: Any = None,
+    config: Any = None,
+) -> dict[str, Any]:
+    """把 digest 半截失败留下的缺口按幂等键补上（可重入）。
+
+    判定一篇要不要补：``memory_count`` 声称的条数，比「现在活着的行数」和
+    「提交成功过的幂等键数」都大 —— 说明有事实**从没写进去**，不是被删了。
+    两种情况下不动它：
+
+    - 事实写进去过、后来被停放/真删（幂等键还在）：那是用户/生命周期做的删除，
+      重放等于复活，不干；
+    - 原文流水已被 prune、重建不出清单：无法判定，报 ``unrepairable``。
+
+    返回的计数就是 CLI 输出的人话：查了几篇 / 缺几条 / 补了几条 / 失败几条。
+    """
+    if store is None:
+        from .store import MemoryStore  # 延迟导入：store 也在 import 本模块
+
+        store = MemoryStore(db, config=config, subject=subject, actor="journal:repair")
+    scan = max(1, int(limit or 50))
+    sql = (
+        "SELECT id, day_key, title, summary, memory_count, derivation FROM episode "
+        "WHERE subject_id=? AND memory_count>0"
+    )
+    params: list[Any] = [subject]
+    if episode_id:
+        sql += " AND id=?"
+        params.append(episode_id)
+        scan = 1
+    sql += " ORDER BY day_key DESC, id DESC LIMIT ?"
+    params.append(scan)
+    episodes = db.conn.execute(sql, params).fetchall()
+
+    stats: dict[str, Any] = {
+        "ok": True,
+        "dry_run": bool(dry_run),
+        "episodes": len(episodes),  # 查了几篇（有派生事实的日记）
+        "gaps": 0,  # 有几篇需要补
+        "missing": 0,  # 需要补几条
+        "added": 0,  # 补成功几条
+        "failed": 0,  # 补失败几条
+        "dropped": 0,  # 写过但后来被删/停放的条数（不复活）
+        "unrepairable": 0,  # 原料没了、补不出来的篇数
+        "remaining": 0,  # 跑完之后仍然对不上的篇数
+        "errors": [],
+        "items": [],
+    }
+    # 分组扫描各一次（逐篇 COUNT/LIKE 会退化成 O(篇数 × 全表)）。
+    derived_map = _derived_counts(db)
+    attempted_map = _attempted_counts(db)
+    for episode in episodes:
+        ep_id = str(episode["id"])
+        claimed = int(episode["memory_count"] or 0)
+        live = derived_map.get(ep_id, 0)
+        tried = attempted_map.get(ep_id, 0)
+        if _fact_gap(db, ep_id, claimed, derived=live, attempted=tried) <= 0:
+            continue
+        stats["gaps"] += 1
+        rebuilt = _episode_facts(db, episode)
+        if rebuilt is None or len(rebuilt[0]) < claimed:
+            # 重建不出来：不猜、不静默，原样报出来（I20 也会一直红着）。
+            stats["unrepairable"] += 1
+            stats["items"].append(
+                {
+                    "episode_id": ep_id,
+                    "day_key": episode["day_key"],
+                    "claimed": claimed,
+                    "live": live,
+                    "attempted": tried,
+                    "reason": "原文已清理，重建不出事实清单",
+                }
+            )
+            continue
+        facts, valid_from, mode = rebuilt
+        for index, text in enumerate(facts):
+            if index >= claimed:  # memory_count 是权威值；多出来的不补
+                break
+            key = fact_idem_key(ep_id, index)
+            if _idem_live_memory(db, key) is not None:
+                continue  # 已经写成了
+            if db.conn.execute("SELECT 1 FROM idem WHERE key=?", (key,)).fetchone() is not None:
+                stats["dropped"] += 1  # 写过、后来被删：不复活
+                continue
+            stats["missing"] += 1
+            item = {
+                "episode_id": ep_id,
+                "day_key": episode["day_key"],
+                "index": index,
+                "text": text,
+            }
+            if dry_run:
+                stats["items"].append({**item, "status": "would-add"})
+                continue
+            try:
+                saved = store.add(
+                    text, **_fact_kwargs(ep_id, index, mode=mode, valid_from=valid_from)
+                )
+            except Exception as exc:  # noqa: BLE001 补写失败要留痕、可重试
+                stats["failed"] += 1
+                stats["errors"].append(
+                    {"episode_id": ep_id, "index": index, "text": text, "error": str(exc)}
+                )
+                continue
+            stats["added"] += 1
+            memory_id = saved.get("id") if isinstance(saved, dict) else None
+            stats["items"].append({**item, "status": "added", "memory_id": memory_id})
+
+    if not dry_run:
+        # 补完再核对一遍：还剩几篇对不上（补了但失败 / 原料没了）。
+        touched = {str(item["episode_id"]) for item in stats["items"] if item.get("episode_id")}
+        if touched:
+            derived_map = _derived_counts(db)
+            attempted_map = _attempted_counts(db)
+            for ep_id in touched:
+                row = db.conn.execute(
+                    "SELECT memory_count FROM episode WHERE id=?", (ep_id,)
+                ).fetchone()
+                if row is None:
+                    continue
+                gap = _fact_gap(
+                    db,
+                    ep_id,
+                    int(row["memory_count"] or 0),
+                    derived=derived_map.get(ep_id, 0),
+                    attempted=attempted_map.get(ep_id, 0),
+                )
+                if gap > 0:
+                    stats["remaining"] += 1
+    else:
+        stats["remaining"] = stats["gaps"]
+    stats["ok"] = stats["failed"] == 0
+    return stats
 
 
 def _cfg(config: Any) -> dict[str, Any]:

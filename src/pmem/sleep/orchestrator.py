@@ -5,6 +5,10 @@
 - **顺序固定**：s1→s8，不并行。睡眠不是吞吐任务，是可解释的整理流程；
 - **一阶段一事务**：阶段成功才写 checkpoint；崩溃后从最后成功阶段继续；
 - **重跑幂等**：每个阶段自己保证重复执行不新增派生行；
+- **续跑 = 一次跑完**：续跑时跳过已提交阶段，但会**重放 s1 的只读查询**把工作集
+  （``work_ids`` / ``backlog``）补回内存——否则 s3 会对空工作集空转；
+- **跨进程单飞**：阶段事件带 ``idem_key=f"{run_id}:{stage}"``（``event_log.idem_key`` 唯一）。
+  后到者先查幂等键直接采纳；抢跑撞键则整个阶段事务回滚、采纳赢家 stats，不产生第二份副作用。
 - **dry-run**：整轮放在一个事务里，最后 ROLLBACK，只写报告文件。
 
 ``s8 snapshot`` 是唯一不在事务里的阶段：``VACUUM INTO`` 不能跑在事务中，
@@ -14,6 +18,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -50,6 +55,50 @@ def _checkpoint(row: Any) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def _stage_idem_key(run_id: str, name: str) -> str:
+    """阶段事件的幂等键：``run_id:stage``（docs/03 §9，跨进程单飞靠它）。"""
+    return f"{run_id}:{name}"
+
+
+def _committed_stage(db: Database, run_id: str, name: str) -> dict[str, Any] | None:
+    """同一 run 的该阶段是否已由别的进程提交？返回其 stats；没有返回 None。
+
+    阶段事件和阶段写入在同一个事务里提交，所以"事件存在"等价于"这个阶段已经落盘"。
+    """
+    row = events.find_by_idem_key(db.conn, _stage_idem_key(run_id, name))
+    if row is None:
+        return None
+    try:
+        payload = json.loads(row["payload_json"] or "{}")
+    except (json.JSONDecodeError, TypeError):
+        payload = {}
+    stats = payload.get("stats")
+    return stats if isinstance(stats, dict) else {}
+
+
+def _adopt_stage(checkpoint: dict[str, Any], name: str, stats: dict[str, Any]) -> dict[str, Any]:
+    """把"别人已提交"的阶段记进内存 checkpoint（不写库，交给 _finish 统一落盘）。"""
+    updated = dict(checkpoint)
+    updated[name] = {"ok": True, "at": now_iso(), "stats": stats, "adopted": True}
+    return updated
+
+
+def _drop_loser_snapshot(
+    db: Database, *, keep_stats: dict[str, Any], drop_stats: dict[str, Any]
+) -> None:
+    """并发 s8 撞键后的收尸：删掉本进程多插的快照行，只留先提交者的。
+
+    ``VACUUM INTO`` 不能进事务（s8 在事务外），所以两个进程可能各插一行同 path 的
+    ``snapshot``。阶段事件的幂等键决定了谁是赢家，输家自己那行要清掉。
+    """
+    keep_id = keep_stats.get("snapshot_id")
+    drop_id = drop_stats.get("snapshot_id")
+    if not keep_id or not drop_id or keep_id == drop_id:
+        return
+    with db.tx() as conn:
+        conn.execute("DELETE FROM snapshot WHERE id=?", (drop_id,))
+
+
 def _resumable(db: Database, subject: str, day_key: str) -> Any | None:
     return db.conn.execute(
         "SELECT * FROM sleep_run WHERE subject_id=? AND day_key=? AND status IN ('running','partial') "
@@ -75,6 +124,7 @@ def _create_run(db: Database, *, subject: str, day_key: str, trigger: str) -> st
             target_id=run_id,
             subject_id=subject,
             payload={"day_key": day_key, "trigger": trigger},
+            run_id=run_id,
         )
     return run_id
 
@@ -103,6 +153,9 @@ def _save_stage(
         target_id=run_id,
         subject_id=subject,
         payload={"day_key": day_key, "stage": name, "stats": stats},
+        # 幂等键即跨进程单飞护栏：同一 run 的同一阶段全局只能提交一次。
+        idem_key=_stage_idem_key(run_id, name),
+        run_id=run_id,
     )
     return updated
 
@@ -189,28 +242,40 @@ def _finish(
         "elapsed_s": round(elapsed, 4),
         "report_path": report_path,
     }
-    with db.tx() as conn:
-        conn.execute(
-            "UPDATE sleep_run SET status=?, finished_at=?, checkpoint_json=?, stats_json=?, error=? "
-            "WHERE id=?",
-            (
-                status,
-                now_iso(),
-                json.dumps(checkpoint, ensure_ascii=False),
-                json.dumps(summary, ensure_ascii=False),
-                error,
-                run_id,
-            ),
-        )
-        events.append(
-            conn,
-            actor="system:sleep",
-            op="sleep.finish",
-            target_tbl="sleep_run",
-            target_id=run_id,
-            subject_id=subject,
-            payload={"day_key": day_key, "status": status, "elapsed_s": round(elapsed, 4)},
-        )
+    # 收尾事件按"收尾状态"取幂等键：同一条 run 可以先 partial 收尾、续跑后再 ok 收尾
+    # （顺序续跑是合法的多次收尾，两边状态不同 → 键不同）；而并发续跑的两个进程通常
+    # 都以 ok 收尾、算出同一个键，后到者撞 UNIQUE 后放弃写状态——正好是单飞。
+    # 键里不用"第几次收尾"的计数：读计数与插入不在同一快照里，后到者会算出 +1 而漏网。
+    finish_key = f"{run_id}:finish:{status}"
+    try:
+        with db.tx() as conn:
+            conn.execute(
+                "UPDATE sleep_run SET status=?, finished_at=?, checkpoint_json=?, stats_json=?, error=? "
+                "WHERE id=?",
+                (
+                    status,
+                    now_iso(),
+                    json.dumps(checkpoint, ensure_ascii=False),
+                    json.dumps(summary, ensure_ascii=False),
+                    error,
+                    run_id,
+                ),
+            )
+            events.append(
+                conn,
+                actor="system:sleep",
+                op="sleep.finish",
+                target_tbl="sleep_run",
+                target_id=run_id,
+                subject_id=subject,
+                payload={"day_key": day_key, "status": status, "elapsed_s": round(elapsed, 4)},
+                idem_key=finish_key,
+                run_id=run_id,
+            )
+    except sqlite3.IntegrityError:
+        if events.find_by_idem_key(db.conn, finish_key) is None:
+            raise
+        # 另一进程已用同一状态收尾：它的 status/checkpoint/stats 为准，不覆盖
 
 
 def _context(
@@ -357,10 +422,38 @@ def run(
     error: str | None = None
     status = "ok"
     stopped = False
+    stats: dict[str, Any] | None = None
+
+    def _replay_collect() -> str | None:
+        """续跑时重放 s1 的只读查询，把工作集（work_ids/notes）补回内存。"""
+        try:
+            STAGE_FNS["s1_collect"](ctx)
+            return None
+        except Exception as exc:  # noqa: BLE001 工作集重建失败按阶段失败处理
+            return f"s1_collect(replay): {type(exc).__name__}: {exc}"
 
     for name in STAGES:
         prior = checkpoint.get(name)
         if isinstance(prior, dict) and prior.get("ok"):
+            # 续跑：s1 已被 checkpoint 跳过，但它的产物只在内存里。重放 s1（纯只读）
+            # 把 work_ids/backlog 补回来，否则 s3 会对着空工作集空转——续跑 ≠ 一次跑完。
+            # stats 仍沿用 checkpoint 里那次的，不改写已完成阶段的历史。
+            if name == "s1_collect":
+                replay_error = _replay_collect()
+                if replay_error is not None:
+                    error = replay_error
+                    results.append(
+                        {
+                            "name": name,
+                            "ok": False,
+                            "skipped": False,
+                            "ms": 0,
+                            "stats": {},
+                            "error": error,
+                        }
+                    )
+                    status = "partial" if any(item.get("ok") for item in results) else "failed"
+                    break
             results.append(
                 {
                     "name": name,
@@ -372,7 +465,45 @@ def run(
             )
             continue
 
+        # 跨进程单飞：同一 run 的同一阶段只要有人提交过（事件就在同一事务里），
+        # 后到者直接采纳它的 stats，不重复执行。
+        committed = _committed_stage(db, run_id, name)
+        if committed is not None:
+            if name == "s1_collect":
+                replay_error = _replay_collect()
+                if replay_error is not None:
+                    error = replay_error
+                    results.append(
+                        {
+                            "name": name,
+                            "ok": False,
+                            "skipped": False,
+                            "ms": 0,
+                            "stats": {},
+                            "error": error,
+                        }
+                    )
+                    status = "partial" if any(item.get("ok") for item in results) else "failed"
+                    break
+            checkpoint = _adopt_stage(checkpoint, name, committed)
+            results.append(
+                {
+                    "name": name,
+                    "ok": True,
+                    "skipped": True,
+                    "adopted": True,
+                    "ms": 0,
+                    "stats": committed,
+                }
+            )
+            if stop_at == name:
+                stopped = True
+                status = "partial"
+                break
+            continue
+
         t0 = time.perf_counter()
+        stats = None
         try:
             if name == "s8_snapshot":
                 stats = STAGE_FNS[name](ctx)
@@ -398,6 +529,30 @@ def run(
                         name=name,
                         stats=stats,
                     )
+        except sqlite3.IntegrityError:
+            # 抢跑撞了幂等键：另一进程已提交该阶段；本进程的阶段事务整体回滚。
+            # 采纳对方的 stats 继续，不把整轮判失败（这就是单飞护栏）。
+            committed = _committed_stage(db, run_id, name)
+            if committed is None:
+                raise
+            if name == "s8_snapshot" and isinstance(stats, dict):
+                _drop_loser_snapshot(db, keep_stats=committed, drop_stats=stats)
+            checkpoint = _adopt_stage(checkpoint, name, committed)
+            results.append(
+                {
+                    "name": name,
+                    "ok": True,
+                    "skipped": True,
+                    "adopted": True,
+                    "ms": int((time.perf_counter() - t0) * 1000),
+                    "stats": committed,
+                }
+            )
+            if stop_at == name:
+                stopped = True
+                status = "partial"
+                break
+            continue
         except Exception as exc:
             error = f"{name}: {type(exc).__name__}: {exc}"
             results.append(

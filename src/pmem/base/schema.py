@@ -233,6 +233,10 @@ DDL: list[str] = [
     """,
     "CREATE INDEX IF NOT EXISTS idx_event_ts ON event_log(ts)",
     "CREATE INDEX IF NOT EXISTS idx_event_target ON event_log(target_tbl, target_id)",
+    # run_id 是「一次运行改了什么」的因果链键：睡眠/进化/备份/评测的事件都带它。
+    # 0.24.3 引入 event_log 时列就一起在了；早期/手改库若缺列，由
+    # Database._migrate_event_log_run 先补列（幂等），这里只负责幂等建索引。
+    "CREATE INDEX IF NOT EXISTS idx_event_run ON event_log(run_id)",
     # ---- 关系网络 --------------------------------------------------------
     ENTITY_DDL,
     *ENTITY_INDEXES,

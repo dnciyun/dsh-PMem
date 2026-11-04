@@ -340,6 +340,11 @@ def main(argv: list[str] | None = None) -> int:
     p_exp = sub.add_parser("export", help="导出 JSONL")
     p_exp.add_argument("--out", default=None)
     p_exp.add_argument("--no-redact", action="store_true")
+    p_exp.add_argument(
+        "--with-events",
+        action="store_true",
+        help="连同 event_log 一起导出（事件是哈希链，导入端要求空库）",
+    )
     p_imp = sub.add_parser("import", help="导入 JSONL（M8）")
     p_imp.add_argument("path", nargs="?", default="-", help="文件路径；- 表示 stdin")
     p_imp.add_argument("--on-conflict", choices=["skip", "merge", "fail"], default="skip")
@@ -777,6 +782,11 @@ def main(argv: list[str] | None = None) -> int:
     p_jr = jn_sub.add_parser("recent", help="最近几天的日记")
     p_jr.add_argument("--limit", type=int, default=7)
     p_jr.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    p_jrp = jn_sub.add_parser("repair", help="补齐日记声称派生但没写成的事实（幂等重放，可反复跑）")
+    p_jrp.add_argument("--dry-run", action="store_true", help="只报告缺多少，不写库")
+    p_jrp.add_argument("--limit", type=int, default=50, help="最多检查多少篇日记（默认 50）")
+    p_jrp.add_argument("--episode", default=None, help="只修这一篇（episode id）")
+    p_jrp.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
 
     p_sh = sub.add_parser("shadow", help="影子模式（只记录不注入）")
     sh_sub = p_sh.add_subparsers(dest="action", required=True)
@@ -1608,6 +1618,36 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"✓ 原话索引已重建：{result['indexed']}/{result['lines']} 行")
                 return 0
 
+            if action == "repair":
+                result = journal_mod.repair(
+                    app.db,
+                    subject=app.subject,
+                    episode_id=args.episode,
+                    dry_run=bool(args.dry_run),
+                    limit=int(args.limit or 50),
+                    store=app.store,
+                    config=app.config,
+                )
+                if args.json:
+                    return _emit({"ok": True, "data": result}, True)
+                verb = "会补" if result["dry_run"] else "已补"
+                print(
+                    f"— 查了 {result['episodes']} 篇日记，{result['gaps']} 篇有缺口："
+                    f"缺 {result['missing']} 条，{verb} {result['added']} 条，失败 {result['failed']} 条"
+                )
+                if result.get("dropped"):
+                    print(f"  （另有 {result['dropped']} 条写过、后来被删，按删除处理，不复活）")
+                if result.get("unrepairable"):
+                    print(f"  ! {result['unrepairable']} 篇的原文已清理，重建不出事实清单")
+                if result.get("remaining"):
+                    print(f"  ! {result['remaining']} 篇仍对不上：先看上面的失败原因，再跑一次")
+                for err in result.get("errors") or []:
+                    print(
+                        f"    ✗ #{err.get('index')} {str(err.get('text') or '')[:24]}："
+                        f"{err.get('error')}"
+                    )
+                return 1 if result.get("failed") else 0
+
             if action == "digest":
                 idle = args.idle if args.idle is not None else int(app.config.get("journal.idle_minutes", 45) or 45)
                 if args.sleep_check:
@@ -2038,10 +2078,15 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "history":
             return _emit(app.history(args.id, limit=args.limit), args.json)
         if args.cmd == "export":
-            text = app.export(redact=not args.no_redact)
+            text = app.export(redact=not args.no_redact, include_events=args.with_events)
             if args.out:
                 Path(args.out).write_text(text, encoding="utf-8")
-                print(f"已导出 → {args.out}（{len(text.splitlines()) - 1} 条）")
+                header = json.loads(text.splitlines()[0]) if text.strip() else {}
+                counts = header.get("counts") or {}
+                detail = f"记忆 {counts.get('memory', 0)} 条"
+                if args.with_events:
+                    detail += f"，事件 {counts.get('event', 0)} 条"
+                print(f"已导出 → {args.out}（{detail}）")
                 return 0
             sys.stdout.write(text)
             return 0
@@ -2061,6 +2106,7 @@ def main(argv: list[str] | None = None) -> int:
             print(
                 f"导入：{stats['input']} 行 → 新增 {stats['inserted']} / 合并 {stats['merged']} / "
                 f"跳过 {stats['skipped']} / 忽略 {stats['ignored']}"
+                + (f"；事件 {stats['events_inserted']} 条" if stats.get("events_input") else "")
                 + ("（dry-run，未落库）" if stats["dry_run"] else "")
             )
             return 0

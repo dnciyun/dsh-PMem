@@ -257,7 +257,7 @@ pmem import pexport.jsonl
 
 ```bash
 pmem dsh status      # 装在不在、MCP 片段对不对、python 是不是同一个
-pmem doctor          # 完整性 / 事件链 / 16 条不变量
+pmem doctor          # 完整性 / 事件链 / 17 条不变量
 pmem stats           # integrity_ok / db_path / 条数分布
 pmem trace "那句话"   # 按字查原话：在不在、谁说的、哪次会话第几行
 ```

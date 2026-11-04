@@ -11,6 +11,7 @@ import re
 from datetime import date, datetime, time, timedelta
 from typing import Any
 
+from ..base import events
 from ..base.clock import now_iso, to_iso
 from ..base.db import Database
 from .audit import audit
@@ -286,6 +287,22 @@ def write(db: Database, *, subject: str = "self", key: str | None = None, **kwar
                     "INSERT INTO metrics(ts, day_key, name, value, labels_json) VALUES(?,?,?,?,?)",
                     (ts, end_day, f"reflect.{name}", float(value), "{}"),
                 )
+        # 周报是派生视图（只写 reflection/metrics），但它是一次真实运行的产物：
+        # 补一条事件，monthly/星图/审计才能回答「这周的反思跑过没有、结论几个」。
+        events.append(
+            conn,
+            actor="system:reflect",
+            op="reflect.report",
+            target_tbl="reflection",
+            target_id=reflection_id,
+            subject_id=subject,
+            payload={
+                "period": period,
+                "quality": payload.get("quality"),
+                "defects": len(payload.get("findings") or []),
+                "suggestions": len(payload.get("suggestions") or []),
+            },
+        )
     return {
         **payload,
         "id": reflection_id,

@@ -20,6 +20,7 @@ import math
 import re
 from typing import Any, Iterable
 
+from ..base import events
 from ..base.clock import now_iso
 from ..base.ids import ulid
 from ..memory.text import normalize
@@ -745,6 +746,24 @@ def merge(db: Any, keep_id: str, drop_id: str, *, actor: str = "system:net") -> 
         "last_seen=? WHERE id=?",
         (keep_id, now_iso(), keep_id),
     )
+    # 合并会改挂别名/提及/关系/分组/等级，是事实层的结构性变更：留一条事件，
+    # 否则「这个实体去哪了」在 event_log 里查不到（只有 status='merged'+canonical_id 可猜）。
+    with db.tx() as conn:
+        events.append(
+            conn,
+            actor=actor,
+            op="entity.merge",
+            target_tbl="entity",
+            target_id=keep_id,
+            subject_id=keep["subject_id"],
+            payload={
+                "merged_id": drop_id,
+                "merged_name": drop["name"],
+                "aliases": moved_alias,
+                "mentions": moved_mention,
+                "relations": moved_rel,
+            },
+        )
     return {
         "keep": keep_id,
         "merged": drop_id,

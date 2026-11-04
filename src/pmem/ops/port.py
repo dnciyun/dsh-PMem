@@ -9,7 +9,8 @@
 4. 整批一个事务，失败整体回滚；
 5. 向量不导入，`memory_vec_plain` 留空。
 
-只处理 `type=memory`；entity/relation/trait 行会记入 `ignored`，由 net/sleep 重算。
+只处理 `type=memory` 与 `type=event`（事件行是可选的整链快照，见 ``import_jsonl``）；
+entity/relation/trait 行会记入 `ignored`，由 net/sleep 重算。
 """
 
 from __future__ import annotations
@@ -165,6 +166,100 @@ _COLUMNS = (
     "last_used_at,decay_score,extra_json,deleted_at"
 )
 
+# ---- 事件日志导出/导入（M29） ---------------------------------------------
+# 导出行：{"type": "event", "seq": ..., ..., "payload": {...}}
+# 为什么 payload 用 JSON 值而不是原始字符串：外部工具/人读都方便。导入时按
+# ``events.append`` 同一套 canonical 规则重新序列化——event_log 的 payload_json
+# 一律由 events.append 写成 canonical JSON，所以「导出→导入」后逐字节相同，
+# 哈希链可原样验证。若有人手改过 payload_json（非 canonical），导入端会在
+# verify_chain 处明确报错，而不是悄悄放过。
+_EVENT_FIELDS = (
+    "seq",
+    "id",
+    "ts",
+    "actor",
+    "op",
+    "target_tbl",
+    "target_id",
+    "subject_id",
+    "idem_key",
+    "run_id",
+    "prev_hash",
+    "hash",
+)
+_EVENT_SELECT = "SELECT " + ",".join(_EVENT_FIELDS) + ",payload_json FROM event_log ORDER BY seq"
+_EVENT_INSERT = (
+    "INSERT INTO event_log(seq,id,ts,actor,op,target_tbl,target_id,subject_id,payload_json,"
+    "idem_key,run_id,prev_hash,hash) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"
+)
+
+
+def _payload_value(raw: Any) -> Any:
+    try:
+        return json.loads(raw or "{}")
+    except (json.JSONDecodeError, TypeError):
+        return {"_raw": raw}
+
+
+def _event_payload_json(record: dict[str, Any]) -> str:
+    payload = record.get("payload")
+    if payload is None:
+        return "{}"
+    if isinstance(payload, str):
+        return payload
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def export_event_records(db: Database, *, limit: int | None = None) -> list[dict[str, Any]]:
+    """把 event_log 转成可导出的 ``type=event`` 行（按 seq 升序）。"""
+    sql = _EVENT_SELECT + (" LIMIT ?" if limit else "")
+    rows = db.conn.execute(sql, (int(limit),) if limit else ()).fetchall()
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        item: dict[str, Any] = {"type": "event"}
+        for field in _EVENT_FIELDS:
+            item[field] = row[field]
+        item["payload"] = _payload_value(row["payload_json"])
+        out.append(item)
+    return out
+
+
+def _event_insert_row(record: dict[str, Any]) -> tuple[Any, ...]:
+    raw_seq = record.get("seq")
+    if isinstance(raw_seq, bool) or not isinstance(raw_seq, int):
+        try:
+            raw_seq = int(str(raw_seq))
+        except (TypeError, ValueError):
+            raise ValidationError("事件记录缺少合法的 seq", field="data") from None
+    if raw_seq <= 0:
+        raise ValidationError("事件记录的 seq 必须为正整数", field="data")
+    event_id = str(record.get("id") or "").strip()
+    if not event_id:
+        raise ValidationError("事件记录缺少 id", field="data")
+    for required in ("ts", "actor", "op", "hash"):
+        if not str(record.get(required) or "").strip():
+            raise ValidationError(f"事件记录缺少 {required}", field="data")
+
+    def opt(name: str) -> str | None:
+        value = record.get(name)
+        return None if value is None or value == "" else str(value)
+
+    return (
+        raw_seq,
+        event_id,
+        str(record["ts"]),
+        str(record["actor"]),
+        str(record["op"]),
+        opt("target_tbl"),
+        opt("target_id"),
+        opt("subject_id"),
+        _event_payload_json(record),
+        opt("idem_key"),
+        opt("run_id"),
+        opt("prev_hash"),
+        str(record["hash"]),
+    )
+
 
 def import_jsonl(
     db: Database,
@@ -180,23 +275,51 @@ def import_jsonl(
     header, records = parse_jsonl(data)
     _check_header(db, header)
 
+    memory_records = [record for record in records if record.get("type") == "memory"]
+    event_records = [record for record in records if record.get("type") == "event"]
+    event_rows = sorted(
+        (_event_insert_row(record) for record in event_records), key=lambda row: row[0]
+    )
+    event_ids = [row[1] for row in event_rows]
+    if len(set(event_ids)) != len(event_ids):
+        raise ValidationError("导出文件里事件 id 重复", field="data")
+    if event_rows:
+        # 哈希链按 seq 首尾相连：只能整条链落进空日志。往已有事件后面追加另一条链，
+        # 从第一条开始 prev_hash 就对不上——与其导入后链断，不如当场拒绝。
+        existing_events = int(
+            db.conn.execute("SELECT COUNT(*) c FROM event_log").fetchone()["c"]
+        )
+        if existing_events:
+            raise ValidationError(
+                "目标库已有事件日志，不能把另一条哈希链合并进来",
+                hint=(
+                    "事件日志按 seq 串成哈希链，只能导入到空库；整库迁移请直接用备份文件"
+                    "（pmem backup / snapshot），或导出时不带事件、只导入记忆。"
+                ),
+                field="event_log",
+            )
+
     stats = {
         "input": len(records),
         "inserted": 0,
         "merged": 0,
         "skipped": 0,
         "failed": 0,
-        "ignored": 0,
+        "ignored": len(records) - len(memory_records) - len(event_records),
+        "events_inserted": 0,
+        "events_input": len(event_rows),
         "dry_run": dry_run,
     }
     seen: set[str] = set()
 
     try:
         with db.tx() as conn:
-            for record in records:
-                if record.get("type") != "memory":
-                    stats["ignored"] += 1
-                    continue
+            # 事件先写：后面导入记忆时补发的事件会接到这条链的尾巴上，链仍然连续。
+            for row in event_rows:
+                conn.execute(_EVENT_INSERT, row)
+            if event_rows:
+                stats["events_inserted"] = len(event_rows)
+            for record in memory_records:
                 row = _row_from_record(record, subject=subject)
                 memory_id = row["id"]
                 if memory_id in seen:
@@ -232,18 +355,22 @@ def import_jsonl(
                     values,
                 )
                 if not dry_run:
-                    events.append(
-                        conn,
-                        actor=actor,
-                        op="memory.import",
-                        target_tbl="memory",
-                        target_id=memory_id,
-                        subject_id=subject,
-                        payload={
-                            "source": header.get("created_at"),
-                            "schema": header.get("schema_version"),
-                        },
-                    )
+                    # 事件日志随导出一起导入时，源库的 memory.add 事件已经记过这些记忆；
+                    # 再补 memory.import 会让「导出 N 条事件 → 导入 N 条」对不上。分组/等级
+                    # 是本地新动作，它们自己的事件照写（链会继续往后接）。
+                    if not event_rows:
+                        events.append(
+                            conn,
+                            actor=actor,
+                            op="memory.import",
+                            target_tbl="memory",
+                            target_id=memory_id,
+                            subject_id=subject,
+                            payload={
+                                "source": header.get("created_at"),
+                                "schema": header.get("schema_version"),
+                            },
+                        )
                     groups = record.get("groups")
                     if isinstance(groups, list):
                         for path in groups:
@@ -266,6 +393,14 @@ def import_jsonl(
                         )
                 stats["inserted"] += 1
 
+            if event_rows:
+                chain_ok, chain_detail = events.verify_chain(conn)
+                if not chain_ok:
+                    raise ValidationError(
+                        f"导入的事件哈希链校验失败：{chain_detail}",
+                        hint="导出文件可能被修改或不完整；请重新导出，或关掉 --with-events 只导入记忆。",
+                        field="event_log",
+                    )
             if dry_run:
                 raise _DryRun(stats)
     except _DryRun as exc:

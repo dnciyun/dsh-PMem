@@ -1,4 +1,4 @@
-"""不变量自检（`docs/02` §5 I1–I19）。
+"""不变量自检（`docs/02` §5 I1–I20）。
 
 ``pmem doctor`` 调它。每条返回 ``{id, ok, detail}``；失败不抛异常 —— 体检要能一次看全。
 """
@@ -203,6 +203,42 @@ def check_all(db: Database, *, subject: str = "self") -> list[dict[str, Any]]:
         "I19",
         bad_vec == 0 and dangling_vec == 0,
         f"{bad_vec} 条向量维度不自洽，{dangling_vec} 条向量指向不存在的记忆",
+    )
+
+    # I20 日记「声称派生的事实」必须真的派生过（digest 半截失败的探测器）
+    #
+    # 判据不是「现在还剩几条」，而是「提交成功过几条」：一条日记派生的事实会在
+    # ``store.add`` 的同一个事务里留下 ``idem_key = journal:{episode_id}:{index}``。
+    # 所以「行还在 / 被停放 / 被真删」三种都算派生过（幂等键还在），只有
+    # **半截失败**（进程被杀、store.add 抛错）才既没有行也没有幂等键。
+    # 这样「用户真删了一条日记事实」不会把 I20 弄红，而「digest 少写了几条」会红。
+    #
+    # 两次分组扫描，不逐篇 COUNT/LIKE：``memory.episode_id`` 没有索引，
+    # 逐篇查会退化成 O(篇数 × 全表)，把 doctor 拖慢。
+    derived_map = {
+        str(row["episode_id"]): int(row["c"])
+        for row in conn.execute(
+            "SELECT episode_id, COUNT(*) c FROM memory WHERE episode_id IS NOT NULL GROUP BY episode_id"
+        )
+    }
+    attempted_map: dict[str, int] = {}
+    for row in conn.execute("SELECT key FROM idem WHERE key LIKE 'journal:%'"):
+        parts = str(row["key"]).split(":")
+        if len(parts) >= 3 and parts[1]:
+            attempted_map[parts[1]] = attempted_map.get(parts[1], 0) + 1
+    bad_episodes = 0
+    missing_facts = 0
+    for row in conn.execute("SELECT id, memory_count FROM episode WHERE memory_count>0"):
+        claimed = int(row["memory_count"] or 0)
+        accounted = max(derived_map.get(str(row["id"]), 0), attempted_map.get(str(row["id"]), 0))
+        if accounted < claimed:
+            bad_episodes += 1
+            missing_facts += claimed - accounted
+    add(
+        "I20",
+        bad_episodes == 0,
+        f"{bad_episodes} 篇日记声称的事实没派生全（共缺 {missing_facts} 条；"
+        f"`pmem journal repair` 可补）",
     )
 
     return results

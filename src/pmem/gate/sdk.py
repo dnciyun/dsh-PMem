@@ -538,6 +538,39 @@ class PMem:
         except PmemError as exc:
             return self._fail(exc, started)
 
+    def journal_repair(
+        self,
+        *,
+        episode_id: str | None = None,
+        dry_run: bool = False,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """补齐「日记声称派生、但事实没写成」的缺口（幂等重放，可反复跑）。
+
+        为什么需要它：``journal digest`` 是先提交日记、再在事务外逐条写事实；
+        进程在那之间被杀，或者某条事实写入失败，流水已经标记消费，重跑 digest
+        只会得到 ``no_lines``。缺口靠 ``idem_key=journal:{episode_id}:{index}``
+        重放补上，补不齐就让它一直红着（不变量 I20），不静默。
+        """
+        started = time.perf_counter()
+        from ..memory import journal
+
+        try:
+            return self._ok(
+                journal.repair(
+                    self.db,
+                    subject=self.subject,
+                    episode_id=episode_id,
+                    dry_run=bool(dry_run),
+                    limit=50 if limit is None else int(limit),
+                    store=self.store,
+                    config=self.config,
+                ),
+                started,
+            )
+        except PmemError as exc:
+            return self._fail(exc, started)
+
     def trace(
         self, query: str, *, limit: int = 20, include_retracted: bool = False
     ) -> dict[str, Any]:
@@ -1135,11 +1168,19 @@ class PMem:
         except PmemError as exc:
             return self._fail(exc, started)
 
-    def export(self, *, redact: bool = True) -> str:
-        """导出 JSONL（04 §5.9）。M1 只导记忆 + 元信息。"""
+    def export(self, *, redact: bool = True, include_events: bool = False) -> str:
+        """导出 JSONL（04 §5.9）：记忆 + 元信息；可选整条事件日志。
+
+        ``include_events=True`` 追加 ``type=event`` 行（按 seq 升序）。事件日志是
+        哈希链，所以导入端只接受空 event_log 的库（见 ``ops/port.import_jsonl``）。
+        事件 payload 原样导出：改一个字节，链就验不过——这也是它可信的原因。
+        """
         import json
 
+        from ..ops.port import export_event_records
+
         lines: list[str] = []
+        event_records = export_event_records(self.db) if include_events else []
         header = {
             "type": "pmem_export",
             "version": "v1",
@@ -1149,13 +1190,15 @@ class PMem:
             "counts": {},
         }
         rows = self.db.conn.execute("SELECT * FROM memory WHERE status<>'deleted' ORDER BY seq").fetchall()
-        header["counts"] = {"memory": len(rows)}
+        header["counts"] = {"memory": len(rows), "event": len(event_records)}
         lines.append(json.dumps(header, ensure_ascii=False))
         for row in rows:
             payload = self.store._to_item(row, include_extra=True)
             if redact and row["sensitivity"] == "secret":
                 payload["text"] = "[redacted]"
             lines.append(json.dumps({"type": "memory", **payload}, ensure_ascii=False))
+        for record in event_records:
+            lines.append(json.dumps(record, ensure_ascii=False))
         return "\n".join(lines) + "\n"
 
     def sleep_history(self, *, limit: int = 14) -> dict[str, Any]:
@@ -1195,12 +1238,28 @@ class PMem:
         return self._ok({"runs": runs, "limit": len(runs)}, started)
 
     # -- 迁移（M8） --------------------------------------------------------
-    def export_bundle(self, *, redact: bool = True) -> dict[str, Any]:
+    def export_bundle(self, *, redact: bool = True, include_events: bool = False) -> dict[str, Any]:
         started = time.perf_counter()
-        text = self.export(redact=redact)
-        count = max(0, len(text.splitlines()) - 1)
+        text = self.export(redact=redact, include_events=include_events)
+        memory_count = event_count = 0
+        for line in text.splitlines()[1:]:
+            try:
+                kind = json.loads(line).get("type")
+            except json.JSONDecodeError:
+                continue
+            if kind == "memory":
+                memory_count += 1
+            elif kind == "event":
+                event_count += 1
         return self._ok(
-            {"format": "jsonl", "count": count, "jsonl": text, "redacted": redact}, started
+            {
+                "format": "jsonl",
+                "count": memory_count,
+                "events": event_count,
+                "jsonl": text,
+                "redacted": redact,
+            },
+            started,
         )
 
     def import_bundle(

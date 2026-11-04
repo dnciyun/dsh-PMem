@@ -163,6 +163,9 @@ class BackupCase(unittest.TestCase):
         self.assertEqual(drill["restored"]["memory"], 3)
         self.assertEqual(drill["counts"]["memory"], 3)
         self.assertIn("event_chain", {item["name"] for item in drill["checks"]})
+        # 备份是整库副本：event_log 应原样在副本里（条数与备份时一致，链由上面 event_chain 校验）
+        self.assertEqual(drill["counts"]["event"], result["counts"]["event"])
+        self.assertGreater(drill["counts"]["event"], 0)
         self.assertGreaterEqual(drill["restore_ms"], 0)
 
     def test_prune_keeps_latest(self) -> None:

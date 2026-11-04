@@ -2,8 +2,9 @@
 
 每个阶段只做一件事，输入输出都是可序列化的 stats；阶段之间不共享
 内存里的对象，只共享 ``SleepContext``（当天的工作集与配置）。
-这样"模拟崩溃后续跑"才成立：从 checkpoint 恢复时，s1 会重新算出
-同样的工作集，后面的阶段照常走。
+这样"模拟崩溃后续跑"才成立：从 checkpoint 恢复时，编排器会**重放 s1 的
+只读查询**重新算出同样的工作集（``orchestrator.run`` 里 checkpoint 命中
+s1 时调用 ``s1_collect``），后面的阶段照常走。
 """
 
 from __future__ import annotations
