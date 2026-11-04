@@ -230,6 +230,9 @@ def evaluate_persona(corpus: dict, k: int) -> dict:
                         "rank": rank,
                         "mrr": (1.0 / rank) if rank else 0.0,
                         "noise_bad": noise_bad,
+                        "origin": probe.get("origin") or "original",
+                        "query": probe.get("query"),
+                        "hardness": probe.get("hardness"),
                         "fresh_ok": (rank is not None) if probe.get("category") == "update" else None,
                         "retrieval_ms": res["retrieval_ms"],
                         "inject_tokens": round(tokens(res["card"]) + tokens("".join(h["text"] for h in res["hits"])), 1),
@@ -273,14 +276,60 @@ def summarize(all_rows: list[dict]) -> dict:
     }
 
 
+def load_negatives(path: Path | None = None) -> dict[str, list[dict]]:
+    """读合成的硬负例（M29）。没有这个文件就返回空字典，评测照常跑。"""
+    target = path or (DATA / "hard-negatives.json")
+    if not target.is_file():
+        return {}
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    personas = payload.get("personas") or {}
+    return {str(k): list(v) for k, v in personas.items() if isinstance(v, list)}
+
+
+def summarize_negatives(rows: list[dict]) -> dict:
+    """硬负例单独汇总：题数、不重复问句、前 3 纯净度、共存 / 被挤掉、分档表现。"""
+    if not rows:
+        return {"probes": 0}
+    single = [r for r in rows if r.get("category") in ("precision", "no_memory")]
+    purity = round(100.0 * sum(1 for r in single if not r["noise_bad"]) / max(1, len(single)), 1)
+    coexist = sum(1 for r in single if r["noise_bad"] and r["rank"] is not None)
+    distract = sum(1 for r in single if r["noise_bad"] and r["rank"] is None)
+    by_tier: dict[str, dict] = {}
+    for tier in (1, 2, 3):
+        tier_rows = [r for r in single if r.get("hardness") == tier]
+        if not tier_rows:
+            continue
+        by_tier[str(tier)] = {
+            "probes": len(tier_rows),
+            "purity": round(
+                100.0 * sum(1 for r in tier_rows if not r["noise_bad"]) / len(tier_rows), 1
+            ),
+            "coexist": sum(1 for r in tier_rows if r["noise_bad"]),
+        }
+    return {
+        "probes": len(single),
+        "distinct_queries": len({r.get("query") for r in single}),
+        "purity": purity,
+        "coexist": coexist,
+        "distract": distract,
+        "by_tier": by_tier,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--personas", default="")
     parser.add_argument("--k", type=int, default=8)
     parser.add_argument("--out", default="")
     parser.add_argument("--json", action="store_true", help="只输出 JSON")
+    parser.add_argument(
+        "--no-negatives",
+        action="store_true",
+        help="不合并 testdata/hard-negatives.json（默认合并，硬负例单独报一块）",
+    )
     args = parser.parse_args()
 
+    negatives = load_negatives()
     corpus_dir = DATA / "corpus-90d"
     names = (
         [p.strip() for p in args.personas.split(",") if p.strip()]
@@ -294,17 +343,25 @@ def main() -> None:
             print(f"跳过（没有语料）：{name}")
             continue
         corpus = json.loads(path.read_text(encoding="utf-8"))
+        extras = [] if args.no_negatives else negatives.get(name) or []
+        if extras:
+            corpus = {**corpus, "probes": [*(corpus.get("probes") or []), *extras]}
         result = evaluate_persona(corpus, args.k)
         rows = result["rows"]
         all_rows.extend(rows)
-        m = summarize(rows)
+        m = summarize([r for r in rows if r.get("origin") == "original"])
         if not args.json:
             print(
                 f"{name}: 可答 {m['answer_rate']}% · MRR {m['mrr']} · 45天+ {m['long_keep']}% · "
                 f"时效 {m['fresh']}% · 抗干扰 {m['noise_ok']}% · 检索 p50 {m['retrieval_p50_ms']}ms"
             )
 
-    summary = summarize(all_rows)
+    # 主表只算原题：加了硬负例之后，历史数字仍然可比；硬负例单独报一块。
+    original_rows = [r for r in all_rows if r.get("origin") == "original"]
+    negative_rows = [r for r in all_rows if r.get("origin") != "original"]
+    summary = summarize(original_rows)
+    if negative_rows:
+        summary["negative"] = summarize_negatives(negative_rows)
     summary["personas"] = len(names)
     if args.json:
         print(json.dumps(summary, ensure_ascii=False, indent=2))

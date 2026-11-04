@@ -1,0 +1,6227 @@
+{
+ "version": 1,
+ "generator": "scripts/gen_hard_negatives.py",
+ "note": "合成的硬负例：问句沿用原题（人写的），expect.none 是同一个人的另一条真实记忆里独有的关键词。hardness 按「兄弟记忆命中问句几个双字」分档，1 最硬。同一道问句可能配多组诱饵，所以「题数」和「不重复问句数」要分开看。",
+ "counts": {
+  "probes": 277,
+  "distinct_queries": 137,
+  "tiers": {
+   "1": 56,
+   "2": 69,
+   "3": 152
+  }
+ },
+ "personas": {
+  "p01": [
+   {
+    "id": "neg-p01-q03-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "国庆七天我到底有没有回老家？",
+    "expect": {
+     "any": [
+      "没回家"
+     ],
+     "none": [
+      "回老家",
+      "妈妈"
+     ]
+    },
+    "unit_ids": [
+     "p01-u046"
+    ],
+    "decoy_unit": "p01-u005",
+    "note": "同题硬负例：诱饵来自 p01-u005（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p01-q05-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "订单服务重构的目标成功率到底是多少来着？",
+    "expect": {
+     "any": [
+      "99.95"
+     ],
+     "none": [
+      "10月12日",
+      "全量"
+     ]
+    },
+    "unit_ids": [
+     "p01-u001"
+    ],
+    "decoy_unit": "p01-u052",
+    "note": "同题硬负例：诱饵来自 p01-u052（与目标共享关键词），命中问句 5 个双字"
+   },
+   {
+    "id": "neg-p01-q05-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "订单服务重构的目标成功率到底是多少来着？",
+    "expect": {
+     "any": [
+      "99.95"
+     ],
+     "none": [
+      "出差",
+      "客户现场"
+     ]
+    },
+    "unit_ids": [
+     "p01-u001"
+    ],
+    "decoy_unit": "p01-u012",
+    "note": "同题硬负例：诱饵来自 p01-u012（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p01-q05-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "订单服务重构的目标成功率到底是多少来着？",
+    "expect": {
+     "any": [
+      "99.95"
+     ],
+     "none": [
+      "全量",
+      "大爆炸式迁移"
+     ]
+    },
+    "unit_ids": [
+     "p01-u001"
+    ],
+    "decoy_unit": "p01-u002",
+    "note": "同题硬负例：诱饵来自 p01-u002（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p01-q05-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "订单服务重构的目标成功率到底是多少来着？",
+    "expect": {
+     "any": [
+      "99.95"
+     ],
+     "none": [
+      "三个月",
+      "全量上线"
+     ]
+    },
+    "unit_ids": [
+     "p01-u001"
+    ],
+    "decoy_unit": "p01-u066",
+    "note": "同题硬负例：诱饵来自 p01-u066（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p01-q09-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "全量之后那个成功率数字稳在多少？",
+    "expect": {
+     "any": [
+      "99.92"
+     ],
+     "none": [
+      "10月12日",
+      "Go"
+     ]
+    },
+    "unit_ids": [
+     "p01-u058"
+    ],
+    "decoy_unit": "p01-u052",
+    "note": "同题硬负例：诱饵来自 p01-u052（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p01-q06-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "九月中旬那次发版最后是什么结果？",
+    "expect": {
+     "any": [
+      "回滚"
+     ],
+     "none": [
+      "辞职"
+     ]
+    },
+    "unit_ids": [
+     "p01-u036"
+    ],
+    "decoy_unit": "p01-u067",
+    "note": "同题硬负例：诱饵来自 p01-u067（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p01-q07-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我们最后定的几号做全量切换？",
+    "expect": {
+     "any": [
+      "10月12日"
+     ],
+     "none": [
+      "Go",
+      "下单成功率"
+     ]
+    },
+    "unit_ids": [
+     "p01-u049"
+    ],
+    "decoy_unit": "p01-u052",
+    "note": "同题硬负例：诱饵来自 p01-u052（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p01-q09-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "全量之后那个成功率数字稳在多少？",
+    "expect": {
+     "any": [
+      "99.92"
+     ],
+     "none": [
+      "Go",
+      "Java"
+     ]
+    },
+    "unit_ids": [
+     "p01-u058"
+    ],
+    "decoy_unit": "p01-u001",
+    "note": "同题硬负例：诱饵来自 p01-u001（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p01-q09-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "全量之后那个成功率数字稳在多少？",
+    "expect": {
+     "any": [
+      "99.92"
+     ],
+     "none": [
+      "9月17日",
+      "回滚"
+     ]
+    },
+    "unit_ids": [
+     "p01-u058"
+    ],
+    "decoy_unit": "p01-u036",
+    "note": "同题硬负例：诱饵来自 p01-u036（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p01-q03-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "国庆七天我到底有没有回老家？",
+    "expect": {
+     "any": [
+      "没回家"
+     ],
+     "none": [
+      "信号",
+      "妈妈"
+     ]
+    },
+    "unit_ids": [
+     "p01-u046"
+    ],
+    "decoy_unit": "p01-u041",
+    "note": "同题硬负例：诱饵来自 p01-u041（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q03-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "国庆七天我到底有没有回老家？",
+    "expect": {
+     "any": [
+      "没回家"
+     ],
+     "none": [
+      "妈妈",
+      "老师"
+     ]
+    },
+    "unit_ids": [
+     "p01-u046"
+    ],
+    "decoy_unit": "p01-u045",
+    "note": "同题硬负例：诱饵来自 p01-u045（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q03-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "国庆七天我到底有没有回老家？",
+    "expect": {
+     "any": [
+      "没回家"
+     ],
+     "none": [
+      "推掉",
+      "见人"
+     ]
+    },
+    "unit_ids": [
+     "p01-u046"
+    ],
+    "decoy_unit": "p01-u051",
+    "note": "同题硬负例：诱饵来自 p01-u051（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q07-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我们最后定的几号做全量切换？",
+    "expect": {
+     "any": [
+      "10月12日"
+     ],
+     "none": [
+      "大爆炸式迁移",
+      "订单服务"
+     ]
+    },
+    "unit_ids": [
+     "p01-u049"
+    ],
+    "decoy_unit": "p01-u002",
+    "note": "同题硬负例：诱饵来自 p01-u002（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q07-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我们最后定的几号做全量切换？",
+    "expect": {
+     "any": [
+      "10月12日"
+     ],
+     "none": [
+      "监控面板"
+     ]
+    },
+    "unit_ids": [
+     "p01-u049"
+    ],
+    "decoy_unit": "p01-u050",
+    "note": "同题硬负例：诱饵来自 p01-u050（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q13-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "十月被安利的那部新番我最后看下去没？",
+    "expect": {
+     "any": [
+      "看不进去"
+     ],
+     "none": [
+      "后宫",
+      "异世界"
+     ]
+    },
+    "unit_ids": [
+     "p01-u064"
+    ],
+    "decoy_unit": "p01-u023",
+    "note": "同题硬负例：诱饵来自 p01-u023（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q20-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "当初想一把全量搬完的方案后来改成什么打法？",
+    "expect": {
+     "any": [
+      "绞杀者"
+     ],
+     "none": [
+      "方案评审",
+      "老徐"
+     ]
+    },
+    "unit_ids": [
+     "p01-u038",
+     "p01-u002"
+    ],
+    "decoy_unit": "p01-u018",
+    "note": "同题硬负例：诱饵来自 p01-u018（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q20-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "当初想一把全量搬完的方案后来改成什么打法？",
+    "expect": {
+     "any": [
+      "绞杀者"
+     ],
+     "none": [
+      "10月12日",
+      "Go"
+     ]
+    },
+    "unit_ids": [
+     "p01-u038",
+     "p01-u002"
+    ],
+    "decoy_unit": "p01-u052",
+    "note": "同题硬负例：诱饵来自 p01-u052（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q20-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "当初想一把全量搬完的方案后来改成什么打法？",
+    "expect": {
+     "any": [
+      "绞杀者"
+     ],
+     "none": [
+      "10月12日",
+      "回滚脚本"
+     ]
+    },
+    "unit_ids": [
+     "p01-u038",
+     "p01-u002"
+    ],
+    "decoy_unit": "p01-u049",
+    "note": "同题硬负例：诱饵来自 p01-u049（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q20-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "当初想一把全量搬完的方案后来改成什么打法？",
+    "expect": {
+     "any": [
+      "绞杀者"
+     ],
+     "none": [
+      "三个月",
+      "全量上线"
+     ]
+    },
+    "unit_ids": [
+     "p01-u038",
+     "p01-u002"
+    ],
+    "decoy_unit": "p01-u066",
+    "note": "同题硬负例：诱饵来自 p01-u066（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q23-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我这段时间上班方式和写代码的工具各换了什么？",
+    "expect": {
+     "any": [
+      "骑车",
+      "Cursor"
+     ],
+     "none": [
+      "二手",
+      "公路车"
+     ]
+    },
+    "unit_ids": [
+     "p01-u028",
+     "p01-u054"
+    ],
+    "decoy_unit": "p01-u027",
+    "note": "同题硬负例：诱饵来自 p01-u027（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q24-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我在成都出差那晚在酒店补的番叫啥？",
+    "expect": {
+     "any": [
+      "命运石之门"
+     ],
+     "none": [
+      "Java 8",
+      "迁移方案"
+     ]
+    },
+    "unit_ids": [
+     "p01-u014",
+     "p01-u012"
+    ],
+    "decoy_unit": "p01-u013",
+    "note": "同题硬负例：诱饵来自 p01-u013（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q25-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "全量上线那晚我是跟谁喝的酒？",
+    "expect": {
+     "any": [
+      "老周"
+     ],
+     "none": [
+      "大爆炸式迁移"
+     ]
+    },
+    "unit_ids": [
+     "p01-u052",
+     "p01-u053"
+    ],
+    "decoy_unit": "p01-u002",
+    "note": "同题硬负例：诱饵来自 p01-u002（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q25-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "全量上线那晚我是跟谁喝的酒？",
+    "expect": {
+     "any": [
+      "老周"
+     ],
+     "none": [
+      "回滚脚本"
+     ]
+    },
+    "unit_ids": [
+     "p01-u052",
+     "p01-u053"
+    ],
+    "decoy_unit": "p01-u049",
+    "note": "同题硬负例：诱饵来自 p01-u049（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q25-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "全量上线那晚我是跟谁喝的酒？",
+    "expect": {
+     "any": [
+      "老周"
+     ],
+     "none": [
+      "监控面板"
+     ]
+    },
+    "unit_ids": [
+     "p01-u052",
+     "p01-u053"
+    ],
+    "decoy_unit": "p01-u050",
+    "note": "同题硬负例：诱饵来自 p01-u050（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p01-q25-26",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "全量上线那晚我是跟谁喝的酒？",
+    "expect": {
+     "any": [
+      "老周"
+     ],
+     "none": [
+      "99.92"
+     ]
+    },
+    "unit_ids": [
+     "p01-u052",
+     "p01-u053"
+    ],
+    "decoy_unit": "p01-u058",
+    "note": "同题硬负例：诱饵来自 p01-u058（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p02": [
+   {
+    "id": "neg-p02-q02-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "八月底那次我烧到多少度？",
+    "expect": {
+     "any": [
+      "38度7"
+     ],
+     "none": [
+      "嗓子疼"
+     ]
+    },
+    "unit_ids": [
+     "p02-u024"
+    ],
+    "decoy_unit": "p02-u066",
+    "note": "同题硬负例：诱饵来自 p02-u066（与目标共享关键词），命中问句 4 个双字"
+   },
+   {
+    "id": "neg-p02-q05-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我暑假备的那节公开课是哪篇课文？",
+    "expect": {
+     "any": [
+      "秋天的雨"
+     ],
+     "none": [
+      "投影",
+      "救场"
+     ]
+    },
+    "unit_ids": [
+     "p02-u001"
+    ],
+    "decoy_unit": "p02-u042",
+    "note": "同题硬负例：诱饵来自 p02-u042（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q05-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我暑假备的那节公开课是哪篇课文？",
+    "expect": {
+     "any": [
+      "秋天的雨"
+     ],
+     "none": [
+      "报名",
+      "教案比赛"
+     ]
+    },
+    "unit_ids": [
+     "p02-u001"
+    ],
+    "decoy_unit": "p02-u053",
+    "note": "同题硬负例：诱饵来自 p02-u053（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q06-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我公开课那天开场就出了什么岔子？",
+    "expect": {
+     "any": [
+      "投影"
+     ],
+     "none": [
+      "报名",
+      "教案比赛"
+     ]
+    },
+    "unit_ids": [
+     "p02-u042"
+    ],
+    "decoy_unit": "p02-u053",
+    "note": "同题硬负例：诱饵来自 p02-u053（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q07-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "区里那个教案比赛我最后拿了什么奖？",
+    "expect": {
+     "any": [
+      "二等奖"
+     ],
+     "none": [
+      "公开课",
+      "报名"
+     ]
+    },
+    "unit_ids": [
+     "p02-u063"
+    ],
+    "decoy_unit": "p02-u053",
+    "note": "同题硬负例：诱饵来自 p02-u053（与目标共享关键词），命中问句 4 个双字"
+   },
+   {
+    "id": "neg-p02-q07-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "区里那个教案比赛我最后拿了什么奖？",
+    "expect": {
+     "any": [
+      "二等奖"
+     ],
+     "none": [
+      "三个月",
+      "公开课"
+     ]
+    },
+    "unit_ids": [
+     "p02-u063"
+    ],
+    "decoy_unit": "p02-u073",
+    "note": "同题硬负例：诱饵来自 p02-u073（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q07-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "区里那个教案比赛我最后拿了什么奖？",
+    "expect": {
+     "any": [
+      "二等奖"
+     ],
+     "none": [
+      "初稿"
+     ]
+    },
+    "unit_ids": [
+     "p02-u063"
+    ],
+    "decoy_unit": "p02-u059",
+    "note": "同题硬负例：诱饵来自 p02-u059（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q08-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "那个总不交作业的孩子家里出了什么事？",
+    "expect": {
+     "any": [
+      "离婚"
+     ],
+     "none": [
+      "批评"
+     ]
+    },
+    "unit_ids": [
+     "p02-u050",
+     "p02-u048"
+    ],
+    "decoy_unit": "p02-u051",
+    "note": "同题硬负例：诱饵来自 p02-u051（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q23-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "秋天的雨"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u008",
+    "note": "同题硬负例：诱饵来自 p02-u008（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p02-q03-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "国庆回自贡那几天，亲戚都问我什么呀？",
+    "expect": {
+     "any": [
+      "结婚"
+     ],
+     "none": [
+      "妈妈",
+      "考编"
+     ]
+    },
+    "unit_ids": [
+     "p02-u055"
+    ],
+    "decoy_unit": "p02-u005",
+    "note": "同题硬负例：诱饵来自 p02-u005（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q03-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "国庆回自贡那几天，亲戚都问我什么呀？",
+    "expect": {
+     "any": [
+      "结婚"
+     ],
+     "none": [
+      "备课",
+      "暑假"
+     ]
+    },
+    "unit_ids": [
+     "p02-u055"
+    ],
+    "decoy_unit": "p02-u007",
+    "note": "同题硬负例：诱饵来自 p02-u007（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q05-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我暑假备的那节公开课是哪篇课文？",
+    "expect": {
+     "any": [
+      "秋天的雨"
+     ],
+     "none": [
+      "三个月",
+      "二等奖"
+     ]
+    },
+    "unit_ids": [
+     "p02-u001"
+    ],
+    "decoy_unit": "p02-u073",
+    "note": "同题硬负例：诱饵来自 p02-u073（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q05-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我暑假备的那节公开课是哪篇课文？",
+    "expect": {
+     "any": [
+      "秋天的雨"
+     ],
+     "none": [
+      "四十分钟",
+      "试上"
+     ]
+    },
+    "unit_ids": [
+     "p02-u001"
+    ],
+    "decoy_unit": "p02-u029",
+    "note": "同题硬负例：诱饵来自 p02-u029（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q06-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我公开课那天开场就出了什么岔子？",
+    "expect": {
+     "any": [
+      "投影"
+     ],
+     "none": [
+      "三年级",
+      "秋天的雨"
+     ]
+    },
+    "unit_ids": [
+     "p02-u042"
+    ],
+    "decoy_unit": "p02-u001",
+    "note": "同题硬负例：诱饵来自 p02-u001（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q06-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我公开课那天开场就出了什么岔子？",
+    "expect": {
+     "any": [
+      "投影"
+     ],
+     "none": [
+      "三个月",
+      "二等奖"
+     ]
+    },
+    "unit_ids": [
+     "p02-u042"
+    ],
+    "decoy_unit": "p02-u073",
+    "note": "同题硬负例：诱饵来自 p02-u073（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q06-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我公开课那天开场就出了什么岔子？",
+    "expect": {
+     "any": [
+      "投影"
+     ],
+     "none": [
+      "四十分钟",
+      "试上"
+     ]
+    },
+    "unit_ids": [
+     "p02-u042"
+    ],
+    "decoy_unit": "p02-u029",
+    "note": "同题硬负例：诱饵来自 p02-u029（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q13-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "阿尼亚考试那集我笑成什么样来着？",
+    "expect": {
+     "any": [
+      "笑到出声"
+     ],
+     "none": [
+      "学生",
+      "说大话"
+     ]
+    },
+    "unit_ids": [
+     "p02-u046"
+    ],
+    "decoy_unit": "p02-u011",
+    "note": "同题硬负例：诱饵来自 p02-u011（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q23-26",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "三年级",
+      "秋天的雨"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u001",
+    "note": "同题硬负例：诱饵来自 p02-u001（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q23-27",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "投影",
+      "救场"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u042",
+    "note": "同题硬负例：诱饵来自 p02-u042（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q23-28",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "三个月",
+      "二等奖"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u073",
+    "note": "同题硬负例：诱饵来自 p02-u073（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q24-33",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我回自贡那几天，阿哲在干什么？",
+    "expect": {
+     "any": [
+      "加班"
+     ],
+     "none": [
+      "备课",
+      "暑假"
+     ]
+    },
+    "unit_ids": [
+     "p02-u055",
+     "p02-u056"
+    ],
+    "decoy_unit": "p02-u007",
+    "note": "同题硬负例：诱饵来自 p02-u007（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p02-q03-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "国庆回自贡那几天，亲戚都问我什么呀？",
+    "expect": {
+     "any": [
+      "结婚"
+     ],
+     "none": [
+      "加班",
+      "阿哲"
+     ]
+    },
+    "unit_ids": [
+     "p02-u055"
+    ],
+    "decoy_unit": "p02-u056",
+    "note": "同题硬负例：诱饵来自 p02-u056（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q04-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我给哪盆多肉换了土之后它缓过来了？",
+    "expect": {
+     "any": [
+      "桃蛋"
+     ],
+     "none": [
+      "多肉",
+      "闺蜜"
+     ]
+    },
+    "unit_ids": [
+     "p02-u071"
+    ],
+    "decoy_unit": "p02-u012",
+    "note": "同题硬负例：诱饵来自 p02-u012（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q14-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我阳台多肉里活得最好的是哪个品种呀？",
+    "expect": {
+     "any": [
+      "玉露"
+     ],
+     "none": [
+      "小满",
+      "闺蜜"
+     ]
+    },
+    "unit_ids": [
+     "p02-u013"
+    ],
+    "decoy_unit": "p02-u012",
+    "note": "同题硬负例：诱饵来自 p02-u012（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q14-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我阳台多肉里活得最好的是哪个品种呀？",
+    "expect": {
+     "any": [
+      "玉露"
+     ],
+     "none": [
+      "调回成都",
+      "阿哲"
+     ]
+    },
+    "unit_ids": [
+     "p02-u013"
+    ],
+    "decoy_unit": "p02-u072",
+    "note": "同题硬负例：诱饵来自 p02-u072（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q18-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我十月那会儿对考编这事最后怎么决定的？",
+    "expect": {
+     "any": [
+      "不考编"
+     ],
+     "none": [
+      "一年",
+      "教书"
+     ]
+    },
+    "unit_ids": [
+     "p02-u067",
+     "p02-u014"
+    ],
+    "decoy_unit": "p02-u068",
+    "note": "同题硬负例：诱饵来自 p02-u068（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q18-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我十月那会儿对考编这事最后怎么决定的？",
+    "expect": {
+     "any": [
+      "不考编"
+     ],
+     "none": [
+      "自贡"
+     ]
+    },
+    "unit_ids": [
+     "p02-u067",
+     "p02-u014"
+    ],
+    "decoy_unit": "p02-u005",
+    "note": "同题硬负例：诱饵来自 p02-u005（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q19-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我以前点面时特意不要的那样东西，现在是不是能吃了？",
+    "expect": {
+     "any": [
+      "能吃香菜了"
+     ],
+     "none": [
+      "买房",
+      "存钱"
+     ]
+    },
+    "unit_ids": [
+     "p02-u028",
+     "p02-u003"
+    ],
+    "decoy_unit": "p02-u070",
+    "note": "同题硬负例：诱饵来自 p02-u070（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q21-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我这一年一直在忙的两件事，最后各是什么结果？",
+    "expect": {
+     "any": [
+      "不考编",
+      "二等奖"
+     ],
+     "none": [
+      "自贡"
+     ]
+    },
+    "unit_ids": [
+     "p02-u068",
+     "p02-u067",
+     "p02-u063"
+    ],
+    "decoy_unit": "p02-u005",
+    "note": "同题硬负例：诱饵来自 p02-u005（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q23-29",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "异地",
+      "程序员"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u006",
+    "note": "同题硬负例：诱饵来自 p02-u006（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q23-30",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "曲奇",
+      "烤糊"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u018",
+    "note": "同题硬负例：诱饵来自 p02-u018（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q23-31",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "工作",
+      "硬撑"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u041",
+    "note": "同题硬负例：诱饵来自 p02-u041（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q23-32",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我一边备公开课一边跟阿哲吵架那阵子，最后是谁先低头的？",
+    "expect": {
+     "any": [
+      "奶茶"
+     ],
+     "none": [
+      "加班",
+      "国庆"
+     ]
+    },
+    "unit_ids": [
+     "p02-u040",
+     "p02-u045"
+    ],
+    "decoy_unit": "p02-u056",
+    "note": "同题硬负例：诱饵来自 p02-u056（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p02-q24-34",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我回自贡那几天，阿哲在干什么？",
+    "expect": {
+     "any": [
+      "加班"
+     ],
+     "none": [
+      "妈妈",
+      "考编"
+     ]
+    },
+    "unit_ids": [
+     "p02-u055",
+     "p02-u056"
+    ],
+    "decoy_unit": "p02-u005",
+    "note": "同题硬负例：诱饵来自 p02-u005（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p03": [
+   {
+    "id": "neg-p03-q01-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "豆豆头一次去幼儿园那天，哭得厉害吗？",
+    "expect": {
+     "any": [
+      "四十分钟"
+     ],
+     "none": [
+      "三十八度七",
+      "发烧"
+     ]
+    },
+    "unit_ids": [
+     "p03-u022"
+    ],
+    "decoy_unit": "p03-u038",
+    "note": "同题硬负例：诱饵来自 p03-u038（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p03-q01-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "豆豆头一次去幼儿园那天，哭得厉害吗？",
+    "expect": {
+     "any": [
+      "四十分钟"
+     ],
+     "none": [
+      "幼儿园"
+     ]
+    },
+    "unit_ids": [
+     "p03-u022"
+    ],
+    "decoy_unit": "p03-u002",
+    "note": "同题硬负例：诱饵来自 p03-u002（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p03-q01-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "豆豆头一次去幼儿园那天，哭得厉害吗？",
+    "expect": {
+     "any": [
+      "四十分钟"
+     ],
+     "none": [
+      "抢玩具"
+     ]
+    },
+    "unit_ids": [
+     "p03-u022"
+    ],
+    "decoy_unit": "p03-u067",
+    "note": "同题硬负例：诱饵来自 p03-u067（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p03-q14-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "重看第一话，这次注意到美里说了句什么？",
+    "expect": {
+     "any": [
+      "不要逃"
+     ],
+     "none": [
+      "二十六话",
+      "鼓掌"
+     ]
+    },
+    "unit_ids": [
+     "p03-u065"
+    ],
+    "decoy_unit": "p03-u078",
+    "note": "同题硬负例：诱饵来自 p03-u078（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p03-q17-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "自行车头一回送去修，是哪个零件出的问题？",
+    "expect": {
+     "any": [
+      "后闸"
+     ],
+     "none": [
+      "链条"
+     ]
+    },
+    "unit_ids": [
+     "p03-u014"
+    ],
+    "decoy_unit": "p03-u056",
+    "note": "同题硬负例：诱饵来自 p03-u056（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p03-q08-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "比亚迪路测那次复位是什么原因？",
+    "expect": {
+     "any": [
+      "颠簸路段",
+      "欠压"
+     ],
+     "none": [
+      "减速带"
+     ]
+    },
+    "unit_ids": [
+     "p03-u063",
+     "p03-u064"
+    ],
+    "decoy_unit": "p03-u069",
+    "note": "同题硬负例：诱饵来自 p03-u069（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p03-q17-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "自行车头一回送去修，是哪个零件出的问题？",
+    "expect": {
+     "any": [
+      "后闸"
+     ],
+     "none": [
+      "外胎",
+      "年终"
+     ]
+    },
+    "unit_ids": [
+     "p03-u014"
+    ],
+    "decoy_unit": "p03-u043",
+    "note": "同题硬负例：诱饵来自 p03-u043（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p03-q19-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我写周报一开始写几行，老板说了什么？",
+    "expect": {
+     "any": [
+      "三行"
+     ],
+     "none": [
+      "五行"
+     ]
+    },
+    "unit_ids": [
+     "p03-u008"
+    ],
+    "decoy_unit": "p03-u040",
+    "note": "同题硬负例：诱饵来自 p03-u040（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p03-q24-27",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "那辆破自行车我一共修了几回，都修的什么地方？",
+    "expect": {
+     "any": [
+      "后闸",
+      "内胎",
+      "链条"
+     ],
+     "none": [
+      "年终"
+     ]
+    },
+    "unit_ids": [
+     "p03-u014",
+     "p03-u042",
+     "p03-u056"
+    ],
+    "decoy_unit": "p03-u043",
+    "note": "同题硬负例：诱饵来自 p03-u043（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p03-q27-30",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "看牙那阵子项目也在赶，我加了几个晚上班？",
+    "expect": {
+     "any": [
+      "四个晚上"
+     ],
+     "none": [
+      "加班",
+      "硬件"
+     ]
+    },
+    "unit_ids": [
+     "p03-u020",
+     "p03-u040"
+    ],
+    "decoy_unit": "p03-u041",
+    "note": "同题硬负例：诱饵来自 p03-u041（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p03-q01-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆头一次去幼儿园那天，哭得厉害吗？",
+    "expect": {
+     "any": [
+      "四十分钟"
+     ],
+     "none": [
+      "开学",
+      "门口"
+     ]
+    },
+    "unit_ids": [
+     "p03-u022"
+    ],
+    "decoy_unit": "p03-u032",
+    "note": "同题硬负例：诱饵来自 p03-u032（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q03-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆那次发烧烧到多少度，我妈想干什么来着？",
+    "expect": {
+     "any": [
+      "三十八度七",
+      "刮痧"
+     ],
+     "none": [
+      "开学",
+      "门口"
+     ]
+    },
+    "unit_ids": [
+     "p03-u038",
+     "p03-u039"
+    ],
+    "decoy_unit": "p03-u032",
+    "note": "同题硬负例：诱饵来自 p03-u032（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q03-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆那次发烧烧到多少度，我妈想干什么来着？",
+    "expect": {
+     "any": [
+      "三十八度七",
+      "刮痧"
+     ],
+     "none": [
+      "汪汪队",
+      "积木"
+     ]
+    },
+    "unit_ids": [
+     "p03-u038",
+     "p03-u039"
+    ],
+    "decoy_unit": "p03-u047",
+    "note": "同题硬负例：诱饵来自 p03-u047（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q03-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆那次发烧烧到多少度，我妈想干什么来着？",
+    "expect": {
+     "any": [
+      "三十八度七",
+      "刮痧"
+     ],
+     "none": [
+      "适应班"
+     ]
+    },
+    "unit_ids": [
+     "p03-u038",
+     "p03-u039"
+    ],
+    "decoy_unit": "p03-u002",
+    "note": "同题硬负例：诱饵来自 p03-u002（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q03-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆那次发烧烧到多少度，我妈想干什么来着？",
+    "expect": {
+     "any": [
+      "三十八度七",
+      "刮痧"
+     ],
+     "none": [
+      "抢玩具"
+     ]
+    },
+    "unit_ids": [
+     "p03-u038",
+     "p03-u039"
+    ],
+    "decoy_unit": "p03-u067",
+    "note": "同题硬负例：诱饵来自 p03-u067（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q03-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆那次发烧烧到多少度，我妈想干什么来着？",
+    "expect": {
+     "any": [
+      "三十八度七",
+      "刮痧"
+     ],
+     "none": [
+      "蒸蛋",
+      "血鸭"
+     ]
+    },
+    "unit_ids": [
+     "p03-u038",
+     "p03-u039"
+    ],
+    "decoy_unit": "p03-u003",
+    "note": "同题硬负例：诱饵来自 p03-u003（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q05-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "国庆带娃去的那个公园，停车排了多长时间？",
+    "expect": {
+     "any": [
+      "一个半小时"
+     ],
+     "none": [
+      "死机"
+     ]
+    },
+    "unit_ids": [
+     "p03-u055"
+    ],
+    "decoy_unit": "p03-u054",
+    "note": "同题硬负例：诱饵来自 p03-u054（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q07-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "广汽那边出问题的时候，是什么操作触发的？",
+    "expect": {
+     "any": [
+      "倒车影像"
+     ],
+     "none": [
+      "方案",
+      "线束"
+     ]
+    },
+    "unit_ids": [
+     "p03-u048"
+    ],
+    "decoy_unit": "p03-u029",
+    "note": "同题硬负例：诱饵来自 p03-u029（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q07-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "广汽那边出问题的时候，是什么操作触发的？",
+    "expect": {
+     "any": [
+      "倒车影像"
+     ],
+     "none": [
+      "bug",
+      "样机"
+     ]
+    },
+    "unit_ids": [
+     "p03-u048"
+    ],
+    "decoy_unit": "p03-u044",
+    "note": "同题硬负例：诱饵来自 p03-u044（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q10-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我周报后来改成怎么写了？",
+    "expect": {
+     "any": [
+      "五行"
+     ],
+     "none": [
+      "三行",
+      "老板"
+     ]
+    },
+    "unit_ids": [
+     "p03-u040"
+    ],
+    "decoy_unit": "p03-u008",
+    "note": "同题硬负例：诱饵来自 p03-u008（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q15-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆看动画片只看哪只狗的部分？",
+    "expect": {
+     "any": [
+      "毛毛"
+     ],
+     "none": [
+      "幼儿园",
+      "豆豆"
+     ]
+    },
+    "unit_ids": [
+     "p03-u009"
+    ],
+    "decoy_unit": "p03-u002",
+    "note": "同题硬负例：诱饵来自 p03-u002（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q15-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆看动画片只看哪只狗的部分？",
+    "expect": {
+     "any": [
+      "毛毛"
+     ],
+     "none": [
+      "开学",
+      "豆豆"
+     ]
+    },
+    "unit_ids": [
+     "p03-u009"
+    ],
+    "decoy_unit": "p03-u032",
+    "note": "同题硬负例：诱饵来自 p03-u032（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q15-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆看动画片只看哪只狗的部分？",
+    "expect": {
+     "any": [
+      "毛毛"
+     ],
+     "none": [
+      "三十八度七",
+      "发烧"
+     ]
+    },
+    "unit_ids": [
+     "p03-u009"
+    ],
+    "decoy_unit": "p03-u038",
+    "note": "同题硬负例：诱饵来自 p03-u038（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q15-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "豆豆看动画片只看哪只狗的部分？",
+    "expect": {
+     "any": [
+      "毛毛"
+     ],
+     "none": [
+      "豆豆",
+      "适应班"
+     ]
+    },
+    "unit_ids": [
+     "p03-u009"
+    ],
+    "decoy_unit": "p03-u022",
+    "note": "同题硬负例：诱饵来自 p03-u022（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q21-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我现在加班靠什么撑着，以前不是这样吧？",
+    "expect": {
+     "any": [
+      "美式"
+     ],
+     "none": [
+      "外贸",
+      "阿慧"
+     ]
+    },
+    "unit_ids": [
+     "p03-u033"
+    ],
+    "decoy_unit": "p03-u004",
+    "note": "同题硬负例：诱饵来自 p03-u004（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q21-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我现在加班靠什么撑着，以前不是这样吧？",
+    "expect": {
+     "any": [
+      "美式"
+     ],
+     "none": [
+      "五行",
+      "周报"
+     ]
+    },
+    "unit_ids": [
+     "p03-u033"
+    ],
+    "decoy_unit": "p03-u040",
+    "note": "同题硬负例：诱饵来自 p03-u040（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q21-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我现在加班靠什么撑着，以前不是这样吧？",
+    "expect": {
+     "any": [
+      "美式"
+     ],
+     "none": [
+      "硬件",
+      "老贺"
+     ]
+    },
+    "unit_ids": [
+     "p03-u033"
+    ],
+    "decoy_unit": "p03-u041",
+    "note": "同题硬负例：诱饵来自 p03-u041（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q22-26",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我最近偷偷用什么工具补文档了？",
+    "expect": {
+     "any": [
+      "Cursor"
+     ],
+     "none": [
+      "不信",
+      "固件"
+     ]
+    },
+    "unit_ids": [
+     "p03-u076"
+    ],
+    "decoy_unit": "p03-u025",
+    "note": "同题硬负例：诱饵来自 p03-u025（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q25-28",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我游泳这几个月是怎么加上去的，最后加到多少？",
+    "expect": {
+     "any": [
+      "一千米",
+      "一千二百米",
+      "一千五"
+     ],
+     "none": [
+      "复查",
+      "根管"
+     ]
+    },
+    "unit_ids": [
+     "p03-u007",
+     "p03-u019",
+     "p03-u071"
+    ],
+    "decoy_unit": "p03-u045",
+    "note": "同题硬负例：诱饵来自 p03-u045（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q26-29",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "九月那阵家里和公司同时出事，分别是啥来着？",
+    "expect": {
+     "any": [
+      "三十八度七",
+      "倒车影像"
+     ],
+     "none": [
+      "开学",
+      "门口"
+     ]
+    },
+    "unit_ids": [
+     "p03-u038",
+     "p03-u048"
+    ],
+    "decoy_unit": "p03-u032",
+    "note": "同题硬负例：诱饵来自 p03-u032（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q27-31",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "看牙那阵子项目也在赶，我加了几个晚上班？",
+    "expect": {
+     "any": [
+      "四个晚上"
+     ],
+     "none": [
+      "加班",
+      "外贸"
+     ]
+    },
+    "unit_ids": [
+     "p03-u020",
+     "p03-u040"
+    ],
+    "decoy_unit": "p03-u004",
+    "note": "同题硬负例：诱饵来自 p03-u004（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p03-q27-32",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "看牙那阵子项目也在赶，我加了几个晚上班？",
+    "expect": {
+     "any": [
+      "四个晚上"
+     ],
+     "none": [
+      "加班",
+      "咖啡"
+     ]
+    },
+    "unit_ids": [
+     "p03-u020",
+     "p03-u040"
+    ],
+    "decoy_unit": "p03-u033",
+    "note": "同题硬负例：诱饵来自 p03-u033（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p04": [
+   {
+    "id": "neg-p04-q04-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我天天喝的霸王茶姬，每次点什么？",
+    "expect": {
+     "any": [
+      "伯牙绝弦"
+     ],
+     "none": [
+      "同人",
+      "早上六点"
+     ]
+    },
+    "unit_ids": [
+     "p04-u020"
+    ],
+    "decoy_unit": "p04-u070",
+    "note": "同题硬负例：诱饵来自 p04-u070（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p04-q07-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "画集合同是哪天签的，第一期多少钱？",
+    "expect": {
+     "any": [
+      "十月十五号",
+      "一万二"
+     ],
+     "none": [
+      "三万六",
+      "四十二张"
+     ]
+    },
+    "unit_ids": [
+     "p04-u062"
+    ],
+    "decoy_unit": "p04-u055",
+    "note": "同题硬负例：诱饵来自 p04-u055（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p04-q16-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "冰菓里那句我很好奇，我怎么说它来着？",
+    "expect": {
+     "any": [
+      "全剧发动机"
+     ],
+     "none": [
+      "学园祭"
+     ]
+    },
+    "unit_ids": [
+     "p04-u066"
+    ],
+    "decoy_unit": "p04-u009",
+    "note": "同题硬负例：诱饵来自 p04-u009（与目标共享关键词），命中问句 4 个双字"
+   },
+   {
+    "id": "neg-p04-q24-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我最后还搬不搬去大理？",
+    "expect": {
+     "any": [
+      "不搬大理"
+     ],
+     "none": [
+      "房租"
+     ]
+    },
+    "unit_ids": [
+     "p04-u065"
+    ],
+    "decoy_unit": "p04-u051",
+    "note": "同题硬负例：诱饵来自 p04-u051（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p04-q01-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我妈一直想让我回哪里，干什么来着？",
+    "expect": {
+     "any": [
+      "无锡",
+      "考公"
+     ],
+     "none": [
+      "当饭吃"
+     ]
+    },
+    "unit_ids": [
+     "p04-u007"
+    ],
+    "decoy_unit": "p04-u064",
+    "note": "同题硬负例：诱饵来自 p04-u064（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p04-q08-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "画集稿费多少，怎么付？",
+    "expect": {
+     "any": [
+      "三万六",
+      "分三期"
+     ],
+     "none": [
+      "一万二",
+      "十月十五号"
+     ]
+    },
+    "unit_ids": [
+     "p04-u055"
+    ],
+    "decoy_unit": "p04-u062",
+    "note": "同题硬负例：诱饵来自 p04-u062（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p04-q12-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "当初出版社那边要看我先弄什么？",
+    "expect": {
+     "any": [
+      "作品集"
+     ],
+     "none": [
+      "上海",
+      "大理"
+     ]
+    },
+    "unit_ids": [
+     "p04-u026"
+    ],
+    "decoy_unit": "p04-u065",
+    "note": "同题硬负例：诱饵来自 p04-u065（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p04-q14-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "芙莉莲里谁出来我就想哭？",
+    "expect": {
+     "any": [
+      "辛美尔"
+     ],
+     "none": [
+      "三十张",
+      "第八集"
+     ]
+    },
+    "unit_ids": [
+     "p04-u040"
+    ],
+    "decoy_unit": "p04-u054",
+    "note": "同题硬负例：诱饵来自 p04-u054（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p04-q14-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "芙莉莲里谁出来我就想哭？",
+    "expect": {
+     "any": [
+      "辛美尔"
+     ],
+     "none": [
+      "背影",
+      "芙莉莲同人"
+     ]
+    },
+    "unit_ids": [
+     "p04-u040"
+    ],
+    "decoy_unit": "p04-u059",
+    "note": "同题硬负例：诱饵来自 p04-u059（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p04-q15-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "芙莉莲第八集我哭成什么样了？",
+    "expect": {
+     "any": [
+      "鼻塞"
+     ],
+     "none": [
+      "菲伦"
+     ]
+    },
+    "unit_ids": [
+     "p04-u054"
+    ],
+    "decoy_unit": "p04-u040",
+    "note": "同题硬负例：诱饵来自 p04-u040（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p04-q02-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我那张图最后改到第几版，甲方用的哪一版？",
+    "expect": {
+     "any": [
+      "第二版",
+      "七版色稿"
+     ],
+     "none": [
+      "感觉不对",
+      "星辰互娱"
+     ]
+    },
+    "unit_ids": [
+     "p04-u018"
+    ],
+    "decoy_unit": "p04-u003",
+    "note": "同题硬负例：诱饵来自 p04-u003（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q03-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我第一次收到定金是多少钱？",
+    "expect": {
+     "any": [
+      "一千三百五"
+     ],
+     "none": [
+      "接单",
+      "结算"
+     ]
+    },
+    "unit_ids": [
+     "p04-u043"
+    ],
+    "decoy_unit": "p04-u016",
+    "note": "同题硬负例：诱饵来自 p04-u016（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q09-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "九月初被哪家甲方放了鸽子？",
+    "expect": {
+     "any": [
+      "星辰互娱"
+     ],
+     "none": [
+      "感觉不对"
+     ]
+    },
+    "unit_ids": [
+     "p04-u033"
+    ],
+    "decoy_unit": "p04-u003",
+    "note": "同题硬负例：诱饵来自 p04-u003（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q11-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "八月我一共挣了多少，房租多少？",
+    "expect": {
+     "any": [
+      "六千二",
+      "四千五"
+     ],
+     "none": [
+      "上海",
+      "吵架"
+     ]
+    },
+    "unit_ids": [
+     "p04-u029"
+    ],
+    "decoy_unit": "p04-u008",
+    "note": "同题硬负例：诱饵来自 p04-u008（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q11-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "八月我一共挣了多少，房租多少？",
+    "expect": {
+     "any": [
+      "六千二",
+      "四千五"
+     ],
+     "none": [
+      "大理"
+     ]
+    },
+    "unit_ids": [
+     "p04-u029"
+    ],
+    "decoy_unit": "p04-u051",
+    "note": "同题硬负例：诱饵来自 p04-u051（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q12-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "当初出版社那边要看我先弄什么？",
+    "expect": {
+     "any": [
+      "作品集"
+     ],
+     "none": [
+      "回音"
+     ]
+    },
+    "unit_ids": [
+     "p04-u026"
+    ],
+    "decoy_unit": "p04-u050",
+    "note": "同题硬负例：诱饵来自 p04-u050（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q19-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "糯米吐毛球，化毛膏怎么喂它才吃？",
+    "expect": {
+     "any": [
+      "拌罐头"
+     ],
+     "none": [
+      "图层",
+      "键盘"
+     ]
+    },
+    "unit_ids": [
+     "p04-u017"
+    ],
+    "decoy_unit": "p04-u001",
+    "note": "同题硬负例：诱饵来自 p04-u001（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q19-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "糯米吐毛球，化毛膏怎么喂它才吃？",
+    "expect": {
+     "any": [
+      "拌罐头"
+     ],
+     "none": [
+      "交稿",
+      "打呼"
+     ]
+    },
+    "unit_ids": [
+     "p04-u017"
+    ],
+    "decoy_unit": "p04-u074",
+    "note": "同题硬负例：诱饵来自 p04-u074（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q21-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我买的那把人体工学椅多少钱？",
+    "expect": {
+     "any": [
+      "一千六"
+     ],
+     "none": [
+      "椅子",
+      "电竞椅"
+     ]
+    },
+    "unit_ids": [
+     "p04-u047"
+    ],
+    "decoy_unit": "p04-u022",
+    "note": "同题硬负例：诱饵来自 p04-u022（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q22-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我现在接单要先收多少钱？",
+    "expect": {
+     "any": [
+      "三成定金"
+     ],
+     "none": [
+      "结算"
+     ]
+    },
+    "unit_ids": [
+     "p04-u035"
+    ],
+    "decoy_unit": "p04-u016",
+    "note": "同题硬负例：诱饵来自 p04-u016（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q23-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我现在一张报价多少了？",
+    "expect": {
+     "any": [
+      "一千五"
+     ],
+     "none": [
+      "九月"
+     ]
+    },
+    "unit_ids": [
+     "p04-u037"
+    ],
+    "decoy_unit": "p04-u030",
+    "note": "同题硬负例：诱饵来自 p04-u030（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q25-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "家里两次漏水分别在哪儿？",
+    "expect": {
+     "any": [
+      "厨房",
+      "卧室"
+     ],
+     "none": [
+      "投诉"
+     ]
+    },
+    "unit_ids": [
+     "p04-u005",
+     "p04-u057"
+    ],
+    "decoy_unit": "p04-u023",
+    "note": "同题硬负例：诱饵来自 p04-u023（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q26-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "这些甲方都让我改了几轮稿子？",
+    "expect": {
+     "any": [
+      "四次",
+      "七版",
+      "第五轮"
+     ],
+     "none": [
+      "参考图"
+     ]
+    },
+    "unit_ids": [
+     "p04-u003",
+     "p04-u018",
+     "p04-u068"
+    ],
+    "decoy_unit": "p04-u004",
+    "note": "同题硬负例：诱饵来自 p04-u004（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q28-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我妈嫌画画不能干嘛，我拿什么给她看的？",
+    "expect": {
+     "any": [
+      "签了画集合同",
+      "合同照片"
+     ],
+     "none": [
+      "无锡",
+      "考公"
+     ]
+    },
+    "unit_ids": [
+     "p04-u064",
+     "p04-u062",
+     "p04-u063"
+    ],
+    "decoy_unit": "p04-u007",
+    "note": "同题硬负例：诱饵来自 p04-u007（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p04-q28-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我妈嫌画画不能干嘛，我拿什么给她看的？",
+    "expect": {
+     "any": [
+      "签了画集合同",
+      "合同照片"
+     ],
+     "none": [
+      "中秋"
+     ]
+    },
+    "unit_ids": [
+     "p04-u064",
+     "p04-u062",
+     "p04-u063"
+    ],
+    "decoy_unit": "p04-u045",
+    "note": "同题硬负例：诱饵来自 p04-u045（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p05": [
+   {
+    "id": "neg-p05-q01-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我阳台上除了辣椒还摆了什么，你还记得不？",
+    "expect": {
+     "any": [
+      "绿萝"
+     ],
+     "none": [
+      "菜市场",
+      "辣椒"
+     ]
+    },
+    "unit_ids": [
+     "p05-u001"
+    ],
+    "decoy_unit": "p05-u077",
+    "note": "同题硬负例：诱饵来自 p05-u077（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p05-q07-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "八月底那次摸底，我们班平均分多少？",
+    "expect": {
+     "any": [
+      "六十八"
+     ],
+     "none": [
+      "年级组",
+      "摸底卷"
+     ]
+    },
+    "unit_ids": [
+     "p05-u034"
+    ],
+    "decoy_unit": "p05-u005",
+    "note": "同题硬负例：诱饵来自 p05-u005（与目标共享关键词），命中问句 5 个双字"
+   },
+   {
+    "id": "neg-p05-q07-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "八月底那次摸底，我们班平均分多少？",
+    "expect": {
+     "any": [
+      "六十八"
+     ],
+     "none": [
+      "六十一",
+      "年级第四"
+     ]
+    },
+    "unit_ids": [
+     "p05-u034"
+    ],
+    "decoy_unit": "p05-u064",
+    "note": "同题硬负例：诱饵来自 p05-u064（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p05-q09-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "竞赛班那六个学生里，有几个是来凑数的？",
+    "expect": {
+     "any": [
+      "四个"
+     ],
+     "none": [
+      "微积分"
+     ]
+    },
+    "unit_ids": [
+     "p05-u044"
+    ],
+    "decoy_unit": "p05-u045",
+    "note": "同题硬负例：诱饵来自 p05-u045（与目标共享关键词），命中问句 4 个双字"
+   },
+   {
+    "id": "neg-p05-q09-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "竞赛班那六个学生里，有几个是来凑数的？",
+    "expect": {
+     "any": [
+      "四个"
+     ],
+     "none": [
+      "五十二",
+      "模拟测"
+     ]
+    },
+    "unit_ids": [
+     "p05-u044"
+    ],
+    "decoy_unit": "p05-u056",
+    "note": "同题硬负例：诱饵来自 p05-u056（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p05-q09-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "竞赛班那六个学生里，有几个是来凑数的？",
+    "expect": {
+     "any": [
+      "四个"
+     ],
+     "none": [
+      "受力分析"
+     ]
+    },
+    "unit_ids": [
+     "p05-u044"
+    ],
+    "decoy_unit": "p05-u048",
+    "note": "同题硬负例：诱饵来自 p05-u048（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p05-q17-32",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "期中那回我们班平均分掉到多少了？",
+    "expect": {
+     "any": [
+      "六十一"
+     ],
+     "none": [
+      "六十四",
+      "小测"
+     ]
+    },
+    "unit_ids": [
+     "p05-u064"
+    ],
+    "decoy_unit": "p05-u074",
+    "note": "同题硬负例：诱饵来自 p05-u074（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p05-q28-44",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "周六跟大刘约的钓鱼，跟头一回空军那趟是不是同一个地方？",
+    "expect": {
+     "any": [
+      "府河"
+     ],
+     "none": [
+      "五条",
+      "白酒"
+     ]
+    },
+    "unit_ids": [
+     "p05-u076",
+     "p05-u012"
+    ],
+    "decoy_unit": "p05-u050",
+    "note": "同题硬负例：诱饵来自 p05-u050（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p05-q02-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "八月补物理那阵，我讲哪一节把后排讲睡了？",
+    "expect": {
+     "any": [
+      "楞次定律"
+     ],
+     "none": [
+      "补课",
+      "题外话"
+     ]
+    },
+    "unit_ids": [
+     "p05-u003"
+    ],
+    "decoy_unit": "p05-u023",
+    "note": "同题硬负例：诱饵来自 p05-u023（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q06-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我在东湖钓上来的那条大鱼，几斤来着？",
+    "expect": {
+     "any": [
+      "六斤"
+     ],
+     "none": [
+      "国庆",
+      "小鲤鱼"
+     ]
+    },
+    "unit_ids": [
+     "p05-u025"
+    ],
+    "decoy_unit": "p05-u061",
+    "note": "同题硬负例：诱饵来自 p05-u061（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q06-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我在东湖钓上来的那条大鱼，几斤来着？",
+    "expect": {
+     "any": [
+      "六斤"
+     ],
+     "none": [
+      "钓鱼"
+     ]
+    },
+    "unit_ids": [
+     "p05-u025"
+    ],
+    "decoy_unit": "p05-u011",
+    "note": "同题硬负例：诱饵来自 p05-u011（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q07-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "八月底那次摸底，我们班平均分多少？",
+    "expect": {
+     "any": [
+      "六十八"
+     ],
+     "none": [
+      "六十四",
+      "小测"
+     ]
+    },
+    "unit_ids": [
+     "p05-u034"
+    ],
+    "decoy_unit": "p05-u074",
+    "note": "同题硬负例：诱饵来自 p05-u074（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q09-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "竞赛班那六个学生里，有几个是来凑数的？",
+    "expect": {
+     "any": [
+      "四个"
+     ],
+     "none": [
+      "主任",
+      "年级组"
+     ]
+    },
+    "unit_ids": [
+     "p05-u044"
+    ],
+    "decoy_unit": "p05-u043",
+    "note": "同题硬负例：诱饵来自 p05-u043（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q11-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我现在上课还用粉笔板书吗？",
+    "expect": {
+     "any": [
+      "投屏"
+     ],
+     "none": [
+      "楞次定律",
+      "电磁感应"
+     ]
+    },
+    "unit_ids": [
+     "p05-u052",
+     "p05-u004"
+    ],
+    "decoy_unit": "p05-u003",
+    "note": "同题硬负例：诱饵来自 p05-u003（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q13-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "竞赛班头一回模拟测，最高分多少来着？",
+    "expect": {
+     "any": [
+      "五十二"
+     ],
+     "none": [
+      "六个学生"
+     ]
+    },
+    "unit_ids": [
+     "p05-u056"
+    ],
+    "decoy_unit": "p05-u044",
+    "note": "同题硬负例：诱饵来自 p05-u044（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q14-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "女儿考砸那晚，我陪着她看了多少？",
+    "expect": {
+     "any": [
+      "两集"
+     ],
+     "none": [
+      "何苗",
+      "高二"
+     ]
+    },
+    "unit_ids": [
+     "p05-u055"
+    ],
+    "decoy_unit": "p05-u008",
+    "note": "同题硬负例：诱饵来自 p05-u008（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q15-27",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "跟女儿吵完架，我在阳台站了多久？",
+    "expect": {
+     "any": [
+      "半个钟头"
+     ],
+     "none": [
+      "菜市场",
+      "辣椒"
+     ]
+    },
+    "unit_ids": [
+     "p05-u057"
+    ],
+    "decoy_unit": "p05-u077",
+    "note": "同题硬负例：诱饵来自 p05-u077（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q15-28",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "跟女儿吵完架，我在阳台站了多久？",
+    "expect": {
+     "any": [
+      "半个钟头"
+     ],
+     "none": [
+      "绿萝"
+     ]
+    },
+    "unit_ids": [
+     "p05-u057"
+    ],
+    "decoy_unit": "p05-u001",
+    "note": "同题硬负例：诱饵来自 p05-u001（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q15-29",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "跟女儿吵完架，我在阳台站了多久？",
+    "expect": {
+     "any": [
+      "半个钟头"
+     ],
+     "none": [
+      "试一个月"
+     ]
+    },
+    "unit_ids": [
+     "p05-u057"
+    ],
+    "decoy_unit": "p05-u042",
+    "note": "同题硬负例：诱饵来自 p05-u042（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q17-33",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "期中那回我们班平均分掉到多少了？",
+    "expect": {
+     "any": [
+      "六十一"
+     ],
+     "none": [
+      "年级组",
+      "摸底卷"
+     ]
+    },
+    "unit_ids": [
+     "p05-u064"
+    ],
+    "decoy_unit": "p05-u005",
+    "note": "同题硬负例：诱饵来自 p05-u005（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q17-34",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "期中那回我们班平均分掉到多少了？",
+    "expect": {
+     "any": [
+      "六十一"
+     ],
+     "none": [
+      "年级第二"
+     ]
+    },
+    "unit_ids": [
+     "p05-u064"
+    ],
+    "decoy_unit": "p05-u034",
+    "note": "同题硬负例：诱饵来自 p05-u034（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q28-45",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "周六跟大刘约的钓鱼，跟头一回空军那趟是不是同一个地方？",
+    "expect": {
+     "any": [
+      "府河"
+     ],
+     "none": [
+      "学钓鱼",
+      "退休"
+     ]
+    },
+    "unit_ids": [
+     "p05-u076",
+     "p05-u012"
+    ],
+    "decoy_unit": "p05-u051",
+    "note": "同题硬负例：诱饵来自 p05-u051（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q28-46",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "周六跟大刘约的钓鱼，跟头一回空军那趟是不是同一个地方？",
+    "expect": {
+     "any": [
+      "府河"
+     ],
+     "none": [
+      "鱼竿"
+     ]
+    },
+    "unit_ids": [
+     "p05-u076",
+     "p05-u012"
+    ],
+    "decoy_unit": "p05-u009",
+    "note": "同题硬负例：诱饵来自 p05-u009（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p05-q01-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我阳台上除了辣椒还摆了什么，你还记得不？",
+    "expect": {
+     "any": [
+      "绿萝"
+     ],
+     "none": [
+      "后悔",
+      "女儿"
+     ]
+    },
+    "unit_ids": [
+     "p05-u001"
+    ],
+    "decoy_unit": "p05-u057",
+    "note": "同题硬负例：诱饵来自 p05-u057（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q03-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "女儿拉我一块看的那部动画，主角叫什么名字来着？",
+    "expect": {
+     "any": [
+      "炭治郎"
+     ],
+     "none": [
+      "何苗",
+      "高二"
+     ]
+    },
+    "unit_ids": [
+     "p05-u007"
+    ],
+    "decoy_unit": "p05-u008",
+    "note": "同题硬负例：诱饵来自 p05-u008（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q03-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "女儿拉我一块看的那部动画，主角叫什么名字来着？",
+    "expect": {
+     "any": [
+      "炭治郎"
+     ],
+     "none": [
+      "游郭篇",
+      "音柱"
+     ]
+    },
+    "unit_ids": [
+     "p05-u007"
+    ],
+    "decoy_unit": "p05-u016",
+    "note": "同题硬负例：诱饵来自 p05-u016（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q03-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "女儿拉我一块看的那部动画，主角叫什么名字来着？",
+    "expect": {
+     "any": [
+      "炭治郎"
+     ],
+     "none": [
+      "柱训练篇",
+      "蝴蝶忍"
+     ]
+    },
+    "unit_ids": [
+     "p05-u007"
+    ],
+    "decoy_unit": "p05-u046",
+    "note": "同题硬负例：诱饵来自 p05-u046（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q03-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "女儿拉我一块看的那部动画，主角叫什么名字来着？",
+    "expect": {
+     "any": [
+      "炭治郎"
+     ],
+     "none": [
+      "两集",
+      "月考"
+     ]
+    },
+    "unit_ids": [
+     "p05-u007"
+    ],
+    "decoy_unit": "p05-u055",
+    "note": "同题硬负例：诱饵来自 p05-u055（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q08-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "上回腌辣椒，我拿什么装的？",
+    "expect": {
+     "any": [
+      "玻璃坛子"
+     ],
+     "none": [
+      "菜市场",
+      "阳台"
+     ]
+    },
+    "unit_ids": [
+     "p05-u038"
+    ],
+    "decoy_unit": "p05-u077",
+    "note": "同题硬负例：诱饵来自 p05-u077（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q08-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "上回腌辣椒，我拿什么装的？",
+    "expect": {
+     "any": [
+      "玻璃坛子"
+     ],
+     "none": [
+      "太阳"
+     ]
+    },
+    "unit_ids": [
+     "p05-u038"
+    ],
+    "decoy_unit": "p05-u019",
+    "note": "同题硬负例：诱饵来自 p05-u019（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q10-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "在府河守了一下午，最后钓上来几条鱼？",
+    "expect": {
+     "any": [
+      "两条小鲫鱼"
+     ],
+     "none": [
+      "五条",
+      "白酒"
+     ]
+    },
+    "unit_ids": [
+     "p05-u012"
+    ],
+    "decoy_unit": "p05-u050",
+    "note": "同题硬负例：诱饵来自 p05-u050（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q10-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "在府河守了一下午，最后钓上来几条鱼？",
+    "expect": {
+     "any": [
+      "两条小鲫鱼"
+     ],
+     "none": [
+      "不带酒"
+     ]
+    },
+    "unit_ids": [
+     "p05-u012"
+    ],
+    "decoy_unit": "p05-u076",
+    "note": "同题硬负例：诱饵来自 p05-u076（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q14-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "女儿考砸那晚，我陪着她看了多少？",
+    "expect": {
+     "any": [
+      "两集"
+     ],
+     "none": [
+      "叛逆",
+      "摔门"
+     ]
+    },
+    "unit_ids": [
+     "p05-u055"
+    ],
+    "decoy_unit": "p05-u018",
+    "note": "同题硬负例：诱饵来自 p05-u018（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p05-q14-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "女儿考砸那晚，我陪着她看了多少？",
+    "expect": {
+     "any": [
+      "两集"
+     ],
+     "none": [
+      "六千八",
+      "补课班"
+     ]
+    },
+    "unit_ids": [
+     "p05-u055"
+    ],
+    "decoy_unit": "p05-u041",
+    "note": "同题硬负例：诱饵来自 p05-u041（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p06": [
+   {
+    "id": "neg-p06-q21-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "孤独摇滚那场演出，我买的是什么票来着？",
+    "expect": {
+     "any": [
+      "线上票"
+     ],
+     "none": [
+      "壁橱",
+      "波奇"
+     ]
+    },
+    "unit_ids": [
+     "p06-u069"
+    ],
+    "decoy_unit": "p06-u026",
+    "note": "同题硬负例：诱饵来自 p06-u026（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p06-q21-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "孤独摇滚那场演出，我买的是什么票来着？",
+    "expect": {
+     "any": [
+      "线上票"
+     ],
+     "none": [
+      "二刷",
+      "虹夏"
+     ]
+    },
+    "unit_ids": [
+     "p06-u069"
+    ],
+    "decoy_unit": "p06-u045",
+    "note": "同题硬负例：诱饵来自 p06-u045（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p06-q21-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "孤独摇滚那场演出，我买的是什么票来着？",
+    "expect": {
+     "any": [
+      "线上票"
+     ],
+     "none": [
+      "犹豫",
+      "苏苏"
+     ]
+    },
+    "unit_ids": [
+     "p06-u069"
+    ],
+    "decoy_unit": "p06-u047",
+    "note": "同题硬负例：诱饵来自 p06-u047（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p06-q03-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我实习那家公司叫什么来着？",
+    "expect": {
+     "any": [
+      "云图"
+     ],
+     "none": [
+      "第一天"
+     ]
+    },
+    "unit_ids": [
+     "p06-u005"
+    ],
+    "decoy_unit": "p06-u004",
+    "note": "同题硬负例：诱饵来自 p06-u004（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p06-q06-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "剧本杀那次我抽到凶手，被问了几轮？",
+    "expect": {
+     "any": [
+      "八轮"
+     ],
+     "none": [
+      "室友"
+     ]
+    },
+    "unit_ids": [
+     "p06-u016"
+    ],
+    "decoy_unit": "p06-u017",
+    "note": "同题硬负例：诱饵来自 p06-u017（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p06-q16-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "导师说我那份答辩稿像什么来着？",
+    "expect": {
+     "any": [
+      "流水账"
+     ],
+     "none": [
+      "两秒一",
+      "第四版"
+     ]
+    },
+    "unit_ids": [
+     "p06-u060"
+    ],
+    "decoy_unit": "p06-u061",
+    "note": "同题硬负例：诱饵来自 p06-u061（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p06-q18-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "赛马娘那个活动我抽了多少抽才出？",
+    "expect": {
+     "any": [
+      "三十抽"
+     ],
+     "none": [
+      "五把"
+     ]
+    },
+    "unit_ids": [
+     "p06-u052"
+    ],
+    "decoy_unit": "p06-u020",
+    "note": "同题硬负例：诱饵来自 p06-u020（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p06-q28-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我论文和答辩稿两头赶的那半个月，细节还记得吗？",
+    "expect": {
+     "any": [
+      "凌晨三点",
+      "四版"
+     ],
+     "none": [
+      "导师",
+      "流水账"
+     ]
+    },
+    "unit_ids": [
+     "p06-u062",
+     "p06-u061"
+    ],
+    "decoy_unit": "p06-u060",
+    "note": "同题硬负例：诱饵来自 p06-u060（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p06-q31-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "赶上线那阵，我改滚动条改到几点？",
+    "expect": {
+     "any": [
+      "十一点"
+     ],
+     "none": [
+      "登录页",
+      "转正答辩"
+     ]
+    },
+    "unit_ids": [
+     "p06-u030"
+    ],
+    "decoy_unit": "p06-u059",
+    "note": "同题硬负例：诱饵来自 p06-u059（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p06-q03-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我实习那家公司叫什么来着？",
+    "expect": {
+     "any": [
+      "云图"
+     ],
+     "none": [
+      "大四",
+      "论文"
+     ]
+    },
+    "unit_ids": [
+     "p06-u005"
+    ],
+    "decoy_unit": "p06-u035",
+    "note": "同题硬负例：诱饵来自 p06-u035（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q09-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我八月开始玩的那个手游，一天养几把？",
+    "expect": {
+     "any": [
+      "五把"
+     ],
+     "none": [
+      "三十抽",
+      "奶茶"
+     ]
+    },
+    "unit_ids": [
+     "p06-u020"
+    ],
+    "decoy_unit": "p06-u052",
+    "note": "同题硬负例：诱饵来自 p06-u052（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q14-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "博远那场面试，他们让我写什么？",
+    "expect": {
+     "any": [
+      "算法题"
+     ],
+     "none": [
+      "不回成都",
+      "留在重庆"
+     ]
+    },
+    "unit_ids": [
+     "p06-u050"
+    ],
+    "decoy_unit": "p06-u071",
+    "note": "同题硬负例：诱饵来自 p06-u071（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q14-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "博远那场面试，他们让我写什么？",
+    "expect": {
+     "any": [
+      "算法题"
+     ],
+     "none": [
+      "报到",
+      "论文答辩"
+     ]
+    },
+    "unit_ids": [
+     "p06-u050"
+    ],
+    "decoy_unit": "p06-u073",
+    "note": "同题硬负例：诱饵来自 p06-u073（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q16-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "导师说我那份答辩稿像什么来着？",
+    "expect": {
+     "any": [
+      "流水账"
+     ],
+     "none": [
+      "Promise",
+      "async"
+     ]
+    },
+    "unit_ids": [
+     "p06-u060"
+    ],
+    "decoy_unit": "p06-u006",
+    "note": "同题硬负例：诱饵来自 p06-u006（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q16-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "导师说我那份答辩稿像什么来着？",
+    "expect": {
+     "any": [
+      "流水账"
+     ],
+     "none": [
+      "前端"
+     ]
+    },
+    "unit_ids": [
+     "p06-u060"
+    ],
+    "decoy_unit": "p06-u007",
+    "note": "同题硬负例：诱饵来自 p06-u007（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q16-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "导师说我那份答辩稿像什么来着？",
+    "expect": {
+     "any": [
+      "流水账"
+     ],
+     "none": [
+      "四个人"
+     ]
+    },
+    "unit_ids": [
+     "p06-u060"
+    ],
+    "decoy_unit": "p06-u031",
+    "note": "同题硬负例：诱饵来自 p06-u031（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p06-q24-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "答辩那批实习生，最后结果怎么样？",
+    "expect": {
+     "any": [
+      "就过了他一个"
+     ],
+     "none": [
+      "滚动条",
+      "登录页"
+     ]
+    },
+    "unit_ids": [
+     "p06-u065",
+     "p06-u067"
+    ],
+    "decoy_unit": "p06-u059",
+    "note": "同题硬负例：诱饵来自 p06-u059（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p07": [
+   {
+    "id": "neg-p07-q11-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "9 月大促最后那个 ROI 是多少？",
+    "expect": {
+     "any": [
+      "3.2"
+     ],
+     "none": [
+      "第五版",
+      "选品表"
+     ]
+    },
+    "unit_ids": [
+     "p07-u034"
+    ],
+    "decoy_unit": "p07-u019",
+    "note": "同题硬负例：诱饵来自 p07-u019（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p07-q11-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "9 月大促最后那个 ROI 是多少？",
+    "expect": {
+     "any": [
+      "3.2"
+     ],
+     "none": [
+      "直播"
+     ]
+    },
+    "unit_ids": [
+     "p07-u034"
+    ],
+    "decoy_unit": "p07-u033",
+    "note": "同题硬负例：诱饵来自 p07-u033（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p07-q13-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我陪儿子看的那个奥特曼，是哪一集这么燃？",
+    "expect": {
+     "any": [
+      "第十二集",
+      "泽塔"
+     ],
+     "none": [
+      "最后一集"
+     ]
+    },
+    "unit_ids": [
+     "p07-u018"
+    ],
+    "decoy_unit": "p07-u065",
+    "note": "同题硬负例：诱饵来自 p07-u065（与目标共享关键词），命中问句 5 个双字"
+   },
+   {
+    "id": "neg-p07-q13-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我陪儿子看的那个奥特曼，是哪一集这么燃？",
+    "expect": {
+     "any": [
+      "第十二集",
+      "泽塔"
+     ],
+     "none": [
+      "卡包"
+     ]
+    },
+    "unit_ids": [
+     "p07-u018"
+    ],
+    "decoy_unit": "p07-u005",
+    "note": "同题硬负例：诱饵来自 p07-u005（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p07-q14-26",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我陪儿子看到最后，对那个奥特曼的感觉变了吗？",
+    "expect": {
+     "any": [
+      "看进去"
+     ],
+     "none": [
+      "第十二集"
+     ]
+    },
+    "unit_ids": [
+     "p07-u065"
+    ],
+    "decoy_unit": "p07-u018",
+    "note": "同题硬负例：诱饵来自 p07-u018（与目标共享关键词），命中问句 5 个双字"
+   },
+   {
+    "id": "neg-p07-q14-27",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我陪儿子看到最后，对那个奥特曼的感觉变了吗？",
+    "expect": {
+     "any": [
+      "看进去"
+     ],
+     "none": [
+      "卡包"
+     ]
+    },
+    "unit_ids": [
+     "p07-u065"
+    ],
+    "decoy_unit": "p07-u005",
+    "note": "同题硬负例：诱饵来自 p07-u005（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p07-q25-51",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我跳槽那事跟儿子学游泳是不是撞在同一个月？",
+    "expect": {
+     "any": [
+      "宠物食品",
+      "游泳课"
+     ],
+     "none": [
+      "加班",
+      "换工作"
+     ]
+    },
+    "unit_ids": [
+     "p07-u042",
+     "p07-u043"
+    ],
+    "decoy_unit": "p07-u060",
+    "note": "同题硬负例：诱饵来自 p07-u060（与目标共享关键词），命中问句 4 个双字"
+   },
+   {
+    "id": "neg-p07-q05-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我儿子现在游泳一口气能游多远？",
+    "expect": {
+     "any": [
+      "二十五米"
+     ],
+     "none": [
+      "游泳",
+      "老陈"
+     ]
+    },
+    "unit_ids": [
+     "p07-u073"
+    ],
+    "decoy_unit": "p07-u028",
+    "note": "同题硬负例：诱饵来自 p07-u028（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q05-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我儿子现在游泳一口气能游多远？",
+    "expect": {
+     "any": [
+      "二十五米"
+     ],
+     "none": [
+      "游泳班",
+      "钢琴课"
+     ]
+    },
+    "unit_ids": [
+     "p07-u073"
+    ],
+    "decoy_unit": "p07-u037",
+    "note": "同题硬负例：诱饵来自 p07-u037（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q05-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我儿子现在游泳一口气能游多远？",
+    "expect": {
+     "any": [
+      "二十五米"
+     ],
+     "none": [
+      "游泳课"
+     ]
+    },
+    "unit_ids": [
+     "p07-u073"
+    ],
+    "decoy_unit": "p07-u043",
+    "note": "同题硬负例：诱饵来自 p07-u043（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q09-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "双十一的方案最后怎么折中定的？",
+    "expect": {
+     "any": [
+      "七成",
+      "三成"
+     ],
+     "none": [
+      "宠物食品"
+     ]
+    },
+    "unit_ids": [
+     "p07-u048"
+    ],
+    "decoy_unit": "p07-u055",
+    "note": "同题硬负例：诱饵来自 p07-u055（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q11-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "9 月大促最后那个 ROI 是多少？",
+    "expect": {
+     "any": [
+      "3.2"
+     ],
+     "none": [
+      "2.5",
+      "预算"
+     ]
+    },
+    "unit_ids": [
+     "p07-u034"
+    ],
+    "decoy_unit": "p07-u014",
+    "note": "同题硬负例：诱饵来自 p07-u014（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q21-32",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我儿子那个钢琴后来怎么处理的？",
+    "expect": {
+     "any": [
+      "游泳班"
+     ],
+     "none": [
+      "五百",
+      "老陈"
+     ]
+    },
+    "unit_ids": [
+     "p07-u037",
+     "p07-u013"
+    ],
+    "decoy_unit": "p07-u016",
+    "note": "同题硬负例：诱饵来自 p07-u016（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q21-36",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我儿子那个钢琴后来怎么处理的？",
+    "expect": {
+     "any": [
+      "游泳班"
+     ],
+     "none": [
+      "老陈",
+      "钢琴老师"
+     ]
+    },
+    "unit_ids": [
+     "p07-u037",
+     "p07-u013"
+    ],
+    "decoy_unit": "p07-u028",
+    "note": "同题硬负例：诱饵来自 p07-u028（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q23-38",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "从大促中段到最后，ROI 是怎么一步步上去的？",
+    "expect": {
+     "any": [
+      "2.9",
+      "3.2"
+     ],
+     "none": [
+      "2.5",
+      "预算"
+     ]
+    },
+    "unit_ids": [
+     "p07-u033",
+     "p07-u034"
+    ],
+    "decoy_unit": "p07-u014",
+    "note": "同题硬负例：诱饵来自 p07-u014（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q25-52",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我跳槽那事跟儿子学游泳是不是撞在同一个月？",
+    "expect": {
+     "any": [
+      "宠物食品",
+      "游泳课"
+     ],
+     "none": [
+      "游泳班",
+      "钢琴课"
+     ]
+    },
+    "unit_ids": [
+     "p07-u042",
+     "p07-u043"
+    ],
+    "decoy_unit": "p07-u037",
+    "note": "同题硬负例：诱饵来自 p07-u037（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q25-53",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我跳槽那事跟儿子学游泳是不是撞在同一个月？",
+    "expect": {
+     "any": [
+      "宠物食品",
+      "游泳课"
+     ],
+     "none": [
+      "钢琴"
+     ]
+    },
+    "unit_ids": [
+     "p07-u042",
+     "p07-u043"
+    ],
+    "decoy_unit": "p07-u013",
+    "note": "同题硬负例：诱饵来自 p07-u013（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p07-q01-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我最早跟你聊跑步那次，膝盖是怎么不舒服的？",
+    "expect": {
+     "any": [
+      "膝盖外侧",
+      "下楼梯发软"
+     ],
+     "none": [
+      "两杯",
+      "咖啡"
+     ]
+    },
+    "unit_ids": [
+     "p07-u002"
+    ],
+    "decoy_unit": "p07-u056",
+    "note": "同题硬负例：诱饵来自 p07-u056（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q02-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那次发烧，是谁在带着他？",
+    "expect": {
+     "any": [
+      "老陈",
+      "38 度"
+     ],
+     "none": [
+      "卡包",
+      "泽塔奥特曼"
+     ]
+    },
+    "unit_ids": [
+     "p07-u003"
+    ],
+    "decoy_unit": "p07-u005",
+    "note": "同题硬负例：诱饵来自 p07-u005（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q02-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那次发烧，是谁在带着他？",
+    "expect": {
+     "any": [
+      "老陈",
+      "38 度"
+     ],
+     "none": [
+      "五百",
+      "钢琴课"
+     ]
+    },
+    "unit_ids": [
+     "p07-u003"
+    ],
+    "decoy_unit": "p07-u016",
+    "note": "同题硬负例：诱饵来自 p07-u016（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q02-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那次发烧，是谁在带着他？",
+    "expect": {
+     "any": [
+      "老陈",
+      "38 度"
+     ],
+     "none": [
+      "泽塔奥特曼",
+      "第十二集"
+     ]
+    },
+    "unit_ids": [
+     "p07-u003"
+    ],
+    "decoy_unit": "p07-u018",
+    "note": "同题硬负例：诱饵来自 p07-u018（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q02-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那次发烧，是谁在带着他？",
+    "expect": {
+     "any": [
+      "老陈",
+      "38 度"
+     ],
+     "none": [
+      "游泳",
+      "钢琴老师"
+     ]
+    },
+    "unit_ids": [
+     "p07-u003"
+    ],
+    "decoy_unit": "p07-u028",
+    "note": "同题硬负例：诱饵来自 p07-u028（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q05-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子现在游泳一口气能游多远？",
+    "expect": {
+     "any": [
+      "二十五米"
+     ],
+     "none": [
+      "发烧",
+      "老陈"
+     ]
+    },
+    "unit_ids": [
+     "p07-u073"
+    ],
+    "decoy_unit": "p07-u003",
+    "note": "同题硬负例：诱饵来自 p07-u003（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q07-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "预算最后批回来多少，老板提了什么硬指标？",
+    "expect": {
+     "any": [
+      "一半",
+      "2.5"
+     ],
+     "none": [
+      "线上",
+      "线下"
+     ]
+    },
+    "unit_ids": [
+     "p07-u014"
+    ],
+    "decoy_unit": "p07-u015",
+    "note": "同题硬负例：诱饵来自 p07-u015（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q07-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "预算最后批回来多少，老板提了什么硬指标？",
+    "expect": {
+     "any": [
+      "一半",
+      "2.5"
+     ],
+     "none": [
+      "3.2",
+      "大促"
+     ]
+    },
+    "unit_ids": [
+     "p07-u014"
+    ],
+    "decoy_unit": "p07-u034",
+    "note": "同题硬负例：诱饵来自 p07-u034（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q08-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "大促预热那次库存是怎么出岔子的？",
+    "expect": {
+     "any": [
+      "标错",
+      "三百单"
+     ],
+     "none": [
+      "第五版",
+      "选品表"
+     ]
+    },
+    "unit_ids": [
+     "p07-u030"
+    ],
+    "decoy_unit": "p07-u019",
+    "note": "同题硬负例：诱饵来自 p07-u019（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q08-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "大促预热那次库存是怎么出岔子的？",
+    "expect": {
+     "any": [
+      "标错",
+      "三百单"
+     ],
+     "none": [
+      "启动会",
+      "小唐"
+     ]
+    },
+    "unit_ids": [
+     "p07-u030"
+    ],
+    "decoy_unit": "p07-u021",
+    "note": "同题硬负例：诱饵来自 p07-u021（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q08-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "大促预热那次库存是怎么出岔子的？",
+    "expect": {
+     "any": [
+      "标错",
+      "三百单"
+     ],
+     "none": [
+      "ROI",
+      "直播"
+     ]
+    },
+    "unit_ids": [
+     "p07-u030"
+    ],
+    "decoy_unit": "p07-u033",
+    "note": "同题硬负例：诱饵来自 p07-u033（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q08-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "大促预热那次库存是怎么出岔子的？",
+    "expect": {
+     "any": [
+      "标错",
+      "三百单"
+     ],
+     "none": [
+      "3.2",
+      "ROI"
+     ]
+    },
+    "unit_ids": [
+     "p07-u030"
+    ],
+    "decoy_unit": "p07-u034",
+    "note": "同题硬负例：诱饵来自 p07-u034（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q10-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我提离职那天老板开什么条件留我？",
+    "expect": {
+     "any": [
+      "涨 25%",
+      "VP"
+     ],
+     "none": [
+      "睡不着"
+     ]
+    },
+    "unit_ids": [
+     "p07-u059"
+    ],
+    "decoy_unit": "p07-u064",
+    "note": "同题硬负例：诱饵来自 p07-u064（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q11-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "9 月大促最后那个 ROI 是多少？",
+    "expect": {
+     "any": [
+      "3.2"
+     ],
+     "none": [
+      "启动会",
+      "小唐"
+     ]
+    },
+    "unit_ids": [
+     "p07-u034"
+    ],
+    "decoy_unit": "p07-u021",
+    "note": "同题硬负例：诱饵来自 p07-u021（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q13-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我陪儿子看的那个奥特曼，是哪一集这么燃？",
+    "expect": {
+     "any": [
+      "第十二集",
+      "泽塔"
+     ],
+     "none": [
+      "发烧",
+      "老陈"
+     ]
+    },
+    "unit_ids": [
+     "p07-u018"
+    ],
+    "decoy_unit": "p07-u003",
+    "note": "同题硬负例：诱饵来自 p07-u003（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q13-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我陪儿子看的那个奥特曼，是哪一集这么燃？",
+    "expect": {
+     "any": [
+      "第十二集",
+      "泽塔"
+     ],
+     "none": [
+      "游泳班",
+      "钢琴课"
+     ]
+    },
+    "unit_ids": [
+     "p07-u018"
+    ],
+    "decoy_unit": "p07-u037",
+    "note": "同题硬负例：诱饵来自 p07-u037（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p07-q14-28",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我陪儿子看到最后，对那个奥特曼的感觉变了吗？",
+    "expect": {
+     "any": [
+      "看进去"
+     ],
+     "none": [
+      "发烧",
+      "老陈"
+     ]
+    },
+    "unit_ids": [
+     "p07-u065"
+    ],
+    "decoy_unit": "p07-u003",
+    "note": "同题硬负例：诱饵来自 p07-u003（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p08": [
+   {
+    "id": "neg-p08-q05-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我练拉花最后拉出个什么形状？",
+    "expect": {
+     "any": [
+      "心形"
+     ],
+     "none": [
+      "奶泡"
+     ]
+    },
+    "unit_ids": [
+     "p08-u051"
+    ],
+    "decoy_unit": "p08-u016",
+    "note": "同题硬负例：诱饵来自 p08-u016（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q08-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "外卖平台给的抽成条件是什么？",
+    "expect": {
+     "any": [
+      "百分之十二",
+      "十八"
+     ],
+     "none": [
+      "味道"
+     ]
+    },
+    "unit_ids": [
+     "p08-u039"
+    ],
+    "decoy_unit": "p08-u012",
+    "note": "同题硬负例：诱饵来自 p08-u012（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q08-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "外卖平台给的抽成条件是什么？",
+    "expect": {
+     "any": [
+      "百分之十二",
+      "十八"
+     ],
+     "none": [
+      "拿铁"
+     ]
+    },
+    "unit_ids": [
+     "p08-u039"
+    ],
+    "decoy_unit": "p08-u042",
+    "note": "同题硬负例：诱饵来自 p08-u042（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q11-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "翠湖店试营业这段时间经营得怎么样？",
+    "expect": {
+     "any": [
+      "不亏"
+     ],
+     "none": [
+      "新店",
+      "老客"
+     ]
+    },
+    "unit_ids": [
+     "p08-u074"
+    ],
+    "decoy_unit": "p08-u072",
+    "note": "同题硬负例：诱饵来自 p08-u072（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q12-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "新店试营业来的都是些什么人？",
+    "expect": {
+     "any": [
+      "老客"
+     ],
+     "none": [
+      "不亏",
+      "两头跑"
+     ]
+    },
+    "unit_ids": [
+     "p08-u072"
+    ],
+    "decoy_unit": "p08-u074",
+    "note": "同题硬负例：诱饵来自 p08-u074（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q22-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "翠湖那边后来到底签没签？",
+    "expect": {
+     "any": [
+      "签了"
+     ],
+     "none": [
+      "房东",
+      "铺子"
+     ]
+    },
+    "unit_ids": [
+     "p08-u061",
+     "p08-u022"
+    ],
+    "decoy_unit": "p08-u052",
+    "note": "同题硬负例：诱饵来自 p08-u052（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q27-33",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "翠湖开店跟我妈回老家是不是赶在一块了？",
+    "expect": {
+     "any": [
+      "外婆"
+     ],
+     "none": [
+      "冰箱"
+     ]
+    },
+    "unit_ids": [
+     "p08-u050",
+     "p08-u061"
+    ],
+    "decoy_unit": "p08-u064",
+    "note": "同题硬负例：诱饵来自 p08-u064（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p08-q04-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我妈回老家之前把家里什么塞满了？",
+    "expect": {
+     "any": [
+      "冰箱"
+     ],
+     "none": [
+      "外婆"
+     ]
+    },
+    "unit_ids": [
+     "p08-u064"
+    ],
+    "decoy_unit": "p08-u017",
+    "note": "同题硬负例：诱饵来自 p08-u017（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p08-q07-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "上个月扣完房租水电，我和阿细一人剩多少？",
+    "expect": {
+     "any": [
+      "四千"
+     ],
+     "none": [
+      "中毒"
+     ]
+    },
+    "unit_ids": [
+     "p08-u004"
+    ],
+    "decoy_unit": "p08-u035",
+    "note": "同题硬负例：诱饵来自 p08-u035（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p08-q26-31",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "上外卖之前那阵子我身体出了什么事？",
+    "expect": {
+     "any": [
+      "见手青",
+      "两瓶水"
+     ],
+     "none": [
+      "味道"
+     ]
+    },
+    "unit_ids": [
+     "p08-u034",
+     "p08-u039"
+    ],
+    "decoy_unit": "p08-u012",
+    "note": "同题硬负例：诱饵来自 p08-u012（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p08-q06-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "秋天爬山那杯咖啡为什么更好喝？",
+    "expect": {
+     "any": [
+      "出了汗",
+      "花香特别清楚"
+     ],
+     "none": [
+      "爬山",
+      "龙门"
+     ]
+    },
+    "unit_ids": [
+     "p08-u076"
+    ],
+    "decoy_unit": "p08-u011",
+    "note": "同题硬负例：诱饵来自 p08-u011（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q07-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "上个月扣完房租水电，我和阿细一人剩多少？",
+    "expect": {
+     "any": [
+      "四千"
+     ],
+     "none": [
+      "一百三十多杯",
+      "国庆"
+     ]
+    },
+    "unit_ids": [
+     "p08-u004"
+    ],
+    "decoy_unit": "p08-u057",
+    "note": "同题硬负例：诱饵来自 p08-u057（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q07-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "上个月扣完房租水电，我和阿细一人剩多少？",
+    "expect": {
+     "any": [
+      "四千"
+     ],
+     "none": [
+      "出品",
+      "分工"
+     ]
+    },
+    "unit_ids": [
+     "p08-u004"
+    ],
+    "decoy_unit": "p08-u060",
+    "note": "同题硬负例：诱饵来自 p08-u060（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q10-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "节后那几天阿细对完账，说这笔钱够顶什么开销？",
+    "expect": {
+     "any": [
+      "半年租金"
+     ],
+     "none": [
+      "延长营业",
+      "排班"
+     ]
+    },
+    "unit_ids": [
+     "p08-u059"
+    ],
+    "decoy_unit": "p08-u054",
+    "note": "同题硬负例：诱饵来自 p08-u054（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q10-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "节后那几天阿细对完账，说这笔钱够顶什么开销？",
+    "expect": {
+     "any": [
+      "半年租金"
+     ],
+     "none": [
+      "一百三十多杯",
+      "阿细"
+     ]
+    },
+    "unit_ids": [
+     "p08-u059"
+    ],
+    "decoy_unit": "p08-u057",
+    "note": "同题硬负例：诱饵来自 p08-u057（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q12-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "新店试营业来的都是些什么人？",
+    "expect": {
+     "any": [
+      "老客"
+     ],
+     "none": [
+      "明年",
+      "第三家"
+     ]
+    },
+    "unit_ids": [
+     "p08-u072"
+    ],
+    "decoy_unit": "p08-u075",
+    "note": "同题硬负例：诱饵来自 p08-u075（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q13-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我每季都追的那部动画叫什么？",
+    "expect": {
+     "any": [
+      "夏目友人帐"
+     ],
+     "none": [
+      "六季",
+      "第一季"
+     ]
+    },
+    "unit_ids": [
+     "p08-u008"
+    ],
+    "decoy_unit": "p08-u071",
+    "note": "同题硬负例：诱饵来自 p08-u071（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q15-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我看那部动画看哭了，还不承认，是哪部？",
+    "expect": {
+     "any": [
+      "CLANNAD"
+     ],
+     "none": [
+      "父亲线"
+     ]
+    },
+    "unit_ids": [
+     "p08-u044"
+    ],
+    "decoy_unit": "p08-u066",
+    "note": "同题硬负例：诱饵来自 p08-u066（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q16-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "夏目六季刷完，我觉得哪季最好？",
+    "expect": {
+     "any": [
+      "第一季"
+     ],
+     "none": [
+      "想哭",
+      "每季都看"
+     ]
+    },
+    "unit_ids": [
+     "p08-u071"
+    ],
+    "decoy_unit": "p08-u008",
+    "note": "同题硬负例：诱饵来自 p08-u008（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q16-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "夏目六季刷完，我觉得哪季最好？",
+    "expect": {
+     "any": [
+      "第一季"
+     ],
+     "none": [
+      "第三季",
+      "遗忘"
+     ]
+    },
+    "unit_ids": [
+     "p08-u071"
+    ],
+    "decoy_unit": "p08-u053",
+    "note": "同题硬负例：诱饵来自 p08-u053（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q18-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "有客人带猫来，我家那只躲哪了？",
+    "expect": {
+     "any": [
+      "吧台底下"
+     ],
+     "none": [
+      "国庆"
+     ]
+    },
+    "unit_ids": [
+     "p08-u023"
+    ],
+    "decoy_unit": "p08-u058",
+    "note": "同题硬负例：诱饵来自 p08-u058（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q20-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "店里手冲的豆子后来换了吗？",
+    "expect": {
+     "any": [
+      "埃塞水洗"
+     ],
+     "none": [
+      "88 度",
+      "手冲参数"
+     ]
+    },
+    "unit_ids": [
+     "p08-u043",
+     "p08-u013"
+    ],
+    "decoy_unit": "p08-u010",
+    "note": "同题硬负例：诱饵来自 p08-u010（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q22-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "翠湖那边后来到底签没签？",
+    "expect": {
+     "any": [
+      "签了"
+     ],
+     "none": [
+      "动工",
+      "吧台"
+     ]
+    },
+    "unit_ids": [
+     "p08-u061",
+     "p08-u022"
+    ],
+    "decoy_unit": "p08-u067",
+    "note": "同题硬负例：诱饵来自 p08-u067（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q22-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "翠湖那边后来到底签没签？",
+    "expect": {
+     "any": [
+      "签了"
+     ],
+     "none": [
+      "桂花拿铁",
+      "菜单"
+     ]
+    },
+    "unit_ids": [
+     "p08-u061",
+     "p08-u022"
+    ],
+    "decoy_unit": "p08-u069",
+    "note": "同题硬负例：诱饵来自 p08-u069（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q22-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "翠湖那边后来到底签没签？",
+    "expect": {
+     "any": [
+      "签了"
+     ],
+     "none": [
+      "王老师",
+      "看着"
+     ]
+    },
+    "unit_ids": [
+     "p08-u061",
+     "p08-u022"
+    ],
+    "decoy_unit": "p08-u062",
+    "note": "同题硬负例：诱饵来自 p08-u062（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q24-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "从八月到九月，豆子和外卖这两件事是怎么变的？",
+    "expect": {
+     "any": [
+      "埃塞水洗",
+      "外卖平台"
+     ],
+     "none": [
+      "抽成",
+      "百分之十二"
+     ]
+    },
+    "unit_ids": [
+     "p08-u013",
+     "p08-u043",
+     "p08-u042"
+    ],
+    "decoy_unit": "p08-u039",
+    "note": "同题硬负例：诱饵来自 p08-u039（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q24-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "从八月到九月，豆子和外卖这两件事是怎么变的？",
+    "expect": {
+     "any": [
+      "埃塞水洗",
+      "外卖平台"
+     ],
+     "none": [
+      "冰手冲",
+      "十一单"
+     ]
+    },
+    "unit_ids": [
+     "p08-u013",
+     "p08-u043",
+     "p08-u042"
+    ],
+    "decoy_unit": "p08-u045",
+    "note": "同题硬负例：诱饵来自 p08-u045（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q24-26",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "从八月到九月，豆子和外卖这两件事是怎么变的？",
+    "expect": {
+     "any": [
+      "埃塞水洗",
+      "外卖平台"
+     ],
+     "none": [
+      "冰块",
+      "冰手冲"
+     ]
+    },
+    "unit_ids": [
+     "p08-u013",
+     "p08-u043",
+     "p08-u042"
+    ],
+    "decoy_unit": "p08-u049",
+    "note": "同题硬负例：诱饵来自 p08-u049（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q24-27",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "从八月到九月，豆子和外卖这两件事是怎么变的？",
+    "expect": {
+     "any": [
+      "埃塞水洗",
+      "外卖平台"
+     ],
+     "none": [
+      "味道"
+     ]
+    },
+    "unit_ids": [
+     "p08-u013",
+     "p08-u043",
+     "p08-u042"
+    ],
+    "decoy_unit": "p08-u012",
+    "note": "同题硬负例：诱饵来自 p08-u012（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q25-28",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "店里生意从八月到国庆是怎么个变化？",
+    "expect": {
+     "any": [
+      "四千",
+      "四十六杯",
+      "一百三十多杯"
+     ],
+     "none": [
+      "延长营业",
+      "排班"
+     ]
+    },
+    "unit_ids": [
+     "p08-u004",
+     "p08-u032",
+     "p08-u057"
+    ],
+    "decoy_unit": "p08-u054",
+    "note": "同题硬负例：诱饵来自 p08-u054（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q25-29",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "店里生意从八月到国庆是怎么个变化？",
+    "expect": {
+     "any": [
+      "四千",
+      "四十六杯",
+      "一百三十多杯"
+     ],
+     "none": [
+      "客人",
+      "拿铁"
+     ]
+    },
+    "unit_ids": [
+     "p08-u004",
+     "p08-u032",
+     "p08-u057"
+    ],
+    "decoy_unit": "p08-u058",
+    "note": "同题硬负例：诱饵来自 p08-u058（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q25-30",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "店里生意从八月到国庆是怎么个变化？",
+    "expect": {
+     "any": [
+      "四千",
+      "四十六杯",
+      "一百三十多杯"
+     ],
+     "none": [
+      "半年租金"
+     ]
+    },
+    "unit_ids": [
+     "p08-u004",
+     "p08-u032",
+     "p08-u057"
+    ],
+    "decoy_unit": "p08-u059",
+    "note": "同题硬负例：诱饵来自 p08-u059（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q26-32",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "上外卖之前那阵子我身体出了什么事？",
+    "expect": {
+     "any": [
+      "见手青",
+      "两瓶水"
+     ],
+     "none": [
+      "拿铁"
+     ]
+    },
+    "unit_ids": [
+     "p08-u034",
+     "p08-u039"
+    ],
+    "decoy_unit": "p08-u042",
+    "note": "同题硬负例：诱饵来自 p08-u042（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p08-q27-34",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "翠湖开店跟我妈回老家是不是赶在一块了？",
+    "expect": {
+     "any": [
+      "外婆"
+     ],
+     "none": [
+      "房东",
+      "铺子"
+     ]
+    },
+    "unit_ids": [
+     "p08-u050",
+     "p08-u061"
+    ],
+    "decoy_unit": "p08-u052",
+    "note": "同题硬负例：诱饵来自 p08-u052（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p09": [
+   {
+    "id": "neg-p09-q03-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我十月半给阿May打电话哭成那样，说了多久",
+    "expect": {
+     "any": [
+      "十几分钟"
+     ],
+     "none": [
+      "1700",
+      "3400"
+     ]
+    },
+    "unit_ids": [
+     "p09-u076"
+    ],
+    "decoy_unit": "p09-u029",
+    "note": "同题硬负例：诱饵来自 p09-u029（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q03-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我十月半给阿May打电话哭成那样，说了多久",
+    "expect": {
+     "any": [
+      "十几分钟"
+     ],
+     "none": [
+      "合租",
+      "垫钱"
+     ]
+    },
+    "unit_ids": [
+     "p09-u076"
+    ],
+    "decoy_unit": "p09-u012",
+    "note": "同题硬负例：诱饵来自 p09-u012（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q03-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我十月半给阿May打电话哭成那样，说了多久",
+    "expect": {
+     "any": [
+      "十几分钟"
+     ],
+     "none": [
+      "二百三",
+      "潮汕牛肉火锅"
+     ]
+    },
+    "unit_ids": [
+     "p09-u076"
+    ],
+    "decoy_unit": "p09-u027",
+    "note": "同题硬负例：诱饵来自 p09-u027（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q03-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "我十月半给阿May打电话哭成那样，说了多久",
+    "expect": {
+     "any": [
+      "十几分钟"
+     ],
+     "none": [
+      "合租",
+      "舍不得"
+     ]
+    },
+    "unit_ids": [
+     "p09-u076"
+    ],
+    "decoy_unit": "p09-u041",
+    "note": "同题硬负例：诱饵来自 p09-u041（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q09-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "护士长后来让我先上什么班来着",
+    "expect": {
+     "any": [
+      "两天白班"
+     ],
+     "none": [
+      "3床家属",
+      "拍桌子"
+     ]
+    },
+    "unit_ids": [
+     "p09-u080"
+    ],
+    "decoy_unit": "p09-u002",
+    "note": "同题硬负例：诱饵来自 p09-u002（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q23-21",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "排球少年里我反复看的那几场，分别什么感觉",
+    "expect": {
+     "any": [
+      "白鸟泽",
+      "青城战"
+     ],
+     "none": [
+      "抢到",
+      "第87本"
+     ]
+    },
+    "unit_ids": [
+     "p09-u007",
+     "p09-u060"
+    ],
+    "decoy_unit": "p09-u066",
+    "note": "同题硬负例：诱饵来自 p09-u066（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q23-22",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 1,
+    "ask_day": 90,
+    "query": "排球少年里我反复看的那几场，分别什么感觉",
+    "expect": {
+     "any": [
+      "白鸟泽",
+      "青城战"
+     ],
+     "none": [
+      "漫画",
+      "磕角"
+     ]
+    },
+    "unit_ids": [
+     "p09-u007",
+     "p09-u060"
+    ],
+    "decoy_unit": "p09-u042",
+    "note": "同题硬负例：诱饵来自 p09-u042（与目标共享关键词），命中问句 3 个双字"
+   },
+   {
+    "id": "neg-p09-q06-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "八月那次夜班我跑去找医生，是几床的血氧掉了",
+    "expect": {
+     "any": [
+      "九床"
+     ],
+     "none": [
+      "几分钟",
+      "等医生"
+     ]
+    },
+    "unit_ids": [
+     "p09-u013"
+    ],
+    "decoy_unit": "p09-u014",
+    "note": "同题硬负例：诱饵来自 p09-u014（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p09-q09-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "护士长后来让我先上什么班来着",
+    "expect": {
+     "any": [
+      "两天白班"
+     ],
+     "none": [
+      "撂挑子",
+      "调岗申请"
+     ]
+    },
+    "unit_ids": [
+     "p09-u080"
+    ],
+    "decoy_unit": "p09-u023",
+    "note": "同题硬负例：诱饵来自 p09-u023（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p09-q09-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "护士长后来让我先上什么班来着",
+    "expect": {
+     "any": [
+      "两天白班"
+     ],
+     "none": [
+      "连续三个夜班"
+     ]
+    },
+    "unit_ids": [
+     "p09-u080"
+    ],
+    "decoy_unit": "p09-u005",
+    "note": "同题硬负例：诱饵来自 p09-u005（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p09-q01-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "八月初有个病人家属跟我拍桌子，是因为什么",
+    "expect": {
+     "any": [
+      "给氧慢"
+     ],
+     "none": [
+      "连续三个夜班"
+     ]
+    },
+    "unit_ids": [
+     "p09-u002"
+    ],
+    "decoy_unit": "p09-u005",
+    "note": "同题硬负例：诱饵来自 p09-u005（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q05-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我最后那天发工资，钱是怎么分的来着",
+    "expect": {
+     "any": [
+      "分了三份"
+     ],
+     "none": [
+      "五六百",
+      "夜班费"
+     ]
+    },
+    "unit_ids": [
+     "p09-u089"
+    ],
+    "decoy_unit": "p09-u022",
+    "note": "同题硬负例：诱饵来自 p09-u022（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q06-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "八月那次夜班我跑去找医生，是几床的血氧掉了",
+    "expect": {
+     "any": [
+      "九床"
+     ],
+     "none": [
+      "晚上十点",
+      "睡不着"
+     ]
+    },
+    "unit_ids": [
+     "p09-u013"
+    ],
+    "decoy_unit": "p09-u004",
+    "note": "同题硬负例：诱饵来自 p09-u004（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q06-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "八月那次夜班我跑去找医生，是几床的血氧掉了",
+    "expect": {
+     "any": [
+      "九床"
+     ],
+     "none": [
+      "三班倒",
+      "内科病房"
+     ]
+    },
+    "unit_ids": [
+     "p09-u013"
+    ],
+    "decoy_unit": "p09-u006",
+    "note": "同题硬负例：诱饵来自 p09-u006（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q06-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "八月那次夜班我跑去找医生，是几床的血氧掉了",
+    "expect": {
+     "any": [
+      "九床"
+     ],
+     "none": [
+      "怀疑",
+      "编制"
+     ]
+    },
+    "unit_ids": [
+     "p09-u013"
+    ],
+    "decoy_unit": "p09-u059",
+    "note": "同题硬负例：诱饵来自 p09-u059（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q07-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我八月那会儿考虑调岗，那边说工资能多多少",
+    "expect": {
+     "any": [
+      "五六百"
+     ],
+     "none": [
+      "分了三份",
+      "阿May"
+     ]
+    },
+    "unit_ids": [
+     "p09-u022"
+    ],
+    "decoy_unit": "p09-u089",
+    "note": "同题硬负例：诱饵来自 p09-u089（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q10-15",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "那部排球动画我一共刷了几遍来着",
+    "expect": {
+     "any": [
+      "三遍"
+     ],
+     "none": [
+      "抢到",
+      "第87本"
+     ]
+    },
+    "unit_ids": [
+     "p09-u007"
+    ],
+    "decoy_unit": "p09-u066",
+    "note": "同题硬负例：诱饵来自 p09-u066（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q10-16",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "那部排球动画我一共刷了几遍来着",
+    "expect": {
+     "any": [
+      "三遍"
+     ],
+     "none": [
+      "漫画",
+      "磕角"
+     ]
+    },
+    "unit_ids": [
+     "p09-u007"
+    ],
+    "decoy_unit": "p09-u042",
+    "note": "同题硬负例：诱饵来自 p09-u042（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q11-17",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我追那部药屋的，最吃里面哪个人物",
+    "expect": {
+     "any": [
+      "猫猫"
+     ],
+     "none": [
+      "看哭",
+      "那股劲"
+     ]
+    },
+    "unit_ids": [
+     "p09-u015"
+    ],
+    "decoy_unit": "p09-u078",
+    "note": "同题硬负例：诱饵来自 p09-u078（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q12-18",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "十月那本画册我抢到的是第几本",
+    "expect": {
+     "any": [
+      "第87本"
+     ],
+     "none": [
+      "三百本"
+     ]
+    },
+    "unit_ids": [
+     "p09-u066"
+    ],
+    "decoy_unit": "p09-u047",
+    "note": "同题硬负例：诱饵来自 p09-u047（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q19-19",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我十月底搬出来以后住哪儿了",
+    "expect": {
+     "any": [
+      "打地铺"
+     ],
+     "none": [
+      "合租",
+      "舍不得"
+     ]
+    },
+    "unit_ids": [
+     "p09-u086"
+    ],
+    "decoy_unit": "p09-u041",
+    "note": "同题硬负例：诱饵来自 p09-u041（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q21-20",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我管的那两个病人，一个喘一个脚烂，分别是什么病",
+    "expect": {
+     "any": [
+      "慢阻肺",
+      "糖尿病足"
+     ],
+     "none": [
+      "告别",
+      "最后一个夜班"
+     ]
+    },
+    "unit_ids": [
+     "p09-u001",
+     "p09-u009"
+    ],
+    "decoy_unit": "p09-u033",
+    "note": "同题硬负例：诱饵来自 p09-u033（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q25-23",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "小邹当初是从哪儿回来的，后来我俩怎么了",
+    "expect": {
+     "any": [
+      "回广州",
+      "分手"
+     ],
+     "none": [
+      "员村",
+      "猪脚饭"
+     ]
+    },
+    "unit_ids": [
+     "p09-u035",
+     "p09-u086"
+    ],
+    "decoy_unit": "p09-u039",
+    "note": "同题硬负例：诱饵来自 p09-u039（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q25-24",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "小邹当初是从哪儿回来的，后来我俩怎么了",
+    "expect": {
+     "any": [
+      "回广州",
+      "分手"
+     ],
+     "none": [
+      "二手洗衣机",
+      "闪了腰"
+     ]
+    },
+    "unit_ids": [
+     "p09-u035",
+     "p09-u086"
+    ],
+    "decoy_unit": "p09-u053",
+    "note": "同题硬负例：诱饵来自 p09-u053（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q25-25",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "小邹当初是从哪儿回来的，后来我俩怎么了",
+    "expect": {
+     "any": [
+      "回广州",
+      "分手"
+     ],
+     "none": [
+      "差点吵",
+      "排球"
+     ]
+    },
+    "unit_ids": [
+     "p09-u035",
+     "p09-u086"
+    ],
+    "decoy_unit": "p09-u061",
+    "note": "同题硬负例：诱饵来自 p09-u061（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q25-26",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "小邹当初是从哪儿回来的，后来我俩怎么了",
+    "expect": {
+     "any": [
+      "回广州",
+      "分手"
+     ],
+     "none": [
+      "搬进新房"
+     ]
+    },
+    "unit_ids": [
+     "p09-u035",
+     "p09-u086"
+    ],
+    "decoy_unit": "p09-u048",
+    "note": "同题硬负例：诱饵来自 p09-u048（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p09-q26-27",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我抢到的那本画册，搬走那天怎么处理的",
+    "expect": {
+     "any": [
+      "排球少年画册"
+     ],
+     "none": [
+      "三百本"
+     ]
+    },
+    "unit_ids": [
+     "p09-u066",
+     "p09-u087"
+    ],
+    "decoy_unit": "p09-u047",
+    "note": "同题硬负例：诱饵来自 p09-u047（与目标共享关键词），命中问句 1 个双字"
+   }
+  ],
+  "p10": [
+   {
+    "id": "neg-p10-q09-01",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "九月我流水多少，到手还剩多少",
+    "expect": {
+     "any": [
+      "六千二",
+      "三千一"
+     ],
+     "none": [
+      "八千六",
+      "四千三"
+     ]
+    },
+    "unit_ids": [
+     "p10-u065"
+    ],
+    "decoy_unit": "p10-u035",
+    "note": "同题硬负例：诱饵来自 p10-u035（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p10-q09-02",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "九月我流水多少，到手还剩多少",
+    "expect": {
+     "any": [
+      "六千二",
+      "三千一"
+     ],
+     "none": [
+      "七千四",
+      "八千八"
+     ]
+    },
+    "unit_ids": [
+     "p10-u065"
+    ],
+    "decoy_unit": "p10-u091",
+    "note": "同题硬负例：诱饵来自 p10-u091（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p10-q19-03",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我儿子那个社团后来改成啥了",
+    "expect": {
+     "any": [
+      "乒乓球"
+     ],
+     "none": [
+      "初一",
+      "篮球社团"
+     ]
+    },
+    "unit_ids": [
+     "p10-u079"
+    ],
+    "decoy_unit": "p10-u029",
+    "note": "同题硬负例：诱饵来自 p10-u029（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p10-q21-08",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我八月的流水、十月的到手，分别是多少",
+    "expect": {
+     "any": [
+      "八千六",
+      "七千四"
+     ],
+     "none": [
+      "9月",
+      "三千一"
+     ]
+    },
+    "unit_ids": [
+     "p10-u035",
+     "p10-u091"
+    ],
+    "decoy_unit": "p10-u065",
+    "note": "同题硬负例：诱饵来自 p10-u065（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p10-q22-09",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 2,
+    "ask_day": 90,
+    "query": "我爸那场病是啥病，最后在医院花了多少",
+    "expect": {
+     "any": [
+      "脑梗",
+      "一万三"
+     ],
+     "none": [
+      "三个钟头",
+      "陪父亲"
+     ]
+    },
+    "unit_ids": [
+     "p10-u043",
+     "p10-u086"
+    ],
+    "decoy_unit": "p10-u045",
+    "note": "同题硬负例：诱饵来自 p10-u045（与目标共享关键词），命中问句 2 个双字"
+   },
+   {
+    "id": "neg-p10-q19-04",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那个社团后来改成啥了",
+    "expect": {
+     "any": [
+      "乒乓球"
+     ],
+     "none": [
+      "初一",
+      "开学"
+     ]
+    },
+    "unit_ids": [
+     "p10-u079"
+    ],
+    "decoy_unit": "p10-u005",
+    "note": "同题硬负例：诱饵来自 p10-u005（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q19-05",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那个社团后来改成啥了",
+    "expect": {
+     "any": [
+      "乒乓球"
+     ],
+     "none": [
+      "吵架",
+      "面汤"
+     ]
+    },
+    "unit_ids": [
+     "p10-u079"
+    ],
+    "decoy_unit": "p10-u012",
+    "note": "同题硬负例：诱饵来自 p10-u012（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q19-06",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我儿子那个社团后来改成啥了",
+    "expect": {
+     "any": [
+      "乒乓球"
+     ],
+     "none": [
+      "媳妇",
+      "胡辣汤"
+     ]
+    },
+    "unit_ids": [
+     "p10-u079"
+    ],
+    "decoy_unit": "p10-u068",
+    "note": "同题硬负例：诱饵来自 p10-u068（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q20-07",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我修车后来都去哪儿了",
+    "expect": {
+     "any": [
+      "老赵的修理厂"
+     ],
+     "none": [
+      "花得冤"
+     ]
+    },
+    "unit_ids": [
+     "p10-u057"
+    ],
+    "decoy_unit": "p10-u015",
+    "note": "同题硬负例：诱饵来自 p10-u015（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q23-10",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "换电车这事我是怎么算过来的",
+    "expect": {
+     "any": [
+      "三千二",
+      "四十二"
+     ],
+     "none": [
+      "不划算",
+      "确定要换"
+     ]
+    },
+    "unit_ids": [
+     "p10-u041",
+     "p10-u077"
+    ],
+    "decoy_unit": "p10-u054",
+    "note": "同题硬负例：诱饵来自 p10-u054（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q23-11",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "换电车这事我是怎么算过来的",
+    "expect": {
+     "any": [
+      "三千二",
+      "四十二"
+     ],
+     "none": [
+      "10月8日",
+      "秦PLUS"
+     ]
+    },
+    "unit_ids": [
+     "p10-u041",
+     "p10-u077"
+    ],
+    "decoy_unit": "p10-u075",
+    "note": "同题硬负例：诱饵来自 p10-u075（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q23-12",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "换电车这事我是怎么算过来的",
+    "expect": {
+     "any": [
+      "三千二",
+      "四十二"
+     ],
+     "none": [
+      "护工费"
+     ]
+    },
+    "unit_ids": [
+     "p10-u041",
+     "p10-u077"
+    ],
+    "decoy_unit": "p10-u049",
+    "note": "同题硬负例：诱饵来自 p10-u049（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q24-13",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "我那次追尾之后，决定换成什么了",
+    "expect": {
+     "any": [
+      "定下来换电车"
+     ],
+     "none": [
+      "出租车",
+      "南二环"
+     ]
+    },
+    "unit_ids": [
+     "p10-u050",
+     "p10-u059"
+    ],
+    "decoy_unit": "p10-u008",
+    "note": "同题硬负例：诱饵来自 p10-u008（与目标共享关键词），命中问句 1 个双字"
+   },
+   {
+    "id": "neg-p10-q26-14",
+    "category": "precision",
+    "origin": "synthetic",
+    "hardness": 3,
+    "ask_day": 90,
+    "query": "换车前后，我一个月到手分别是多少",
+    "expect": {
+     "any": [
+      "三千一",
+      "七千四"
+     ],
+     "none": [
+      "八千六",
+      "四千三"
+     ]
+    },
+    "unit_ids": [
+     "p10-u065",
+     "p10-u091"
+    ],
+    "decoy_unit": "p10-u035",
+    "note": "同题硬负例：诱饵来自 p10-u035（与目标共享关键词），命中问句 1 个双字"
+   }
+  ]
+ }
+}
