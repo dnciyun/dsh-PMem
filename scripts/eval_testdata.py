@@ -246,6 +246,12 @@ def summarize(all_rows: list[dict]) -> dict:
     long_rows = [r for r in answerable if r["bucket"] == "45天以上"]
     update_rows = [r for r in all_rows if r["category"] == "update"]
     noise_rows = [r for r in all_rows if r["category"] in ("precision", "no_memory")]
+    # 干扰拆成两层（M28）：no_memory 题用来看「有没有编造」，precision 题拆「答案被挤掉」
+    # 和「答案在、但相邻事实也进了前 3」。三层混成一个 noise_ok 的时候，看不出改了什么。
+    faith_rows = [r for r in all_rows if r["category"] == "no_memory"]
+    prec_rows = [r for r in all_rows if r["category"] == "precision"]
+    coexist = [r for r in prec_rows if r["noise_bad"] and r["rank"] is not None]
+    distract = [r for r in prec_rows if r["noise_bad"] and r["rank"] is None]
     lat = [r["retrieval_ms"] for r in all_rows]
     lat.sort()
     return {
@@ -256,6 +262,12 @@ def summarize(all_rows: list[dict]) -> dict:
         "long_keep": round(100.0 * sum(1 for r in long_rows if r["answer_ok"]) / max(1, len(long_rows)), 1),
         "fresh": round(100.0 * sum(1 for r in update_rows if r["fresh_ok"]) / max(1, len(update_rows)), 1),
         "noise_ok": round(100.0 * sum(1 for r in noise_rows if not r["noise_bad"]) / max(1, len(noise_rows)), 1),
+        "faithfulness": round(
+            100.0 * sum(1 for r in faith_rows if not r["noise_bad"]) / max(1, len(faith_rows)), 1
+        ),
+        "distract": len(distract),
+        "coexist": len(coexist),
+        "noise_probes": len(noise_rows),
         "retrieval_p50_ms": round(statistics.median(lat), 2) if lat else 0.0,
         "inject_tokens_mean": round(statistics.mean([r["inject_tokens"] for r in all_rows]), 1) if all_rows else 0.0,
     }

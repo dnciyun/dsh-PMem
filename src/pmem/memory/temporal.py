@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import math
 import re
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Iterable
 
 from ..base.clock import days_between, now, parse_iso
@@ -169,18 +169,62 @@ EVENT_MARKERS = (
 
 
 _DATE_RE = re.compile(r"(\d{1,2})\s*月\s*(\d{1,2})\s*[号日]")
+# 中文数词也要认：「十月十二号」是日常写法，语料和真实聊天里都比「10月12日」多。
+_CN_NUM = "[零一二三四五六七八九十]{1,3}"
+_DATE_CN = re.compile(rf"({_CN_NUM}|\d{{1,2}})\s*月\s*({_CN_NUM}|\d{{1,2}})\s*[号日]")
+# 只认「X月」本身（后面没跟具体哪一天）：日号比月份更精确，两个都命中时按日走。
+_MONTH_ONLY = re.compile(rf"({_CN_NUM}|\d{{1,2}})\s*月(?![^，。]{{0,4}}?(?:{_CN_NUM}|\d{{1,2}})\s*[号日])")
+_CN_DIGITS = {
+    "零": 0,
+    "一": 1,
+    "二": 2,
+    "两": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+    "十": 10,
+}
+
+
+def _small_number(text: str) -> int | None:
+    """「十二」「二十」「三十一」「八」→ 整数；只处理 1–99（月份/日号够用）。"""
+    chunk = str(text or "").strip()
+    if not chunk:
+        return None
+    if chunk.isdigit():
+        return int(chunk)
+    if "十" in chunk:
+        left, _, right = chunk.partition("十")
+        if left and left not in _CN_DIGITS:
+            return None
+        if right and right not in _CN_DIGITS:
+            return None
+        tens = _CN_DIGITS.get(left, 1) if left else 1
+        ones = _CN_DIGITS.get(right, 0) if right else 0
+        value = tens * 10 + ones
+        return value if 1 <= value <= 99 else None
+    if len(chunk) == 1 and chunk in _CN_DIGITS:
+        return _CN_DIGITS[chunk]
+    return None
 
 
 def _explicit_day(text: str) -> tuple[str, str] | None:
-    """「11月3号」这种写明日期的问法 → (ISO 日期, 给人看的标签)。
+    """「11月3号」「十二月三号」这种写明日期的问法 → (ISO 日期, 给人看的标签)。
 
     年份按「最近的一次」推：说的是将来的月份（现在 11 月、问 12 月）就算去年的，
     因为人回忆「那天」几乎总是在往回看。日期非法（2 月 30 号）就当没写。
     """
-    match = _DATE_RE.search(text)
+    match = _DATE_CN.search(text) or _DATE_RE.search(text)
     if not match:
         return None
-    month, day = int(match.group(1)), int(match.group(2))
+    month = _small_number(match.group(1))
+    day = _small_number(match.group(2))
+    if month is None or day is None:
+        return None
     if not (1 <= month <= 12 and 1 <= day <= 31):
         return None
     today = now().date()
@@ -194,6 +238,62 @@ def _explicit_day(text: str) -> tuple[str, str] | None:
         except ValueError:
             return None
     return candidate.isoformat(), f"{month}月{day}号"
+
+
+def anchor(query: str) -> dict[str, Any] | None:
+    """问句里明确的时间锚点：「十月十二号」「八月」——说的是**哪一次**。
+
+    和 ``range_window`` 的分工：那个是「哪天/上周咱们都干嘛了」（问经过，补日记条目），
+    这个只认**明确日期/月份**，用来把「同一个人、同一类事、不同那一次」分开。
+    模糊词（那次/上次/以前/最近）一律不猜——猜错窗口比不猜更糟，会直接把对的挤掉。
+    """
+    text = str(query or "")
+    if not text:
+        return None
+    explicit = _explicit_day(text)
+    if explicit is not None:
+        day, label = explicit
+        return {"kind": "day", "from": day, "to": day, "label": label}
+    months: list[int] = []
+    for match in _MONTH_ONLY.finditer(text):
+        month = _small_number(match.group(1))
+        if month is not None and 1 <= month <= 12:
+            months.append(month)
+    if not months:
+        return None
+    # 多个月份时取最后提到的：问句的主语通常是最后那个时间
+    # （「八月那次发烧，十月这次是什么症状」问的是十月）。
+    month = months[-1]
+    today = now().date()
+    year = today.year if month <= today.month else today.year - 1
+    start = date(year, month, 1)
+    end = date(year + (1 if month == 12 else 0), (month % 12) + 1, 1) - timedelta(days=1)
+    return {"kind": "month", "from": start.isoformat(), "to": end.isoformat(), "label": f"{month}月"}
+
+
+def in_anchor_window(
+    stamp: str | None, win: dict[str, Any], *, tolerance_days: int = 0
+) -> bool | None:
+    """这一行的时间戳落在锚点窗口里吗？``None`` = 时间戳坏/缺失，不判。"""
+    if not stamp:
+        return None
+    day = str(stamp)[:10]
+    try:
+        if len(day) != 10:
+            return None
+        target = date.fromisoformat(day)
+    except ValueError:
+        return None
+    span = max(0, int(tolerance_days))
+    if win.get("kind") == "day":
+        base = date.fromisoformat(str(win["from"]))
+        return abs((target - base).days) <= span
+    try:
+        low = date.fromisoformat(str(win["from"])) - timedelta(days=span)
+        high = date.fromisoformat(str(win["to"])) + timedelta(days=span)
+    except (KeyError, ValueError):
+        return None
+    return low <= target <= high
 
 
 def range_window(query: str) -> dict[str, Any] | None:

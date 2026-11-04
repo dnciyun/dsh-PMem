@@ -37,6 +37,7 @@ from .text import (
     tokenize,
 )
 from . import query as query_mod
+from . import answer_type as answer_type_mod
 from . import graph as graph_mod
 from . import journal as journal_mod
 from . import scope as scope_mod
@@ -870,16 +871,40 @@ class MemoryStore:
         fresh_bonus = float(temporal_cfg.get("fresh_bonus", 0.0) or 0.0) if update_q else 0.0
         stale_penalty = float(temporal_cfg.get("stale_penalty", 0.0) or 0.0) if update_q else 0.0
         fresh_hl = float(temporal_cfg.get("fresh_half_life_days", 30) or 30)
+        # 时间锚点（M28）：「十月十二号」「八月」说的是**哪一次**。
+        # 只认明确日期/月份，模糊词（上次/那次/以前）一律不猜——猜错窗口比不猜更糟。
+        anchor_cfg = temporal_cfg.get("anchor")
+        anchor_cfg = anchor_cfg if isinstance(anchor_cfg, dict) else {}
+        anchor_win = (
+            temporal_mod.anchor(q)
+            if temporal_on and bool(anchor_cfg.get("enabled", True))
+            else None
+        )
+        anchor_bonus = float(anchor_cfg.get("bonus", 0.06) or 0.0)
+        anchor_miss = float(anchor_cfg.get("miss_factor", 1.0) or 1.0)
+        anchor_tol = int(anchor_cfg.get("tolerance_days", 7) or 0)
+        # 答案类型（M28）：问数字/地点/时间时，候选里没有那种东西的别抢前排。
+        # person 不做字面判断（没有 NER），kind_of 给了也跳过。
+        atype_cfg = self.cfg.get("retrieval.answer_type")
+        atype_cfg = atype_cfg if isinstance(atype_cfg, dict) else {}
+        atype = None
+        if bool(atype_cfg.get("enabled", True)):
+            kind = answer_type_mod.kind_of(q)
+            atype = kind if kind and kind != "person" else None
+        type_bonus = float(atype_cfg.get("bonus", 0.06) or 0.0)
+        type_miss = float(atype_cfg.get("miss_factor", 1.0) or 1.0)
         scored: list[tuple[int, float]] = []
         stale_seqs: dict[int, str] = {}
         by_seq: dict[int, dict[str, Any]] = {}
         debug_rows: list[dict[str, Any]] | None = [] if os.environ.get("PMEM_DEBUG_SEARCH") else None
         for row, relevance in pending:
+            stamp: str | None = None
             if temporal_on and temporal_axis == "valid_from":
                 stamp = temporal_mod.real_axis(row)
                 age = days_between(stamp) if stamp else days_between(row["created_at"])
             else:
                 age = days_between(row["created_at"])
+            stamp = stamp or row["created_at"]
             hl = float(half_lives.get(row["kind"], 365))
             recency_v = scoring.recency(age, hl)
             if old_invert:
@@ -913,6 +938,30 @@ class MemoryStore:
                 score = max(0.0, score - pending_penalty)
             if stale_kind:
                 stale_seqs[int(row["seq"])] = stale_kind
+            # 时间锚点（M28）：问句点明了哪一天/哪个月，落在窗口里的加分，
+            # 窗口外的按配置压一档（默认 1.0 = 只加分不扣分，扣分要 A/B 证明过再开）。
+            anchor_state = ""
+            if anchor_win is not None:
+                in_win = temporal_mod.in_anchor_window(stamp, anchor_win, tolerance_days=anchor_tol)
+                if in_win is True:
+                    anchor_state = "in"
+                    if anchor_bonus:
+                        score = min(1.0, score + anchor_bonus)
+                elif in_win is False:
+                    anchor_state = "out"
+                    if anchor_miss < 1.0:
+                        score = max(0.0, score * anchor_miss)
+            # 答案类型（M28）：问「多少/哪+地点/什么时候」时，候选里得有那种东西的字面证据。
+            type_state = ""
+            if atype:
+                if answer_type_mod.has_evidence(row["text_raw"], atype):
+                    type_state = "hit"
+                    if type_bonus:
+                        score = min(1.0, score + type_bonus)
+                else:
+                    type_state = "miss"
+                    if type_miss < 1.0:
+                        score = max(0.0, score * type_miss)
             if scope_on:
                 if role_bonus:
                     score += scope_mod.role_bonus(q, row["text_raw"], bonus=role_bonus)
@@ -945,6 +994,8 @@ class MemoryStore:
                         "cov": round(float(cov_by_seq.get(row["seq"], 0.0)), 3),
                         "affinity": round(float(affinity.get(row["seq"], 0.0)), 3),
                         "score": round(score, 4),
+                        "anchor": anchor_state,
+                        "atype": type_state,
                         "text": (row["text_raw"] or "")[:120],
                     }
                 )
@@ -1000,6 +1051,16 @@ class MemoryStore:
             lam=self.cfg.get("retrieval.mmr_lambda", 0.7),
         )
 
+        # 相对覆盖率下限（M28）：比「最佳候选」覆盖率低太多的条目，多半只是同一批人的
+        # 另一件事（问「钓鱼在哪个湖」，候选里混进「府河只钓到两条小鲫鱼」）。
+        # 只截**词法候选**，后面图/向量/实体补进来的多跳答案不受影响。
+        floor_frac = float(self.cfg.get("retrieval.min_rel_coverage", 0.0) or 0.0)
+        if floor_frac > 0 and picked and cov_by_seq:
+            best_cov = max(cov_by_seq.values())
+            if best_cov > 0:
+                kept = [pair for pair in picked if cov_by_seq.get(pair[0], 0.0) >= floor_frac * best_cov]
+                picked = kept or picked[:1]
+
         payload: list[dict[str, Any]] = []
         payload_seq: list[int] = []
         for seq, score in picked:
@@ -1025,6 +1086,32 @@ class MemoryStore:
         payload, used = scoring.fit_budget(payload, budget)
         payload = payload[:k]
         payload_seq = payload_seq[: len(payload)]
+        # 注入侧元信息（M28）：一屏里出现两条以上讲同一批人的记忆时，光看日期模型分不清
+        # 「十月那次」和「八月那次」。把「涉及谁」一起给它，让它自己挑。一次 IN 查询，
+        # 关掉就不查；实体表缺/坏都只是少这行备注，不影响检索。
+        meta_cfg = self.cfg.get("retrieval.inject_meta")
+        meta_cfg = meta_cfg if isinstance(meta_cfg, dict) else {}
+        if bool(meta_cfg.get("enabled", True)) and payload_seq:
+            limit_ent = max(1, int(meta_cfg.get("entities", 3) or 3))
+            ent_map: dict[int, list[str]] = {}
+            marks_e = ",".join("?" for _ in payload_seq)
+            try:
+                for ent in self.db.conn.execute(
+                    f"SELECT em.memory_seq AS seq, e.name AS name FROM entity_mention em "
+                    f"JOIN entity e ON e.id=em.entity_id "
+                    f"WHERE em.memory_seq IN ({marks_e}) AND e.status='active' "
+                    f"ORDER BY em.memory_seq, em.seq",
+                    tuple(payload_seq),
+                ).fetchall():
+                    names = ent_map.setdefault(int(ent["seq"]), [])
+                    if ent["name"] not in names and len(names) < limit_ent:
+                        names.append(ent["name"])
+            except Exception:  # noqa: BLE001 实体表异常不影响检索
+                ent_map = {}
+            for item, seq in zip(payload, payload_seq):
+                names = ent_map.get(int(seq)) or []
+                if names:
+                    item["entities"] = names
         # 预算按**实际要注入的条目**算（fit_budget 的 used 含被 [:k] 截掉的部分）。
         spent = sum(estimate_tokens(item["text"]) + 12 for item in payload)
         # 每条已选结果现在有多「有实词依据」：补候选时只用覆盖率为 0 的尾巴换。

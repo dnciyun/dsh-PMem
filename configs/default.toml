@@ -19,6 +19,10 @@ w_graph = 0.08
 mmr_lambda = 0.7
 mmr_pool = 16
 candidate_pool = 64
+# 相对覆盖率下限（M28）：比最佳候选覆盖率低太多的候选，多半只是同一批人的另一件事。
+# 默认 0（关）。0.35 能把抗干扰 84.8→91.3，但可答率 98.6→95.5；这是权衡线不是净化，
+# 所以要开的话自己选。
+min_rel_coverage = 0.0
 drought_days = 14
 raw_fallback = true
 raw_fallback_coverage = 0.3
@@ -79,6 +83,16 @@ expired_penalty = 0.15
 pending_penalty = 0.06
 valid_grace_days = 0.0
 
+[retrieval.temporal.anchor]
+# 时间锚点（M28）：问句点明「十月十二号」「八月」时，把它当「哪一次」的信号。
+# 只认明确日期/月份，模糊词（上次/那次/以前）不猜。tolerance_days 给日期留余量：
+# 事实常常比事情晚几天才被说出来（10-12 的事 10-19 才记下）。
+# 默认关：M28 实测开了可答率 98.6→98.3、抗干扰不变（84.8），所以不默认替用户改排序。
+enabled = false
+bonus = 0.06
+tolerance_days = 7
+miss_factor = 1.0
+
 [retrieval.scope]
 # 语文范围（M15）：问句里的角色词/自称/「名字+她他」决定候选该是「本人」还是「家属」。
 enabled = true
@@ -87,6 +101,21 @@ name_bonus = 0.04
 other_owner_penalty = 0.06
 owner_conflict_penalty = 0.22
 recall = true
+
+[retrieval.answer_type]
+# 答案类型（M28）：问「多少/几层/哪+地点/什么时候」时，候选里得有那种东西的字面证据。
+# 人名不做（没 NER，硬判会误伤）。
+# 默认关：M28 实测可答率 98.6→98.3、MRR 0.815→0.812、抗干扰不变；扣分档更糟
+# （0.85 换抗干扰 87.0，代价可答率 97.6）。
+enabled = false
+bonus = 0.06
+miss_factor = 1.0
+
+[retrieval.inject_meta]
+# 注入侧元信息（M28）：一屏里两条以上讲同一批人的记忆时，报「涉及谁」，让模型自己分清
+# 「十月那次」和「八月那次」。关掉就只是少这一行备注。
+enabled = true
+entities = 3
 
 [retrieval.vector]
 # 向量通道（M13）：本地 bge-small-zh-v1.5 ONNX int8，词法没把握时的第二手段。
