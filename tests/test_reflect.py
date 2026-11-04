@@ -325,7 +325,7 @@ class Case(unittest.TestCase):
             tools = mcp.call("tools/list")["result"]["tools"]
             names = {tool["name"] for tool in tools}
             self.assertIn("memory_reflect", names)
-            self.assertEqual(len(tools), 23)
+            self.assertEqual(len(tools), 24)
 
             before = self.db.conn.execute("SELECT COUNT(*) c FROM reflection").fetchone()["c"]
             data = mcp.tool("memory_reflect", {"period": f"day:{date.today()}"})

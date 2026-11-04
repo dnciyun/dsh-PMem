@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-SCHEMA_VERSION = "1.9.0"
+SCHEMA_VERSION = "1.10.0"
 
 # 实体表单独提出来：M3 的迁移要重建它（SQLite 不支持改 CHECK 约束）
 ENTITY_DDL = """
@@ -594,6 +594,27 @@ DDL: list[str] = [
     """,
     "CREATE INDEX IF NOT EXISTS idx_journal_day ON journal_line(day_key, seq)",
     "CREATE INDEX IF NOT EXISTS idx_journal_open ON journal_line(subject_id, episode_id)",
+    # ---- 原话撤回墓碑（1.10.0 / M27）：撤回不是删除 ----
+    # 为什么不给 journal_line 加一列：原文行是「说过什么」的事实，撤回是「这句
+    # 不算数了」的另一条事实。两件事都只追加，谁都不改写谁——这才对得上
+    # 「原文只追加、结论必有证据」。而且原文 30 天后会被 prune 掉，墓碑留着，
+    # 还能回答「我确实撤回过」。excerpt 存撤回时的摘要：原文过期后仍认得出撤了什么。
+    """
+    CREATE TABLE IF NOT EXISTS journal_retraction (
+      seq         INTEGER PRIMARY KEY AUTOINCREMENT,
+      id          TEXT NOT NULL UNIQUE,
+      subject_id  TEXT NOT NULL REFERENCES subject(id),
+      line_id     TEXT NOT NULL,
+      session_id  TEXT,
+      role        TEXT,
+      reason      TEXT,
+      excerpt     TEXT,
+      actor       TEXT NOT NULL,
+      created_at  TEXT NOT NULL,
+      UNIQUE(subject_id, line_id)
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_jretr_line ON journal_retraction(subject_id, line_id)",
     # 原文兜底索引（1.7.0）：派生事实会截断/改人称，原话里丢掉的细节靠它找回来。
     # 只做兜底：派生结果薄弱时才查，避免每轮都多一份注入成本。
     """

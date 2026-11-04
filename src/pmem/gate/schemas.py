@@ -335,14 +335,49 @@ TOOLS: list[dict[str, Any]] = [
             "用途：认出「这是不是你说过的」「他答应过什么」「这句话是谁说的」——先查这个，别凭印象。"
             "它和 memory_search 不是一回事：search 给的是「相关」，trace 给的是「在不在」。"
             "查不到就说没有，别拿相似记忆顶；少于 3 个字会返回「太短、没查」，那不算没有。"
+            "默认不返回撤回过的原话；要连同撤回记录一起看，传 include_retracted=true。"
         ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "query": {"type": "string", "description": "要查的那句话（可以整段贴进来）"},
                 "limit": {"type": "integer", "default": 20, "description": "最多返回几条，默认 20"},
+                "include_retracted": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": "连撤回过的原话一起返回（会带 retracted 标记）",
+                },
             },
             "required": ["query"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "memory_retract",
+        "description": (
+            "撤回一句原话或一条记忆：**不是删除**，是「这句/这条不算数了」的墓碑。"
+            "原文、证据、事件链一个字都不改，只多一条撤回事实；默认的读取（trace、检索、醒来卡）"
+            "不再返回它，memory_trace(include_retracted=true) 与 memory_history 仍看得见。"
+            "两种目标的区别：原话撤回不可恢复（只留墓碑 + 摘要）；记忆撤回是降到 archived，"
+            "可以 memory_update(status=active) 恢复。"
+            "target 认不出是哪种时先认记忆 id，再认原话 id；都认不出会明确报错，不会瞎撤。"
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "target": {
+                    "type": "string",
+                    "description": "要撤回的 id：记忆 id（01…）或用 memory_trace 查到的原话 id",
+                },
+                "reason": {"type": "string", "description": "为什么撤回（会进事件日志，方便以后认账）"},
+                "kind": {
+                    "type": "string",
+                    "enum": ["auto", "line", "memory"],
+                    "default": "auto",
+                    "description": "auto=自己认；line=只当原话；memory=只当记忆",
+                },
+            },
+            "required": ["target"],
             "additionalProperties": False,
         },
     },

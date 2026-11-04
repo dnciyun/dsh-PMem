@@ -305,6 +305,16 @@ def main(argv: list[str] | None = None) -> int:
     p_trace = sub.add_parser("trace", help="按字查原话（一字不差）：会话 / 行号 / 角色")
     p_trace.add_argument("query")
     p_trace.add_argument("--limit", type=int, default=20)
+    p_trace.add_argument(
+        "--include-retracted", action="store_true", help="连撤回过的原话一起看（带标记）"
+    )
+
+    p_retr = sub.add_parser("retract", help="撤回一句原话或一条记忆（墓碑，不是删除）")
+    p_retr.add_argument("target", help="记忆 id，或 trace 查到的原话 id")
+    p_retr.add_argument("--reason", default="", help="为什么撤回（写进事件日志，方便认账）")
+    p_retr.add_argument(
+        "--kind", default="auto", choices=["auto", "line", "memory"], help="auto=自己认"
+    )
 
     p_get = sub.add_parser("get", help="取一条")
     p_get.add_argument("id")
@@ -1889,7 +1899,11 @@ def main(argv: list[str] | None = None) -> int:
                 args.json,
             )
         if args.cmd == "trace":
-            result = app.trace(args.query, limit=args.limit)
+            result = app.trace(
+                args.query,
+                limit=args.limit,
+                include_retracted=bool(getattr(args, "include_retracted", False)),
+            )
             if args.json or not result.get("ok"):
                 return _emit(result, args.json)
             data = result.get("data") or {}
@@ -1900,10 +1914,31 @@ def main(argv: list[str] | None = None) -> int:
             print(f"— 按字查过（{data.get('scope', '')}）：命中 {len(items)} 条")
             for it in items:
                 sid = str(it.get("session_id") or "")
-                print(f"  {it.get('role')} · 会话 …{sid[-8:]} · 第 {it.get('line_no')} 行 · {it.get('ts')}")
+                mark = " · 已撤回" if it.get("retracted") else ""
+                print(
+                    f"  {it.get('role')} · 会话 …{sid[-8:]} · 第 {it.get('line_no')} 行 · {it.get('ts')}{mark}"
+                )
                 print(f"    {str(it.get('text'))[:160]}")
             if not items:
                 print("  " + str(data.get("note") or "库里没有这句话"))
+            return 0
+        if args.cmd == "retract":
+            result = app.retract(args.target, reason=args.reason, kind=args.kind)
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            data = result.get("data") or {}
+            what = "记忆" if data.get("target") == "memory" else "原话"
+            if data.get("already"):
+                print(f"— 这条{what}已经撤回过（{str(data.get('created_at') or '')[:19]}）")
+                return 0
+            print(f"✓ 已撤回一条{what}：{args.target}")
+            if data.get("excerpt"):
+                print(f"  撤回的那句：{data['excerpt']}")
+            if data.get("restore_hint"):
+                print(f"  只是归档，{data['restore_hint']}；原文与事件链没动")
+            else:
+                print("  原文没删、事件链没动，只是默认不再返回")
+                print("  仍可查：pmem trace \"那句话\" --include-retracted")
             return 0
         if args.cmd == "get":
             return _emit(app.get(args.id), args.json)

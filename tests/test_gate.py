@@ -121,6 +121,7 @@ class TestMcp(unittest.TestCase):
                 "memory_sleep",
                 "memory_journal",
                 "memory_trace",
+                "memory_retract",
                 "memory_evolve",
                 "memory_profile",
                 "memory_reflect",
@@ -227,7 +228,7 @@ class TestMcpStdio(unittest.TestCase):
                 resp = client.call("initialize", {"protocolVersion": "2024-11-05"})
                 self.assertEqual(resp["result"]["serverInfo"]["name"], "pmem")
                 tools = client.call("tools/list")["result"]["tools"]
-                self.assertEqual(len(tools), 23)
+                self.assertEqual(len(tools), 24)
             finally:
                 client.close()
         finally:

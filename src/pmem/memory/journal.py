@@ -28,6 +28,7 @@ from typing import Any, Callable, Iterable
 from ..base import events
 from ..base.clock import day_key as today_key
 from ..base.clock import now, now_iso, to_iso
+from ..base.errors import NotFoundError
 from ..base.ids import ulid
 from .text import tokenize
 
@@ -137,6 +138,114 @@ def append(
     return {"ok": True, "id": line_id, "day_key": day, "role": role, "indexed": with_index}
 
 
+# -- 撤回（M27 / 1.10.0） --------------------------------------------------
+#
+# 为什么「撤回」不是「删除」：
+# - 删除是**清账**：这条不该存在，删掉（memory_delete --hard 不可逆）；
+# - 撤回是**表态**：这句我说过，但它不算数了。原文和事件链一个字都不改，
+#   只多一条「撤回」事实；读的时候默认不看它，想查的时候照样查得到。
+# 谁可以撤：用户（"这句别记了"）和 AI（"我刚才说错了"）都可以；原话只追加，
+# 所以撤回只加墓碑，不删行。
+
+
+def retracted_ids(
+    db: Any, *, subject: str = "self", line_ids: Iterable[str] | None = None
+) -> set[str]:
+    """一批原话 id 里，哪些已经被撤回过。``line_ids=None`` 表示整库（统计用）。"""
+    if line_ids is not None:
+        ids = list(line_ids)[:900]
+        if not ids:
+            return set()
+        marks = ",".join("?" for _ in ids)
+        rows = db.conn.execute(
+            f"SELECT line_id FROM journal_retraction WHERE subject_id=? AND line_id IN ({marks})",
+            (subject, *ids),
+        ).fetchall()
+    else:
+        rows = db.conn.execute(
+            "SELECT line_id FROM journal_retraction WHERE subject_id=?", (subject,)
+        ).fetchall()
+    return {str(row["line_id"]) for row in rows}
+
+
+def retract(
+    db: Any,
+    line_id: str,
+    *,
+    subject: str = "self",
+    reason: str = "",
+    actor: str = "self",
+    excerpt_chars: int = 120,
+) -> dict[str, Any]:
+    """撤回一条原话：追加墓碑，原文不动。重复撤回返回 ``already=True``。"""
+    row = db.conn.execute(
+        "SELECT id, session_id, role, text FROM journal_line WHERE id=? AND subject_id=?",
+        (line_id, subject),
+    ).fetchone()
+    if row is None:
+        raise NotFoundError(
+            f"找不到这条原话 {line_id}",
+            hint="先用 memory_trace / pmem trace 查到原话 id，再撤；认不出是哪句就不撤。",
+            field="target",
+        )
+    existing = db.conn.execute(
+        "SELECT id, created_at FROM journal_retraction WHERE subject_id=? AND line_id=?",
+        (subject, line_id),
+    ).fetchone()
+    if existing is not None:
+        return {
+            "ok": True,
+            "already": True,
+            "id": existing["id"],
+            "line_id": line_id,
+            "created_at": existing["created_at"],
+        }
+    body = str(row["text"] or "")
+    excerpt = body if len(body) <= excerpt_chars else body[: max(1, excerpt_chars - 1)] + "…"
+    rid = ulid()
+    stamp = now_iso()
+    with db.tx() as conn:
+        conn.execute(
+            "INSERT INTO journal_retraction(id, subject_id, line_id, session_id, role, reason, "
+            "excerpt, actor, created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+            (
+                rid,
+                subject,
+                line_id,
+                row["session_id"],
+                row["role"],
+                str(reason or ""),
+                excerpt,
+                actor,
+                stamp,
+            ),
+        )
+        events.append(
+            conn,
+            actor=actor,
+            op="journal.retract",
+            target_tbl="journal_line",
+            target_id=line_id,
+            subject_id=subject,
+            payload={
+                "reason": str(reason or ""),
+                "excerpt": excerpt,
+                "session_id": row["session_id"],
+                "role": row["role"],
+            },
+        )
+    return {
+        "ok": True,
+        "already": False,
+        "id": rid,
+        "line_id": line_id,
+        "session_id": row["session_id"],
+        "role": row["role"],
+        "excerpt": excerpt,
+        "created_at": stamp,
+    }
+
+
 def _day_of(iso: str) -> str:
     """ISO 时间 → 本地日期键。解析失败就退回今天，不抛。"""
     try:
@@ -154,17 +263,24 @@ def pending(
     day_key: str | None = None,
     limit: int = 200,
 ) -> list[Any]:
-    """还没消化的流水，按时间正序。"""
+    """还没消化的流水，按时间正序。
+
+    撤回过的原话不再进待消化队列：它已经是「不算数」的表态，不该再变成日记。
+    """
     if day_key is None:
         sql = (
-            "SELECT * FROM journal_line WHERE subject_id=? AND episode_id IS NULL "
-            "ORDER BY seq LIMIT ?"
+            "SELECT * FROM journal_line jl WHERE jl.subject_id=? AND jl.episode_id IS NULL "
+            "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+            "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id) "
+            "ORDER BY jl.seq LIMIT ?"
         )
         params: tuple[Any, ...] = (subject, int(limit))
     else:
         sql = (
-            "SELECT * FROM journal_line WHERE subject_id=? AND episode_id IS NULL "
-            "AND day_key=? ORDER BY seq LIMIT ?"
+            "SELECT * FROM journal_line jl WHERE jl.subject_id=? AND jl.episode_id IS NULL "
+            "AND jl.day_key=? AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+            "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id) "
+            "ORDER BY jl.seq LIMIT ?"
         )
         params = (subject, day_key, int(limit))
     return list(db.conn.execute(sql, params).fetchall())
@@ -172,8 +288,10 @@ def pending(
 
 def pending_days(db: Any, *, subject: str = "self") -> list[str]:
     rows = db.conn.execute(
-        "SELECT day_key, COUNT(*) c FROM journal_line WHERE subject_id=? AND episode_id IS NULL "
-        "GROUP BY day_key ORDER BY day_key",
+        "SELECT jl.day_key, COUNT(*) c FROM journal_line jl WHERE jl.subject_id=? "
+        "AND jl.episode_id IS NULL AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+        "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id) "
+        "GROUP BY jl.day_key ORDER BY jl.day_key",
         (subject,),
     ).fetchall()
     return [row["day_key"] for row in rows]
@@ -882,7 +1000,12 @@ def stats(db: Any, *, subject: str = "self") -> dict[str, Any]:
     return {
         "episodes": _one("SELECT COUNT(*) FROM episode WHERE subject_id=?"),
         "lines": _one("SELECT COUNT(*) FROM journal_line WHERE subject_id=?"),
-        "pending": _one("SELECT COUNT(*) FROM journal_line WHERE subject_id=? AND episode_id IS NULL"),
+        "pending": _one(
+            "SELECT COUNT(*) FROM journal_line jl WHERE jl.subject_id=? AND jl.episode_id IS NULL "
+            "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+            "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id)"
+        ),
+        "retracted": _one("SELECT COUNT(*) FROM journal_retraction WHERE subject_id=?"),
         "pending_days": pending_days(db, subject=subject),
         "last": latest(db, subject=subject),
     }
@@ -921,6 +1044,8 @@ __all__ = [
     "pending_days",
     "prune",
     "recent",
+    "retract",
+    "retracted_ids",
     "search_episodes",
     "stats",
     "template_draft",
@@ -934,12 +1059,16 @@ def trace(
     subject: str = "self",
     limit: int = 20,
     max_chars: int = 400,
+    include_retracted: bool = False,
 ) -> dict[str, Any]:
     """按字查原话：**精确子串**匹配（一字不差），返回会话、行号、角色、时间。
 
     为什么不用 FTS：FTS 是分词后的相关性，不是「这句话在不在这里」。要认归属、
     认承诺，就得按字查。行号是「同一会话内第几行」（按 journal_line.seq 排），
     不是全局行号。
+
+    默认**不返回撤回过的原话**（撤回 = 这句不算数了）；``include_retracted=True``
+    时照样能查到，并标明 ``retracted``——想认账的时候查得到，日常回忆时看不见。
 
     三条纪律：
     1. 少于 3 个字不扫，如实说「太短、没查」——**那不算没有**；
@@ -956,17 +1085,24 @@ def trace(
             "scope": "PMem 原话流水（journal_line）",
             "note": "太短，扫不了（至少 3 个字）；这不算「没有」。",
         }
+    live_filter = ""
+    if not include_retracted:
+        live_filter = (
+            "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+            "WHERE r.subject_id=journal_line.subject_id AND r.line_id=journal_line.id) "
+        )
     rows = db.conn.execute(
-        """
+        f"""
         SELECT id, session_id, ts, role, line_no, text, seq FROM (
             SELECT id, session_id, ts, role, text, seq,
                    ROW_NUMBER() OVER (PARTITION BY session_id ORDER BY seq) AS line_no
-            FROM journal_line WHERE subject_id=?
+            FROM journal_line WHERE subject_id=? {live_filter}
         ) WHERE instr(text, ?) > 0
         ORDER BY seq DESC LIMIT ?
         """,
         (subject, q, max(1, int(limit))),
     ).fetchall()
+    gone = retracted_ids(db, subject=subject, line_ids=[row["id"] for row in rows])
     items: list[dict[str, Any]] = []
     for row in rows:
         body = str(row["text"] or "")
@@ -979,13 +1115,17 @@ def trace(
                 "ts": row["ts"],
                 "text": clipped,
                 "id": row["id"],
+                "retracted": row["id"] in gone,
             }
         )
+    scope = "PMem 原话流水（journal_line，全库所有会话）"
+    if include_retracted:
+        scope += "，含已撤回"
     return {
         "query": q,
         "count": len(items),
         "items": items,
         "too_short": False,
-        "scope": "PMem 原话流水（journal_line，全库所有会话）",
-        "note": "" if items else "这条线的库里没有这句话（不代表没发生过：可能没进流水）。",
+        "scope": scope,
+        "note": "" if items else "这条线的库里没有这句话（不代表没发生过：可能没进流水，或已被撤回）。",
     }

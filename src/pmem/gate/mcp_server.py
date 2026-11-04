@@ -234,7 +234,17 @@ class McpServer:
                 dry_run=bool(args.get("dry_run", False)),
             )
         if name == "memory_trace":
-            return self.app.trace(args.get("query", ""), limit=int(args.get("limit", 20) or 20))
+            return self.app.trace(
+                args.get("query", ""),
+                limit=int(args.get("limit", 20) or 20),
+                include_retracted=bool(args.get("include_retracted", False)),
+            )
+        if name == "memory_retract":
+            return self.app.retract(
+                args.get("target", ""),
+                reason=str(args.get("reason", "") or ""),
+                kind=str(args.get("kind", "auto") or "auto"),
+            )
         if name == "memory_evolve":
             return self.app.evolve(
                 action=args.get("action", "run"),

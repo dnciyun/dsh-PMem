@@ -376,7 +376,19 @@ class MemoryStore:
             raise NotFoundError(f"找不到记忆 {memory_id}", field="id")
         if row["status"] == "deleted" and not include_deleted:
             raise NotFoundError(f"记忆 {memory_id} 已被删除", hint="如需恢复请用 update --status active")
-        return self._to_item(row, include_extra=True)
+        item = self._to_item(row, include_extra=True)
+        # 恢复过的记忆不该还挂着「已撤回」：撤回态就是 archived + 撤回事件，
+        # 用 update 改回 active 之后，这两条都要同时不成立。
+        item["retracted"] = row["status"] == "archived" and self._is_retracted(memory_id)
+        return item
+
+    def _is_retracted(self, memory_id: str) -> bool:
+        """这条记忆是不是被「撤回」过（不等于普通归档：归档没有撤回事件）。"""
+        row = self.db.conn.execute(
+            "SELECT 1 FROM event_log WHERE op='memory.retract' AND target_id=? LIMIT 1",
+            (memory_id,),
+        ).fetchone()
+        return row is not None
 
     def _row(self, memory_id: str) -> Any | None:
         return self.db.conn.execute("SELECT * FROM memory WHERE id=?", (memory_id,)).fetchone()
@@ -580,6 +592,63 @@ class MemoryStore:
                 payload={"reason": reason, "tombstone": True},
             )
         return {"deleted": 1, "hard": True, "cascaded": cascaded}
+
+    def retract(
+        self,
+        memory_id: str,
+        *,
+        reason: str | None = None,
+        actor: str | None = None,
+    ) -> dict[str, Any]:
+        """撤回一条记忆：**不是删除**。
+
+        语义对齐原话层的墓碑：这条说过，但不算数了。实现上落到 ``status='archived'``
+        ——「不算数」的记忆不该再进检索/醒来卡，但原文、证据、事件链一个字都不改，
+        想恢复就 ``update --status active``。和 ``memory_delete`` 的区别写在这里，
+        因为这是最容易混的一处：
+
+        - 撤回：留痕、可恢复、默认看不见（``memory.retract`` 事件）；
+        - 删除：清账（软删 7 天可恢复，``--hard`` 连行一起没）。
+        """
+        row = self._row(memory_id)
+        if row is None:
+            raise NotFoundError(f"找不到记忆 {memory_id}", field="id")
+        actor = actor or self.actor
+        if row["status"] == "deleted":
+            raise ValidationError(
+                "已删除的记忆不能撤回",
+                hint="删除是清账，撤回是表态；已被删除的请先 update --status active 再决定。",
+                field="target",
+            )
+        if row["status"] == "archived" and self._is_retracted(memory_id):
+            return {
+                "ok": True,
+                "already": True,
+                "id": memory_id,
+                "status": "archived",
+                "restore_hint": "update --status active 可恢复",
+            }
+        previous = row["status"]
+        with self.db.tx() as conn:
+            conn.execute("UPDATE memory SET status='archived' WHERE id=?", (memory_id,))
+            events.append(
+                conn,
+                actor=actor,
+                op="memory.retract",
+                target_tbl="memory",
+                target_id=memory_id,
+                subject_id=self.subject,
+                payload={"from": previous, "reason": reason},
+            )
+        return {
+            "ok": True,
+            "already": False,
+            "id": memory_id,
+            "status": "archived",
+            "from": previous,
+            "restore_hint": "update --status active 可恢复",
+        }
+
 
     def history(self, target: str, *, limit: int = 50) -> list[dict[str, Any]]:
         if ":" in target:
@@ -1833,7 +1902,10 @@ class MemoryStore:
             rows = self.db.conn.execute(
                 "SELECT jl.id, jl.text, jl.day_key, jl.role, bm25(journal_fts) AS bm25 "
                 "FROM journal_fts JOIN journal_line jl ON jl.seq=journal_fts.rowid "
-                "WHERE journal_fts MATCH ? ORDER BY bm25(journal_fts) LIMIT ?",
+                "WHERE journal_fts MATCH ? "
+                "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+                "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id) "
+                "ORDER BY bm25(journal_fts) LIMIT ?",
                 (expr, limit * 4),
             ).fetchall()
         except Exception:  # noqa: BLE001 老库没建索引：兜底不存在也不报错

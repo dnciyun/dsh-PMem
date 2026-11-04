@@ -538,17 +538,60 @@ class PMem:
         except PmemError as exc:
             return self._fail(exc, started)
 
-    def trace(self, query: str, *, limit: int = 20) -> dict[str, Any]:
+    def trace(
+        self, query: str, *, limit: int = 20, include_retracted: bool = False
+    ) -> dict[str, Any]:
         """按字查原话（一字不差）：查全库原话流水，返回会话 / 行号 / 角色 / 时间。
 
         和 ``search`` 的分工：search 是「想起来」（相关性），trace 是「认归属」（精确子串）。
         查不到就是没有；少于 3 个字会明说「太短、没查」。
+        默认不返回撤回过的原话；``include_retracted=True`` 才看得见（带标记）。
         """
         started = time.perf_counter()
         from ..memory import journal
 
         try:
-            return self._ok(journal.trace(self.db, query, subject=self.subject, limit=limit), started)
+            return self._ok(
+                journal.trace(
+                    self.db,
+                    query,
+                    subject=self.subject,
+                    limit=limit,
+                    include_retracted=include_retracted,
+                ),
+                started,
+            )
+        except PmemError as exc:
+            return self._fail(exc, started)
+
+    def retract(self, target: str, *, reason: str = "", kind: str = "auto") -> dict[str, Any]:
+        """撤回一句原话或一条记忆：**不是删除**，是「这句不算数了」的墓碑。
+
+        为什么要一个统一的入口：用户说「刚才那句别记」时，不该先知道它是原话还是
+        结论、也不该先背下三种 id——由这个入口自己认（先认记忆 id，再认原话 id）。
+
+        两种目标语义不同，但原则相同（原文与事件链都不改写，只多一条撤回事实）：
+
+        - 原话：``journal_retraction`` 墓碑，默认 trace / 原文兜底看不到；
+        - 记忆：状态降到 ``archived``（检索、醒来卡默认不返回），可以 update 回 active。
+        """
+        started = time.perf_counter()
+        from ..memory import journal
+
+        try:
+            mode = str(kind or "auto").strip().lower()
+            if mode not in ("auto", "line", "memory"):
+                raise ValidationError("kind 只能是 auto/line/memory", field="kind")
+            row = self.store._row(target) if mode in ("auto", "memory") else None
+            if row is not None:
+                data = self.store.retract(target, reason=reason)
+                data["target"] = "memory"
+                return self._ok(data, started)
+            if mode == "memory":
+                raise NotFoundError(f"找不到记忆 {target}", field="target")
+            data = journal.retract(self.db, target, subject=self.subject, reason=reason)
+            data["target"] = "journal_line"
+            return self._ok(data, started)
         except PmemError as exc:
             return self._fail(exc, started)
 

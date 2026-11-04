@@ -93,7 +93,7 @@ class TestDatabase(unittest.TestCase):
             db = Database(tmp / "x.db")
             db.init()
             db.init()
-            self.assertEqual(db.meta("schema_version"), "1.9.0")
+            self.assertEqual(db.meta("schema_version"), "1.10.0")
             self.assertTrue(db.integrity_ok())
             row = db.conn.execute("SELECT COUNT(*) c FROM subject").fetchone()
             self.assertEqual(row["c"], 1)
