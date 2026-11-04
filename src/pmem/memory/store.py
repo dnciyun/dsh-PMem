@@ -2226,6 +2226,20 @@ class MemoryStore:
             "by_status": by_status,
             "by_kind": by_kind,
             "event_count": conn.execute("SELECT COUNT(*) c FROM event_log").fetchone()["c"],
+            # 「最近记了什么」要有确定答案：按写入顺序取最后几条，别让人拿相关性检索去猜。
+            "recent": [
+                {
+                    "id": row["id"],
+                    "day": row["day_key"],
+                    "kind": row["kind"],
+                    "status": row["status"],
+                    "text": str(row["text_raw"] or "")[:80],
+                }
+                for row in conn.execute(
+                    "SELECT id, day_key, kind, status, text_raw FROM memory "
+                    "WHERE status<>'deleted' ORDER BY seq DESC LIMIT 5"
+                )
+            ],
             "schema_version": self.db.meta("schema_version"),
             "db_size_bytes": size,
             # 带上库路径：出问题时第一件要确认的是「它读的是不是同一个库」。

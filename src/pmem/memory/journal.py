@@ -1038,6 +1038,43 @@ def prune(db: Any, *, subject: str = "self", keep_days: int = 30) -> int:
     return int(cur.rowcount or 0)
 
 
+def rebuild_index(db: Any, *, dry_run: bool = False) -> dict[str, Any]:
+    """重建原话兜底索引（``journal_fts``）。
+
+    为什么需要：FTS5 的倒排索引一旦报 `malformed inverted index`，查询会静默降级
+    （原话兜底失效），而 `ensure_index` 只补**缺的**行，修不了坏的行。这里做的是
+    「清空 + 按 journal_line 全量重灌」，确定性、可反复跑。
+    """
+    total = db.conn.execute("SELECT COUNT(*) c FROM journal_line").fetchone()["c"]
+    stats: dict[str, Any] = {"lines": int(total), "indexed": 0, "dry_run": bool(dry_run)}
+    if dry_run:
+        return stats
+    rows = db.conn.execute("SELECT seq, text FROM journal_line ORDER BY seq").fetchall()
+    with db.tx() as conn:
+        conn.execute("DELETE FROM journal_fts")
+        done = 0
+        for row in rows:
+            try:
+                conn.execute(
+                    "INSERT INTO journal_fts(rowid, text_seg) VALUES(?,?)",
+                    (int(row["seq"]), tokenize(row["text"])),
+                )
+                done += 1
+            except Exception:  # noqa: BLE001 单行失败不挡整批
+                continue
+        stats["indexed"] = done
+        events.append(
+            conn,
+            actor="maintenance",
+            op="journal.reindex",
+            target_tbl="journal_fts",
+            target_id=None,
+            subject_id="self",
+            payload={"lines": stats["lines"], "indexed": done},
+        )
+    return stats
+
+
 def ensure_index(db: Any, *, limit: int | None = None) -> int:
     """把还没进 journal_fts 的历史流水补进去。
 

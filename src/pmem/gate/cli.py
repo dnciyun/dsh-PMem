@@ -768,6 +768,8 @@ def main(argv: list[str] | None = None) -> int:
     p_jn.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     p_pn = jn_sub.add_parser("purge-noise", help="清掉流水里的脚手架台词（只删还没消化的）")
     p_pn.add_argument("--dry-run", action="store_true", help="只报会删多少，不动库")
+    p_ri = jn_sub.add_parser("reindex", help="重建原话兜底索引（FTS5 报 malformed 时用）")
+    p_ri.add_argument("--dry-run", action="store_true", help="只报行数，不动库")
     p_js = jn_sub.add_parser("status", help="有几篇日记、积压多少流水、该不该睡")
     p_js.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     p_jr = jn_sub.add_parser("recent", help="最近几天的日记")
@@ -1558,6 +1560,16 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 for line in result.get("sample") or []:
                     print(f"    {line}")
+                return 0
+
+            if action == "reindex":
+                result = journal_mod.rebuild_index(app.db, dry_run=bool(args.dry_run))
+                if args.json:
+                    return _emit({"ok": True, "data": result}, True)
+                if result["dry_run"]:
+                    print(f"— 干跑：{result['lines']} 行原话待重建")
+                else:
+                    print(f"✓ 原话索引已重建：{result['indexed']}/{result['lines']} 行")
                 return 0
 
             if action == "digest":
