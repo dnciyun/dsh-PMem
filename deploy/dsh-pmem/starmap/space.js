@@ -707,22 +707,24 @@
     group_chain: [0.72, 0.78, 0.95]
   };
   var LINK_ALPHA = {
-    similar: 0.55,
-    co_mention: 0.32,
-    mention: 0.40,
-    group: 0.20,
-    relation: 0.62,
-    evidence: 0.45,
-    group_chain: 0.13
+    similar: 0.62,
+    co_mention: 0.40,
+    mention: 0.48,
+    group: 0.28,
+    relation: 0.66,
+    evidence: 0.52,
+    group_chain: 0.20
   };
+  // 线宽整体抬一档：0.7~2.0px 的细线在高 DPI 屏上会被抗锯齿切成一段一段，
+  // 看起来就像虚线。实线的第一要求是「连续」，所以先把它画粗。
   var LINK_WIDTH = {
-    similar: 1.5,
-    co_mention: 0.9,
-    mention: 1.1,
-    group: 0.8,
-    relation: 2.0,
-    evidence: 1.2,
-    group_chain: 0.7
+    similar: 2.4,
+    co_mention: 1.5,
+    mention: 1.8,
+    group: 1.3,
+    relation: 3.0,
+    evidence: 1.9,
+    group_chain: 1.1
   };
 
   function colorOf(node) {
