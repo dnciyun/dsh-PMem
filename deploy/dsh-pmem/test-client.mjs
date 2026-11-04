@@ -60,6 +60,13 @@ assert.ok(source.includes("['night', '夜间']"), '缺少「夜间」标签')
 assert.ok(source.includes("setTab('night')"), '概览的「夜间页」按钮应该切到「夜间」标签')
 assert.ok(source.includes("'/sleep/now'"), '夜间标签缺少「现在入睡」的 /sleep/now 调用')
 assert.ok(source.includes("'/sleep'"), '夜间标签缺少 /sleep 列表数据源')
+// 夜间标签的第二课：内容要把人话摆在前面，高度要收在设置弹窗里。
+// 直接把 stats JSON 甩上去 = 花括号天书；卡片不折叠 + max-height 100vh = 标签栏被滚出可视区、切不回别的页。
+assert.ok(!/JSON\.stringify\(\s*stage\.stats/.test(source), '阶段摘要不能直接甩 JSON')
+assert.ok(source.includes('pmem-run-toggle'), '睡眠卡片要能点开/收起')
+assert.ok(source.includes('aria-expanded'), '折叠按钮要暴露展开状态')
+assert.ok(/max-height:\s*min\(\s*700px/.test(source), '面板高度要收在设置弹窗里（否则标签栏会被滚出去）')
+assert.ok(source.includes('stageSummary'), '阶段要有人话摘要')
 // 星图不再嵌在设置页里：页内浮层有概率被窗口边缘压住关闭按钮，
 // 所以只保留「在浏览器打开」这一条（插件自己的回环只读服务 + 系统浏览器）。
 assert.ok(!source.includes('pmem-overlay'), '页内浮层已经去掉了，不该再出现')

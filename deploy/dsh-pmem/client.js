@@ -32,7 +32,7 @@ window.__ModuleLoader__.load({
 
     const CSS_TAG = 'dsh-pmem/settings.css'
     const CSS = `
-.pmem-app{max-width:960px;margin:0 auto;color:var(--dsw-alias-label-primary,#1f2328);font-size:13px;line-height:20px;border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 24px);background:rgba(127,127,127,.03)}
+.pmem-app{max-width:960px;margin:0 auto;color:var(--dsw-alias-label-primary,#1f2328);font-size:13px;line-height:20px;border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;max-height:min(700px,calc(100vh - 160px));background:rgba(127,127,127,.03)}
 .pmem-head{padding:16px 18px 12px;border-bottom:1px solid var(--dsw-alias-border-l2,#d0d5dd);background:linear-gradient(135deg,rgba(91,140,255,.12),rgba(120,90,255,.07))}
 .pmem-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dsw-alias-label-secondary,#5b6472);margin:0 0 4px}
 .pmem-title{margin:0;font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -41,7 +41,7 @@ window.__ModuleLoader__.load({
 .pmem-tab{border:none;background:transparent;color:var(--dsw-alias-label-secondary,#5b6472);font:inherit;font-size:12.5px;padding:8px 10px 9px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;border-radius:6px 6px 0 0}
 .pmem-tab:hover{background:rgba(127,127,127,.09);color:var(--dsw-alias-label-primary,#1f2328)}
 .pmem-tab.on{color:var(--dsw-alias-label-primary,#1f2328);border-bottom-color:var(--dsw-alias-brand-primary,#2f6fed);font-weight:600}
-.pmem-body{padding:14px 18px 18px;overflow:auto}
+.pmem-body{padding:14px 18px 18px;overflow:auto;min-height:0}
 .pmem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .pmem-card{border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:10px;padding:11px 12px;background:rgba(127,127,127,.03)}
 .pmem-card h4{margin:0 0 4px;font-size:12px;font-weight:600;color:var(--dsw-alias-label-secondary,#5b6472);letter-spacing:.02em}
@@ -79,15 +79,18 @@ window.__ModuleLoader__.load({
 .pmem-switch input:disabled{opacity:.45;cursor:default}
 .pmem-switch input:focus-visible{outline:2px solid var(--dsw-alias-brand-primary,#2f6fed);outline-offset:2px}
 .pmem-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.pmem-runs{display:flex;flex-direction:column;gap:10px}
-.pmem-run{border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:10px;padding:10px 12px;background:rgba(127,127,127,.03)}
-.pmem-run-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pmem-runs{display:flex;flex-direction:column;gap:8px}
+.pmem-run{border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:10px;padding:8px 12px;background:rgba(127,127,127,.03)}
+.pmem-run-toggle{border:none;background:transparent;color:inherit;font:inherit;width:100%;text-align:left;padding:2px 0;cursor:pointer;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pmem-run-toggle:hover .pmem-run-day{color:var(--dsw-alias-brand-primary,#2f6fed)}
+.pmem-run-caret{color:var(--dsw-alias-label-secondary,#5b6472);font-size:10px;width:10px;flex:none}
 .pmem-run-day{font-weight:600}
-.pmem-tag{font-size:11px;line-height:16px;padding:1px 8px;border-radius:99px;background:rgba(127,127,127,.14);color:var(--dsw-alias-label-secondary,#5b6472)}
+.pmem-run-meta{font-size:11.5px;color:var(--dsw-alias-label-secondary,#5b6472)}
+.pmem-tag{font-size:11px;line-height:16px;padding:1px 8px;border-radius:99px;background:rgba(127,127,127,.14);color:var(--dsw-alias-label-secondary,#5b6472);white-space:nowrap}
 .pmem-tag-ok{background:rgba(47,191,113,.16);color:var(--dsw-alias-state-success-primary,#2fbf71)}
 .pmem-tag-bad{background:rgba(229,72,77,.16);color:var(--dsw-alias-state-error-primary,#e5484d)}
 .pmem-run-err{margin-top:6px;font-size:12.5px}
-.pmem-stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px}
+.pmem-stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px}
 .pmem-stage{border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:9px;padding:7px 9px;background:rgba(127,127,127,.04);min-width:0}
 .pmem-stage.done{border-left:3px solid var(--dsw-alias-state-success-primary,#2fbf71)}
 .pmem-stage.bad{border-left:3px solid var(--dsw-alias-state-error-primary,#e5484d)}
@@ -185,8 +188,9 @@ window.__ModuleLoader__.load({
       )
     }
 
-    // 睡眠流水（`pmem sleep log --json`）：一次 run 一张卡，八个阶段各一格。
-    // 阶段名按 `pmem sleep log` 的 sN_* 阶段键映射；前端只做展示，不解释数据。
+    // 睡眠流水（`pmem sleep log --json`）：一次 run 一张可折叠的卡，展开是八个阶段。
+    // 数据里各阶段 stats 是嵌套 JSON（原始是一堆花括号数字，人看不懂），
+    // 所以每个阶段给一句人话摘要；不认识的阶段/字段退回"键=值"列表，绝不直接甩 JSON。
     const STAGE_LABELS = {
       s1_collect: '1 · 收集',
       s2_dedup: '2 · 去重',
@@ -198,13 +202,110 @@ window.__ModuleLoader__.load({
       s8_snapshot: '8 · 快照',
     }
 
+    const STATUS_LABELS = { ok: '完成', partial: '部分完成', failed: '失败', error: '出错', running: '进行中' }
+    const TRIGGER_LABELS = { manual: '手动', schedule: '定时', sched: '定时', catchup: '补跑', dry_run: '演练' }
+    const KIND_LABELS = { episodic: '情景', semantic: '语义', person: '人物', relation: '关系', goal: '目标', experience: '经验', meta: '元' }
+
     const stageId = stage => stage?.name || stage?.stage || '?'
     const stageLabel = stage => STAGE_LABELS[stageId(stage)] || stageId(stage)
+    const statusText = run => STATUS_LABELS[String(run?.status ?? '')] || String(run?.status ?? '—')
+    const triggerText = run => TRIGGER_LABELS[String(run?.trigger ?? '')] || String(run?.trigger ?? '')
 
+    function fmtClock(iso) {
+      if (!iso) return ''
+      const date = new Date(iso)
+      return Number.isNaN(date.getTime()) ? '' : date.toLocaleTimeString()
+    }
+
+    function fmtDuration(run) {
+      const start = Date.parse(run?.started_at ?? '')
+      const end = Date.parse(run?.finished_at ?? '')
+      if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return ''
+      const ms = end - start
+      return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)}s`
+    }
+
+    const numberAt = (stats, key) => (typeof stats?.[key] === 'number' ? stats[key] : undefined)
+
+    /** 不认识的阶段：把 stats 摊平成"键 值"，跳掉空对象/空串，最多 6 项。 */
+    function genericPairs(stats) {
+      const pairs = []
+      for (const [key, value] of Object.entries(stats ?? {})) {
+        if (value === null || value === undefined || value === '' || typeof value === 'object') continue
+        if (pairs.length >= 6) break
+        const text = typeof value === 'boolean' ? (value ? '是' : '否') : String(value)
+        pairs.push(`${key} ${text}`)
+      }
+      return pairs
+    }
+
+    /** 每个阶段一句人话；数值单位尽量说清（条 / 个 / KB）。 */
     function stageSummary(stage) {
-      if (!stage || stage.skipped === true || !stage.stats) return ''
-      const text = typeof stage.stats === 'string' ? stage.stats : JSON.stringify(stage.stats)
-      return text.length > 160 ? `${text.slice(0, 160)}…` : text
+      if (!stage || stage.skipped === true) return '本次跳过'
+      const stats = stage.stats && typeof stage.stats === 'object' ? stage.stats : null
+      if (!stats) return typeof stage.stats === 'string' ? stage.stats.slice(0, 120) : ''
+      const parts = []
+      const add = (label, value, unit = '') => {
+        if (value === undefined || value === null) return
+        parts.push(`${label} ${value}${unit}`)
+      }
+      const n = key => numberAt(stats, key)
+      switch (stageId(stage)) {
+        case 's1_collect': {
+          add('记忆', n('memories'), ' 条')
+          add('召回', n('recalls'), ' 次')
+          add('待办', n('backlog'), ' 条')
+          const kinds = Object.entries(stats.by_kind ?? {})
+            .filter(([, count]) => typeof count === 'number' && count > 0)
+            .map(([kind, count]) => `${KIND_LABELS[kind] || kind} ${count}`)
+          if (kinds.length) parts.push(kinds.join(' · '))
+          break
+        }
+        case 's2_dedup':
+          add('合并', n('merged'), ' 条')
+          add('候选', n('candidates'), ' 组')
+          add('归档分组', n('groups_archived'))
+          break
+        case 's3_relations':
+          add('扫描记忆', n('scanned'), ' 条')
+          add('提及', n('mentions'), ' 次')
+          add('新关系', n('relations_created'), ' 条')
+          add('强化', n('relations_reinforced'), ' 条')
+          break
+        case 's4_conflicts':
+          add('发现冲突', n('found'), ' 处')
+          add('新建', n('created'), ' 条')
+          break
+        case 's5_patterns':
+          add('新规律', n('patterns_created'), ' 条')
+          add('更新规律', n('patterns_updated'), ' 条')
+          add('新经验', n('experience_created'), ' 条')
+          add('未完成经验', n('experience_incomplete'), ' 条')
+          break
+        case 's6_traits':
+          add('新增特质', n('created'))
+          add('更新', n('updated_in_place'))
+          add('建立', n('established'))
+          add('退役', n('retired'))
+          add('当前活跃', n('active'))
+          break
+        case 's7_reflect':
+          add('质量分', n('quality'))
+          add('缺陷', n('defects'))
+          add('未决冲突', n('conflicts_open'))
+          break
+        case 's8_snapshot': {
+          const size = n('size_bytes')
+          if (size !== undefined) parts.push(`快照 ${(size / 1024).toFixed(0)} KB`)
+          if (typeof stats.verified === 'boolean') parts.push(stats.verified ? '校验通过' : '校验未过')
+          add('记忆', n('memory_count'), ' 条')
+          break
+        }
+        default:
+          parts.push(...genericPairs(stats))
+      }
+      if (!parts.length) parts.push(...genericPairs(stats))
+      return parts.join(' · ')
     }
 
     function NightStage({ stage }) {
@@ -212,38 +313,52 @@ window.__ModuleLoader__.load({
       // 阶段失败（ok === false 且不是跳过）要和成功分开：旧夜间页把失败也画成绿的，
       // 看起来像"跑完了"，实际上那一阶段什么都没做成。
       const failed = !skipped && stage?.ok === false
-      const ms = typeof stage?.ms === 'number' ? `${stage.ms}ms` : ''
+      const ms = typeof stage?.ms === 'number' ? ` · ${stage.ms}ms` : ''
       const summary = stageSummary(stage)
       return h(
         'div',
         { className: 'pmem-stage ' + (skipped ? 'skip' : failed ? 'bad' : 'done') },
-        h('div', { className: 'pmem-stage-name' }, [stageLabel(stage), ms].filter(Boolean).join(' ')),
+        h('div', { className: 'pmem-stage-name' }, `${stageLabel(stage)}${ms}`),
         summary ? h('div', { className: 'pmem-stage-stats' }, summary) : null,
       )
     }
 
-    function NightRun({ run }) {
+    /** 一次睡眠：默认展开最近一次，其余折叠——不折叠的话 14 次会把面板撑到看不见标签栏。 */
+    function NightRun({ run, open, onToggle }) {
       if (!run) return null
       const status = String(run.status ?? '')
       const statusClass = status === 'ok' ? ' pmem-tag-ok' : status === 'running' ? '' : ' pmem-tag-bad'
-      const span = run.finished_at
-        ? `${fmtTime(run.started_at)} → ${fmtTime(run.finished_at)}`
-        : fmtTime(run.started_at)
+      const stages = (run.stages ?? []).filter(Boolean)
+      const okCount = stages.filter(stage => stage.skipped !== true && stage.ok !== false).length
+      const clock = [fmtClock(run.started_at), fmtClock(run.finished_at)].filter(Boolean).join(' → ')
+      const duration = fmtDuration(run)
       return h(
         'div',
         { className: 'pmem-run' },
         h(
-          'div',
-          { className: 'pmem-run-head' },
+          'button',
+          {
+            type: 'button',
+            className: 'pmem-run-toggle',
+            'aria-expanded': open ? 'true' : 'false',
+            onClick: onToggle,
+          },
+          h('span', { className: 'pmem-run-caret' }, open ? '▾' : '▸'),
           h('span', { className: 'pmem-run-day' }, run.day ?? '—'),
-          h('span', { className: 'pmem-tag' + statusClass }, status || '—'),
-          run.trigger ? h('span', { className: 'pmem-tag' }, run.trigger) : null,
-          h('span', { className: 'pmem-row-sub' }, span),
+          h('span', { className: 'pmem-tag' + statusClass }, statusText(run)),
+          run.trigger ? h('span', { className: 'pmem-tag' }, triggerText(run)) : null,
+          h(
+            'span',
+            { className: 'pmem-run-meta' },
+            `${okCount}/${stages.length || 8} 阶段${duration ? ` · 耗时 ${duration}` : ''}${clock ? ` · ${clock}` : ''}`,
+          ),
         ),
         run.error ? h('div', { className: 'pmem-err pmem-run-err' }, run.error) : null,
-        h('div', { className: 'pmem-stages' },
-          ...(run.stages ?? []).map((stage, index) =>
-            h(NightStage, { key: `${stageId(stage)}-${index}`, stage }))),
+        open
+          ? h('div', { className: 'pmem-stages' },
+              ...stages.map((stage, index) =>
+                h(NightStage, { key: `${stageId(stage)}-${index}`, stage })))
+          : null,
       )
     }
 
@@ -259,6 +374,7 @@ window.__ModuleLoader__.load({
       const [night, setNight] = useState(null)
       const [nightLoading, setNightLoading] = useState(true)
       const [nightError, setNightError] = useState('')
+      const [openRuns, setOpenRuns] = useState({})
       const [sleeping, setSleeping] = useState(false)
       const [err, setErr] = useState('')
       const [toast, setToast] = useState('')
@@ -503,7 +619,7 @@ window.__ModuleLoader__.load({
               if (!runs.length) return '还没有睡眠记录（夜里会自动跑；也可以现在入睡）'
               const run = runs[0]
               const done = (run.stages || []).filter(stage => stage && stage.skipped !== true).length
-              return `${run.day} · ${run.status} · ${done}/8 阶段 · ${fmtTime(run.started_at)}`
+              return `${run.day} · ${statusText(run)} · ${done}/8 阶段 · ${fmtClock(run.started_at)}`
             })(),
           }, h(
             'div',
@@ -693,6 +809,18 @@ window.__ModuleLoader__.load({
       // dsh-app:// 相对路径则静默 deny、0 请求——用户看到的就是「点了没反应」。
       // 整页导航能过（主进程会补 cookie），但会离开设置面板，所以也不走。
       const nightRuns = night?.data?.runs ?? []
+      // 默认只展开最近一次；其余点开再看。14 张全展开会把面板撑到标签栏都滚没。
+      const runKey = (run, index) => String(run?.id ?? `${run?.day ?? 'run'}-${index}`)
+      const isRunOpen = (run, index) => {
+        const key = runKey(run, index)
+        return Object.prototype.hasOwnProperty.call(openRuns, key) ? Boolean(openRuns[key]) : index === 0
+      }
+      const toggleRun = (run, index) => {
+        const key = runKey(run, index)
+        const next = !isRunOpen(run, index)
+        setOpenRuns(prev => ({ ...prev, [key]: next }))
+      }
+
       const nightTab = h(
         'div',
         null,
@@ -716,11 +844,17 @@ window.__ModuleLoader__.load({
           : nightRuns.length
             ? h('div', { className: 'pmem-runs' },
                 ...nightRuns.map((run, index) =>
-                  h(NightRun, { key: `${run?.id ?? run?.day ?? 'run'}-${index}`, run })))
+                  h(NightRun, {
+                    key: runKey(run, index),
+                    run,
+                    open: isRunOpen(run, index),
+                    onToggle: () => toggleRun(run, index),
+                  })))
             : h('p', { className: 'pmem-empty' },
                 nightLoading ? '加载中…' : '还没有睡眠记录。跑一次「现在入睡」就有。'),
         h('p', { className: 'pmem-note' },
-          '这是 PMem 的睡眠流水：每次跑了哪些阶段、各阶段做了什么、有没有失败。' +
+          '每次睡眠是一张卡片，点标题展开八个阶段：左边绿条=这一步跑完了，红条=失败了，淡一点=这次跳过。' +
+          '阶段下面那句是这一步到底做了什么（记忆几条、合并几条、新关系几条……）。默认只展开最近一次，' +
           '数据来自 pmem sleep log，最多显示最近 14 次。'),
       )
 
