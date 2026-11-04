@@ -51,7 +51,7 @@ _locks = threading.Lock()
 
 # 可被检索的状态（和 store.VISIBLE_STATUS 一致）：superseded/hidden/deleted 的记忆
 # 不能进向量池，否则更新题会答成旧说法。
-VISIBLE_STATUS = ("active", "contested", "dormant")
+VISIBLE_STATUS = ("active", "contested", "dormant", "candidate")
 _VISIBLE_SQL = "m.status IN (" + ",".join("'" + s + "'" for s in VISIBLE_STATUS) + ")"
 
 _PUNCT = frozenset("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")

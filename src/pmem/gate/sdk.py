@@ -1232,6 +1232,8 @@ class PMem:
             day = clean(item.get("day", ""))
             text = clean(item.get("text", ""))
             tag = "（推测）" if item.get("provenance") in {"inferred", "unconfirmed"} else ""
+            if item.get("status") == "candidate":
+                tag += "（候选·还没确认）"
             meta: list[str] = []
             if item.get("grade"):
                 meta.append(str(item["grade"]))

@@ -100,12 +100,39 @@ class TestFilters(SearchCase):
         result = self.store.search("下周", filters={"kind": ["goal"]})
         self.assertTrue(all(item["kind"] == "goal" for item in result["items"]))
 
-    def test_status_filter_excludes_candidate(self) -> None:
+    def test_candidate_is_searchable_but_marked(self) -> None:
+        """candidate 表示「还没确认」，不等于「不存在」——默认能被搜到，答案里带 status。
+
+        这条是 M30 改的：我们自己写的实验结论多以 observed 写进来、重要度偏低，
+        落在 candidate；以前默认藏起来，于是「我自己记过的事，问的时候找不到」。
+        """
         self.store.add("用户周三常问财报", provenance="observed")  # candidate
         result = self.store.search("财报")
-        self.assertEqual([item for item in result["items"] if "周三" in item["text"]], [])
-        loose = self.store.search("财报", filters={"status": ["active", "candidate"]})
-        self.assertGreaterEqual(len(loose["items"]), 1)
+        hits = [
+            item
+            for item in result["items"]
+            if "周三" in item["text"] and item["status"] == "candidate"
+        ]
+        self.assertEqual(len(hits), 1)
+        # 显式只要 active 时，candidate 不混进来
+        strict = self.store.search("财报", filters={"status": ["active"]})
+        self.assertEqual(
+            [
+                item
+                for item in strict["items"]
+                if "周三" in item["text"] and item["status"] == "candidate"
+            ],
+            [],
+        )
+
+    def test_candidate_stays_off_wake_card(self) -> None:
+        """醒来卡是每轮常驻，仍然只放 active/contested（候选不该占常驻位置）。"""
+        from pmem.memory import wake
+
+        self.store.add("用户周三常问财报，候选不该上卡", provenance="observed", kind="semantic")
+        card = wake.build(self.store.db, subject=self.store.subject)
+        text = str(card.get("live") or card.get("text") or "")
+        self.assertNotIn("周三常问财报", text)
 
     def test_pinned_only(self) -> None:
         result = self.store.add("置顶这件事", pinned=True)

@@ -140,7 +140,8 @@ function formatItems(payload) {
     const ents = (item.entities ?? []).filter(name => shared.has(name))
     const entTag = ents.length ? ` · 涉及：${ents.join('、')}` : ''
     const day = item.day || item.created_at || ''
-    const tag = diary ? '（日记·那一天的经过）' : ''
+    const tag =
+      (diary ? '（日记·那一天的经过）' : '') + (item.status === 'candidate' ? '（候选·还没确认）' : '')
     lines.push(`- ${day}${tag}${grade}${groups}${entTag}｜${String(item.text ?? '').slice(0, 240)}`)
   }
   // 稀疏自适应（M19）：日记断了就说断在哪，别让人以为那段时间什么都没发生。

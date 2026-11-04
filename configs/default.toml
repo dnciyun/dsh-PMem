@@ -132,6 +132,11 @@ max_tokens = 256
 threads = 0
 query_prefix = false
 min_score = 0.55
+# 向量通道（M30）：余弦相似度当一路候选参与 RRF，而不是只在末尾补两条。
+# 默认关：公开语料上可答率 -0.3pp / MRR +0.021 / p50 +2.5ms；自己的聊天上第一位 +3pp。
+# 想开就在配置里打开，别改默认值替所有人选。
+channel = false
+channel_limit = 12
 trigger = "coverage"
 trigger_coverage = 0.55
 append = true

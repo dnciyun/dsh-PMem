@@ -181,6 +181,11 @@ DEFAULTS: dict[str, Any] = {
             # always = 每题都跑。实测两者在 90 天语料上**命中完全相同**（都是 +5/-1），
             # 但 always 的 p50 从 6.05 涨到 11.19 ms，coverage 只涨到 8.62 ms
             # （综合分 82.45 → 81.74 vs 82.52）。默认 coverage。
+            # 向量通道（M30）：把余弦相似度当**一路候选**参与 RRF（而不是只在末尾补两条）。
+            # 为什么：自己聊天里的问句（「许可证怎么表述的」）几乎没有稀有词，词法通道被高频
+            # 双字带着跑，语义通道反而认得出「说的是同一件事」。默认关，等 A/B 数据。
+            "channel": False,
+            "channel_limit": 12,
             "trigger": "coverage",
             "trigger_coverage": 0.55,
             "append": True,

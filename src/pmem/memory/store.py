@@ -50,7 +50,10 @@ from . import vector as vector_mod
 # 30 天试跑里 21/22 条记忆进入 dormant，`memory_search` 一条都找不到。
 # 那是**想不起来**，不是**忘了**：记忆还在库里，只是不再被主动提起。
 # 主动浮现（surface）可以只挑活跃的，但用户/模型主动来问时必须能挖到。
-VISIBLE_STATUS = ("active", "contested", "dormant")
+# candidate 也要能被检索到：它表示「还没确认」，不等于「不存在」。我们自己的实验结论
+# 大多以 observed 写进来、重要度偏低，落在 candidate；把它们藏起来的结果是
+# 「我自己记过的事，问的时候找不到」。答案里会带 status，让上层自己判断可信度。
+VISIBLE_STATUS = ("active", "contested", "dormant", "candidate")
 
 DEFAULT_SCOPE = "project:manual"
 
@@ -767,6 +770,29 @@ class MemoryStore:
                     entity_bridge = {"error": f"{type(exc).__name__}: {exc}"}
                 if entity_bridge.get("channel"):
                     channels["entity"] = list(entity_bridge["channel"])
+            # 向量通道（M30）：把语义相似度**当一路候选**参与 RRF，而不是只在末尾补两条。
+            # 为什么需要它：我们自己聊天里的问句（「许可证现在怎么表述的？」）几乎没有稀有词，
+            # 词法通道被高频双字带着跑，长摘要反而排前面；而语义通道能认出「讲的是同一件事」。
+            # 默认关：先 A/B，确认不会把公开语料的可答率带下去再开。
+            vec_channel_cfg = vector_mod.settings(self.cfg)
+            if bool(vec_channel_cfg.get("channel", False)) and bool(
+                vec_channel_cfg.get("enabled", False)
+            ):
+                try:
+                    vector_mod.ensure_once(self.db, self.cfg)
+                    sims = vector_mod.search(
+                        self.db,
+                        self.cfg,
+                        q,
+                        limit=max(4, int(vec_channel_cfg.get("channel_limit", 12) or 12)),
+                        min_score=float(vec_channel_cfg.get("min_score", 0.55) or 0.0),
+                    )
+                except Exception:  # noqa: BLE001 向量挂了不能带崩词法
+                    sims = {}
+                if sims:
+                    channels["vec"] = [
+                        seq for seq, _score in sorted(sims.items(), key=lambda kv: -kv[1])
+                    ]
             if not channels:
                 # 兜底：只有词法与 trigram 都没命中才做全表 LIKE（慢，但少见）
                 like = self._chan_like(q)
@@ -1072,6 +1098,7 @@ class MemoryStore:
                     "text": row["text_raw"],
                     "score": round(score, 4),
                     "kind": row["kind"],
+                    "status": row["status"],
                     "day": row["day_key"],
                     "importance": row["importance"],
                     "confidence": row["confidence"],
@@ -1402,6 +1429,22 @@ class MemoryStore:
                 "margin": round(margin, 3),
                 **({"drought_days": drought_age} if "drought" in reasons else {}),
             }
+        # 统一带上 status：补候选那几路（图/向量/时效链/原话）各自造的条目没这个字段，
+        # 而「候选 / 生效 / 休眠」正是上层判断可信度要看的。一次 IN 查询补齐。
+        if payload:
+            ids = [str(item.get("id")) for item in payload if item.get("id")]
+            if ids:
+                marks_s = ",".join("?" for _ in ids)
+                status_map = {
+                    row["id"]: row["status"]
+                    for row in self.db.conn.execute(
+                        f"SELECT id, status FROM memory WHERE id IN ({marks_s})", tuple(ids)
+                    )
+                }
+                for item in payload:
+                    if not item.get("status"):
+                        item["status"] = status_map.get(str(item.get("id")))
+
         latency_ms = int((time.perf_counter() - started) * 1000)
         entity_info: dict[str, Any] = {}
         if entity_on:
