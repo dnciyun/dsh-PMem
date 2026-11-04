@@ -6,6 +6,14 @@
 
 from __future__ import annotations
 
+import sys
+import unittest
+
+# 计划任务是 Windows 专属（schtasks / .cmd 包装器）：别的平台上这些断言没有意义，
+# 直接跳过，别让 CI 在 Linux 上红一片。
+if sys.platform != "win32":
+    raise unittest.SkipTest("Windows 计划任务：非 win32 平台跳过")  # noqa: B904
+
 import unittest
 from io import StringIO
 from pathlib import Path

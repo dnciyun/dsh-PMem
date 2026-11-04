@@ -37,9 +37,15 @@ def _load_pressure_module():
     return module
 
 
-run = _load_pressure_module()
+# 压测台（bench/pressure）是内部工具，公开仓库里不带（它把对手系统也一起编排进来了）。
+# 干净克隆里这些用例跳过，而不是收集失败——跳过要在报告里看得见，所以写明原因。
+try:
+    run = _load_pressure_module()
+except (FileNotFoundError, AssertionError, ImportError):  # noqa: BLE001
+    run = None
 
-
+@unittest.skipUnless(run is not None, "压测台是内部工具，公开仓库不含 bench/pressure")
+@unittest.skipUnless(run is not None, "压测台是内部工具（含对手编排），公开仓库不含 bench/pressure")
 class CorpusShiftCase(unittest.TestCase):
     def test_shift_keeps_day_and_date_consistent(self):
         day = {"day": 3, "date": "2026-08-03", "sessions": [], "units": []}
@@ -57,6 +63,7 @@ class CorpusShiftCase(unittest.TestCase):
         self.assertEqual(moved[0]["date"], "2027-01-28")
 
 
+@unittest.skipUnless(run is not None, "压测台是内部工具（含对手编排），公开仓库不含 bench/pressure")
 class LatencyCase(unittest.TestCase):
     def test_percentiles(self):
         values = [float(i) for i in range(1, 101)]
@@ -76,6 +83,7 @@ class LatencyCase(unittest.TestCase):
         self.assertEqual(files[0].stem, "p01")
 
 
+@unittest.skipUnless(run is not None, "压测台是内部工具（含对手编排），公开仓库不含 bench/pressure")
 class HostileCaseCase(unittest.TestCase):
     def test_cases_are_actually_hostile(self):
         cases = run.HOSTILE_CASES
@@ -91,6 +99,7 @@ class HostileCaseCase(unittest.TestCase):
         self.assertEqual(len(set(token)), 1)
 
 
+@unittest.skipUnless(run is not None, "压测台是内部工具（含对手编排），公开仓库不含 bench/pressure")
 class UnitGradeCase(unittest.TestCase):
     def test_grades(self):
         self.assertEqual(run.grade_for_unit({"kind": "fact", "importance": 5}), "A")
@@ -98,6 +107,7 @@ class UnitGradeCase(unittest.TestCase):
         self.assertEqual(run.grade_for_unit({"kind": "trivia", "importance": 2}), "C")
 
 
+@unittest.skipUnless(run is not None, "压测台是内部工具（含对手编排），公开仓库不含 bench/pressure")
 class ReportRenderCase(unittest.TestCase):
     def test_report_marks_fail_and_pass(self):
         payload = {
@@ -136,6 +146,7 @@ class ReportRenderCase(unittest.TestCase):
         self.assertIn("口径与边界", text)
 
 
+@unittest.skipUnless(run is not None, "压测台是内部工具（含对手编排），公开仓库不含 bench/pressure")
 class WakeBudgetCase(unittest.TestCase):
     """配置写 220，就发不超过 220：不允许「保底 480」把配置架空。"""
 

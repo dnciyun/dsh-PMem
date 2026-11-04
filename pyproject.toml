@@ -9,7 +9,12 @@ description = "dsh-PMem · 可塑性记忆 —— 给你家那条大肥鱼的记
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "PolyForm-Noncommercial-1.0.0" }
-authors = [{ name = "dnciyun", url = "https://github.com/dnciyun" }]
+authors = [{ name = "dnciyun" }]
+
+[project.urls]
+Homepage = "https://github.com/dnciyun/dsh-PMem"
+Repository = "https://github.com/dnciyun/dsh-PMem"
+Issues = "https://github.com/dnciyun/dsh-PMem/issues"
 dependencies = []
 
 [project.optional-dependencies]

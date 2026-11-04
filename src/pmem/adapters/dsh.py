@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import time
@@ -28,9 +29,18 @@ SESSION_GLOB = "**/session.v4.jsonl.zstd"
 # ---------------------------------------------------------------- 作用域
 
 def normalize_path(path: str) -> str:
-    """与 dsh-soul 的 normalizePath 等价：反斜杠→正斜杠、去尾斜杠、win32 小写。"""
-    text = path.replace("\\", "/").rstrip("/")
-    return text.lower() if os.name == "nt" else text
+    """与 dsh-soul 的 normalizePath 等价：反斜杠→正斜杠、去尾斜杠、Windows 路径小写。
+
+    注意「Windows 路径小写」是**按路径形态判断的，不按当前系统**：scope 是跨机器共享的键，
+    在 Linux 上处理一个 ``D:\\work\\demo`` 时如果保留大小写，算出来的哈希就和 Windows
+    记下的不一样——同一台机器换个系统就成了另一个人。POSIX 路径保持大小写敏感。
+    """
+    text = str(path or "").replace("\\", "/")
+    if len(text) > 1:
+        text = text.rstrip("/") or "/"
+    if re.match(r"^[A-Za-z]:/", text) or text.startswith("//"):
+        return text.lower()
+    return text
 
 
 def project_scope(cwd: str) -> str:

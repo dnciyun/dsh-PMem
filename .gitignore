@@ -1,17 +1,19 @@
 # 运行数据与本地环境（不进仓库）
-data/
-.tmp/
-tmp/
-.pytest_cache/
+# 注意：这些规则必须**锚定根目录**（前导 /）。不锚定的 `bench/` 会把
+# `src/pmem/bench/` 这个源码包一起忽略，干净克隆里就少一整个包、测试全红。
+/data/
+/.tmp/
+/tmp/
+/.pytest_cache/
 __pycache__/
 *.py[cod]
 *.egg-info/
-.venv/
-venv/
+/.venv/
+/venv/
 node_modules/
 
 # 个人记忆与备份：永远不进仓库
-backups/
+/backups/
 *.db
 *.db-wal
 *.db-shm
@@ -20,12 +22,18 @@ wake-card.txt
 wake-live.txt
 
 # 基准与对比材料（本地跑，不随仓库发布）
-bench/
+# 但压力题库 runner（bench/stress）是纯 PMem 的回归题库，要发布：
+# tests/test_stress_suite.py 靠它守住「过期事实 / 未实现计划 / 同名小明」这些语文边界。
+/bench/**
+!/bench/stress/
+!/bench/stress/run.py
+!/bench/stress/corpus.json
 
 # 设计文档只放行两篇（其余是开发过程记录，含本地跑分与对比，不发布）
 docs/*
 !docs/07-hippocampus.md
 !docs/archive-semantics.md
+!docs/README.md
 # README 用的渲染图（演示数据生成，不含真实记忆）
 !docs/images
 docs/images/*
@@ -33,8 +41,9 @@ docs/images/*
 !docs/images/live-card.png
 !docs/images/starmap.png
 
-# 开发草稿
-tools/
+# 开发草稿（tools/ 里只发布 cordis 注册片段的静态检查器，测试要用）
+/tools/**
+!/tools/check_cordis.py
 .rename-backup/
 _qa_tmp/
 tests/test_holdout.py

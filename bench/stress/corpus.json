@@ -1,0 +1,1614 @@
+{
+ "version": "1.1",
+ "name": "语文压力题库（stress-v1）",
+ "description": "62 道小场景题：过期/未生效事实、问旧事、自称、代词、父子角色、多人指代、跨条指代、长尾亲戚、同名与近义干扰。",
+ "now": "2026-11-03T23:00:00+01:00",
+ "cases": [
+  {
+   "id": "exp-01",
+   "category": "expired",
+   "query": "我现在住在哪儿？",
+   "memories": [
+    {
+     "text": "用户住在杭州西湖区，离公司骑车二十分钟",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户搬去成都了，住在武侯区",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00",
+     "valid_to": "2026-09-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "杭州",
+     "西湖"
+    ],
+    "none": [
+     "成都",
+     "武侯"
+    ]
+   },
+   "note": "成都那条 9 月 1 日失效，现在仍住杭州"
+  },
+  {
+   "id": "exp-02",
+   "category": "expired",
+   "query": "我现在在哪家公司实习？",
+   "memories": [
+    {
+     "text": "用户在云图科技做前端实习，组里只有四个人",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户要去博远数据实习，做数据产品",
+     "kind": "semantic",
+     "valid_from": "2026-08-20T00:00:00+00:00",
+     "valid_to": "2026-09-15T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "云图"
+    ],
+    "none": [
+     "博远"
+    ]
+   },
+   "note": "博远那条已失效"
+  },
+  {
+   "id": "exp-03",
+   "category": "expired",
+   "query": "我现在喝什么咖啡？",
+   "memories": [
+    {
+     "text": "用户现在只喝冰美式咖啡，一天三杯起步",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户改成喝生椰拿铁了，奶咖也没那么难喝",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00",
+     "valid_to": "2026-10-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "冰美式"
+    ],
+    "none": [
+     "生椰",
+     "奶咖"
+    ]
+   },
+   "note": "生椰那条 10 月 1 日失效"
+  },
+  {
+   "id": "exp-04",
+   "category": "expired",
+   "query": "我手机号尾号多少来着？",
+   "memories": [
+    {
+     "text": "用户手机号尾号 0417，用了六年",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户上个月换号了，尾号 8836",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00",
+     "valid_to": "2026-10-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "0417"
+    ],
+    "none": [
+     "8836"
+    ]
+   },
+   "note": "8836 那条已过期（话术是上个月换号，但事实已失效）"
+  },
+  {
+   "id": "exp-05",
+   "category": "expired",
+   "query": "我房租一个月多少？",
+   "memories": [
+    {
+     "text": "用户房租一个月四千五，含水电网",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户之前在老小区租，房租三千二",
+     "kind": "semantic",
+     "valid_from": "2026-07-10T12:00:00+00:00",
+     "valid_to": "2026-09-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "四千五"
+    ],
+    "none": [
+     "三千二"
+    ]
+   },
+   "note": "三千二是旧房租"
+  },
+  {
+   "id": "exp-06",
+   "category": "expired",
+   "query": "我家猫吃什么？",
+   "memories": [
+    {
+     "text": "用户家的猫吃冻干，别的都不碰",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户家的猫吃的是罐头，一罐能吃两天",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00",
+     "valid_to": "2026-09-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "冻干"
+    ],
+    "none": [
+     "罐头"
+    ]
+   },
+   "note": "罐头是旧喂法"
+  },
+  {
+   "id": "exp-07",
+   "category": "expired",
+   "query": "我现在什么时候锻炼？",
+   "memories": [
+    {
+     "text": "用户现在晚上夜跑，绕西湖跑五公里",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户早上晨跑，六点出门",
+     "kind": "semantic",
+     "valid_from": "2026-09-05T00:00:00+00:00",
+     "valid_to": "2026-10-15T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "夜跑"
+    ],
+    "none": [
+     "晨跑"
+    ]
+   },
+   "note": "晨跑是旧习惯"
+  },
+  {
+   "id": "exp-08",
+   "category": "expired",
+   "query": "我现在上班怎么通勤？",
+   "memories": [
+    {
+     "text": "用户现在骑车上班，单程二十五分钟",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户之前挤地铁上班，单程五十多分钟",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00",
+     "valid_to": "2026-09-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "骑车"
+    ],
+    "none": [
+     "地铁"
+    ]
+   },
+   "note": "地铁是旧通勤"
+  },
+  {
+   "id": "fut-01",
+   "category": "future",
+   "query": "我现在在哪上班？",
+   "memories": [
+    {
+     "text": "用户现在在云图科技上班，做前端实习",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户下个月入职博远数据上班，做数据产品经理",
+     "kind": "semantic",
+     "valid_from": "2026-12-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "云图"
+    ],
+    "none": [
+     "博远"
+    ]
+   },
+   "note": "博远 12 月才生效"
+  },
+  {
+   "id": "fut-02",
+   "category": "future",
+   "query": "我现在住哪儿？",
+   "memories": [
+    {
+     "text": "用户现在住在杭州西湖区",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户下个月搬去成都住，房子已经看好了",
+     "kind": "semantic",
+     "valid_from": "2026-12-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "杭州"
+    ],
+    "none": [
+     "成都"
+    ]
+   },
+   "note": "搬家是未来计划"
+  },
+  {
+   "id": "fut-03",
+   "category": "future",
+   "query": "我最近在忙什么？",
+   "memories": [
+    {
+     "text": "用户最近在赶项目上线，天天加班到十点",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户下个月去大理待两周，机票已经订了",
+     "kind": "semantic",
+     "valid_from": "2026-12-20T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "加班",
+     "上线"
+    ],
+    "none": [
+     "大理"
+    ]
+   },
+   "note": "大理是未来计划"
+  },
+  {
+   "id": "fut-04",
+   "category": "future",
+   "query": "我现在开什么车？",
+   "memories": [
+    {
+     "text": "用户现在开一台帝豪，烧油的车",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户下个月提一台秦 PLUS 电车开",
+     "kind": "semantic",
+     "valid_from": "2026-12-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "帝豪"
+    ],
+    "none": [
+     "秦",
+     "电车"
+    ]
+   },
+   "note": "提车是未来"
+  },
+  {
+   "id": "fut-05",
+   "category": "future",
+   "query": "我最近在学什么？",
+   "memories": [
+    {
+     "text": "用户最近在学 Go，跟着文档写小工具",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户下个月报一个日语班",
+     "kind": "semantic",
+     "valid_from": "2026-12-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "Go"
+    ],
+    "none": [
+     "日语"
+    ]
+   },
+   "note": "日语是未来计划"
+  },
+  {
+   "id": "fut-06",
+   "category": "future",
+   "query": "我家养猫了吗？",
+   "memories": [
+    {
+     "text": "用户家里现在没养宠物，只养了两盆绿萝",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户下个月接一只橘猫回家",
+     "kind": "semantic",
+     "valid_from": "2026-12-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "绿萝"
+    ],
+    "none": [
+     "橘猫"
+    ]
+   },
+   "note": "接猫是未来"
+  },
+  {
+   "id": "self-01",
+   "category": "selfref",
+   "query": "本人叫什么名字？",
+   "memories": [
+    {
+     "text": "用户叫小米枣，小名小鲸鲸",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "小米枣"
+    ],
+    "none": []
+   },
+   "note": "「本人」要在记忆里对上「用户」"
+  },
+  {
+   "id": "self-02",
+   "category": "selfref",
+   "query": "自己生日是哪天？",
+   "memories": [
+    {
+     "text": "用户的生日是三月初八",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "三月初八"
+    ],
+    "none": []
+   },
+   "note": "「自己」→ 用户"
+  },
+  {
+   "id": "self-03",
+   "category": "selfref",
+   "query": "我们家的猫叫什么？",
+   "memories": [
+    {
+     "text": "用户养了一只橘猫叫年糕",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "年糕"
+    ],
+    "none": []
+   },
+   "note": "「我们家」→ 用户的"
+  },
+  {
+   "id": "self-04",
+   "category": "selfref",
+   "query": "咱的房租多少？",
+   "memories": [
+    {
+     "text": "用户房租一个月四千五",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "四千五"
+    ],
+    "none": []
+   },
+   "note": "「咱」→ 用户"
+  },
+  {
+   "id": "self-05",
+   "category": "selfref",
+   "query": "我是什么工作的？",
+   "memories": [
+    {
+     "text": "用户现在在云图科技工作，做前端实习",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户的朋友在博远工作，做数据产品",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "云图"
+    ],
+    "none": [
+     "博远"
+    ]
+   },
+   "note": "别把朋友的工作当成我的"
+  },
+  {
+   "id": "self-06",
+   "category": "selfref",
+   "query": "本人最近在学什么？",
+   "memories": [
+    {
+     "text": "用户最近在学 Go，跟着文档写小工具",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户的同事在学 Rust",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "Go"
+    ],
+    "none": [
+     "Rust"
+    ]
+   },
+   "note": "本人 = 用户，不是同事"
+  },
+  {
+   "id": "self-07",
+   "category": "selfref",
+   "query": "自己住的城市是哪个？",
+   "memories": [
+    {
+     "text": "用户住在杭州西湖区",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户的妹妹住在成都",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "杭州"
+    ],
+    "none": [
+     "成都"
+    ]
+   },
+   "note": "自己 ≠ 妹妹"
+  },
+  {
+   "id": "self-08",
+   "category": "selfref",
+   "query": "我们公司叫什么？",
+   "memories": [
+    {
+     "text": "用户所在的公司在云图科技，做企业服务",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户上一家公司在博远数据",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00",
+     "valid_to": "2026-09-01T00:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "云图"
+    ],
+    "none": [
+     "博远"
+    ]
+   },
+   "note": "「我们公司」= 现在这家"
+  },
+  {
+   "id": "coref-01",
+   "category": "coref",
+   "query": "小红她妈是做什么的？",
+   "memories": [
+    {
+     "text": "小红妈妈是护士，在急诊科",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小红在杭州上大学，学护理",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "护士"
+    ],
+    "none": [
+     "大学"
+    ]
+   },
+   "note": "「小红她妈」要落到「小红妈妈」那条，不是小红自己"
+  },
+  {
+   "id": "coref-02",
+   "category": "coref",
+   "query": "小明他爸是开什么的？",
+   "memories": [
+    {
+     "text": "小明爸爸开出租车，夜班多",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小明在念小学二年级",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "出租车"
+    ],
+    "none": [
+     "小学"
+    ]
+   },
+   "note": "他爸 ≠ 小明"
+  },
+  {
+   "id": "coref-03",
+   "category": "coref",
+   "query": "阿哲他最近在忙什么？",
+   "memories": [
+    {
+     "text": "阿哲在找工作，说想换赛道",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    },
+    {
+     "text": "阿哲的老婆在医院上班",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "找工作",
+     "换赛道"
+    ],
+    "none": [
+     "医院"
+    ]
+   },
+   "note": "「他」指阿哲本人"
+  },
+  {
+   "id": "coref-04",
+   "category": "coref",
+   "query": "小雅她是在哪儿上班来着？",
+   "memories": [
+    {
+     "text": "小雅在杭州当老师",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "小雅的男朋友在成都上班",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "杭州"
+    ],
+    "none": [
+     "成都"
+    ]
+   },
+   "note": "「小雅她」= 小雅本人"
+  },
+  {
+   "id": "coref-05",
+   "category": "coref",
+   "query": "年糕它吃什么？",
+   "memories": [
+    {
+     "text": "用户的橘猫年糕只吃冻干，别的都不碰",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户的狗阿黄什么都吃，连青菜都吃",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "冻干"
+    ],
+    "none": [
+     "青菜"
+    ]
+   },
+   "note": "「它」= 年糕，别串到狗"
+  },
+  {
+   "id": "coref-06",
+   "category": "coref",
+   "query": "小满她最近压力大吗？",
+   "memories": [
+    {
+     "text": "用户的妹妹小满今年考研，压力挺大",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户最近项目上线，压力也不小",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "考研"
+    ],
+    "none": [
+     "项目"
+    ]
+   },
+   "note": "「小满她」= 妹妹，不是用户"
+  },
+  {
+   "id": "coref-07",
+   "category": "coref",
+   "query": "豆豆他爸周末带他去哪？",
+   "memories": [
+    {
+     "text": "用户的儿子豆豆上幼儿园，爸爸周末带他去公园",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "豆豆的妈妈在超市上班",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "公园"
+    ],
+    "none": [
+     "超市"
+    ]
+   },
+   "note": "「他爸」= 爸爸那条"
+  },
+  {
+   "id": "coref-08",
+   "category": "coref",
+   "query": "小满她妈对那只仓鼠什么态度？",
+   "memories": [
+    {
+     "text": "用户女儿小满养了只仓鼠叫团子，她妈不让养",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "小满自己很喜欢团子，天天喂它",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "不让"
+    ],
+    "none": [
+     "喜欢"
+    ]
+   },
+   "note": "「她妈」= 妈妈，不是小满自己"
+  },
+  {
+   "id": "pc-01",
+   "category": "parent_child",
+   "query": "小明他爸是做什么的？",
+   "memories": [
+    {
+     "text": "小明今年上小学二年级",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小明他爸是出租车司机",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小明他妈在超市上班",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "出租车"
+    ],
+    "none": [
+     "小学",
+     "超市"
+    ]
+   },
+   "note": "父子三人各一句，问爸别答成儿子/妈"
+  },
+  {
+   "id": "pc-02",
+   "category": "parent_child",
+   "query": "小明今年上几年级？",
+   "memories": [
+    {
+     "text": "小明今年上小学二年级",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小明他爸是出租车司机",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小明他妈在超市上班",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "小学",
+     "二年级"
+    ],
+    "none": [
+     "出租车",
+     "超市"
+    ]
+   },
+   "note": "问儿子别答成爸/妈"
+  },
+  {
+   "id": "pc-03",
+   "category": "parent_child",
+   "query": "小红她妈做什么工作？",
+   "memories": [
+    {
+     "text": "小红她妈是护士",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小红在杭州上大学",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "护士"
+    ],
+    "none": [
+     "大学"
+    ]
+   },
+   "note": "她妈 = 护士"
+  },
+  {
+   "id": "pc-04",
+   "category": "parent_child",
+   "query": "小红在哪儿上学？",
+   "memories": [
+    {
+     "text": "小红她妈是护士",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "小红在杭州上大学",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "杭州"
+    ],
+    "none": [
+     "护士"
+    ]
+   },
+   "note": "问小红本人"
+  },
+  {
+   "id": "pc-05",
+   "category": "parent_child",
+   "query": "豆豆他爸周末带他去哪？",
+   "memories": [
+    {
+     "text": "用户的儿子豆豆上幼儿园",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "豆豆他爸周末带他去公园",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "公园"
+    ],
+    "none": [
+     "幼儿园"
+    ]
+   },
+   "note": "他爸带去哪 = 公园"
+  },
+  {
+   "id": "pc-06",
+   "category": "parent_child",
+   "query": "豆豆上什么班？",
+   "memories": [
+    {
+     "text": "用户的儿子豆豆上幼儿园",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "豆豆他爸周末带他去公园",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "幼儿园"
+    ],
+    "none": [
+     "公园"
+    ]
+   },
+   "note": "问豆豆自己"
+  },
+  {
+   "id": "pc-07",
+   "category": "parent_child",
+   "query": "小满她妈对仓鼠什么态度？",
+   "memories": [
+    {
+     "text": "用户女儿小满养了只仓鼠叫团子",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "小满她妈不让养仓鼠",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "不让"
+    ],
+    "none": [
+     "养了"
+    ]
+   },
+   "note": "她妈的态度"
+  },
+  {
+   "id": "pc-08",
+   "category": "parent_child",
+   "query": "小满养了什么？",
+   "memories": [
+    {
+     "text": "用户女儿小满养了只仓鼠叫团子",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "小满她妈不让养仓鼠",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "仓鼠",
+     "团子"
+    ],
+    "none": [
+     "不让"
+    ]
+   },
+   "note": "问小满自己"
+  },
+  {
+   "id": "dis-01",
+   "category": "distractor",
+   "query": "同事小明负责什么？",
+   "memories": [
+    {
+     "text": "同事小明负责后端，写 Go",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "邻居家小明上小学二年级",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "后端"
+    ],
+    "none": [
+     "小学"
+    ]
+   },
+   "note": "两个小明：同事 vs 邻居家孩子"
+  },
+  {
+   "id": "dis-02",
+   "category": "distractor",
+   "query": "邻居家小明上什么学？",
+   "memories": [
+    {
+     "text": "同事小明负责后端，写 Go",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "邻居家小明上小学二年级",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "小学"
+    ],
+    "none": [
+     "后端"
+    ]
+   },
+   "note": "别答成同事小明"
+  },
+  {
+   "id": "dis-03",
+   "category": "distractor",
+   "query": "我房租多少？",
+   "memories": [
+    {
+     "text": "用户房租一个月四千五",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户上个月水电费三百二",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "四千五"
+    ],
+    "none": [
+     "三百二"
+    ]
+   },
+   "note": "房租别抓成水电"
+  },
+  {
+   "id": "dis-04",
+   "category": "distractor",
+   "query": "我奖金多少？",
+   "memories": [
+    {
+     "text": "用户月薪一万二",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户今年奖金三千",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "三千"
+    ],
+    "none": [
+     "一万二"
+    ]
+   },
+   "note": "奖金和月薪别混"
+  },
+  {
+   "id": "dis-05",
+   "category": "distractor",
+   "query": "老街那家咖啡店叫什么？",
+   "memories": [
+    {
+     "text": "用户常去老街那家咖啡店，叫慢半拍",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户楼下的咖啡店叫豆仓",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "慢半拍"
+    ],
+    "none": [
+     "豆仓"
+    ]
+   },
+   "note": "两家店"
+  },
+  {
+   "id": "dis-06",
+   "category": "distractor",
+   "query": "我什么时候搬去成都的？",
+   "memories": [
+    {
+     "text": "用户三月份去成都出过一次差",
+     "kind": "semantic",
+     "valid_from": "2026-03-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户八月份搬去成都，住在武侯区",
+     "kind": "semantic",
+     "valid_from": "2026-08-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "八月"
+    ],
+    "none": [
+     "三月"
+    ]
+   },
+   "note": "出差 vs 搬家"
+  },
+  {
+   "id": "dis-07",
+   "category": "distractor",
+   "query": "我爸开什么车？",
+   "memories": [
+    {
+     "text": "用户的车是帝豪，烧油的",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户的爸爸开桑塔纳",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "桑塔纳"
+    ],
+    "none": [
+     "帝豪"
+    ]
+   },
+   "note": "我爸 vs 我"
+  },
+  {
+   "id": "dis-08",
+   "category": "distractor",
+   "query": "我朋友养了什么猫？",
+   "memories": [
+    {
+     "text": "用户养了只橘猫年糕",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户的朋友养了只布偶叫雪球",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "布偶",
+     "雪球"
+    ],
+    "none": [
+     "年糕"
+    ]
+   },
+   "note": "朋友的猫 vs 我的猫"
+  },
+  {
+   "id": "old-01",
+   "category": "oldref",
+   "query": "我第一次去修车摊是什么问题？",
+   "memories": [
+    {
+     "text": "用户第一次去修车摊是后闸松了，花二十换线管",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户第三次去修车摊，链条前拨一起修，外胎也磨平了",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "后闸"
+    ],
+    "none": [
+     "链条"
+    ]
+   },
+   "note": "问第一次，别答最近一次"
+  },
+  {
+   "id": "old-02",
+   "category": "oldref",
+   "query": "最初的迁移方案是什么？",
+   "memories": [
+    {
+     "text": "用户最早想的是大爆炸式迁移，一把全量搬完",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户后来改成绞杀者模式，一个模块一个模块切",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "大爆炸"
+    ],
+    "none": [
+     "绞杀者"
+    ]
+   },
+   "note": "问最初，别答后来"
+  },
+  {
+   "id": "old-03",
+   "category": "oldref",
+   "query": "我一开始用的什么编辑器？",
+   "memories": [
+    {
+     "text": "用户一开始用 VS Code 写代码",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户十月把主力编辑器换成 Cursor 了",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "VS Code"
+    ],
+    "none": [
+     "Cursor"
+    ]
+   },
+   "note": "问一开始"
+  },
+  {
+   "id": "old-04",
+   "category": "oldref",
+   "query": "我最开始喝什么咖啡？",
+   "memories": [
+    {
+     "text": "用户最开始只喝冰美式，一天三杯",
+     "kind": "semantic",
+     "valid_from": "2026-01-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户后来开始喝生椰拿铁了",
+     "kind": "semantic",
+     "valid_from": "2026-05-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "冰美式"
+    ],
+    "none": [
+     "生椰"
+    ]
+   },
+   "note": "问最开始"
+  },
+  {
+   "id": "multi-01",
+   "category": "coref_multi",
+   "query": "阿哲怎么上班？",
+   "memories": [
+    {
+     "text": "阿凯住城西，每天坐地铁上班",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "阿哲住城东，每天开车上班",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "开车"
+    ],
+    "none": [
+     "地铁"
+    ]
+   },
+   "note": "两个人两条记忆，问阿哲别答成阿凯"
+  },
+  {
+   "id": "multi-02",
+   "category": "coref_multi",
+   "query": "小美的猫叫什么？",
+   "memories": [
+    {
+     "text": "小美的猫叫布丁",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "小丽的猫叫雪球",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "布丁"
+    ],
+    "none": [
+     "雪球"
+    ]
+   },
+   "note": "两只猫两个人"
+  },
+  {
+   "id": "multi-03",
+   "category": "coref_multi",
+   "query": "阿凯他在哪儿上班？",
+   "memories": [
+    {
+     "text": "阿哲最近在找工作，他说不想干了",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    },
+    {
+     "text": "阿凯在城西上班，每天坐地铁",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "城西"
+    ],
+    "none": [
+     "找工作"
+    ]
+   },
+   "note": "阿凯他 = 阿凯本人"
+  },
+  {
+   "id": "multi-04",
+   "category": "coref_multi",
+   "query": "谁输了棋？",
+   "memories": [
+    {
+     "text": "老王和老李下棋，老王输了，他气得把棋盘掀了",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "老王"
+    ],
+    "none": []
+   },
+   "note": "他指老王（输棋那个）"
+  },
+  {
+   "id": "long-01",
+   "category": "longref",
+   "query": "阿哲最近在忙什么？",
+   "memories": [
+    {
+     "text": "用户认识了新同事阿哲",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "阿哲说他想换工作，最近在投简历",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "投简历",
+     "换工作"
+    ],
+    "none": [
+     "认识"
+    ]
+   },
+   "note": "实体先出场，事实在另一条"
+  },
+  {
+   "id": "long-02",
+   "category": "longref",
+   "query": "年糕吃什么？",
+   "memories": [
+    {
+     "text": "用户养了只橘猫叫年糕",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "年糕最近挑食，只吃冻干",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "冻干"
+    ],
+    "none": [
+     "养了"
+    ]
+   },
+   "note": "两条记忆拼起来才完整"
+  },
+  {
+   "id": "long-03",
+   "category": "longref",
+   "query": "小满最近怎么样？",
+   "memories": [
+    {
+     "text": "用户的妹妹小满今年考研",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "小满压力大，瘦了五斤",
+     "kind": "semantic",
+     "valid_from": "2026-10-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "压力"
+    ],
+    "none": [
+     "考研"
+    ]
+   },
+   "note": "问最近状况，不是问她考不考研"
+  },
+  {
+   "id": "long-04",
+   "category": "longref",
+   "query": "我爸住院花了多少？",
+   "memories": [
+    {
+     "text": "用户的爸爸住院了，交八千押金",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    },
+    {
+     "text": "他住院那阵子，用户天天往医院跑",
+     "kind": "semantic",
+     "valid_from": "2026-09-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "八千"
+    ],
+    "none": []
+   },
+   "note": "钱在前一条，别被后一条带跑"
+  },
+  {
+   "id": "kin-01",
+   "category": "kin_long",
+   "query": "我小姨在哪儿开民宿？",
+   "memories": [
+    {
+     "text": "用户小姨在杭州开民宿",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户二舅在成都开饭店",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "杭州"
+    ],
+    "none": [
+     "成都"
+    ]
+   },
+   "note": "小姨 ≠ 二舅"
+  },
+  {
+   "id": "kin-02",
+   "category": "kin_long",
+   "query": "我二舅在哪儿开饭店？",
+   "memories": [
+    {
+     "text": "用户小姨在杭州开民宿",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户二舅在成都开饭店",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "成都"
+    ],
+    "none": [
+     "杭州"
+    ]
+   },
+   "note": "二舅 ≠ 小姨"
+  },
+  {
+   "id": "kin-03",
+   "category": "kin_long",
+   "query": "我表姐做什么工作？",
+   "memories": [
+    {
+     "text": "用户表姐是护士",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户堂哥是老师",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "护士"
+    ],
+    "none": [
+     "老师"
+    ]
+   },
+   "note": "表姐 ≠ 堂哥"
+  },
+  {
+   "id": "kin-04",
+   "category": "kin_long",
+   "query": "我三叔在哪儿？",
+   "memories": [
+    {
+     "text": "用户大姑在老家",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    },
+    {
+     "text": "用户三叔在北京",
+     "kind": "semantic",
+     "valid_from": "2026-06-10T12:00:00+00:00"
+    }
+   ],
+   "expect": {
+    "any": [
+     "北京"
+    ],
+    "none": [
+     "老家"
+    ]
+   },
+   "note": "三叔用前缀正则兜底，不在手写表里"
+  }
+ ]
+}
