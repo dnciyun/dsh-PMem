@@ -32,7 +32,10 @@ import unicodedata
 from pathlib import Path
 from typing import Any, Sequence
 
-import numpy as np
+try:  # numpy 是**可选**依赖：向量通道要它，但核心（词法链路）必须能在没 numpy 的机器上跑。
+    import numpy as np  # type: ignore
+except ImportError:  # pragma: no cover - 取决于环境
+    np = None  # type: ignore[assignment]
 
 from ..base.clock import now_iso
 
@@ -86,7 +89,9 @@ def dim_of(cfg: Any) -> int:
 
 
 def ready(cfg: Any) -> tuple[bool, str]:
-    """能不能用：模型文件在不在、onnxruntime 装没装。返回 ``(ok, 原因)``。"""
+    """能不能用：numpy / 模型文件 / onnxruntime 三样齐不齐。返回 ``(ok, 原因)``。"""
+    if np is None:
+        return False, "numpy 不可用（向量通道是可选件：pip install numpy onnxruntime 后启用）"
     base = model_dir(cfg)
     tok = base / "tokenizer.json"
     onnx = onnx_path(cfg)
@@ -319,6 +324,8 @@ def encoder(cfg: Any) -> Encoder:
 
 def embed(texts: Sequence[str], cfg: Any, *, prefix: bool = False) -> np.ndarray | None:
     """对外入口：缺件时返回 None（调用方无需 try/except）。"""
+    if np is None:
+        return None
     if not texts:
         return np.zeros((0, dim_of(cfg)), dtype=np.float32)
     ok, _reason = ready(cfg)
@@ -346,11 +353,15 @@ _matrix_cache: dict[tuple[Any, ...], tuple[np.ndarray, np.ndarray]] = {}
 def _pack(vec: np.ndarray) -> bytes:
     """存 fp16：向量已 L2 归一化，fp16 的余弦误差 < 1e-3（实测 0.99997），
     存储直接减半（512 维从 2 KB 到 1 KB），对 308 题的名次没有任何影响。"""
+    if np is None:
+        return b""
     return np.asarray(vec, dtype=np.float16).tobytes()
 
 
 def _unpack(blob: bytes, dim: int) -> np.ndarray:
     """兼容 fp32 老行：按 blob 长度判断，不靠版本号。"""
+    if np is None:
+        return None  # type: ignore[return-value]
     raw = np.frombuffer(blob, dtype=np.uint8)
     if raw.size == dim * 2:
         arr = np.frombuffer(blob, dtype=np.float16).astype(np.float32)
@@ -362,6 +373,8 @@ def _unpack(blob: bytes, dim: int) -> np.ndarray:
 
 
 def put(conn: Any, seq: int, vec: np.ndarray, cfg: Any) -> None:
+    if np is None:
+        return
     conn.execute(
         "INSERT INTO memory_vec_plain(memory_seq, model_id, dim, vec, updated_at) "
         "VALUES(?,?,?,?,?) ON CONFLICT(memory_seq) DO UPDATE SET "
@@ -465,6 +478,8 @@ def rebuild(db: Any, cfg: Any, *, batch: int = 2000) -> dict[str, Any]:
 
 def _matrix(db: Any, cfg: Any) -> tuple[np.ndarray, np.ndarray] | None:
     """可见记忆的（向量矩阵, seq 数组）。按「模型 + 行数 + 最大 seq + 更新时间」缓存。"""
+    if np is None:
+        return None
     model = model_id(cfg)
     conn = db.conn
     stamp = conn.execute(

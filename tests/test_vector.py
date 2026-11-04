@@ -19,12 +19,18 @@ import tempfile
 import unittest
 from unittest import mock
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:  # 向量通道是可选件：没 numpy 就不跑这组测试，但别让整个测试集收不起来
+    np = None
 
 from pmem.base.config import DEFAULTS, Config
 from pmem.gate.sdk import PMem
 from pmem.memory import vector
 from pmem.ops import invariants
+
+if np is None:
+    raise unittest.SkipTest("向量通道需要 numpy（可选依赖：pip install numpy onnxruntime）")
 
 VOCAB = {
     "[PAD]": 0,

@@ -14,6 +14,8 @@ dependencies = []
 
 [project.optional-dependencies]
 # 核心零依赖；以下按需安装
+# 向量通道（可选）：不装也能跑词法链路，只是语义改写类问题会弱一些
+vector = ["numpy>=1.24", "onnxruntime>=1.16"]
 embed = ["sentence-transformers>=2.2", "jieba>=0.42"]
 dev = ["pytest>=7", "ruff>=0.4"]
 
