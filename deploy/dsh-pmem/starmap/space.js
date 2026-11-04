@@ -357,7 +357,8 @@
     'void main(){',
     '  float edge = 1.0 - abs(vUv.y * 2.0 - 1.0);',
     '  float soft = edge * edge;',
-    '  float fade = smoothstep(0.0, 0.14, vUv.x) * (1.0 - smoothstep(0.86, 1.0, vUv.x));',
+    // 实线：只在两端各留 2% 收口，中段不衰减。之前 14% 的淡出会让细线看着像虚线。
+    '  float fade = smoothstep(0.0, 0.02, vUv.x) * (1.0 - smoothstep(0.98, 1.0, vUv.x));',
     '  float a = soft * fade * vColor.a * uAlphaMul;',
     '  if (a < 0.0015) discard;',
     '  outColor = vec4(vColor.rgb * a, a);',
@@ -968,8 +969,10 @@
       goalDist: 3.05,
       theta: -Math.PI / 2 + 0.35,
       goalTheta: -Math.PI / 2 + 0.35,
-      phi: 0.62,
-      goalPhi: 0.62,
+      // 机位略高：0.62 时几乎贴盘面，星系被压成一条横线（「横向有点薄」）。
+      // 0.98 是斜俯视，盘面能张开，又不至于变成正上方的俯视图。
+      phi: 0.98,
+      goalPhi: 0.98,
       fov: 42 * Math.PI / 180,
       near: 0.02,
       far: 140
