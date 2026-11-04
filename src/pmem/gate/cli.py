@@ -421,7 +421,9 @@ def main(argv: list[str] | None = None) -> int:
 
     p_soul = sub.add_parser("soul", help="自我层（M17）：宪法 / 叙事 / 未闭环承诺")
     soul_sub = p_soul.add_subparsers(dest="soul_action", required=True)
-    soul_sub.add_parser("show", help="打印会注入到新会话的自我层文本")
+    p_ss = soul_sub.add_parser("show", help="打印会注入到新会话的自我层文本（--all 看全部增补）")
+    p_ss.add_argument("--all", action="store_true", help="不按预算裁：所有增补 + 完整叙事")
+    p_ss.add_argument("--budget", type=int, default=None, help="按指定 token 预算渲染，默认配置值")
     soul_sub.add_parser("status", help="版本 / 字数 / 未闭环承诺")
     soul_sub.add_parser("init", help="首次建模板（已有文件不覆盖）")
     p_sd = soul_sub.add_parser("diff", help="当前文件 vs 上一次提交前")
@@ -894,7 +896,15 @@ def main(argv: list[str] | None = None) -> int:
 
             action = args.soul_action
             if action == "show":
-                text = soul_mod.render(app.config)
+                # 默认打的是**真的会注入**的那张卡（按预算裁过）；--all 才是全文。
+                # 为什么补这一条：卡上的脚注写着「另有 N 条更早的增补，pmem soul show 可看」，
+                # 而 show 以前用的是同一个预算——等于指着自己看不到的东西说「去那儿看」。
+                budget = None
+                if getattr(args, "all", False):
+                    budget = 10_000_000
+                elif getattr(args, "budget", None):
+                    budget = int(args.budget)
+                text = soul_mod.render(app.config, budget=budget)
                 if not text:
                     print("（自我层还没建：先 pmem soul init，或直接写 ~/.dsh/pmem/soul/*.md）")
                     return 1

@@ -612,5 +612,65 @@ class TestWakeIntegration(unittest.TestCase):
             app.close()
 
 
+class TestShowAll(unittest.TestCase):
+    """卡上的脚注写着「`pmem soul show` 可看」，show 就必须真能看到被裁掉的。
+
+    这条曾经是假的：show 用同一个预算渲染，等于指着自己看不到的东西说「去那儿看」。
+    默认视图收紧是对的（那是每轮注入的卡），但「认账」的路必须真的通。
+    """
+
+    def setUp(self) -> None:
+        import io
+        from contextlib import redirect_stdout
+
+        from pmem.gate import cli
+
+        self._io = io
+        self._redirect = redirect_stdout
+        self._cli = cli
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        soul_dir = self.dir / "soul"
+        self.db_path = self.dir / "pmem.db"
+        cfg = Config({"identity": {"dir": str(soul_dir), "enabled": True, "budget": 200}})
+        soul.bootstrap(cfg, constitution=CONSTITUTION, narrative=NARRATIVE)
+        for i in range(12):
+            soul.amend(f"第{i}条增补：钱要花在刀刃上", cfg=cfg)
+        self.cfg_path = self.dir / "config.toml"
+        self.cfg_path.write_text(
+            f'[identity]\ndir = "{soul_dir.as_posix()}"\nbudget = 200\n', encoding="utf-8"
+        )
+
+    def tearDown(self) -> None:
+        self.tmp.cleanup()
+
+    def _run(self, *argv: str) -> tuple[int, str]:
+        buf = self._io.StringIO()
+        with self._redirect(buf):
+            code = self._cli.main(
+                ["--db", str(self.db_path), "--config", str(self.cfg_path), *argv]
+            )
+        return code, buf.getvalue()
+
+    def test_default_show_is_the_card(self) -> None:
+        code, out = self._run("soul", "show")
+        self.assertEqual(code, 0)
+        self.assertIn("另有", out)  # 卡上说「还有更早的」
+        self.assertLess(out.count("条增补"), 12)
+
+    def test_show_all_really_shows_all(self) -> None:
+        code, out = self._run("soul", "show", "--all")
+        self.assertEqual(code, 0)
+        self.assertEqual(out.count("条增补"), 12)
+        self.assertIn("第0条增补", out)  # 最老的那条也在
+
+    def test_show_budget_override(self) -> None:
+        code, small = self._run("soul", "show", "--budget", "160")
+        self.assertEqual(code, 0)
+        code, big = self._run("soul", "show", "--budget", "4000")
+        self.assertEqual(code, 0)
+        self.assertGreaterEqual(big.count("条增补"), small.count("条增补"))
+
+
 if __name__ == "__main__":
     unittest.main()
