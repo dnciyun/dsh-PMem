@@ -255,3 +255,21 @@ class Database:
     def integrity_ok(self) -> bool:
         row = self.conn.execute("PRAGMA integrity_check").fetchone()
         return bool(row and row[0] == "ok")
+
+    def integrity_detail(self) -> dict:
+        """完整性检查的**可解释**版本：``ok`` 可能是 True / False / None。
+
+        - True：通过；
+        - False：真的坏了（附 errors 前几条）；
+        - None：这次没查成（库被锁、文件不可读……附 error 文本）。
+        为什么要分开：以前「查不了」也被当成「坏了」，别人看到 integrity_ok=false
+        会以为记忆库损坏——其实是那一瞬间没读到。分辨清楚才修得对。
+        """
+        try:
+            rows = self.conn.execute("PRAGMA integrity_check").fetchall()
+        except Exception as exc:  # noqa: BLE001 读不到 ≠ 坏了
+            return {"ok": None, "error": f"{type(exc).__name__}: {exc}"}
+        messages = [str(row[0]) for row in rows]
+        if messages == ["ok"]:
+            return {"ok": True}
+        return {"ok": False, "errors": messages[:5]}

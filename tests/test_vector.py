@@ -382,11 +382,12 @@ class TestSearchIntegration(unittest.TestCase):
             self.store.add("用户楼下有只流浪狗叫阿黄", kind="episodic", provenance="user_explicit")
             result = self.app.search("那个时间循环的动画", k=4, record=False)["data"]
         items = result["items"]
-        self.assertTrue(any(it.get("source") == "vector" for it in items))
+        # M30 起向量默认当一路候选取参与 RRF（channels 里是 "vec"），不再只在末尾补两条；
+        # 老的补候选路径仍可能同时生效（channels 里是 "vector"），两种都算救回。
         rescued = [it for it in items if it["id"] == target["id"]]
         self.assertEqual(len(rescued), 1)
-        self.assertIn("vector", rescued[0]["channels"])
-        self.assertGreaterEqual(result["vector"].get("added", 0), 1)
+        channels = rescued[0]["channels"]
+        self.assertTrue("vec" in channels or "vector" in channels, channels)
 
     def test_vector_skipped_when_lexical_confident(self) -> None:
         with mock.patch.object(vector, "embed", fake_banker(self.cfg)):

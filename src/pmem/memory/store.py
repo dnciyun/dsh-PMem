@@ -2207,6 +2207,12 @@ class MemoryStore:
             "SELECT kind, COUNT(*) c FROM memory GROUP BY kind"
         )}
         total = sum(by_status.values())
+        detail = self.db.integrity_detail()
+        integrity: dict[str, Any] = {"integrity_ok": detail.get("ok")}
+        if detail.get("errors"):
+            integrity["integrity_errors"] = detail["errors"]
+        if detail.get("error"):
+            integrity["integrity_error"] = detail["error"]
         size = 0
         if self.db.path != ":memory:":
             from pathlib import Path
@@ -2222,7 +2228,9 @@ class MemoryStore:
             "event_count": conn.execute("SELECT COUNT(*) c FROM event_log").fetchone()["c"],
             "schema_version": self.db.meta("schema_version"),
             "db_size_bytes": size,
-            "integrity_ok": self.db.integrity_ok(),
+            # 带上库路径：出问题时第一件要确认的是「它读的是不是同一个库」。
+            "db_path": str(self.db.path or ""),
+            **integrity,
         }
 
     def capabilities(self) -> dict[str, Any]:
@@ -2236,8 +2244,9 @@ class MemoryStore:
         vec_rows = self.db.conn.execute("SELECT COUNT(*) c FROM memory_vec_plain").fetchone()["c"]
         vec_ready, vec_reason = vector_mod.ready(self.cfg)
         degraded: list[str] = []
-        if not jieba_ok:
-            degraded.append("no_jieba")
+        # jieba 不是必需件：主词法是自带的双字切分，索引也是按它建的。
+        # 把「没装 jieba」报成「降级」会让人以为系统不完整（实测有人当成异常来问）。
+        # 真正该报的是「用的是哪套切词」，所以改成 features.tokenizer。
         if vec_rows == 0:
             degraded.append("no_embedding")
         return {
@@ -2247,6 +2256,8 @@ class MemoryStore:
             "name": {"cn": pmem.__name_cn__, "en": pmem.__name_en__, "code": pmem.__codename__},
             "features": {
                 "vector": bool(vec_ready and vec_rows > 0),
+                # 主词法：装了 jieba 用它，否则用自带的双字切分（默认、索引也按它建）。
+                "tokenizer": "jieba" if jieba_ok else "bigram",
                 "jieba": jieba_ok,
                 "net": True,
                 "surface": True,
