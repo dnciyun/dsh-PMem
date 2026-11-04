@@ -337,7 +337,7 @@
     '  bool useB = aCorner >= 2.5;',
     '  float side = (aCorner == 0.0 || aCorner == 2.0) ? -1.0 : 1.0;',
     '  vec4 clip = useB ? cb : ca;',
-    '  float w = max(aGeom.x * 0.5, 0.35);',
+    '  float w = max(aGeom.x * 0.5, 1.2);',
     '  vec2 offsetPx = nrm * side * w;',
     // 关节补口：A 端往回、B 端往前各伸 0.75 个线宽，让相邻段在接缝处叠上。
     // 不补的话每段两头各留一条 1px 缝，长连线看起来就是一串虚线。
