@@ -1,7 +1,7 @@
 /**
  * dsh-pmem 的客户端半边：DSH 设置里的「可塑性记忆」窗口。
  *
- * 六个标签页：概览 / 醒来卡 / 记忆 / 自动 handoff / MCP / 高级。
+ * 七个标签页：概览 / 醒来卡 / 记忆 / 自动 handoff / MCP / 高级 / 夜间。
  *
  * 星图**不占标签页**：只在概览里留一行开关 + 「打开星图 ↗」，
  * 主体是独立页面 `/dsh-pmem/starmap`（整页重绘 + SSE 实时）。
@@ -27,6 +27,7 @@ window.__ModuleLoader__.load({
       ['handoff', '自动 handoff'],
       ['mcp', 'MCP'],
       ['advanced', '高级'],
+      ['night', '夜间'],
     ]
 
     const CSS_TAG = 'dsh-pmem/settings.css'
@@ -77,6 +78,24 @@ window.__ModuleLoader__.load({
 .pmem-switch input:checked::after{transform:translateX(14px)}
 .pmem-switch input:disabled{opacity:.45;cursor:default}
 .pmem-switch input:focus-visible{outline:2px solid var(--dsw-alias-brand-primary,#2f6fed);outline-offset:2px}
+.pmem-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.pmem-runs{display:flex;flex-direction:column;gap:10px}
+.pmem-run{border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:10px;padding:10px 12px;background:rgba(127,127,127,.03)}
+.pmem-run-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pmem-run-day{font-weight:600}
+.pmem-tag{font-size:11px;line-height:16px;padding:1px 8px;border-radius:99px;background:rgba(127,127,127,.14);color:var(--dsw-alias-label-secondary,#5b6472)}
+.pmem-tag-ok{background:rgba(47,191,113,.16);color:var(--dsw-alias-state-success-primary,#2fbf71)}
+.pmem-tag-bad{background:rgba(229,72,77,.16);color:var(--dsw-alias-state-error-primary,#e5484d)}
+.pmem-run-err{margin-top:6px;font-size:12.5px}
+.pmem-stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px}
+.pmem-stage{border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:9px;padding:7px 9px;background:rgba(127,127,127,.04);min-width:0}
+.pmem-stage.done{border-left:3px solid var(--dsw-alias-state-success-primary,#2fbf71)}
+.pmem-stage.bad{border-left:3px solid var(--dsw-alias-state-error-primary,#e5484d)}
+.pmem-stage.bad .pmem-stage-name{color:var(--dsw-alias-state-error-primary,#e5484d)}
+.pmem-stage.skip{opacity:.55}
+.pmem-stage-name{font-size:12px;color:var(--dsw-alias-label-secondary,#5b6472)}
+.pmem-stage-stats{font-size:12.5px;margin-top:2px;word-break:break-word}
+.pmem-empty{margin:0;padding:24px 0;color:var(--dsw-alias-label-secondary,#5b6472)}
 `
 
     function useStyleOnce() {
@@ -166,6 +185,68 @@ window.__ModuleLoader__.load({
       )
     }
 
+    // 睡眠流水（`pmem sleep log --json`）：一次 run 一张卡，八个阶段各一格。
+    // 阶段名按 `pmem sleep log` 的 sN_* 阶段键映射；前端只做展示，不解释数据。
+    const STAGE_LABELS = {
+      s1_collect: '1 · 收集',
+      s2_dedup: '2 · 去重',
+      s3_relations: '3 · 关系',
+      s4_conflicts: '4 · 冲突',
+      s5_patterns: '5 · 规律',
+      s6_traits: '6 · 特质',
+      s7_reflect: '7 · 反思',
+      s8_snapshot: '8 · 快照',
+    }
+
+    const stageId = stage => stage?.name || stage?.stage || '?'
+    const stageLabel = stage => STAGE_LABELS[stageId(stage)] || stageId(stage)
+
+    function stageSummary(stage) {
+      if (!stage || stage.skipped === true || !stage.stats) return ''
+      const text = typeof stage.stats === 'string' ? stage.stats : JSON.stringify(stage.stats)
+      return text.length > 160 ? `${text.slice(0, 160)}…` : text
+    }
+
+    function NightStage({ stage }) {
+      const skipped = stage?.skipped === true
+      // 阶段失败（ok === false 且不是跳过）要和成功分开：旧夜间页把失败也画成绿的，
+      // 看起来像"跑完了"，实际上那一阶段什么都没做成。
+      const failed = !skipped && stage?.ok === false
+      const ms = typeof stage?.ms === 'number' ? `${stage.ms}ms` : ''
+      const summary = stageSummary(stage)
+      return h(
+        'div',
+        { className: 'pmem-stage ' + (skipped ? 'skip' : failed ? 'bad' : 'done') },
+        h('div', { className: 'pmem-stage-name' }, [stageLabel(stage), ms].filter(Boolean).join(' ')),
+        summary ? h('div', { className: 'pmem-stage-stats' }, summary) : null,
+      )
+    }
+
+    function NightRun({ run }) {
+      if (!run) return null
+      const status = String(run.status ?? '')
+      const statusClass = status === 'ok' ? ' pmem-tag-ok' : status === 'running' ? '' : ' pmem-tag-bad'
+      const span = run.finished_at
+        ? `${fmtTime(run.started_at)} → ${fmtTime(run.finished_at)}`
+        : fmtTime(run.started_at)
+      return h(
+        'div',
+        { className: 'pmem-run' },
+        h(
+          'div',
+          { className: 'pmem-run-head' },
+          h('span', { className: 'pmem-run-day' }, run.day ?? '—'),
+          h('span', { className: 'pmem-tag' + statusClass }, status || '—'),
+          run.trigger ? h('span', { className: 'pmem-tag' }, run.trigger) : null,
+          h('span', { className: 'pmem-row-sub' }, span),
+        ),
+        run.error ? h('div', { className: 'pmem-err pmem-run-err' }, run.error) : null,
+        h('div', { className: 'pmem-stages' },
+          ...(run.stages ?? []).map((stage, index) =>
+            h(NightStage, { key: `${stageId(stage)}-${index}`, stage }))),
+      )
+    }
+
     function PMemSection() {
       useStyleOnce()
       const [tab, setTab] = useState('overview')
@@ -176,6 +257,8 @@ window.__ModuleLoader__.load({
       const [query, setQuery] = useState('')
       const [busy, setBusy] = useState('')
       const [night, setNight] = useState(null)
+      const [nightLoading, setNightLoading] = useState(true)
+      const [nightError, setNightError] = useState('')
       const [sleeping, setSleeping] = useState(false)
       const [err, setErr] = useState('')
       const [toast, setToast] = useState('')
@@ -252,10 +335,15 @@ window.__ModuleLoader__.load({
       }, [tab])
 
       const loadNight = async () => {
+        setNightLoading(true)
         try {
           setNight(await api('/sleep'))
-        } catch {
+          setNightError('')
+        } catch (error) {
           setNight(null)
+          setNightError(`读不到睡眠记录：${error.message}`)
+        } finally {
+          setNightLoading(false)
         }
       }
 
@@ -276,7 +364,7 @@ window.__ModuleLoader__.load({
       }
 
       useEffect(() => {
-        if (tab !== 'overview') return
+        if (tab !== 'overview' && tab !== 'night') return
         void loadNight()
       }, [tab])
 
@@ -406,7 +494,8 @@ window.__ModuleLoader__.load({
             sub: status?.wake ? `${status.wake.chars} 字 · ${status.wake.head || ''}` : '—',
           }, h('button', { className: 'pmem-btn', onClick: () => setTab('wake') }, '看看')),
           // 夜间：八阶段睡眠的「看得见」入口。最近一次的状态直接写在这行，
-          // 想看每一步细节就打开夜间页；不想等夜里，也可以现在手动入睡。
+          // 想看每一步细节就切到「夜间」标签（同源 fetch，不开新窗口）；
+          // 不想等夜里，也可以现在手动入睡。
           h(Row, {
             title: '夜间',
             sub: (() => {
@@ -421,7 +510,7 @@ window.__ModuleLoader__.load({
             { style: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' } },
             h('button', {
               className: 'pmem-btn',
-              onClick: () => window.open('/dsh-pmem/night', '_blank'),
+              onClick: () => setTab('night'),
             }, '夜间页'),
             h('button', {
               className: 'pmem-btn',
@@ -599,11 +688,48 @@ window.__ModuleLoader__.load({
         ),
       )
 
+      // 「夜间」标签：把夜间流水的信息密度搬进设置面板。数据走同源 /sleep。
+      // 不开新窗口：桌面壳只把 http/https 转给系统浏览器（那边没有登录 cookie，401），
+      // dsh-app:// 相对路径则静默 deny、0 请求——用户看到的就是「点了没反应」。
+      // 整页导航能过（主进程会补 cookie），但会离开设置面板，所以也不走。
+      const nightRuns = night?.data?.runs ?? []
+      const nightTab = h(
+        'div',
+        null,
+        h(
+          'div',
+          { className: 'pmem-toolbar' },
+          h('button', {
+            className: 'pmem-btn',
+            disabled: sleeping,
+            onClick: () => void sleepNow(),
+          }, sleeping ? '入睡中…' : '现在入睡'),
+          h('button', {
+            className: 'pmem-btn',
+            disabled: nightLoading,
+            onClick: () => void loadNight(),
+          }, nightLoading ? '刷新中…' : '刷新'),
+          h('span', { className: 'pmem-row-sub' }, '八阶段：收集→去重→关系→冲突→规律→特质→反思→快照'),
+        ),
+        nightError
+          ? h('p', { className: 'pmem-err', role: 'alert' }, nightError)
+          : nightRuns.length
+            ? h('div', { className: 'pmem-runs' },
+                ...nightRuns.map((run, index) =>
+                  h(NightRun, { key: `${run?.id ?? run?.day ?? 'run'}-${index}`, run })))
+            : h('p', { className: 'pmem-empty' },
+                nightLoading ? '加载中…' : '还没有睡眠记录。跑一次「现在入睡」就有。'),
+        h('p', { className: 'pmem-note' },
+          '这是 PMem 的睡眠流水：每次跑了哪些阶段、各阶段做了什么、有没有失败。' +
+          '数据来自 pmem sleep log，最多显示最近 14 次。'),
+      )
+
       const body = tab === 'wake' ? wakeTab
         : tab === 'memory' ? memoryTab
         : tab === 'handoff' ? handoffTab
         : tab === 'mcp' ? mcpTab
         : tab === 'advanced' ? advancedTab
+        : tab === 'night' ? nightTab
         : overview
 
       const app = h(

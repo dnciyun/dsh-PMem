@@ -214,6 +214,35 @@ try {
   assert.equal(map.body.shape.layout, 'spiral-disk')
   assert.ok(map.body.space.sectors >= 1, '没有分组扇区')
 
+  // ---- 夜间流水：设置面板「夜间」标签的数据源 ----
+  // 独立页面已拆掉（新窗口/整页导航过不了桌面壳和登录闸），这条路由不能悄悄回来。
+  const nightPage = await get('/dsh-pmem/night')
+  assert.equal(nightPage.status, 404, '夜间独立页面应该已经拆掉')
+
+  const sleepLog = await get('/dsh-pmem/api/sleep')
+  assert.equal(sleepLog.status, 200, 'sleep log 取不到')
+  assert.equal(sleepLog.body.ok, true)
+  assert.ok(Array.isArray(sleepLog.body.data?.runs), `sleep log 不是 runs 数组：${JSON.stringify(sleepLog.body)}`)
+  for (const run of sleepLog.body.data.runs) {
+    assert.equal(typeof run.day, 'string', 'run 缺 day')
+    assert.equal(typeof run.status, 'string', 'run 缺 status')
+    assert.ok(Array.isArray(run.stages), 'run.stages 不是数组')
+    for (const stage of run.stages) {
+      assert.equal(typeof (stage.name ?? stage.stage), 'string', '阶段缺名字')
+      assert.equal(typeof stage.skipped, 'boolean', '阶段缺 skipped')
+    }
+  }
+
+  // 主动入睡：POST 才给，GET 405；跑完要回写一条 ok 的 run（空库里也一样）。
+  const sleepNowGet = await get('/dsh-pmem/api/sleep/now')
+  assert.equal(sleepNowGet.status, 405, '主动入睡只接受 POST')
+  const sleepNow = await post('/dsh-pmem/api/sleep/now', {})
+  assert.equal(sleepNow.status, 200, '主动入睡失败')
+  assert.equal(sleepNow.body.ok, true, JSON.stringify(sleepNow.body))
+  assert.equal(typeof sleepNow.body.data?.status, 'string', '主动入睡没回 status')
+  const afterSleep = await get('/dsh-pmem/api/sleep')
+  assert.ok(afterSleep.body.data.runs.length >= 1, '跑完一轮睡眠后历史里没有记录')
+
   // ---- 浏览器通道：独立服务 + 拉起默认浏览器 ----
   const notPost = await fetch(base + '/dsh-pmem/api/starmap/open')
   assert.equal(notPost.status, 405, '打开星图只接受 POST')

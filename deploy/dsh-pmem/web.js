@@ -1,7 +1,7 @@
 /**
  * M9.7：宿主侧 Web 面。
  *
- * 三件事，都只在本机回环上：
+ * 四件事，都只在本机回环上：
  *   · `/dsh-pmem/api/*`      设置页要的数据（状态 / 卡 / 记忆 / 配置 / MCP）
  *   · `/dsh-pmem/starmap`    星图的独立页面（不占设置标签页，WebGL2 实时渲染）
  *   · `/dsh-pmem/starmap/*`  星图的静态资源（三份文件，白名单）
@@ -384,16 +384,6 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
   })
 
   // ---- 状态 ----------------------------------------------------------------
-  // ---- 夜间（M4 睡眠的镜子）：8 个阶段跑到哪、有没有跑 ----
-  route('exact', '/dsh-pmem/night', async (req, res) => {
-    const file = `${pluginDir}/night.html`
-    if (!existsSync(file)) return json(res, 500, { ok: false, error: '缺少 night.html' })
-    res.statusCode = 200
-    res.setHeader('content-type', 'text/html; charset=utf-8')
-    res.setHeader('cache-control', 'no-store')
-    res.end(readFileSync(file))
-  })
-
   route('exact', `${API}/sleep`, async (req, res) => {
     try {
       const data = await callPmem(config, ['sleep', 'log', '--limit', '14'], { json: true, timeout: 30000 })
