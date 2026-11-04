@@ -1,4 +1,4 @@
-# 可塑性记忆 · PMem
+# dsh-PMem · 可塑性记忆
 
 > 白天经历，夜晚沉淀。长期记忆，自主进化。
 >
@@ -98,7 +98,7 @@ PMem 是**一个东西**：记忆器官本身（MCP 内核）+ 它在 DSH 里的
 MCP 是它对外唯一的门，由插件自己拉起。**不用二选一，也不需要分开配。**
 
 ```bash
-git clone https://github.com/dnciyun/pmem
+git clone https://github.com/dnciyun/dsh-PMem
 cd pmem
 pip install -e .
 pmem init                 # 建库（幂等）
