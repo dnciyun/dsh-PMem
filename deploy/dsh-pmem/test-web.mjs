@@ -28,6 +28,10 @@ const init = run(['init'])
 assert.equal(init.status, 0, init.stderr || init.stdout)
 const added = run(['--json', 'add', '我们第一次一起改这个项目', '--group', '我们/经历', '--grade', 'A'])
 assert.equal(added.status, 0, added.stderr)
+// 大睡（宿主模式）要一天流水才会算出计划：给 2026-05-03 写一行原话。
+const appended = run(['--json', 'journal', 'append', '--text', '今晚要加班到十点', '--role', 'user',
+  '--ts', '2026-05-03T10:00:00Z', '--session', 's1'])
+assert.equal(appended.status, 0, appended.stderr || appended.stdout)
 
 mkdirSync(join(dir, 'data'), { recursive: true })
 const star = spawnSync(py, ['-m', 'pmem.gate.cli', '--db', db, 'star', '--no-png', '--out', join(dir, 'data', 'starmap')], {
@@ -37,12 +41,29 @@ const star = spawnSync(py, ['-m', 'pmem.gate.cli', '--db', db, 'star', '--no-png
 assert.equal(star.status, 0, star.stderr || star.stdout)
 
 const routes = []
+// 大睡（宿主模式）会通过这些 mock 验证：确实新建了会话、确实把鲸眠提示词投递进去。
+const hostSessions = []
+const hostPrompts = []
+const sessionController = {
+  async create(payload) {
+    hostSessions.push(payload)
+    return { sessionId: payload.sessionId }
+  },
+  async prompt(payload) {
+    hostPrompts.push(payload)
+  },
+}
 const ctx = {
   systemPrompt: { context: () => () => {} },
   tools: { register: () => () => {} },
   commands: { register: () => () => {} },
   on: () => () => {},
-  get: name => (name === 'connection' ? { requestRejection: () => undefined } : undefined),
+  get: name => {
+    if (name === 'connection') return { requestRejection: () => undefined }
+    if (name === 'sessionController') return sessionController
+    return undefined
+  },
+  sessionController,
   webServer: {
     register(item) {
       routes.push(item)
@@ -256,6 +277,19 @@ try {
   assert.equal(bigReal.body.ok, true, JSON.stringify(bigReal.body))
   assert.equal(typeof bigReal.body.data?.elapsed_s, 'number', '大睡没回 elapsed_s')
   assert.equal(typeof bigReal.body.data?.mode, 'string', '大睡没回 mode')
+
+  // 大睡（默认）：由 DSH 来——算好日子、新建会话、把鲸眠提示词投进去。
+  const hostGet = await get('/dsh-pmem/api/sleep/host-big')
+  assert.equal(hostGet.status, 405, '大睡（DSH）只接受 POST')
+  const hostBig = await post('/dsh-pmem/api/sleep/host-big', {})
+  assert.equal(hostBig.status, 200, '大睡（DSH）失败')
+  assert.equal(hostBig.body.ok, true, JSON.stringify(hostBig.body))
+  assert.ok(hostBig.body.count >= 1, `没算出要睡的日子：${JSON.stringify(hostBig.body)}`)
+  assert.ok(hostBig.body.days.includes('2026-05-03'), '计划里没有 2026-05-03')
+  assert.ok(hostSessions.length >= 1, '没有新建会话')
+  assert.equal(hostSessions.length, hostBig.body.sessions.length, '会话数与返回不一致')
+  assert.match(String(hostPrompts[0]?.content?.[0]?.text || ''), /鲸眠/, '投递的提示词不像鲸眠')
+  assert.match(String(hostPrompts[0]?.content?.[0]?.text || ''), /2026-05-03/, '提示词里没有日期')
 
   // ---- 浏览器通道：独立服务 + 拉起默认浏览器 ----
   const notPost = await fetch(base + '/dsh-pmem/api/starmap/open')

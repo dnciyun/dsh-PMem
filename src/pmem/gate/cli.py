@@ -612,6 +612,12 @@ def main(argv: list[str] | None = None) -> int:
     p_slb.add_argument("--template", action="store_true", help="强制模板写日记，不调模型")
     p_slb.add_argument("--skip-digested", action="store_true", help="只睡还没消化过的日子")
     p_slb.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    p_slp = sl_sub.add_parser("plan", help="大睡计划：列出要睡哪些天（只读，不执行）")
+    p_slp.add_argument("--from", dest="start", default=None, help="起始日期 YYYY-MM-DD（含）")
+    p_slp.add_argument("--to", dest="end", default=None, help="结束日期 YYYY-MM-DD（含）")
+    p_slp.add_argument("--limit", type=int, default=0, help="最多几天（默认 0 = 全部）")
+    p_slp.add_argument("--skip-digested", action="store_true", help="只列还没消化过的天")
+    p_slp.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
 
     p_ev = sub.add_parser("evolve", help="进化引擎（M5）：复核 / 经验复用 / 冲突升级 / 调参")
     ev_sub = p_ev.add_subparsers(dest="evolve_action", required=True)
@@ -1401,6 +1407,22 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"    {name}: {str(rest)[:110]}")
                     if run.get("error"):
                         print(f"    错误：{run['error']}")
+                return 0
+            if args.sleep_action == "plan":
+                result = app.sleep_plan(
+                    start=args.start,
+                    end=args.end,
+                    limit=args.limit,
+                    skip_digested=args.skip_digested,
+                )
+                if getattr(args, "json", False):
+                    return _emit(result, True)
+                if not result.get("ok"):
+                    return _emit(result, False)
+                days = result["data"]["days"]
+                print(f"— 大睡计划：{len(days)} 天")
+                for day in days:
+                    print(f"  {day}")
                 return 0
             if args.sleep_action == "whale":
                 result = app.sleep_whale(

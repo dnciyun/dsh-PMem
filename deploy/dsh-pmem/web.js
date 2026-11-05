@@ -19,6 +19,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { randomUUID } from 'node:crypto'
 import { createStandalone, openInBrowser } from './standalone.js'
 import { dirname } from 'node:path'
 
@@ -26,6 +27,34 @@ const require = createRequire(import.meta.url)
 
 const API = '/dsh-pmem/api'
 const MAX_BODY = 256 * 1024
+
+// 宿主上下文：注册路由时记下来，宿主模式（大睡一场由 DSH 会话执行）要用 sessionController。
+let webCtx = null
+
+function sessionService() {
+  try {
+    const ctx = webCtx
+    if (!ctx) return null
+    const svc = typeof ctx.get === 'function' ? ctx.get('sessionController') : null
+    return svc || ctx.sessionController || null
+  } catch {
+    return null
+  }
+}
+
+/** 一次「大睡」批次的提示词：让宿主模型在会话里逐天调 memory_whale_prep / finish。 */
+function whaleBigPrompt(days) {
+  const list = days.join('、')
+  return `你是「鲸眠」，夜间睡眠里的记忆整理会话。今晚是大睡一场的一段：把下面这些日子逐天补睡。\n\n`
+    + `日子（按顺序）：${list}\n\n`
+    + `对每一天 D，按顺序做：\n`
+    + `1) 调 memory_whale_prep(day_key=D) 拿当天原文 + 醒来卡 + 最近日记 + 写作规则；\n`
+    + `2) 按规则想一遍：只使用原文里出现过的信息、专名照抄、不编不猜、没说完的事进 loops；\n`
+    + `3) 调 memory_whale_finish(day_key=D, title, lines, loops)，它会校验（编造会回落模板）并跑固定 8 阶段；\n`
+    + `4) 若 prep 返回 pending=0，就记下「D 没有流水」并跳过，不要硬写。\n\n`
+    + `全部处理完，用一张小表汇报：日期 / 写成没有 / 标题 / 派生事实数 / 是否回落模板。`
+    + `不要合并日子，也不要跳还有流水的日子。`
+}
 
 export const RUNTIME_DEFAULTS = Object.freeze({
   surface: true,
@@ -433,6 +462,57 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     }
   })
 
+  route('exact', `${API}/sleep/host-big`, async (req, res) => {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    const controller = sessionService()
+    if (!controller
+      || typeof controller.create !== 'function'
+      || typeof controller.prompt !== 'function') {
+      return json(res, 409, {
+        ok: false,
+        error: '宿主没有 sessionController，这次不能由 DSH 来；可以改用模板模式（0 成本）',
+      })
+    }
+    try {
+      // 默认由 DSH 来：先算出要睡哪些天，再开新会话，让宿主模型逐天调
+      // memory_whale_prep / memory_whale_finish。PMem 进程不碰模型凭证。
+      const argv = ['sleep', 'plan']
+      if (body.start) argv.push('--from', String(body.start).slice(0, 10))
+      if (body.end) argv.push('--to', String(body.end).slice(0, 10))
+      const limit = Math.floor(Number(body.limit) || 0)
+      if (limit > 0) argv.push('--limit', String(limit))
+      if (body.skip_digested === true) argv.push('--skip-digested')
+      const plan = await callPmem(config, argv, { json: true, timeout: 60000 })
+      const days = Array.isArray(plan?.data?.days) ? plan.data.days : []
+      if (!days.length) {
+        return json(res, 200, { ok: true, count: 0, days: [], batches: [], sessions: [] })
+      }
+      const size = Math.max(1, Math.min(20, Math.floor(Number(body.batch) || 6)))
+      const batches = []
+      for (let at = 0; at < days.length; at += size) batches.push(days.slice(at, at + size))
+      const sessions = []
+      for (const batch of batches) {
+        const sessionId = randomUUID()
+        await controller.create({ sessionId, cwd: config.cwd })
+        await controller.prompt({
+          sessionId,
+          content: [{ type: 'text', text: whaleBigPrompt(batch) }],
+        })
+        sessions.push(sessionId)
+      }
+      return json(res, 200, { ok: true, count: days.length, days, batches, sessions })
+    } catch (error) {
+      return json(res, 500, { ok: false, error: String(error?.message ?? error) })
+    }
+  })
+
   route('exact', `${API}/status`, async (req, res) => {
     const [dbStats, card, receipts, tokens] = await Promise.all([
       stats().catch(() => null),
@@ -679,6 +759,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     },
     /** 挂到 ctx.webServer 上；返回 disposer。 */
     register(ctx) {
+      webCtx = ctx
       const disposers = []
       for (const item of routes) {
         disposers.push(

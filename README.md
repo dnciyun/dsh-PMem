@@ -69,7 +69,9 @@ PMem 就是为这四件事写的。它做的事很朴素：把经历收好，把
 写成日记（只写日记，facts 仍由原文派生；失败自动退回模板）。默认关闭，见 [`docs/whale-sleep.md`](docs/whale-sleep.md)。
 在 DSH 里用**宿主模式**（0.35.2）：不需要 API key——夜间新建「鲸眠」会话，模型由宿主提供，
 只调 `memory_whale_prep` / `memory_whale_finish` 两个工具；CLI 模式才需要 key。
-想把历史补睡一遍：`pmem sleep big`（默认全部，可用 `--from/--to` 选日期；不调模型就 `--template`）。
+想把历史补睡一遍：`pmem sleep big`（默认全部，可用 `--from/--to` 选日期）。
+设置页「夜间 → 大睡一场」默认**由 DSH 来**（新建「鲸眠」会话逐天写日记，不配 key）；
+勾「模板模式」才在本地用模板跑（0 成本）。
 
 ### 7. 看得见
 

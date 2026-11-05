@@ -110,12 +110,21 @@ pmem sleep whale --no-sleep                # 只写日记，不跑 8 阶段
 pmem sleep big                                    # 全部，从最早一天睡到最近一天
 pmem sleep big --from 2026-05-01 --to 2026-05-31  # 只睡这一段
 pmem sleep big --limit 10 --skip-digested         # 只补还没消化的 10 天
-pmem sleep big --template                         # 不调模型，模板写日记（0 成本）
+pmem sleep big --template                         # 不调模型，本地模板跑（0 成本）
 pmem sleep big --dry-run                          # 演练：不落库，只算
 ```
 
-每天：先消化当天流水（鲸眠写日记；失败自动回落模板），再跑固定 8 阶段；
+每天：先消化当天流水（默认「鲸眠」会话；失败回落模板），再跑固定 8 阶段；
 单天失败不拖垮整轮，出错记在当天结果里。重复跑是幂等的——已经消化过的天不会有第二篇日记。
+
+**设置页按钮（0.35.5 起默认由 DSH 来）**：设置 → 海马体 → 夜间 → 大睡一场。
+默认模式是「由 DSH 来」：先 `pmem sleep plan` 算出要睡哪些天，再按批（默认 6 天）
+**新建 DSH 会话**并把鲸眠提示词投进去，让宿主模型逐天调 `memory_whale_prep` /
+`memory_whale_finish`。PMem 进程不碰模型凭证。面板上的「模板模式」勾上才改成本地模板跑。
+
+```sh
+pmem sleep plan --from 2026-05-01 --to 2026-05-31 --json   # 只列计划，不执行
+```
 
 ## 测试
 

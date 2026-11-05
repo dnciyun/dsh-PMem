@@ -157,6 +157,14 @@ class BigSleepCase(unittest.TestCase):
         self.assertEqual(item["diary"]["mode"], "template")
         self.assertEqual(self._count("episode"), 1)
 
+    def test_sleep_plan_lists_days_without_writing(self) -> None:
+        self._ingest_days(DAYS)
+        result = self.app.sleep_plan(start=DAYS[1], end=DAYS[2])
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["data"]["days"], [DAYS[1], DAYS[2]])
+        self.assertEqual(result["data"]["count"], 2)
+        self.assertEqual(self._count("episode"), 0)
+
     def test_bad_range_raises(self) -> None:
         from pmem.base.errors import PmemError
 

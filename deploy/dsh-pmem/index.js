@@ -27,7 +27,7 @@ import { probeMcp } from './mcp.js'
 import { createWeb, readRuntime } from './web.js'
 
 export const name = 'dsh-pmem'
-export const inject = ['systemPrompt', 'tools', 'commands', 'webServer', 'connection', 'tokenMeter']
+export const inject = ['systemPrompt', 'tools', 'commands', 'webServer', 'connection', 'tokenMeter', 'sessionController']
 
 const execFileAsync = promisify(execFile)
 const PLUGIN_DIR = dirname(fileURLToPath(import.meta.url))

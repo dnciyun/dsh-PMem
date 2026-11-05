@@ -894,6 +894,28 @@ class PMem:
             return self._fail(exc, started)
         return self._ok(data, started)
 
+    def sleep_plan(
+        self,
+        *,
+        start: str | None = None,
+        end: str | None = None,
+        limit: int = 0,
+        skip_digested: bool = False,
+    ) -> dict[str, Any]:
+        """大睡计划：列出「大睡一场」会睡哪些天（只读，不执行）。"""
+        started = time.perf_counter()
+        from ..sleep import big
+
+        try:
+            big.validate_range(start, end)
+            days = big.select_days(
+                self.db, self.subject, start=start, end=end,
+                skip_digested=skip_digested, limit=limit,
+            )
+        except PmemError as exc:
+            return self._fail(exc, started)
+        return self._ok({"days": days, "count": len(days), "range": {"start": start, "end": end}}, started)
+
     def sleep_big(
         self,
         *,

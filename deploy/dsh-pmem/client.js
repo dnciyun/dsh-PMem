@@ -394,7 +394,7 @@ window.__ModuleLoader__.load({
       const [bigBusy, setBigBusy] = useState(false)
       const [bigResult, setBigResult] = useState(null)
       const [bigForm, setBigForm] = useState({
-        start: '', end: '', limit: '', dry: false, template: true, skipDigested: false,
+        start: '', end: '', limit: '', dry: false, template: false, skipDigested: false,
       })
       const [err, setErr] = useState('')
       const [toast, setToast] = useState('')
@@ -499,29 +499,46 @@ window.__ModuleLoader__.load({
         }
       }
 
-      // 大睡一场：把已有的记忆按天从头睡一遍。默认全部、模板模式（不调模型、0 成本）；
-      // 配了 sleep.whale.model 才会走鲸眠会话（会更慢、更贵，按钮文案会提醒）。
+      // 大睡一场：默认由 DSH 来——开新会话，让宿主模型逐天调
+      // memory_whale_prep / memory_whale_finish（PMem 不碰模型凭证）。
+      // 勾「模板模式」才改成本地模板跑（0 成本，但写得像流水账）。
       const sleepBig = async () => {
         setBigBusy(true)
         setErr('')
         setBigResult(null)
         try {
-          const payload = {
+          const shared = {
             start: bigForm.start || undefined,
             end: bigForm.end || undefined,
             limit: Number(bigForm.limit) || 0,
-            dry_run: bigForm.dry === true,
-            template: bigForm.template !== false,
             skip_digested: bigForm.skipDigested === true,
           }
-          const data = await api('/sleep/big', { method: 'POST', body: JSON.stringify(payload) })
-          if (!data?.ok) {
-            setErr(`大睡失败：${data?.error || data?.data?.error?.message || '未知'}`)
+          if (bigForm.template) {
+            const data = await api('/sleep/big', {
+              method: 'POST',
+              body: JSON.stringify({ ...shared, template: true, dry_run: bigForm.dry === true }),
+            })
+            if (!data?.ok) {
+              setErr(`大睡失败：${data?.error || data?.data?.error?.message || '未知'}`)
+            } else {
+              setBigResult({ mode: 'template', ...data.data })
+              notify(data.data?.dry_run ? '演练完成，没有落库' : '大睡完成（模板模式）')
+            }
+            await loadNight()
           } else {
-            setBigResult(data.data)
-            notify(data.data?.dry_run ? '演练完成，没有落库' : '大睡完成')
+            const data = await api('/sleep/host-big', {
+              method: 'POST',
+              body: JSON.stringify(shared),
+            })
+            if (!data?.ok) {
+              setErr(`大睡失败：${data?.error || '未知'}`)
+            } else {
+              setBigResult({ mode: 'host', count: data.count, sessions: data.sessions || [], days: data.days || [] })
+              notify(data.count
+                ? `已开 ${(data.sessions || []).length} 个鲸眠会话（${data.count} 天）`
+                : '没有需要睡的日子')
+            }
           }
-          await loadNight()
         } catch (error) {
           setErr(`大睡失败：${error.message}`)
         } finally {
@@ -905,7 +922,8 @@ window.__ModuleLoader__.load({
               },
             },
               h('p', { className: 'pmem-row-sub' },
-                '大睡一场：把已有的记忆按天从头睡一遍。默认全部日期；模板模式不调模型、不花钱。'),
+                '大睡一场：把已有的记忆按天从头睡一遍。默认由 DSH 来——每批日子开一个新「鲸眠」会话，'
+                + '宿主模型逐天调 prep/finish 写日记；勾「模板模式」才在本地用模板跑。'),
               h('div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginTop: '6px' } },
                 h('span', { className: 'pmem-row-sub' }, '从'),
                 h('input', {
@@ -939,7 +957,7 @@ window.__ModuleLoader__.load({
                     type: 'checkbox',
                     checked: bigForm.template,
                     onChange: event => setBigForm(prev => ({ ...prev, template: event.target.checked })),
-                  }), ' 模板模式（0 成本）'),
+                  }), ' 模板模式（0 成本，不经过 DSH）'),
                 h('label', { className: 'pmem-row-sub' },
                   h('input', {
                     type: 'checkbox',
@@ -951,7 +969,7 @@ window.__ModuleLoader__.load({
                     type: 'checkbox',
                     checked: bigForm.dry,
                     onChange: event => setBigForm(prev => ({ ...prev, dry: event.target.checked })),
-                  }), ' 演练（不落库）'),
+                  }), ' 演练（仅模板模式）'),
                 h('button', {
                   className: 'pmem-btn',
                   disabled: bigBusy,
@@ -960,11 +978,15 @@ window.__ModuleLoader__.load({
               ),
               bigResult
                 ? h('p', { className: 'pmem-note' },
-                    `大睡完成：${bigResult.days ?? 0} 天（鲸眠 ${bigResult.whale_days ?? 0} / `
-                    + `模板 ${bigResult.template_days ?? 0} / 跳过 ${bigResult.skipped_days ?? 0} / `
-                    + `失败 ${bigResult.failed_days ?? 0}），用时 ${bigResult.elapsed_s ?? 0}s`
-                    + `${bigResult.dry_run ? '（演练，未落库）' : ''}`
-                    + `${bigResult.note ? `；${bigResult.note}` : ''}`)
+                    bigResult.mode === 'host'
+                      ? (bigResult.count
+                          ? `已交给 DSH：${bigResult.count} 天，开了 ${(bigResult.sessions || []).length} 个鲸眠会话；`
+                            + '到会话列表里看每天的进度和日记。'
+                          : '没有需要睡的日子（这个范围里的流水都消化过了）。')
+                      : `模板跑完：${bigResult.days ?? 0} 天（跳过 ${bigResult.skipped_days ?? 0} / `
+                        + `失败 ${bigResult.failed_days ?? 0}），用时 ${bigResult.elapsed_s ?? 0}s`
+                        + `${bigResult.dry_run ? '（演练，未落库）' : ''}`
+                        + `${bigResult.note ? `；${bigResult.note}` : ''}`)
                 : null)
           : null,
         nightError
