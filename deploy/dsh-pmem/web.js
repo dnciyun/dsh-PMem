@@ -404,6 +404,35 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     }
   })
 
+  route('exact', `${API}/sleep/big`, async (req, res) => {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    if (body && typeof body !== 'object') body = {}
+    try {
+      // 大睡一场：按天把已有记忆从头睡一遍。默认模板模式（0 成本），可选日期范围。
+      // 注意：模板模式下一天几十毫秒，LLM 模式（配了 sleep.whale.model）会显著变慢。
+      const argv = ['sleep', 'big']
+      if (body.start) argv.push('--from', String(body.start).slice(0, 10))
+      if (body.end) argv.push('--to', String(body.end).slice(0, 10))
+      const limit = Math.floor(Number(body.limit) || 0)
+      if (limit > 0) argv.push('--limit', String(limit))
+      if (body.dry_run === true) argv.push('--dry-run')
+      if (body.skip_digested === true) argv.push('--skip-digested')
+      // template 默认 true：不配置模型时也能用，且不花钱。
+      if (body.template !== false) argv.push('--template')
+      const data = await callPmem(config, argv, { json: true, timeout: 600000 })
+      return json(res, 200, data)
+    } catch (error) {
+      return json(res, 500, { ok: false, error: String(error?.message ?? error) })
+    }
+  })
+
   route('exact', `${API}/status`, async (req, res) => {
     const [dbStats, card, receipts, tokens] = await Promise.all([
       stats().catch(() => null),

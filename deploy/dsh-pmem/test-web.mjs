@@ -243,6 +243,20 @@ try {
   const afterSleep = await get('/dsh-pmem/api/sleep')
   assert.ok(afterSleep.body.data.runs.length >= 1, '跑完一轮睡眠后历史里没有记录')
 
+  // 大睡一场：只接受 POST；模板模式 + 演练要回 ok 和汇总字段（空库时 days=0 也算成功）。
+  const bigGet = await get('/dsh-pmem/api/sleep/big')
+  assert.equal(bigGet.status, 405, '大睡一场只接受 POST')
+  const bigDry = await post('/dsh-pmem/api/sleep/big', { template: true, dry_run: true, limit: 1 })
+  assert.equal(bigDry.status, 200, '大睡演练失败')
+  assert.equal(bigDry.body.ok, true, JSON.stringify(bigDry.body))
+  assert.equal(typeof bigDry.body.data?.days, 'number', '大睡没回 days')
+  assert.equal(bigDry.body.data.dry_run, true, '演练没有标记 dry_run')
+  const bigReal = await post('/dsh-pmem/api/sleep/big', { template: true, limit: 1 })
+  assert.equal(bigReal.status, 200, '大睡失败')
+  assert.equal(bigReal.body.ok, true, JSON.stringify(bigReal.body))
+  assert.equal(typeof bigReal.body.data?.elapsed_s, 'number', '大睡没回 elapsed_s')
+  assert.equal(typeof bigReal.body.data?.mode, 'string', '大睡没回 mode')
+
   // ---- 浏览器通道：独立服务 + 拉起默认浏览器 ----
   const notPost = await fetch(base + '/dsh-pmem/api/starmap/open')
   assert.equal(notPost.status, 405, '打开星图只接受 POST')

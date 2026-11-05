@@ -1445,7 +1445,8 @@ def main(argv: list[str] | None = None) -> int:
                     dry_run=args.dry_run,
                     use_whale=not args.template,
                     skip_digested=args.skip_digested,
-                    on_day=_print_big_day,
+                    # --json 时不能打进度行，否则 stdout 不是纯 JSON（插件 callPmem 会解析失败）
+                    on_day=None if getattr(args, "json", False) else _print_big_day,
                 )
                 if getattr(args, "json", False):
                     return _emit(result, True)

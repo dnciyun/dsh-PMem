@@ -2,7 +2,7 @@
   "name": "dsh-pmem",
   "version": "0.7.1",
   "private": true,
-  "description": "把可塑性记忆（PMem）接进 DSH：醒来卡 + 每轮浮现 + 自动 handoff + 设置页 + WebGL2 星图 + 24 个 MCP 工具。",
+  "description": "把可塑性记忆（PMem）接进 DSH：醒来卡 + 每轮浮现 + 自动 handoff + 设置页 + WebGL2 星图 + 26 个 MCP 工具。",
   "type": "module",
   "main": "./index.js",
   "exports": {

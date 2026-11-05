@@ -389,6 +389,13 @@ window.__ModuleLoader__.load({
       const [nightError, setNightError] = useState('')
       const [openRuns, setOpenRuns] = useState({})
       const [sleeping, setSleeping] = useState(false)
+      // 大睡一场：按天把已有记忆从头睡一遍（默认全部，可限定日期；默认模板模式 0 成本）。
+      const [bigOpen, setBigOpen] = useState(false)
+      const [bigBusy, setBigBusy] = useState(false)
+      const [bigResult, setBigResult] = useState(null)
+      const [bigForm, setBigForm] = useState({
+        start: '', end: '', limit: '', dry: false, template: true, skipDigested: false,
+      })
       const [err, setErr] = useState('')
       const [toast, setToast] = useState('')
       const [debug, setDebug] = useState(null)
@@ -489,6 +496,36 @@ window.__ModuleLoader__.load({
           setErr(`入睡失败：${error.message}`)
         } finally {
           setSleeping(false)
+        }
+      }
+
+      // 大睡一场：把已有的记忆按天从头睡一遍。默认全部、模板模式（不调模型、0 成本）；
+      // 配了 sleep.whale.model 才会走鲸眠会话（会更慢、更贵，按钮文案会提醒）。
+      const sleepBig = async () => {
+        setBigBusy(true)
+        setErr('')
+        setBigResult(null)
+        try {
+          const payload = {
+            start: bigForm.start || undefined,
+            end: bigForm.end || undefined,
+            limit: Number(bigForm.limit) || 0,
+            dry_run: bigForm.dry === true,
+            template: bigForm.template !== false,
+            skip_digested: bigForm.skipDigested === true,
+          }
+          const data = await api('/sleep/big', { method: 'POST', body: JSON.stringify(payload) })
+          if (!data?.ok) {
+            setErr(`大睡失败：${data?.error || data?.data?.error?.message || '未知'}`)
+          } else {
+            setBigResult(data.data)
+            notify(data.data?.dry_run ? '演练完成，没有落库' : '大睡完成')
+          }
+          await loadNight()
+        } catch (error) {
+          setErr(`大睡失败：${error.message}`)
+        } finally {
+          setBigBusy(false)
         }
       }
 
@@ -646,6 +683,10 @@ window.__ModuleLoader__.load({
               disabled: sleeping,
               onClick: () => void sleepNow(),
             }, sleeping ? '入睡中…' : '现在入睡'),
+            h('button', {
+              className: 'pmem-btn',
+              onClick: () => { setTab('night'); setBigOpen(true) },
+            }, '大睡一场'),
             h('span', { className: 'pmem-row-sub', style: { opacity: .7 } }, '八阶段：收集→去重→关系→冲突→规律→特质→反思→快照'),
           )),
         ),
@@ -850,8 +891,82 @@ window.__ModuleLoader__.load({
             disabled: nightLoading,
             onClick: () => void loadNight(),
           }, nightLoading ? '刷新中…' : '刷新'),
+          h('button', {
+            className: 'pmem-btn',
+            onClick: () => setBigOpen(prev => !prev),
+          }, bigOpen ? '收起大睡' : '大睡一场'),
           h('span', { className: 'pmem-row-sub' }, '八阶段：收集→去重→关系→冲突→规律→特质→反思→快照'),
         ),
+        bigOpen
+          ? h('div', {
+              style: {
+                margin: '10px 0', padding: '10px 12px',
+                border: '1px solid rgba(120,140,180,.25)', borderRadius: '8px',
+              },
+            },
+              h('p', { className: 'pmem-row-sub' },
+                '大睡一场：把已有的记忆按天从头睡一遍。默认全部日期；模板模式不调模型、不花钱。'),
+              h('div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginTop: '6px' } },
+                h('span', { className: 'pmem-row-sub' }, '从'),
+                h('input', {
+                  className: 'pmem-input',
+                  type: 'date',
+                  value: bigForm.start,
+                  onChange: event => setBigForm(prev => ({ ...prev, start: event.target.value })),
+                }),
+                h('span', { className: 'pmem-row-sub' }, '到'),
+                h('input', {
+                  className: 'pmem-input',
+                  type: 'date',
+                  value: bigForm.end,
+                  onChange: event => setBigForm(prev => ({ ...prev, end: event.target.value })),
+                }),
+                h('span', { className: 'pmem-row-sub' }, '最多'),
+                h('input', {
+                  className: 'pmem-input',
+                  type: 'number',
+                  min: 0,
+                  placeholder: '全部',
+                  style: { width: '90px' },
+                  value: bigForm.limit,
+                  onChange: event => setBigForm(prev => ({ ...prev, limit: event.target.value })),
+                }),
+                h('span', { className: 'pmem-row-sub' }, '天'),
+              ),
+              h('div', { style: { display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', marginTop: '8px' } },
+                h('label', { className: 'pmem-row-sub' },
+                  h('input', {
+                    type: 'checkbox',
+                    checked: bigForm.template,
+                    onChange: event => setBigForm(prev => ({ ...prev, template: event.target.checked })),
+                  }), ' 模板模式（0 成本）'),
+                h('label', { className: 'pmem-row-sub' },
+                  h('input', {
+                    type: 'checkbox',
+                    checked: bigForm.skipDigested,
+                    onChange: event => setBigForm(prev => ({ ...prev, skipDigested: event.target.checked })),
+                  }), ' 只睡没消化的天'),
+                h('label', { className: 'pmem-row-sub' },
+                  h('input', {
+                    type: 'checkbox',
+                    checked: bigForm.dry,
+                    onChange: event => setBigForm(prev => ({ ...prev, dry: event.target.checked })),
+                  }), ' 演练（不落库）'),
+                h('button', {
+                  className: 'pmem-btn',
+                  disabled: bigBusy,
+                  onClick: () => void sleepBig(),
+                }, bigBusy ? '大睡中…' : '开始大睡'),
+              ),
+              bigResult
+                ? h('p', { className: 'pmem-note' },
+                    `大睡完成：${bigResult.days ?? 0} 天（鲸眠 ${bigResult.whale_days ?? 0} / `
+                    + `模板 ${bigResult.template_days ?? 0} / 跳过 ${bigResult.skipped_days ?? 0} / `
+                    + `失败 ${bigResult.failed_days ?? 0}），用时 ${bigResult.elapsed_s ?? 0}s`
+                    + `${bigResult.dry_run ? '（演练，未落库）' : ''}`
+                    + `${bigResult.note ? `；${bigResult.note}` : ''}`)
+                : null)
+          : null,
         nightError
           ? h('p', { className: 'pmem-err', role: 'alert' }, nightError)
           : nightRuns.length
