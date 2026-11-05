@@ -165,7 +165,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 | ![](docs/images/console-entity-merge.png) | 合并预览（dry_run，不写库） |
 | ![](docs/images/console-sleep.png) | 睡眠页：八阶段 + 每阶段耗时/条数 + 质量趋势 |
 | ![](docs/images/console-settings.png) | 设置页：旧七标签已删，只剩「打开控制台」 |
-| ![](docs/images/console-settings-open.png) | 点「打开控制台」后弹窗关闭、整页控制台接管 |
+| ![](docs/images/console-settings-open.png) | 点「打开控制台」后弹窗关闭、整页控制台接管 |\n| ![](docs/images/console-status-model-header.png) | 顶栏三盏灯：数据库 / 模型通道 / MCP（0.8.1 起模型通道接宿主探测） |
 
 所有操作都走同源 `fetch`，不开新窗口、不整页跳转（桌面壳会静默 deny / 401）。
 空库时总览给引导卡（建库 / 写第一条 / 导入 JSONL / 看文档）。
