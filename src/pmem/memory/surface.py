@@ -108,6 +108,20 @@ _LAST_TOUCH = (
     "m.created_at)"
 )
 
+# 撤回 / 被去重吸收的记忆不能再被浮现端出来。
+#
+# - **撤回**：``retract`` 落到 ``status='archived'`` + 一条 ``memory.retract`` 事件。
+#   「撤回态」= archived 且存在撤回事件（和 ``store.get`` 的 ``retracted`` 判定同一口径）：
+#   用户 ``update --status active`` 恢复之后事件还在，但这条记忆该重新可见。
+#   所以这里判的是「archived 且撤回」，不是「有撤回事件」——后者会让恢复变成假动作。
+# - **吸收**：去重合并把被吸收行 ``canonical_id`` 指向代表行并归档。那条事实由代表行
+#   承担，被吸收行再露头就是同一条事实浮现两次（原文仍可用 trace 查到）。
+_RETRACT_EVENT_SQL = (
+    "EXISTS (SELECT 1 FROM event_log e WHERE e.op='memory.retract' "
+    "AND e.target_tbl='memory' AND e.target_id=m.id)"
+)
+_NOT_SURFACED_SQL = f"m.canonical_id IS NULL AND NOT (m.status='archived' AND {_RETRACT_EVENT_SQL})"
+
 
 def _identity_memories(db: Any, subject: str, limit: int = 4) -> list[Any]:
     rows = db.conn.execute(
@@ -245,6 +259,7 @@ def _rhythm_candidates(db: Any, subject: str, limit: int = 12) -> list[Any]:
         "AND NOT EXISTS (SELECT 1 FROM grp_member gm JOIN grp g ON g.id=gm.grp_id "
         "  WHERE gm.target_tbl='memory' AND gm.target_id=m.id AND g.status='active' "
         "  AND (g.path='我们' OR g.path LIKE '我们/%')) "
+        "AND " + _NOT_SURFACED_SQL + " "
         "ORDER BY " + _LAST_TOUCH + " ASC LIMIT ?",
         (subject, limit),
     ).fetchall()
@@ -294,6 +309,7 @@ def _fair_candidate(db: Any, subject: str, surfaced: set[tuple[str, str]]) -> An
         "AND NOT EXISTS (SELECT 1 FROM grp_member gm JOIN grp g ON g.id=gm.grp_id "
         "  WHERE gm.target_tbl='memory' AND gm.target_id=m.id AND g.status='active' "
         "  AND (g.path='我们' OR g.path LIKE '我们/%')) "
+        "AND " + _NOT_SURFACED_SQL + " "
         "ORDER BY " + _LAST_TOUCH + " ASC, m.id ASC LIMIT 12",
         (subject,),
     ).fetchall()

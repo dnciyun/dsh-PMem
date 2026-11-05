@@ -29,37 +29,39 @@ def apply(
 ) -> dict[str, Any]:
     if signal not in SIGNALS:
         raise ValueError(f"unknown signal: {signal}")
-    row = db.conn.execute("SELECT * FROM memory WHERE id=?", (memory_id,)).fetchone()
-    if row is None:
-        raise KeyError(memory_id)
-
-    importance = row["importance"]
-    confidence = row["confidence"]
-    pinned = row["pinned"]
-    status = row["status"]
-    use_count = row["use_count"]
-
-    if signal == "useful":
-        importance = min(1.0, importance + 0.03)
-        use_count += 1
-    elif signal == "irrelevant":
-        importance = max(0.0, importance * 0.8)
-    elif signal == "confirm":
-        confidence = min(CONF_CAP, confidence + 0.08)
-        if status in ("contested", "candidate"):
-            status = "active"
-    elif signal in ("wrong", "deny"):
-        # 反证：可信度腰斩 + 隔离，等人工裁决；绝不自动删除
-        confidence = round(confidence * scoring.CONF_DEMOTION, 4)
-        status = "contested"
-    elif signal == "pin":
-        pinned = 1
-        importance = 1.0
-    elif signal == "unpin":
-        pinned = 0
-
-    extra_changed = signal in ("useful", "confirm")
+    # 读-改-写整体在同一个事务里：并发 feedback/receipt 不会互相覆盖 use_count/importance
+    # （旧实现先读整行、再写绝对值，审计里是一条真实的丢更新路径）。
     with db.tx() as conn:
+        row = conn.execute("SELECT * FROM memory WHERE id=?", (memory_id,)).fetchone()
+        if row is None:
+            raise KeyError(memory_id)
+
+        importance = row["importance"]
+        confidence = row["confidence"]
+        pinned = row["pinned"]
+        status = row["status"]
+        use_count = row["use_count"]
+
+        if signal == "useful":
+            importance = min(1.0, importance + 0.03)
+            use_count += 1
+        elif signal == "irrelevant":
+            importance = max(0.0, importance * 0.8)
+        elif signal == "confirm":
+            confidence = min(CONF_CAP, confidence + 0.08)
+            if status in ("contested", "candidate"):
+                status = "active"
+        elif signal in ("wrong", "deny"):
+            # 反证：可信度腰斩 + 隔离，等人工裁决；绝不自动删除
+            confidence = round(confidence * scoring.CONF_DEMOTION, 4)
+            status = "contested"
+        elif signal == "pin":
+            pinned = 1
+            importance = 1.0
+        elif signal == "unpin":
+            pinned = 0
+
+        extra_changed = signal in ("useful", "confirm")
         conn.execute(
             "UPDATE memory SET importance=?, confidence=?, pinned=?, status=?, use_count=?, "
             "last_used_at=CASE WHEN ? THEN ? ELSE last_used_at END WHERE id=?",

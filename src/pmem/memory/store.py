@@ -49,6 +49,56 @@ def _json_dump(data: dict[str, Any] | None) -> str:
     return json.dumps(data or {}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
+_EVIDENCE_JSON_TABLES = ("trait", "pattern", "experience")
+
+
+def _drop_evidence_ref(conn: Any, table: str, memory_id: str) -> tuple[int, int]:
+    """从派生表的 ``evidence_json`` 里摘掉指向 ``memory_id`` 的条目。
+
+    返回 ``(updated_rows, deleted_rows)``。摘完变空的行**整行删除**：派生行
+    没有证据就是无源结论（违反 I3），留着比删掉更糟；它们都能从原文重建。
+    重新序列化用 canonical JSON，和 ``sleep.common.evidence`` / ``trait.derive``
+    的写法一致（重跑比较不抖动）。
+    """
+    updated = 0
+    deleted = 0
+    rows = conn.execute(
+        f"SELECT id, evidence_json FROM {table} WHERE evidence_json LIKE ?",
+        (f"%{memory_id}%",),
+    ).fetchall()
+    for row in rows:
+        try:
+            items = json.loads(row["evidence_json"] or "[]")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if not isinstance(items, list):
+            continue
+        kept = [
+            item
+            for item in items
+            if not (isinstance(item, dict) and item.get("memory_id") == memory_id)
+        ]
+        if len(kept) == len(items):
+            continue
+        updated += 1
+        if kept:
+            conn.execute(
+                f"UPDATE {table} SET evidence_json=? WHERE id=?",
+                (
+                    json.dumps(kept, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+                    row["id"],
+                ),
+            )
+        else:
+            # trait 的版本链有自引用外键（prev_id REFERENCES trait(id)）：先断开
+            # 指向它的版本，再删，否则硬删会被 FOREIGN KEY 卡住。
+            if table == "trait":
+                conn.execute("UPDATE trait SET prev_id=NULL WHERE prev_id=?", (row["id"],))
+            conn.execute(f"DELETE FROM {table} WHERE id=?", (row["id"],))
+            deleted += 1
+    return updated, deleted
+
+
 class MemoryStore:
     """记忆内核。一个实例绑定一个库 + 一个主体。"""
 
@@ -127,19 +177,14 @@ class MemoryStore:
         digest = sha256_hex(norm)
         session = session_id or f"adhoc-{ulid()[:10]}"
 
-        existing = self.db.conn.execute(
-            "SELECT * FROM memory WHERE subject_id=? AND text_sha256=? AND status<>'deleted' "
-            "ORDER BY created_at LIMIT 1",
-            (self.subject, digest),
-        ).fetchone()
-
-        if existing is not None:
-            result = self._merge_existing(existing, provenance, session, actor, idem_key, dry_run)
-            if not dry_run:
-                result.update(
-                    self._attach_meta(existing["id"], groups, grade, grade_reason)
-                )
-            return result
+        if dry_run:
+            existing = self.db.conn.execute(
+                "SELECT * FROM memory WHERE subject_id=? AND text_sha256=? AND status<>'deleted' "
+                "ORDER BY created_at LIMIT 1",
+                (self.subject, digest),
+            ).fetchone()
+            if existing is not None:
+                return self._merge_existing(existing, provenance, session, actor, idem_key, dry_run=True)
 
         imp = scoring.importance(
             provenance=provenance,
@@ -203,6 +248,19 @@ class MemoryStore:
             }
 
         with self.db.tx() as conn:
+            # 去重检查必须在 BEGIN IMMEDIATE **之后**：并发同文时后到者能看见先提交的行，
+            # 于是走「并证据」而不是各插一条（审计实测 16 线程同文会写出 1~9 条重复）。
+            existing = conn.execute(
+                "SELECT * FROM memory WHERE subject_id=? AND text_sha256=? AND status<>'deleted' "
+                "ORDER BY created_at LIMIT 1",
+                (self.subject, digest),
+            ).fetchone()
+            if existing is not None:
+                result = self._merge_existing(
+                    existing, provenance, session, actor, idem_key, dry_run=False
+                )
+                result.update(self._attach_meta(existing["id"], groups, grade, grade_reason))
+                return result
             self._insert(conn, row)
             seq = int(conn.execute("SELECT seq FROM memory WHERE id=?", (mem_id,)).fetchone()["seq"])
             # 关联图增量连边：新记忆和谁说过同一件事，入库时就定下来。
@@ -302,44 +360,70 @@ class MemoryStore:
         idem_key: str | None,
         dry_run: bool,
     ) -> dict[str, Any]:
-        """同一条原文再次入库：不新增行，只并证据（同会话不重复计）。"""
-        extra = _json_load(existing["extra_json"])
-        tiers: list[str] = list(extra.get("evidence_tiers") or [existing["provenance"]])
-        same_session = existing["session_id"] == session
-        if not same_session:
-            tiers.append(provenance)
-        conf = scoring.confidence_from_tiers(existing["provenance"], tiers)
-        new_evidence = 0 if same_session else 1
-        extra.update({"evidence_tiers": tiers, "evidence_sessions": len(tiers)})
+        """同一条原文再次入库：不新增行，只并证据（同会话不重复计）。
 
-        if not dry_run:
-            with self.db.tx() as conn:
-                conn.execute(
-                    "UPDATE memory SET evidence_count=evidence_count+?, confidence=?, extra_json=? WHERE id=?",
-                    (new_evidence, conf, _json_dump(extra), existing["id"]),
-                )
-                events.append(
-                    conn,
-                    actor=actor,
-                    op="memory.evidence",
-                    target_tbl="memory",
-                    target_id=existing["id"],
-                    subject_id=self.subject,
-                    payload={"new_evidence": new_evidence, "sessions": len(tiers)},
-                    idem_key=idem_key,
-                )
-                if idem_key:
-                    events.idem_remember(conn, idem_key, "memory.evidence", existing["id"])
+        读-改-写整体在同一个 ``tx()`` 里：并发合并时后到者读到的是前者提交后的
+        ``extra_json``，不会把 ``evidence_tiers/evidence_sessions`` 覆盖回旧值
+        （审计实测 16 并发合并曾出现 count=17 但 sessions=4 的丢更新）。
+        """
 
-        return {
-            "id": existing["id"],
-            "status": existing["status"],
-            "importance": existing["importance"],
-            "confidence": conf,
-            "duplicate_of": existing["id"],
-            "sanitized": False,
-            "idempotent_replay": False,
-        }
+        def _compute(row: Any) -> dict[str, Any]:
+            extra = _json_load(row["extra_json"])
+            tiers: list[str] = list(extra.get("evidence_tiers") or [row["provenance"]])
+            same_session = row["session_id"] == session
+            if not same_session:
+                tiers.append(provenance)
+            conf = scoring.confidence_from_tiers(row["provenance"], tiers)
+            new_evidence = 0 if same_session else 1
+            extra.update({"evidence_tiers": tiers, "evidence_sessions": len(tiers)})
+            return {"extra": extra, "tiers": tiers, "conf": conf, "new_evidence": new_evidence}
+
+        if dry_run:
+            calc = _compute(existing)
+            return {
+                "id": existing["id"],
+                "status": existing["status"],
+                "importance": existing["importance"],
+                "confidence": calc["conf"],
+                "duplicate_of": existing["id"],
+                "sanitized": False,
+                "idempotent_replay": False,
+            }
+
+        with self.db.tx() as conn:
+            fresh = conn.execute(
+                "SELECT * FROM memory WHERE id=? AND status<>'deleted'", (existing["id"],)
+            ).fetchone()
+            if fresh is None:
+                # 极小概率：并证据前这条被另一个进程真删了。别把幽灵 id 写进事件。
+                raise NotFoundError(f"记忆 {existing['id']} 在合并前已被删除", field="id")
+            calc = _compute(fresh)
+            conn.execute(
+                "UPDATE memory SET evidence_count=evidence_count+?, confidence=?, extra_json=? WHERE id=?",
+                (calc["new_evidence"], calc["conf"], _json_dump(calc["extra"]), fresh["id"]),
+            )
+            events.append(
+                conn,
+                actor=actor,
+                op="memory.evidence",
+                target_tbl="memory",
+                target_id=fresh["id"],
+                subject_id=self.subject,
+                payload={"new_evidence": calc["new_evidence"], "sessions": len(calc["tiers"])},
+                idem_key=idem_key,
+            )
+            if idem_key:
+                events.idem_remember(conn, idem_key, "memory.evidence", fresh["id"])
+            result = {
+                "id": fresh["id"],
+                "status": fresh["status"],
+                "importance": fresh["importance"],
+                "confidence": calc["conf"],
+                "duplicate_of": fresh["id"],
+                "sanitized": False,
+                "idempotent_replay": False,
+            }
+        return result
 
     def _insert(self, conn: Any, row: dict[str, Any]) -> None:
         cols = ", ".join(row)
@@ -523,16 +607,27 @@ class MemoryStore:
                 )
             return {"deleted": 1, "hard": False, "cascaded": {}}
 
-        cascaded = {
-            "entity_mention": self.db.conn.execute(
-                "SELECT COUNT(*) c FROM entity_mention WHERE memory_seq=?", (row["seq"],)
-            ).fetchone()["c"],
-            "relation_refs": self.db.conn.execute(
-                "SELECT COUNT(*) c FROM relation WHERE evidence_json LIKE ?", (f"%{memory_id}%",)
-            ).fetchone()["c"],
-        }
         with self.db.tx() as conn:
-            # 真删会级联清掉 mention，但关系证据是 JSON，必须手动摘掉悬空指针（I4）
+            cascaded: dict[str, int] = {}
+            # 真删会级联清掉 mention（FK ON DELETE CASCADE），但证据是 JSON，
+            # 必须手动摘掉悬空指针；先记下受影响实体，删完重算热度。
+            affected_entities = [
+                str(item["entity_id"])
+                for item in conn.execute(
+                    "SELECT DISTINCT entity_id FROM entity_mention WHERE memory_seq=?", (row["seq"],)
+                ).fetchall()
+            ]
+            cascaded["entity_mention"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM entity_mention WHERE memory_seq=?", (row["seq"],)
+                ).fetchone()["c"]
+            )
+            cascaded["relation_refs"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM relation WHERE evidence_json LIKE ?",
+                    (f"%{memory_id}%",),
+                ).fetchone()["c"]
+            )
             for rel in conn.execute(
                 "SELECT id, evidence_json FROM relation WHERE evidence_json LIKE ?",
                 (f"%{memory_id}%",),
@@ -553,6 +648,68 @@ class MemoryStore:
                     )
                 else:
                     conn.execute("DELETE FROM relation WHERE id=?", (rel["id"],))
+
+            # 派生行里的证据指针（trait/pattern/experience）：摘条目；摘空则删行。
+            for table in _EVIDENCE_JSON_TABLES:
+                updated, deleted = _drop_evidence_ref(conn, table, memory_id)
+                cascaded[f"{table}_refs"] = updated
+                if deleted:
+                    cascaded[f"{table}_deleted"] = deleted
+
+            # conflict 的 left_id/right_id 是 NOT NULL（schema 约束），不能置 NULL；
+            # 冲突是派生状态，直接删行（重跑 sleep 会重新检测），避免留下悬空引用。
+            cascaded["conflicts"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM conflict WHERE "
+                    "(left_tbl='memory' AND left_id=?) OR (right_tbl='memory' AND right_id=?)",
+                    (memory_id, memory_id),
+                ).fetchone()["c"]
+            )
+            conn.execute(
+                "DELETE FROM conflict WHERE "
+                "(left_tbl='memory' AND left_id=?) OR (right_tbl='memory' AND right_id=?)",
+                (memory_id, memory_id),
+            )
+
+            # feedback.target_id 也是 NOT NULL：同样只能删行（反馈是对这条记忆的表态，
+            # 记忆真删后它已经没有意义）。
+            cascaded["feedback"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM feedback WHERE target_tbl='memory' AND target_id=?",
+                    (memory_id,),
+                ).fetchone()["c"]
+            )
+            conn.execute(
+                "DELETE FROM feedback WHERE target_tbl='memory' AND target_id=?", (memory_id,)
+            )
+
+            # 幂等键：普通写入的幂等键随记忆一起清掉；
+            # ``journal:*`` 键必须保留——repair 靠它判断「派生过、后来被删 → 不复活」
+            # （tests/test_journal_repair.py 的两条用例就是守这个语义）。
+            cascaded["idem"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM idem WHERE target_id=? AND key NOT LIKE 'journal:%'",
+                    (memory_id,),
+                ).fetchone()["c"]
+            )
+            conn.execute(
+                "DELETE FROM idem WHERE target_id=? AND key NOT LIKE 'journal:%'", (memory_id,)
+            )
+            cascaded["journal_idem_kept"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM idem WHERE target_id=? AND key LIKE 'journal:%'",
+                    (memory_id,),
+                ).fetchone()["c"]
+            )
+
+            # superseded_by 没有外键，需要手动清；supersedes_id 有 ON DELETE SET NULL，自动清。
+            cascaded["superseded_cleared"] = int(
+                conn.execute(
+                    "SELECT COUNT(*) c FROM memory WHERE superseded_by=?", (memory_id,)
+                ).fetchone()["c"]
+            )
+            conn.execute("UPDATE memory SET superseded_by=NULL WHERE superseded_by=?", (memory_id,))
+
             conn.execute("DELETE FROM memory WHERE id=?", (memory_id,))
             conn.execute(
                 "DELETE FROM grp_member WHERE target_tbl='memory' AND target_id=?", (memory_id,)
@@ -563,6 +720,16 @@ class MemoryStore:
             conn.execute(
                 "DELETE FROM surface_log WHERE target_tbl='memory' AND target_id=?", (memory_id,)
             )
+
+            # 实体热度重算：mention 行被级联删了，mention_count 必须跟着降。
+            for entity_id in affected_entities:
+                conn.execute(
+                    "UPDATE entity SET mention_count=(SELECT COUNT(*) FROM entity_mention "
+                    "WHERE entity_id=?) WHERE id=?",
+                    (entity_id, entity_id),
+                )
+            cascaded["entities_recounted"] = len(affected_entities)
+
             events.append(
                 conn,
                 actor=actor,
@@ -570,7 +737,7 @@ class MemoryStore:
                 target_tbl="memory",
                 target_id=memory_id,
                 subject_id=self.subject,
-                payload={"reason": reason, "tombstone": True},
+                payload={"reason": reason, "tombstone": True, "cascaded": cascaded},
             )
         return {"deleted": 1, "hard": True, "cascaded": cascaded}
 

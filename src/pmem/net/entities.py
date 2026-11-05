@@ -638,117 +638,121 @@ def find(db: Any, *, subject: str, name: str) -> list[Any]:
 
 
 def merge(db: Any, keep_id: str, drop_id: str, *, actor: str = "system:net") -> dict[str, Any]:
-    """把 ``drop`` 并入 ``keep``：别名、提及、关系全部改挂，旧实体留墓碑。"""
+    """把 ``drop`` 并入 ``keep``：别名、提及、关系全部改挂，旧实体留墓碑。
+
+    整段结构变更 + 事件在**同一个事务**里：中途失败（锁冲突/进程被杀）不会留下
+    「别名/提及移了一半、旧实体还 active」的半合并状态。
+    """
     if keep_id == drop_id:
         raise ValueError("不能合并到自身")
-    keep = db.conn.execute("SELECT * FROM entity WHERE id=? AND status='active'", (keep_id,)).fetchone()
-    drop = db.conn.execute("SELECT * FROM entity WHERE id=? AND status='active'", (drop_id,)).fetchone()
-    if keep is None or drop is None:
-        raise KeyError("实体不存在或已合并")
-
-    moved_alias = 0
-    for row in db.conn.execute("SELECT * FROM entity_alias WHERE entity_id=?", (drop_id,)).fetchall():
-        if add_alias(db, keep_id, row["alias"], source=row["source"], confidence=row["confidence"]):
-            moved_alias += 1
-    # 被合并方自己的名字/归一化名也作为别名保留
-    add_alias(db, keep_id, drop["name"], source="merge", confidence=0.9)
-    add_alias(db, keep_id, drop["name_norm"], source="merge", confidence=0.9)
-
-    moved_mention = 0
-    for row in db.conn.execute("SELECT * FROM entity_mention WHERE entity_id=?", (drop_id,)).fetchall():
-        dup = db.conn.execute(
-            "SELECT 1 FROM entity_mention WHERE entity_id=? AND memory_seq=? AND span_start=?",
-            (keep_id, row["memory_seq"], row["span_start"]),
-        ).fetchone()
-        if dup:
-            db.conn.execute("DELETE FROM entity_mention WHERE seq=?", (row["seq"],))
-            continue
-        db.conn.execute("UPDATE entity_mention SET entity_id=? WHERE seq=?", (keep_id, row["seq"]))
-        moved_mention += 1
-
-    # 分组/等级也改挂到保留实体；两边都有等级时留更强的那个
-    for member in db.conn.execute(
-        "SELECT * FROM grp_member WHERE target_tbl='entity' AND target_id=?", (drop_id,)
-    ).fetchall():
-        dup = db.conn.execute(
-            "SELECT 1 FROM grp_member WHERE grp_id=? AND target_tbl='entity' AND target_id=?",
-            (member["grp_id"], keep_id),
-        ).fetchone()
-        if dup:
-            db.conn.execute("DELETE FROM grp_member WHERE id=?", (member["id"],))
-        else:
-            db.conn.execute("UPDATE grp_member SET target_id=? WHERE id=?", (keep_id, member["id"]))
-    keep_grade = db.conn.execute(
-        "SELECT grade FROM target_grade WHERE target_tbl='entity' AND target_id=?", (keep_id,)
-    ).fetchone()
-    drop_grade = db.conn.execute(
-        "SELECT * FROM target_grade WHERE target_tbl='entity' AND target_id=?", (drop_id,)
-    ).fetchone()
-    if drop_grade is not None:
-        order = {"S": 0, "A": 1, "B": 2, "C": 3, "D": 4}
-        if keep_grade is None or order.get(drop_grade["grade"], 9) < order.get(keep_grade["grade"], 9):
-            db.conn.execute(
-                "INSERT INTO target_grade(target_tbl, target_id, grade, rationale, evidence_json, "
-                "assigned_by, created_at, updated_at) VALUES('entity',?,?,?,?,?,?,?) "
-                "ON CONFLICT(target_tbl, target_id) DO UPDATE SET grade=excluded.grade, "
-                "rationale=excluded.rationale, evidence_json=excluded.evidence_json, "
-                "assigned_by=excluded.assigned_by, updated_at=excluded.updated_at",
-                (
-                    keep_id,
-                    drop_grade["grade"],
-                    drop_grade["rationale"],
-                    drop_grade["evidence_json"],
-                    drop_grade["assigned_by"],
-                    drop_grade["created_at"],
-                    now_iso(),
-                ),
-            )
-        db.conn.execute(
-            "DELETE FROM target_grade WHERE target_tbl='entity' AND target_id=?", (drop_id,)
-        )
-
-    moved_rel = 0
-    for row in db.conn.execute(
-        "SELECT * FROM relation WHERE src_id=? OR dst_id=?", (drop_id, drop_id)
-    ).fetchall():
-        src_id = keep_id if row["src_id"] == drop_id else row["src_id"]
-        dst_id = keep_id if row["dst_id"] == drop_id else row["dst_id"]
-        if src_id == dst_id:
-            db.conn.execute("DELETE FROM relation WHERE id=?", (row["id"],))
-            continue
-        dup = db.conn.execute(
-            "SELECT * FROM relation WHERE src_id=? AND dst_id=? AND predicate=? "
-            "AND status IN ('active','contested')",
-            (src_id, dst_id, row["predicate"]),
-        ).fetchone()
-        if dup and dup["id"] != row["id"]:
-            evidence = _merge_evidence(dup["evidence_json"], row["evidence_json"])
-            db.conn.execute(
-                "UPDATE relation SET weight=?, confidence=?, evidence_json=?, updated_at=? WHERE id=?",
-                (
-                    max(dup["weight"], row["weight"]),
-                    max(dup["confidence"], row["confidence"]),
-                    evidence,
-                    now_iso(),
-                    dup["id"],
-                ),
-            )
-            db.conn.execute("DELETE FROM relation WHERE id=?", (row["id"],))
-        else:
-            db.conn.execute("UPDATE relation SET src_id=?, dst_id=? WHERE id=?", (src_id, dst_id, row["id"]))
-        moved_rel += 1
-
-    db.conn.execute(
-        "UPDATE entity SET status='merged', canonical_id=? WHERE id=?", (keep_id, drop_id)
-    )
-    db.conn.execute(
-        "UPDATE entity SET mention_count=(SELECT COUNT(*) FROM entity_mention WHERE entity_id=?), "
-        "last_seen=? WHERE id=?",
-        (keep_id, now_iso(), keep_id),
-    )
-    # 合并会改挂别名/提及/关系/分组/等级，是事实层的结构性变更：留一条事件，
-    # 否则「这个实体去哪了」在 event_log 里查不到（只有 status='merged'+canonical_id 可猜）。
     with db.tx() as conn:
+        keep = conn.execute("SELECT * FROM entity WHERE id=? AND status='active'", (keep_id,)).fetchone()
+        drop = conn.execute("SELECT * FROM entity WHERE id=? AND status='active'", (drop_id,)).fetchone()
+        if keep is None or drop is None:
+            raise KeyError("实体不存在或已合并")
+
+        moved_alias = 0
+        for row in conn.execute("SELECT * FROM entity_alias WHERE entity_id=?", (drop_id,)).fetchall():
+            if add_alias(db, keep_id, row["alias"], source=row["source"], confidence=row["confidence"]):
+                moved_alias += 1
+        # 被合并方自己的名字/归一化名也作为别名保留
+        add_alias(db, keep_id, drop["name"], source="merge", confidence=0.9)
+        add_alias(db, keep_id, drop["name_norm"], source="merge", confidence=0.9)
+
+        moved_mention = 0
+        for row in conn.execute("SELECT * FROM entity_mention WHERE entity_id=?", (drop_id,)).fetchall():
+            dup = conn.execute(
+                "SELECT 1 FROM entity_mention WHERE entity_id=? AND memory_seq=? AND span_start=?",
+                (keep_id, row["memory_seq"], row["span_start"]),
+            ).fetchone()
+            if dup:
+                conn.execute("DELETE FROM entity_mention WHERE seq=?", (row["seq"],))
+                continue
+            conn.execute("UPDATE entity_mention SET entity_id=? WHERE seq=?", (keep_id, row["seq"]))
+            moved_mention += 1
+
+        # 分组/等级也改挂到保留实体；两边都有等级时留更强的那个
+        for member in conn.execute(
+            "SELECT * FROM grp_member WHERE target_tbl='entity' AND target_id=?", (drop_id,)
+        ).fetchall():
+            dup = conn.execute(
+                "SELECT 1 FROM grp_member WHERE grp_id=? AND target_tbl='entity' AND target_id=?",
+                (member["grp_id"], keep_id),
+            ).fetchone()
+            if dup:
+                conn.execute("DELETE FROM grp_member WHERE id=?", (member["id"],))
+            else:
+                conn.execute("UPDATE grp_member SET target_id=? WHERE id=?", (keep_id, member["id"]))
+        keep_grade = conn.execute(
+            "SELECT grade FROM target_grade WHERE target_tbl='entity' AND target_id=?", (keep_id,)
+        ).fetchone()
+        drop_grade = conn.execute(
+            "SELECT * FROM target_grade WHERE target_tbl='entity' AND target_id=?", (drop_id,)
+        ).fetchone()
+        if drop_grade is not None:
+            order = {"S": 0, "A": 1, "B": 2, "C": 3, "D": 4}
+            if keep_grade is None or order.get(drop_grade["grade"], 9) < order.get(keep_grade["grade"], 9):
+                conn.execute(
+                    "INSERT INTO target_grade(target_tbl, target_id, grade, rationale, evidence_json, "
+                    "assigned_by, created_at, updated_at) VALUES('entity',?,?,?,?,?,?,?) "
+                    "ON CONFLICT(target_tbl, target_id) DO UPDATE SET grade=excluded.grade, "
+                    "rationale=excluded.rationale, evidence_json=excluded.evidence_json, "
+                    "assigned_by=excluded.assigned_by, updated_at=excluded.updated_at",
+                    (
+                        keep_id,
+                        drop_grade["grade"],
+                        drop_grade["rationale"],
+                        drop_grade["evidence_json"],
+                        drop_grade["assigned_by"],
+                        drop_grade["created_at"],
+                        now_iso(),
+                    ),
+                )
+            conn.execute(
+                "DELETE FROM target_grade WHERE target_tbl='entity' AND target_id=?", (drop_id,)
+            )
+
+        moved_rel = 0
+        for row in conn.execute(
+            "SELECT * FROM relation WHERE src_id=? OR dst_id=?", (drop_id, drop_id)
+        ).fetchall():
+            src_id = keep_id if row["src_id"] == drop_id else row["src_id"]
+            dst_id = keep_id if row["dst_id"] == drop_id else row["dst_id"]
+            if src_id == dst_id:
+                conn.execute("DELETE FROM relation WHERE id=?", (row["id"],))
+                continue
+            dup = conn.execute(
+                "SELECT * FROM relation WHERE src_id=? AND dst_id=? AND predicate=? "
+                "AND status IN ('active','contested')",
+                (src_id, dst_id, row["predicate"]),
+            ).fetchone()
+            if dup and dup["id"] != row["id"]:
+                evidence = _merge_evidence(dup["evidence_json"], row["evidence_json"])
+                conn.execute(
+                    "UPDATE relation SET weight=?, confidence=?, evidence_json=?, updated_at=? WHERE id=?",
+                    (
+                        max(dup["weight"], row["weight"]),
+                        max(dup["confidence"], row["confidence"]),
+                        evidence,
+                        now_iso(),
+                        dup["id"],
+                    ),
+                )
+                conn.execute("DELETE FROM relation WHERE id=?", (row["id"],))
+            else:
+                conn.execute("UPDATE relation SET src_id=?, dst_id=? WHERE id=?", (src_id, dst_id, row["id"]))
+            moved_rel += 1
+
+        conn.execute(
+            "UPDATE entity SET status='merged', canonical_id=? WHERE id=?", (keep_id, drop_id)
+        )
+        conn.execute(
+            "UPDATE entity SET mention_count=(SELECT COUNT(*) FROM entity_mention WHERE entity_id=?), "
+            "last_seen=? WHERE id=?",
+            (keep_id, now_iso(), keep_id),
+        )
+        # 合并会改挂别名/提及/关系/分组/等级，是事实层的结构性变更：留一条事件，
+        # 否则「这个实体去哪了」在 event_log 里查不到（只有 status='merged'+canonical_id 可猜）。
         events.append(
             conn,
             actor=actor,

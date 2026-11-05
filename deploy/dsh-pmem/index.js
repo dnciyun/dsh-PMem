@@ -6,7 +6,7 @@
  *      现在 / 上次 / 下次），让上下文清空后的新会话仍然认识你；
  *   2. 会话结束时把「上次停在哪」写回 `我们/停在哪`（自动 handoff），并同步进自我层 `soul/`；
  *   3. 注册 /pmem 命令：wake / recall / remember / stats；
- *   4. 注册 4 个工具：pmem_wake / pmem_recall / pmem_remember / pmem_stats。
+ *   4. 注册 5 个工具：pmem_wake / pmem_recall / pmem_remember / pmem_soul / pmem_stats。
  *
  * 卡不是每轮现算的：插件启动时、以及每 5 分钟异步跑一次
  * `python -m pmem.gate.cli wake`，把结果缓存在内存和
@@ -32,7 +32,7 @@ export const inject = ['systemPrompt', 'tools', 'commands', 'webServer', 'connec
 const execFileAsync = promisify(execFile)
 const PLUGIN_DIR = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = resolve(PLUGIN_DIR, '..', '..')
-const VERSION = '0.7.0'
+const VERSION = '0.7.1'
 const CACHE_DIR = join(process.env.DSH_HOME?.trim() || join(homedir(), '.dsh'), 'pmem')
 const CACHE_FILE = join(CACHE_DIR, 'wake-card.txt')
 // 每轮背景条（M21）：整卡只在会话开始/交接时给一次，每轮注入这一条（~210 token）。
@@ -565,10 +565,21 @@ export function apply(ctx, input = {}) {
     const reply = String(answer || '').replace(/\s+/g, ' ').trim().slice(0, 600)
     if (reply && !TRIVIAL.test(reply)) lines.push({ role: 'assistant', text: reply })
     if (!lines.length) return
-    void callPmem(config, ['journal', 'turn', '--session', state.id, '--lines', JSON.stringify(lines)], {
-      json: true,
-      timeout: 15000,
-    }).catch(() => { /* 记流水失败不能影响会话；下一轮照记 */ })
+    const argv = ['journal', 'turn', '--session', state.id, '--lines', JSON.stringify(lines)]
+    const send = () => callPmem(config, argv, { json: true, timeout: 15000 })
+    // 原话是最贵的一层：失败先重试一次（短延迟），仍失败只 warn，绝不抛给宿主。
+    // 旧实现 ``.catch(() => {})`` 把锁冲突彻底吞掉，那一轮原话就静默丢了。
+    void send()
+      .catch(() => new Promise(resolve => setTimeout(resolve, 300)).then(send))
+      .catch(err => {
+        const message = `[pmem] 日记流水写入失败（已重试 1 次），这一轮原话可能没落库：${err && err.message ? err.message : err}`
+        try {
+          if (ctx && ctx.logger && typeof ctx.logger.warn === 'function') ctx.logger.warn(message)
+          else console.warn(message)
+        } catch {
+          /* 日志失败也不能影响会话 */
+        }
+      })
   }
 
   // 一轮结束后做的事：先判回执，再考虑 handoff。两件事共用一次 session/event。

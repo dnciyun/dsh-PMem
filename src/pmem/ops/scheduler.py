@@ -280,15 +280,34 @@ def journal_tick(db: Database, cfg: Config, subject: str) -> dict[str, Any]:
 
     这件事**不进任务队列**：它每 10 分钟只做一次两行 SQL 的判断，
     真到期了才写；塞进队列反而要维护 last_run 状态，还容易被 sleep 抢走。
+
+    ``prune`` 不跟着 digest 走：它幂等、便宜（一条 DELETE），必须**每 tick 都跑**。
+    否则「今天还不用写日记」或「digest 一直失败」的日子里，过期流水永远清不掉，
+    库会越攒越大——清理不该被写日记的成功与否绑架。
     """
     from ..memory import journal
 
     if not bool(cfg.get("journal.enabled", True)):
         return {"ok": True, "skipped": "disabled"}
+    kept = int(cfg.get("journal.keep_days", 30) or 30)
+    try:
+        pruned = journal.prune(db, subject=subject, keep_days=kept)
+        prune_error: str | None = None
+    except Exception as exc:  # noqa: BLE001 清理失败不能拖垮调度器
+        pruned = 0
+        prune_error = f"{type(exc).__name__}: {exc}"
     idle = int(cfg.get("journal.idle_minutes", 45) or 45)
     verdict = journal.due(db, subject=subject, idle_minutes=idle)
     if not verdict.get("due"):
-        return {"ok": True, "skipped": verdict.get("reason"), "due": verdict}
+        note: dict[str, Any] = {
+            "ok": prune_error is None,
+            "skipped": verdict.get("reason"),
+            "due": verdict,
+            "pruned": pruned,
+        }
+        if prune_error:
+            note["error"] = prune_error
+        return note
     try:
         from ..memory.store import MemoryStore
 
@@ -297,10 +316,12 @@ def journal_tick(db: Database, cfg: Config, subject: str) -> dict[str, Any]:
             db, subject=subject, day_key=verdict.get("day_key"), store=store, config=cfg
         )
     except Exception as exc:  # 写日记失败不能拖垮调度器
-        return {"ok": False, "error": f"{type(exc).__name__}: {exc}", "due": verdict}
-    kept = int(cfg.get("journal.keep_days", 30) or 30)
-    result["pruned"] = journal.prune(db, subject=subject, keep_days=kept)
-    return {"ok": True, "due": verdict, "digest": result}
+        note = {"ok": False, "error": f"{type(exc).__name__}: {exc}", "due": verdict, "pruned": pruned}
+        if prune_error:
+            note["prune_error"] = prune_error
+        return note
+    result["pruned"] = pruned
+    return {"ok": prune_error is None, "due": verdict, "digest": result}
 
 
 def serve(

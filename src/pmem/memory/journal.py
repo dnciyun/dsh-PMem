@@ -142,7 +142,12 @@ def append(
     role: str = ROLE_USER,
     ts: str | None = None,
 ) -> dict[str, Any]:
-    """追加一行流水。原文原样存，不做任何改写。"""
+    """追加一行流水。原文原样存，不做任何改写。
+
+    原文行与 FTS 索引在**同一个事务**里写：锁冲突交给 ``db.tx()`` 的重试语义
+    （等，不丢）；FTS 写失败只影响索引，不影响原文——原文照样提交，失败写事件
+    留痕（``journal.index_failed``），``stats()["unindexed"]`` 也能看到。
+    """
     body = _strip_runtime(text)
     if not body:
         return {"ok": False, "reason": "empty"}
@@ -151,21 +156,36 @@ def append(
     stamp = ts or now_iso()
     line_id = ulid()
     day = today_key() if ts is None else _day_of(stamp)
-    cur = db.conn.execute(
-        "INSERT INTO journal_line(id, subject_id, session_id, day_key, ts, role, text, created_at) "
-        "VALUES(?,?,?,?,?,?,?,?)",
-        (line_id, subject, session_id, day, stamp, role, body, now_iso()),
-    )
-    # 原文兜底索引：派生事实会截断/改人称，原话原样进 FTS，检索薄弱时回来捞。
-    with_index = True
-    try:
-        db.conn.execute(
-            "INSERT INTO journal_fts(rowid, text_seg) VALUES(?,?)",
-            (int(cur.lastrowid), tokenize(body)),
+    indexed = True
+    index_error: str | None = None
+    with db.tx() as conn:
+        cur = conn.execute(
+            "INSERT INTO journal_line(id, subject_id, session_id, day_key, ts, role, text, created_at) "
+            "VALUES(?,?,?,?,?,?,?,?)",
+            (line_id, subject, session_id, day, stamp, role, body, now_iso()),
         )
-    except Exception:  # noqa: BLE001 索引写失败不能挡住原文入库（旧库/只读场景）
-        with_index = False
-    return {"ok": True, "id": line_id, "day_key": day, "role": role, "indexed": with_index}
+        # 原文兜底索引：派生事实会截断/改人称，原话原样进 FTS，检索薄弱时回来捞。
+        try:
+            conn.execute(
+                "INSERT INTO journal_fts(rowid, text_seg) VALUES(?,?)",
+                (int(cur.lastrowid), tokenize(body)),
+            )
+        except Exception as exc:  # noqa: BLE001 索引写失败不能挡住原文入库，但必须留痕
+            indexed = False
+            index_error = f"{type(exc).__name__}: {exc}"
+            events.append(
+                conn,
+                actor="journal",
+                op="journal.index_failed",
+                target_tbl="journal_line",
+                target_id=line_id,
+                subject_id=subject,
+                payload={"error": index_error[:300]},
+            )
+    result: dict[str, Any] = {"ok": True, "id": line_id, "day_key": day, "role": role, "indexed": indexed}
+    if index_error:
+        result["index_error"] = index_error
+    return result
 
 
 # -- 撤回（M27 / 1.10.0） --------------------------------------------------
@@ -688,15 +708,13 @@ def _third_person(text: str) -> str:
     return body
 
 
-def _facts(draft: DayDraft, *, rows: list[Any]) -> list[str]:
-    """日记 → 记忆事实。
+def _facts_with_sources(draft: DayDraft, *, rows: list[Any]) -> list[tuple[str, Any | None]]:
+    """日记 → (事实正文, 来源原话行)；``None`` 表示这条来自日记行兜底。
 
-    **从用户原话派生，不从日记派生**。日记是给人读的（人称、措辞随模型走），
-    事实是要被检索的（必须稳定、可追证）。两者分开之后，
-    模型写得好不好都不会污染证据层——第一版拿日记改写，结果得到
-    「用户我妈说明天过来」，是人称串了的直接后果。
+    为什么要带来源：repair 重放前要判断某条事实的原料是不是**噪声/已撤回**，
+    只有拿到对应 ``journal_line`` 才能判定；只返回字符串就判不了。
     """
-    out: list[str] = []
+    out: list[tuple[str, Any | None]] = []
     seen: set[str] = set()
     for row in rows:
         if row["role"] != ROLE_USER:
@@ -705,7 +723,7 @@ def _facts(draft: DayDraft, *, rows: list[Any]) -> list[str]:
         if len(body) < 4 or body in seen:
             continue
         seen.add(body)
-        out.append(body)
+        out.append((body, row))
     if out:
         return out
     # 一天全是助手的话（少见）：退回日记行，至少留个痕迹
@@ -714,8 +732,19 @@ def _facts(draft: DayDraft, *, rows: list[Any]) -> list[str]:
         if len(body) < 4 or body in seen:
             continue
         seen.add(body)
-        out.append(body[:80])
+        out.append((body[:80], None))
     return out
+
+
+def _facts(draft: DayDraft, *, rows: list[Any]) -> list[str]:
+    """日记 → 记忆事实。
+
+    **从用户原话派生，不从日记派生**。日记是给人读的（人称、措辞随模型走），
+    事实是要被检索的（必须稳定、可追证）。两者分开之后，
+    模型写得好不好都不会污染证据层——第一版拿日记改写，结果得到
+    「用户我妈说明天过来」，是人称串了的直接后果。
+    """
+    return [text for text, _source in _facts_with_sources(draft, rows=rows)]
 
 
 # -- 派生事实的写入与补写（digest / repair 共用）-----------------------------
@@ -737,6 +766,19 @@ REPAIR_WINDOW = 5  # digest 收尾时顺手检查最近几篇日记
 def fact_idem_key(episode_id: str, index: int) -> str:
     """第 ``index`` 条派生事实的幂等键。digest 与 repair 必须用同一个。"""
     return f"journal:{episode_id}:{index}"
+
+
+def fact_skip_idem_key(episode_id: str, index: int) -> str:
+    """第 ``index`` 条事实被**跳过**（噪声/已撤回）时的幂等键。
+
+    格式与 ``fact_idem_key`` 同前缀，W2 的 I20 会认这个后缀：
+    「这条声称派生过，但原料是噪声/撤回过，已明确跳过」= 不算缺。
+    """
+    return f"journal:{episode_id}:{index}:skipped"
+
+
+_SKIP_REASON_NOISE = "noise"
+_SKIP_REASON_RETRACTED = "retracted"
 
 
 def _fact_kwargs(
@@ -813,8 +855,13 @@ def _idem_live_memory(db: Any, key: str) -> str | None:
 
 def _episode_facts(
     db: Any, episode: Any
-) -> tuple[list[str], str | None, str] | None:
+) -> tuple[list[str], list[str | None], str | None, str] | None:
     """重建一篇日记「当时应该派生」的事实清单；原料没了就返回 None。
+
+    返回 ``(facts, skip_reasons, valid_from, mode)``。``skip_reasons`` 与 ``facts``
+    一一对应：``None`` 表示正常重放；``"noise"`` / ``"retracted"`` 表示这条的原料
+    **不该写成事实**（``_strip_runtime`` 判空 / ``journal_retraction`` 里撤回过的），
+    repair 只该写一条 ``journal:{episode_id}:{index}:skipped`` 幂等键交代过去。
 
     为什么从原文重建、而不是把事实清单存进 ``episode.extra_json``：清单就是事实
     正文的副本，存进去会让「删掉一条记忆」删不干净（日记里还留着一份），
@@ -841,7 +888,70 @@ def _episode_facts(
         lines=[line for line in str(episode["summary"] or "").splitlines() if line],
         mode=str(derivation.get("mode") or "template"),
     )
-    return _facts(draft, rows=ordered), ordered[0]["ts"], str(derivation.get("mode") or "template")
+    planned = _facts_with_sources(draft, rows=ordered)
+    ids = [str(row["id"]) for row in ordered]
+    retracted: set[str] = set()
+    if ids:
+        id_marks = ",".join("?" for _ in ids)
+        retracted = {
+            str(row["line_id"])
+            for row in db.conn.execute(
+                f"SELECT line_id FROM journal_retraction WHERE line_id IN ({id_marks})", ids
+            )
+        }
+    skip_reasons: list[str | None] = []
+    for _text, source in planned:
+        if source is None:
+            skip_reasons.append(None)
+            continue
+        line_id = str(source["id"])
+        # 噪声行：存进去的时候没被剥干净（老数据/直写），重放不能变事实。
+        if _strip_runtime(str(source["text"] or "")) == "":
+            skip_reasons.append(_SKIP_REASON_NOISE)
+        elif line_id in retracted:
+            skip_reasons.append(_SKIP_REASON_RETRACTED)
+        else:
+            skip_reasons.append(None)
+    return [text for text, _source in planned], skip_reasons, ordered[0]["ts"], str(derivation.get("mode") or "template")
+
+
+def _mark_fact_skipped(
+    db: Any,
+    *,
+    subject: str,
+    episode_id: str,
+    index: int,
+    reason: str,
+    text: str,
+) -> bool:
+    """把「这条事实已明确跳过」写进幂等键 + 事件；已经写过就幂等返回 False。
+
+    幂等键格式（W2 的 I20 认它，必须一字不差）：
+    ``journal:{episode_id}:{index}:skipped``
+    事件：``op='journal.fact_skipped'``，payload 带 episode_id / index / reason / text 摘要。
+    """
+    key = fact_skip_idem_key(episode_id, index)
+    with db.tx() as conn:
+        prior = conn.execute("SELECT 1 FROM idem WHERE key=?", (key,)).fetchone()
+        if prior is not None:
+            return False
+        events.idem_remember(conn, key, "journal.fact_skipped", episode_id)
+        events.append(
+            conn,
+            actor="journal",
+            op="journal.fact_skipped",
+            target_tbl="episode",
+            target_id=episode_id,
+            subject_id=subject,
+            payload={
+                "episode_id": episode_id,
+                "index": index,
+                "reason": reason,
+                "text": str(text)[:120],
+            },
+            idem_key=key,
+        )
+    return True
 
 
 def repair(
@@ -893,6 +1003,7 @@ def repair(
         "added": 0,  # 补成功几条
         "failed": 0,  # 补失败几条
         "dropped": 0,  # 写过但后来被删/停放的条数（不复活）
+        "skipped": 0,  # 原料是噪声/已撤回、明确跳过不写成事实的条数
         "unrepairable": 0,  # 原料没了、补不出来的篇数
         "remaining": 0,  # 跑完之后仍然对不上的篇数
         "errors": [],
@@ -924,15 +1035,50 @@ def repair(
                 }
             )
             continue
-        facts, valid_from, mode = rebuilt
+        facts, skip_reasons, valid_from, mode = rebuilt
         for index, text in enumerate(facts):
             if index >= claimed:  # memory_count 是权威值；多出来的不补
                 break
             key = fact_idem_key(ep_id, index)
+            skip_key = fact_skip_idem_key(ep_id, index)
             if _idem_live_memory(db, key) is not None:
                 continue  # 已经写成了
             if db.conn.execute("SELECT 1 FROM idem WHERE key=?", (key,)).fetchone() is not None:
                 stats["dropped"] += 1  # 写过、后来被删：不复活
+                continue
+            if db.conn.execute("SELECT 1 FROM idem WHERE key=?", (skip_key,)).fetchone() is not None:
+                continue  # 之前已经判定过「跳过」，幂等
+            reason = skip_reasons[index]
+            if reason:
+                # 原料是噪声/已撤回：不能写成事实，但要明确「这条不算缺」。
+                item = {
+                    "episode_id": ep_id,
+                    "day_key": episode["day_key"],
+                    "index": index,
+                    "text": text,
+                    "reason": reason,
+                }
+                if dry_run:
+                    stats["skipped"] += 1
+                    stats["items"].append({**item, "status": "would-skip"})
+                    continue
+                try:
+                    _mark_fact_skipped(
+                        db,
+                        subject=subject,
+                        episode_id=ep_id,
+                        index=index,
+                        reason=reason,
+                        text=text,
+                    )
+                except Exception as exc:  # noqa: BLE001 写跳过标记失败要留痕、可重试
+                    stats["failed"] += 1
+                    stats["errors"].append(
+                        {"episode_id": ep_id, "index": index, "text": text, "error": str(exc)}
+                    )
+                    continue
+                stats["skipped"] += 1
+                stats["items"].append({**item, "status": "skipped"})
                 continue
             stats["missing"] += 1
             item = {
@@ -1371,6 +1517,54 @@ def rebuild_index(db: Any, *, dry_run: bool = False) -> dict[str, Any]:
     return stats
 
 
+def rebuild_episode_index(db: Any, *, dry_run: bool = False) -> dict[str, Any]:
+    """重建日记索引（``episode_fts``）。
+
+    为什么不能直接 ``INSERT INTO episode_fts(episode_fts) VALUES('rebuild')``：
+    ``episode_fts`` 是**独立 FTS5 表**（没有 external content / content=），
+    没有可依赖的 content 表，FTS5 的 ``rebuild`` 命令用不了。所以和
+    ``rebuild_index`` 一样做「清空 + 全量重灌」。
+
+    映射方式（与 ``index_episode`` / ``ensure_episode_index`` 完全一致，不另发明）：
+    ``episode.rowid`` → ``episode_fts.rowid``；正文 = ``_episode_text(title, summary)``
+    再 ``tokenize()``。``episode.rowid`` 是 SQLite 隐式 rowid，删/重建表后可能变，
+    所以这里每次都按当前 ``episode`` 全表重算，保证 rowid 一致。
+
+    返回：``{"episodes": episode 总篇数, "indexed": 实际写入的索引行数, "dry_run": bool}``。
+    """
+    total = db.conn.execute("SELECT COUNT(*) c FROM episode").fetchone()["c"]
+    stats: dict[str, Any] = {"episodes": int(total), "indexed": 0, "dry_run": bool(dry_run)}
+    if dry_run:
+        return stats
+    rows = db.conn.execute("SELECT rowid, title, summary FROM episode ORDER BY rowid").fetchall()
+    with db.tx() as conn:
+        conn.execute("DELETE FROM episode_fts")
+        done = 0
+        for row in rows:
+            text = _episode_text(row["title"], row["summary"])
+            if not text:
+                continue
+            try:
+                conn.execute(
+                    "INSERT INTO episode_fts(rowid, text_seg) VALUES(?,?)",
+                    (int(row["rowid"]), tokenize(text)),
+                )
+                done += 1
+            except Exception:  # noqa: BLE001 单行失败不挡整批
+                continue
+        stats["indexed"] = done
+        events.append(
+            conn,
+            actor="maintenance",
+            op="journal.episode_reindex",
+            target_tbl="episode_fts",
+            target_id=None,
+            subject_id="self",
+            payload={"episodes": stats["episodes"], "indexed": done},
+        )
+    return stats
+
+
 def ensure_index(db: Any, *, limit: int | None = None) -> int:
     """把还没进 journal_fts 的历史流水补进去。
 
@@ -1413,9 +1607,32 @@ def stats(db: Any, *, subject: str = "self") -> dict[str, Any]:
         row = db.conn.execute(sql, (subject,)).fetchone()
         return int(row[0] or 0) if row else 0
 
+    # 索引可观测性（1.11.x）：原文行与 FTS 行数对不上时必须看得见。
+    # 老库可能没有 journal_fts 表——那不算「坏」，退化为 0。
+    try:
+        fts_rows = int(
+            db.conn.execute(
+                "SELECT COUNT(*) c FROM journal_fts f JOIN journal_line jl ON jl.seq=f.rowid "
+                "WHERE jl.subject_id=?",
+                (subject,),
+            ).fetchone()["c"]
+        )
+        unindexed = int(
+            db.conn.execute(
+                "SELECT COUNT(*) c FROM journal_line jl WHERE jl.subject_id=? "
+                "AND NOT EXISTS (SELECT 1 FROM journal_fts f WHERE f.rowid=jl.seq)",
+                (subject,),
+            ).fetchone()["c"]
+        )
+    except Exception:  # noqa: BLE001 极旧库/只读：没有 FTS 表时如实报 0，不炸 status
+        fts_rows = 0
+        unindexed = 0
+
     return {
         "episodes": _one("SELECT COUNT(*) FROM episode WHERE subject_id=?"),
         "lines": _one("SELECT COUNT(*) FROM journal_line WHERE subject_id=?"),
+        "fts_rows": fts_rows,
+        "unindexed": unindexed,
         "pending": _one(
             "SELECT COUNT(*) FROM journal_line jl WHERE jl.subject_id=? AND jl.episode_id IS NULL "
             "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
@@ -1459,6 +1676,7 @@ __all__ = [
     "pending",
     "pending_days",
     "prune",
+    "rebuild_episode_index",
     "recent",
     "retract",
     "retracted_ids",
