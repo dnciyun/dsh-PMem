@@ -1,9 +1,9 @@
-"""不变量体检的**注册与基线**（I1–I22 中 check_all 负责的 19 条）。
+"""不变量体检的**注册与基线**（I1–I23 中 check_all 负责的 20 条）。
 
 逐条特例（I4 扩表 / I21 FTS 漂移 / I22 事件链锚点 / I20 skip key）在
 ``tests/test_invariants_extra.py``；这里只钉住「有哪些条、干净库全绿、summary 形状」。
 
-为什么项数是 19 而不是 22：I7 由唯一索引执法、I10 由召回 SQL + 契约测试守、
+为什么项数是 20 而不是 23：I7 由唯一索引执法、I10 由召回 SQL + 契约测试守、
 I11 由 ``pmem backup drill`` 与 sleep s8 自检覆盖，三者不在 ``check_all`` 里。
 """
 
@@ -34,6 +34,7 @@ EXPECTED_IDS = [
     "I20",
     "I21",
     "I22",
+    "I23",
 ]
 
 
@@ -48,7 +49,7 @@ class TestRegistry(unittest.TestCase):
     def test_ids_and_total(self) -> None:
         results = invariants.check_all(self.db)
         self.assertEqual([r["id"] for r in results], EXPECTED_IDS)
-        self.assertEqual(len(results), 19)
+        self.assertEqual(len(results), 20)
 
     def test_result_shape(self) -> None:
         for item in invariants.check_all(self.db):
@@ -62,8 +63,8 @@ class TestRegistry(unittest.TestCase):
 
     def test_summary_shape(self) -> None:
         summary = invariants.summary(invariants.check_all(self.db))
-        self.assertEqual(summary["total"], 19)
-        self.assertEqual(summary["passed"], 19)
+        self.assertEqual(summary["total"], 20)
+        self.assertEqual(summary["passed"], 20)
         self.assertEqual(summary["failed"], [])
         self.assertTrue(summary["ok"])
 

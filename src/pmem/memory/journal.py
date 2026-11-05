@@ -27,7 +27,7 @@ from typing import Any, Callable, Iterable
 
 from ..base import events
 from ..base.clock import day_key as today_key
-from ..base.clock import now, now_iso, to_iso
+from ..base.clock import now, now_iso, occurred_day, to_iso
 from ..base.errors import NotFoundError
 from ..base.ids import ulid
 from .text import tokenize
@@ -297,13 +297,13 @@ def retract(
 
 
 def _day_of(iso: str) -> str:
-    """ISO 时间 → 本地日期键。解析失败就退回今天，不抛。"""
-    try:
-        from datetime import datetime
+    """ISO 时间 → 本地日期键。解析失败就退回今天，不抛。
 
-        return datetime.fromisoformat(iso).astimezone().date().isoformat()
-    except (TypeError, ValueError):
-        return today_key()
+    规则收在 ``clock.occurred_day`` 一处：写入侧的 ``journal_line.day_key``、派生事实的
+    ``memory.day_key``、迁移回填、I23 不变量必须用**同一个**折算，否则「同一个时刻」
+    在不同层能落到不同日期上。
+    """
+    return occurred_day(iso, fallback=today_key()) or today_key()
 
 
 def pending(
@@ -582,7 +582,8 @@ def _finish(
         draft = fallback
     summary = chr(10).join(draft.lines)
     episode_id = ulid()
-    facts = _facts(draft, rows=rows)
+    planned = _facts_with_sources(draft, rows=rows)
+    facts = [text for text, _source in planned]
     derivation = {
         "lines": [row["id"] for row in rows],
         "line_count": len(rows),
@@ -645,10 +646,14 @@ def _finish(
         )
 
     if store is not None and facts:
-        for index, text in enumerate(facts):
+        for index, (text, source) in enumerate(planned):
+            # 每条事实的时间取**它自己那一行**的 ts，不是当天第一条：
+            # 一天里上午和晚上说的两件事，日期相同、时刻不同；用第一条代表全天的
+            # 话，「几点说的」就再也分不出来了（而这是记忆系统仅剩的时间粒度）。
+            source_ts = str(source["ts"]) if source is not None else rows[0]["ts"]
             try:
                 saved = store.add(
-                    text, **_fact_kwargs(episode_id, index, mode=draft.mode, valid_from=rows[0]["ts"])
+                    text, **_fact_kwargs(episode_id, index, mode=draft.mode, valid_from=source_ts)
                 )
             except Exception as exc:  # 一条事实写不进去，不能带崩整篇日记
                 result.setdefault("errors", []).append({"text": text, "error": str(exc)})
@@ -784,7 +789,13 @@ _SKIP_REASON_RETRACTED = "retracted"
 def _fact_kwargs(
     episode_id: str, index: int, *, mode: str, valid_from: str | None
 ) -> dict[str, Any]:
-    """派生事实的 ``store.add`` 参数（只在一处构造，两边不会慢慢走偏）。"""
+    """派生事实的 ``store.add`` 参数（只在一处构造，两边不会慢慢走偏）。
+
+    ``day_key`` 必须跟着 ``valid_from``（原料那一行的 ``ts``）走，**不能**留空让
+    ``store.add`` 按写入时刻自己算：日记是次日凌晨消化的，按写入时刻算会让整篇日记
+    派生出来的事实集体晚一天。``valid_from`` 缺省（老调用/重建失败）时留 ``None``，
+    交给 ``store.add`` 的回退分支，不猜。
+    """
     return {
         "kind": "episodic",
         "grade": "C",
@@ -796,6 +807,7 @@ def _fact_kwargs(
         "session_id": None,
         "idem_key": fact_idem_key(episode_id, index),
         "valid_from": valid_from,
+        "day_key": _day_of(valid_from) if valid_from else None,
     }
 
 
@@ -858,10 +870,12 @@ def _episode_facts(
 ) -> tuple[list[str], list[str | None], str | None, str] | None:
     """重建一篇日记「当时应该派生」的事实清单；原料没了就返回 None。
 
-    返回 ``(facts, skip_reasons, valid_from, mode)``。``skip_reasons`` 与 ``facts``
+    返回 ``(facts, skip_reasons, valid_froms, mode)``。``skip_reasons`` 与 ``facts``
     一一对应：``None`` 表示正常重放；``"noise"`` / ``"retracted"`` 表示这条的原料
     **不该写成事实**（``_strip_runtime`` 判空 / ``journal_retraction`` 里撤回过的），
     repair 只该写一条 ``journal:{episode_id}:{index}:skipped`` 幂等键交代过去。
+    ``valid_froms`` 同样一一对应，是每条事实**自己那行**原话的时间（digest 与 repair
+    必须一致，否则补写的事实时间会跳）。
 
     为什么从原文重建、而不是把事实清单存进 ``episode.extra_json``：清单就是事实
     正文的副本，存进去会让「删掉一条记忆」删不干净（日记里还留着一份），
@@ -912,7 +926,17 @@ def _episode_facts(
             skip_reasons.append(_SKIP_REASON_RETRACTED)
         else:
             skip_reasons.append(None)
-    return [text for text, _source in planned], skip_reasons, ordered[0]["ts"], str(derivation.get("mode") or "template")
+    # 每条事实各自的原料时间：repair 重放时必须逐条还原，否则补写出来的事实会和
+    # 当天第一条的时间绑在一起（digest 路径已经改成逐条了，两条路必须一致）。
+    valid_froms: list[str | None] = [
+        (str(source["ts"]) if source is not None else ordered[0]["ts"]) for _text, source in planned
+    ]
+    return (
+        [text for text, _source in planned],
+        skip_reasons,
+        valid_froms,
+        str(derivation.get("mode") or "template"),
+    )
 
 
 def _mark_fact_skipped(
@@ -1035,7 +1059,7 @@ def repair(
                 }
             )
             continue
-        facts, skip_reasons, valid_from, mode = rebuilt
+        facts, skip_reasons, valid_froms, mode = rebuilt
         for index, text in enumerate(facts):
             if index >= claimed:  # memory_count 是权威值；多出来的不补
                 break
@@ -1092,7 +1116,10 @@ def repair(
                 continue
             try:
                 saved = store.add(
-                    text, **_fact_kwargs(ep_id, index, mode=mode, valid_from=valid_from)
+                    text,
+                    **_fact_kwargs(
+                        ep_id, index, mode=mode, valid_from=valid_froms[index]
+                    ),
                 )
             except Exception as exc:  # noqa: BLE001 补写失败要留痕、可重试
                 stats["failed"] += 1

@@ -10,10 +10,12 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from typing import Any
 
 from ..base import events
-from ..base.clock import day_key, now_iso, parse_iso
+from ..base.clock import day_key as local_day
+from ..base.clock import now_iso, parse_iso
 from ..base.config import Config
 from ..base.db import Database
 from ..base.errors import ConflictError, DeniedError, NotFoundError, ValidationError
@@ -135,6 +137,7 @@ class MemoryStore:
         scope_key: str | None = None,
         valid_from: str | None = None,
         valid_to: str | None = None,
+        day_key: str | None = None,
         sensitivity: str = "personal",
         pinned: bool = False,
         extra: dict[str, Any] | None = None,
@@ -203,6 +206,18 @@ class MemoryStore:
         status = "active" if self._activates(imp, provenance, pinned) else "candidate"
         mem_id = ulid()
         ts = created_at or now_iso()
+        # 「这条记忆属于哪一天」：调用方给了就用给的（派生事实 = 原料所在的那天），
+        # 没给才按写入时刻。以前一律取 now()，于是日记在次日凌晨跑，派生出来的事实
+        # 整体算到第二天——面板和召回 payload 直接把这个字段当日期显示，用户看到的是
+        # 错日期（B 层 6 个库 2118/2227 条偏 +1 天，本机真实库 166 条全偏 1–2 天）。
+        day = local_day(parse_iso(ts))
+        if day_key:
+            text_day = str(day_key).strip()
+            try:
+                date.fromisoformat(text_day)
+            except ValueError as exc:
+                raise ValidationError(f"day_key 必须是 YYYY-MM-DD：{day_key!r}") from exc
+            day = text_day
         row = {
             "id": mem_id,
             "subject_id": self.subject,
@@ -230,7 +245,7 @@ class MemoryStore:
             "recorded_at": ts,
             "valid_from": valid_from,
             "valid_to": valid_to,
-            "day_key": day_key(parse_iso(ts)) if created_at else day_key(),
+            "day_key": day,
             "extra_json": _json_dump(extra_payload),
         }
         if dry_run:

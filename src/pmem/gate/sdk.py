@@ -25,6 +25,28 @@ def _entity_brief(row: Any) -> dict[str, Any]:
     return {"id": row["id"], "name": row["name"], "type": row["type"]}
 
 
+def _occurred_label(item: dict[str, Any]) -> str:
+    """一行记忆的日期标签：优先「发生时刻」，回退到发生日。
+
+    为什么不能只用 ``day``：它只精确到日，而模型回答时要算「上周五」「三天前」这类
+    相对说法，锚点越精确越不容易算错（B 层「相对日期」29 道失败里 27 道是「捞到了
+    但算错/不敢算」，不是检索问题）。
+
+    为什么不能用 ``created_at``：日记是次日凌晨消化的，「写进库」的时刻比「发生」晚
+    一天，混用会让每一条记忆的日期整体漂一天。``valid_from`` 才是发生时间。
+    """
+    from ..base.clock import parse_iso
+
+    day = str(item.get("day") or "")
+    raw = str(item.get("valid_from") or "").strip()
+    if not raw:
+        return day
+    try:
+        return parse_iso(raw).astimezone().strftime("%Y-%m-%d %H:%M")
+    except (TypeError, ValueError):
+        return day
+
+
 class PMem:
     """一个库 + 一个主体的门面。"""
 
@@ -1324,7 +1346,7 @@ class PMem:
         shared_ents = {name for name, count in ent_count.items() if count >= 2}
         body_lines: list[str] = []
         for item in items:
-            day = clean(item.get("day", ""))
+            day = clean(_occurred_label(item))
             text = clean(item.get("text", ""))
             tag = "（推测）" if item.get("provenance") in {"inferred", "unconfirmed"} else ""
             if item.get("status") == "candidate":

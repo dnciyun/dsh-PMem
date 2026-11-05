@@ -17,11 +17,16 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
-from . import schema
-from .clock import now_iso
+from . import events, schema
+from .clock import now_iso, occurred_day
 from .ids import ulid
 
 APPLICATION_ID = 0x504D454D  # 'PMEM'
+
+# 0.31.0：日记派生事实的 day_key 语义迁移标记（写在 schema_meta 里做幂等短路）。
+# value 固定 ``occurred-v1``：以后若再改日期口径，值变了才需要再跑一次新迁移。
+DAY_KEY_META = "day_key_semantics"
+DAY_KEY_META_VALUE = "occurred-v1"
 
 
 class Database:
@@ -91,6 +96,8 @@ class Database:
         # 老库补建 0.30.0 新增的索引：DDL 里已有 CREATE INDEX IF NOT EXISTS，
         # 这里再显式跑一遍（幂等），保证「先有表、后加索引」的旧库开一次就能补上。
         self._migrate_indexes(conn)
+        # 0.31.0：日记派生事实的 day_key 回填成「发生日」（meta 键短路，日常零成本）。
+        self._migrate_memory_day(conn)
         conn.execute(f"PRAGMA application_id = {APPLICATION_ID}")
         ts = now_iso()
         meta = {
@@ -170,6 +177,66 @@ class Database:
             except sqlite3.DatabaseError:
                 # 只读库 / 更老的库结构：索引是增强，不能因此让库打不开。
                 continue
+
+    def _migrate_memory_day(self, conn: sqlite3.Connection) -> None:
+        """0.31.0：把日记派生事实的 ``day_key`` 回填成「发生日」。
+
+        为什么要回填：以前 ``day_key`` 在写库那一刻取 ``now()``，记的是**整理日**
+        而不是**发生日**——日记在次日凌晨跑，派生事实就整体晚一天（实测本机真实库
+        166 条全偏 1–2 天，B 层 6 个库 2118/2227 条偏 +1 天）。语义修好之后（新写入
+        已经用 ``occurred_day(valid_from)``），老数据得一次性回到正确日期。
+
+        范围只限 ``source_kind='journal'``：其它来源的 ``valid_from`` 可能表示
+        「这条事实从何时开始生效」，和 ``day_key`` 允许不同，不能一律按发生日改。
+
+        幂等：``schema_meta.day_key_semantics='occurred-v1'`` 一旦存在就直接返回，
+        所以日常启动只多一次 SELECT meta，不会做全表扫描。整个回填包在
+        ``try/except sqlite3.DatabaseError`` 里：只读库/极旧库不能因此打不开，
+        失败就下次 init 再试。
+
+        为什么不在 SQL 里 ``substr`` 算日期：``day_key`` 用的是**本地日期**规则
+        （``clock.day_key`` 会先 ``astimezone()``），SQL 里的字符串截取会和
+        ``_day_of``/``occurred_day`` 差开——必须逐行调用 Python 的同一个函数。
+        """
+        try:
+            done = conn.execute(
+                "SELECT value FROM schema_meta WHERE key=?", (DAY_KEY_META,)
+            ).fetchone()
+            if done is not None:
+                return
+            # 一次扫描取候选，再在 Python 里按 occurred_day 判断，避免全表逐行回查。
+            rows = conn.execute(
+                "SELECT id, valid_from, day_key FROM memory "
+                "WHERE source_kind='journal' AND valid_from IS NOT NULL"
+            ).fetchall()
+            updates: list[tuple[str, str]] = []
+            for row in rows:
+                occurred = occurred_day(str(row["valid_from"]))
+                if occurred and occurred != row["day_key"]:
+                    updates.append((occurred, str(row["id"])))
+            with self.tx() as tx:
+                for day, memory_id in updates:
+                    tx.execute("UPDATE memory SET day_key=? WHERE id=?", (day, memory_id))
+                tx.execute(
+                    "INSERT INTO schema_meta(key, value, updated_at) VALUES(?,?,?) "
+                    "ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at",
+                    (DAY_KEY_META, DAY_KEY_META_VALUE, now_iso()),
+                )
+                # 只有真的改过行才写审计事件：fresh 库 updated=0，写事件会污染空
+                # event_log，导致「导出的事件只能导入空日志」这条契约失效。
+                if updates:
+                    events.append(
+                        tx,
+                        actor="system:migrate",
+                        op="memory.day_key_backfilled",
+                        target_tbl="memory",
+                        target_id=None,
+                        subject_id=None,
+                        payload={"updated": len(updates), "source_kind": "journal"},
+                    )
+        except sqlite3.DatabaseError:
+            # 只读库 / 极旧库结构：迁移失败不能把库打不开；下一次 init 再试。
+            return
 
     def _migrate_entity_org(self, conn: object) -> None:
         """1.0.0 → 1.1.0：实体表补 ``org`` 类型。

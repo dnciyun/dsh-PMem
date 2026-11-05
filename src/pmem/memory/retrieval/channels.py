@@ -131,6 +131,7 @@ def graph_append(
                 "score": round(min(0.7, 0.18 + 0.5 * share), 4),
                 "kind": row["kind"],
                 "day": row["day_key"],
+                "valid_from": row["valid_from"],
                 "importance": row["importance"],
                 "confidence": row["confidence"],
                 "provenance": row["provenance"],
@@ -218,6 +219,7 @@ def temporal_append(
                 "score": round(score, 4),
                 "kind": row["kind"],
                 "day": row["day_key"],
+                "valid_from": row["valid_from"],
                 "importance": row["importance"],
                 "confidence": row["confidence"],
                 "provenance": row["provenance"],
@@ -266,6 +268,7 @@ def entity_append(
                 "score": round(min(0.62, 0.30 + 0.12 * float(strength)), 4),
                 "kind": row["kind"],
                 "day": row["day_key"],
+                "valid_from": row["valid_from"],
                 "importance": row["importance"],
                 "confidence": row["confidence"],
                 "provenance": row["provenance"],
@@ -330,6 +333,7 @@ def vector_append(
                 "score": round(min(0.95, 0.98 * sim), 4),
                 "kind": row["kind"],
                 "day": row["day_key"],
+                "valid_from": row["valid_from"],
                 "importance": row["importance"],
                 "confidence": row["confidence"],
                 "provenance": row["provenance"],
@@ -485,7 +489,7 @@ def raw_fallback(
     expr = " OR ".join(f'"{token}"' for token in tokens[:64])
     try:
         rows = store.db.conn.execute(
-            "SELECT jl.id, jl.text, jl.day_key, jl.role, bm25(journal_fts) AS bm25 "
+            "SELECT jl.id, jl.text, jl.day_key, jl.role, jl.ts, bm25(journal_fts) AS bm25 "
             "FROM journal_fts JOIN journal_line jl ON jl.seq=journal_fts.rowid "
             "WHERE journal_fts MATCH ? "
             "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
@@ -523,6 +527,11 @@ def raw_fallback(
                 "score": round(min(1.0, 0.35 + 0.1 * overlap), 4),
                 "kind": "journal",
                 "day": row["day_key"],
+                # 原话行没有 memory.valid_from 这一列；它的 ts 就是这句话发生的时间。
+                # 透出 valid_from 让渲染层能和记忆条目用同一套「优先发生时间」逻辑，
+                # role 则让模型知道这句是用户说的还是助手说的（兜底是唯一能召回助手原话的通道）。
+                "valid_from": row["ts"],
+                "role": row["role"],
                 "importance": 0.5,
                 "confidence": 0.6,
                 "provenance": "user_explicit" if row["role"] == "user" else "observed",

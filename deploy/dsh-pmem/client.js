@@ -137,6 +137,19 @@ window.__ModuleLoader__.load({
       return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString()
     }
 
+    // 检索列表的时间：valid_from 是「事情发生时刻」，day 只是发生日（旧数据可能没有 valid_from）。
+    // 按本机时区显示，和 Python 注入侧（sdk._occurred_label）保持同一套算法：
+    // 记忆里存的是带原始偏移的 ISO，直接取墙上时间会在跨时区时差几个小时；转成本机时间才对得上「昨天/今天」。
+    const fmtWhen = item => {
+      const raw = String(item?.valid_from || item?.day || '')
+      const parsed = new Date(raw)
+      if (!Number.isNaN(parsed.getTime())) {
+        const pad = value => String(value).padStart(2, '0')
+        return `${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`
+      }
+      return raw
+    }
+
     function Switch({ checked, onChange, disabled, label }) {
       return h(
         'label',
@@ -697,7 +710,7 @@ window.__ModuleLoader__.load({
           ...(items.length
             ? items.map(item => h('div', { className: 'pmem-item', key: item.id },
                 h('div', { className: 'pmem-item-meta' },
-                  h('span', null, item.day || ''),
+                  h('span', null, fmtWhen(item)),
                   item.grade ? h('span', { className: 'pmem-chip' }, item.grade) : null,
                   ...(item.groups ?? []).map(group => h('span', { key: group }, group))),
                 h('div', null, String(item.text ?? '').slice(0, 320))))

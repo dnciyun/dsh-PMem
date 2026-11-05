@@ -1,4 +1,4 @@
-"""不变量自检（`docs/02` §5 I1–I22）。
+"""不变量自检（`docs/02` §5 I1–I23）。
 
 ``pmem doctor`` 调它。每条返回 ``{id, ok, detail}``；失败不抛异常 —— 体检要能一次看全。
 
@@ -25,10 +25,11 @@
   （``journal:{ep}:{i}`` 与 ``journal:{ep}:{i}:skipped`` 都算交代过）
 - I21 FTS 索引行数漂移（journal/memory/episode）    → 基表行数 vs FTS 文档数（``<fts>_docsize`` 影子表）
 - I22 事件链锚点（防尾部截断）                      → ``events.check_anchor``（锚点由 backup/snapshot 写入）
+- I23 派生事实的 ``day_key`` 必须是发生日            → 扫 ``memory``（只查 ``source_kind='journal'``）
 
 不在 ``check_all`` 里的三条：I7（``trait`` 键唯一）由唯一索引执法；I10（软删不进默认召回）
 由召回 SQL + 契约测试守；I11（快照可读性）由 ``pmem backup drill`` 与 sleep s8 自检覆盖。
-所以 ``doctor`` 的项数 = 19（I1–I6、I8、I9、I12–I22），不是 22。
+所以 ``doctor`` 的项数 = 20（I1–I6、I8、I9、I12–I23），不是 23。
 """
 
 from __future__ import annotations
@@ -38,6 +39,7 @@ import re
 from typing import Any
 
 from ..base import events
+from ..base.clock import occurred_day
 from ..base.db import Database
 
 SCOPE_RE = re.compile(r"^project:[0-9a-f]{8,64}$|^project:manual$")
@@ -427,6 +429,22 @@ def check_all(db: Database, *, subject: str = "self") -> list[dict[str, Any]]:
     # 时由 events.write_anchor 写入），拿「当前条数/锚点事件 hash」对一下就知道有没有被砍。
     anchor_ok, anchor_detail = events.check_anchor(conn)
     add("I22", anchor_ok, anchor_detail)
+
+    # I23 派生事实的 day_key 必须是「发生日」（不是整理日）
+    #
+    # 为什么只查 journal：其它 source_kind（cli/dsh_session/rule/pressure）的
+    # ``valid_from`` 可能表示「这条事实从何时开始生效」，与 ``day_key`` 允许不同；
+    # 日记派生事实的语义是死的——日期就该是原料那一行 ``ts`` 的本地日期。
+    # 迁移（``Database._migrate_memory_day``）会回填老库；这里守回填之后不再漂移。
+    bad_day = 0
+    for row in conn.execute(
+        "SELECT valid_from, day_key FROM memory WHERE source_kind='journal' "
+        "AND valid_from IS NOT NULL AND status<>'deleted'"
+    ):
+        occurred = occurred_day(row["valid_from"])
+        if occurred is not None and occurred != row["day_key"]:
+            bad_day += 1
+    add("I23", bad_day == 0, f"{bad_day} 条派生事实的 day_key 不是发生日")
 
     return results
 

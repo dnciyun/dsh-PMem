@@ -448,6 +448,9 @@ def run_search(
                 "kind": row["kind"],
                 "status": row["status"],
                 "day": row["day_key"],
+                # day 是发生日（0.31.0 起按 valid_from 归日）；valid_from 再给出当天内的
+                # 具体时刻，渲染层才能把「昨天/今天」这类相对说法对到唯一的时间点。
+                "valid_from": row["valid_from"],
                 "importance": row["importance"],
                 "confidence": row["confidence"],
                 "provenance": row["provenance"],

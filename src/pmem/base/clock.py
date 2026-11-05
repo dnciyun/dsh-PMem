@@ -92,6 +92,25 @@ def day_key(dt: datetime | None = None) -> str:
     return dt.astimezone().date().isoformat()
 
 
+def occurred_day(value: str | None, *, fallback: str | None = None) -> str | None:
+    """ISO 时间 → 这件事**发生在哪一天**（本地日期）。
+
+    为什么单独一个函数：``day_key`` 以前在写库那一刻取 ``now()``，于是「记忆属于
+    哪一天」实际记的是**整理日**而不是**发生日**——日记在次日凌晨跑，派生出来的
+    事实就整体晚一天；agent 面板和召回 payload 都拿这个字段当日期显示，用户看到的
+    就是错日期（实测 B 层 6 个库 2118/2227 条偏 +1 天，本机真实库 166 条全偏 1–2 天）。
+
+    派生事实的日期必须回到原料那一行的 ``ts``，所以这里只做一件事：把任意 ISO
+    字符串折成本地日期。解析失败返回 ``fallback``（不抛：一条脏时间不该让整篇日记写不进去）。
+    """
+    if not value:
+        return fallback
+    try:
+        return day_key(parse_iso(str(value)))
+    except (TypeError, ValueError):
+        return fallback
+
+
 def days_between(earlier_iso: str, later_iso: str | None = None) -> float:
     """两时刻相差多少天（用于 recency / 衰减）。"""
     start = parse_iso(earlier_iso)

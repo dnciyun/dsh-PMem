@@ -122,6 +122,23 @@ async function callPmem(config, args, { json = false, timeout = 20000 } = {}) {
  * - 日记条目单独标出来：它是一天的经过，不是一条事实，混在列表里会被当成「证据」；
  * - 末尾带一句「不确定」：把握低的时候必须说出来，而不是让上层当确定结论用。
  */
+/**
+ * 召回条目的时间显示：优先 valid_from（事情发生的时刻），回退 day（发生日）。
+ *
+ * 按本机时区显示，和 Python 注入侧（`sdk._occurred_label`）用同一套算法：
+ * 记忆里存的是带原始偏移的 ISO，直接取墙上时间会在跨时区时差几个小时，
+ * 模型再按这个日期推「昨天/今天」就会错。
+ */
+function whenStamp(item) {
+  const raw = String(item?.valid_from || item?.day || '')
+  const parsed = new Date(raw)
+  if (!Number.isNaN(parsed.getTime())) {
+    const pad = value => String(value).padStart(2, '0')
+    return `${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`
+  }
+  return raw
+}
+
 function formatItems(payload) {
   const items = payload?.data?.items ?? []
   if (!items.length) return '没有召回到相关记忆。'
@@ -139,10 +156,15 @@ function formatItems(payload) {
     const groups = item.groups?.length ? ` · ${item.groups.join(' / ')}` : ''
     const ents = (item.entities ?? []).filter(name => shared.has(name))
     const entTag = ents.length ? ` · 涉及：${ents.join('、')}` : ''
-    const day = item.day || item.created_at || ''
+    const when = whenStamp(item)
+    // 原话兜底是唯一能召回 assistant 行的通道：不标出来，模型会把「助手当时说过的话」
+    // 当成用户事实（或反过来）。这里只加一个展示标记，数据形状不变。
+    const roleTag = item.role === 'assistant' ? '（助手说过）' : ''
     const tag =
-      (diary ? '（日记·那一天的经过）' : '') + (item.status === 'candidate' ? '（候选·还没确认）' : '')
-    lines.push(`- ${day}${tag}${grade}${groups}${entTag}｜${String(item.text ?? '').slice(0, 240)}`)
+      (diary ? '（日记·那一天的经过）' : '') +
+      roleTag +
+      (item.status === 'candidate' ? '（候选·还没确认）' : '')
+    lines.push(`- ${when}${tag}${grade}${groups}${entTag}｜${String(item.text ?? '').slice(0, 240)}`)
   }
   // 稀疏自适应（M19）：日记断了就说断在哪，别让人以为那段时间什么都没发生。
   const sparse = payload?.data?.episode
