@@ -277,7 +277,7 @@ globalThis.fetch = async () => {
 
 const bootFull = {
   version: '0.8.0',
-  status: { db: { memory_total: 12, integrity_ok: true, db_size_bytes: 4096, schema_version: 3 }, mcp: { tools: 24 } },
+  status: { db: { memory_total: 12, integrity_ok: true, db_size_bytes: 4096, schema_version: 3 }, mcp: { tools: 27 } },
   model: { available: true, provider: 'deepseek-account', model: 'deepseek-flash', providers: ['deepseek-account'], source: 'default', note: null },
   counts: { memory_total: 12, today_new: 2, today_recalls: 7, open_conflicts: 1, uses: 30 },
   wake: { text: '卡', tokens: 100, chars: 260 },
@@ -289,7 +289,7 @@ const bootFull = {
 const statusFull = {
   version: '0.8.0',
   db: { integrity_ok: true, db_size_bytes: 4096, schema_version: 3, by_status: { active: 10 } },
-  mcp: { serverName: 'pmem', tools: 24 },
+  mcp: { serverName: 'pmem', tools: 27 },
   tokens: { p95: 100, mean: 90, samples: 4 },
   wake: { chars: 260 },
   runtime: { spec: { budget: { type: 'int', min: 120, max: 1200, step: 20, label: '预算', unit: 'token' } } },

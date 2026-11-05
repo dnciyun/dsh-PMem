@@ -25,6 +25,25 @@ def _entity_brief(row: Any) -> dict[str, Any]:
     return {"id": row["id"], "name": row["name"], "type": row["type"]}
 
 
+def _age_days(item: dict[str, Any]) -> int | None:
+    """这条记忆离今天多少天（负数=未来/坏数据，返回 None 不标）。
+
+    为什么注入侧要报「距今 N 天」：模型算「上周五」「三天前」时需要锚点。靶场里
+    B 层「相对日期」29 道失败有 27 道不是没捞到，是捞到了算错/不敢算——日期本身
+    有，缺的是「这条相对现在是多久」这一句。
+    """
+    from ..base.clock import now, parse_iso
+
+    raw = str(item.get("valid_from") or item.get("created_at") or "").strip()
+    if not raw:
+        return None
+    try:
+        then = parse_iso(raw).astimezone().date()
+    except (TypeError, ValueError):
+        return None
+    return (now().astimezone().date() - then).days
+
+
 def _occurred_label(item: dict[str, Any]) -> str:
     """一行记忆的日期标签：优先「发生时刻」，回退到发生日。
 
@@ -34,6 +53,9 @@ def _occurred_label(item: dict[str, Any]) -> str:
 
     为什么不能用 ``created_at``：日记是次日凌晨消化的，「写进库」的时刻比「发生」晚
     一天，混用会让每一条记忆的日期整体漂一天。``valid_from`` 才是发生时间。
+
+    0.36.0：日期后面补「（距今 N 天）」。只在 N≥1 时补——今天的事说「距今 0 天」
+    是废话，每行都多几个 token 却不解决任何问题。
     """
     from ..base.clock import parse_iso
 
@@ -42,9 +64,13 @@ def _occurred_label(item: dict[str, Any]) -> str:
     if not raw:
         return day
     try:
-        return parse_iso(raw).astimezone().strftime("%Y-%m-%d %H:%M")
+        label = parse_iso(raw).astimezone().strftime("%Y-%m-%d %H:%M")
     except (TypeError, ValueError):
-        return day
+        label = day
+    age = _age_days(item)
+    if age is not None and age >= 1:
+        label = f"{label}（距今 {age} 天）"
+    return label
 
 
 class PMem:
@@ -180,7 +206,34 @@ class PMem:
         started = time.perf_counter()
         try:
             result = self.store.search(query, **kwargs)
+            # 0.36.0：每条结果带上「距今 N 天」，让模型算相对日期时有锚点（只增字段）。
+            for item in result.get("items") or []:
+                age = _age_days(item)
+                if age is not None and age >= 0:
+                    item["age_days"] = age
+                    if age >= 1:
+                        item["age_label"] = f"距今 {age} 天"
             return self._ok(result, started)
+        except PmemError as exc:
+            return self._fail(exc, started)
+
+    def selfcheck(self, answer: str, *, question: str | None = None) -> dict[str, Any]:
+        """作答后自检：草稿回答里的日期/专名有没有记忆出处（确定性，0 模型调用）。"""
+        started = time.perf_counter()
+        try:
+            if not str(answer or "").strip():
+                raise ValidationError("answer 不能为空", field="answer")
+            from ..memory import selfcheck as selfcheck_mod
+
+            data = selfcheck_mod.check_answer(
+                self.store,
+                answer,
+                question=question,
+                max_dates=int(self.config.get("selfcheck.max_dates", 40) or 40),
+                max_names=int(self.config.get("selfcheck.max_names", 20) or 20),
+            )
+            data["report"] = selfcheck_mod.format_report(data)
+            return self._ok(data, started)
         except PmemError as exc:
             return self._fail(exc, started)
 

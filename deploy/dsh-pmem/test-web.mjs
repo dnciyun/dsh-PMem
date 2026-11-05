@@ -15,6 +15,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { apply } from './index.js'
+import { createWeb } from './web.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const py = process.env.PMEM_PYTHON || 'python'
@@ -156,6 +157,7 @@ async function post(path, body, headers = {}) {
   return { status: res.status, body: parsed }
 }
 let stream = null
+let nightCleanup = null
 
 
 try {
@@ -827,6 +829,91 @@ try {
   const chats = await get('/dsh-pmem/api/console/chats')
   assert.equal(chats.status, 404, '控制台不该再有 chats 路由')
 
+  // ---- 夜间用真模型开关（/night-llm） ----
+  // 注意：这条开关落到 PMem 的「全局」配置文件（DSH_HOME 下），而本文件其它测试
+  // 用的是真 Python CLI。为了不写用户真实配置、也不依赖 CLI 的 config 命令是否已落地，
+  // 这里单独起一个 mock callPmem 的 web 面，只验插件路由的契约：
+  //   GET  → 读 sleep.whale.enabled，默认 false；
+  //   POST → 转发 config set sleep.whale.enabled true，并回 enabled=true。
+  // mock 返回的是 CLI 现在的真实信封 {ok:true, data:{key,value,path}}（不是顶层 value）。
+  // 把这段放最后：createWeb.register() 会覆盖模块级的 webCtx，不能影响前面的路由断言。
+  const nightCalls = []
+  const nightMock = createWeb({
+    config: plugin.config,
+    callPmem: async (cfg, argv, opts = {}) => {
+      nightCalls.push({ argv: [...argv], json: opts.json === true })
+      if (argv[0] === 'config' && argv[1] === 'get' && argv[2] === 'sleep.whale.enabled') {
+        return { ok: true, data: { key: 'sleep.whale.enabled', value: false, path: 'mock' } }
+      }
+      if (argv[0] === 'config' && argv[1] === 'set' && argv[2] === 'sleep.whale.enabled') {
+        return { ok: true, data: { key: 'sleep.whale.enabled', value: argv[3] === 'true', path: 'mock' } }
+      }
+      throw new Error(`mock callPmem 没准备这张命令：${argv.join(' ')}`)
+    },
+    version: 'test',
+    runtimeFile: join(dir, 'runtime-night-mock.json'),
+    starmapBase: join(dir, 'data', 'starmap'),
+    pluginDir: dirname(fileURLToPath(import.meta.url)),
+    openBrowser: async () => true,
+  })
+  const nightRoutes = []
+  const nightDispose = nightMock.register({
+    get: () => undefined,
+    webServer: {
+      register(item) {
+        nightRoutes.push(item)
+        return () => {}
+      },
+    },
+  })
+  const nightServer = createServer((req, res) => {
+    const pathname = new URL(req.url, 'http://127.0.0.1').pathname
+    const exact = nightRoutes.find(item => item.kind === 'exact' && item.path === pathname)
+    const prefix = nightRoutes
+      .filter(item => item.kind === 'prefix' && (pathname === item.path || pathname.startsWith(item.path + '/')))
+      .sort((a, b) => b.path.length - a.path.length)[0]
+    const hit = exact ?? prefix
+    if (!hit) {
+      res.statusCode = 404
+      res.end('not found')
+      return
+    }
+    hit.handler(req, res)
+  })
+  await new Promise(done => nightServer.listen(0, '127.0.0.1', done))
+  nightCleanup = async () => {
+    try { nightDispose?.() } catch { /* 已经关了 */ }
+    try { nightMock.standalone.close() } catch { /* 没起过 */ }
+    await new Promise(done => nightServer.close(done))
+  }
+  const nightBase = `http://127.0.0.1:${nightServer.address().port}`
+
+  const nightGetRes = await fetch(nightBase + '/dsh-pmem/api/night-llm', {
+    headers: { accept: 'application/json' },
+  })
+  assert.equal(nightGetRes.status, 200, '夜间开关 GET 失败')
+  const nightGet = await nightGetRes.json()
+  assert.equal(nightGet.ok, true, JSON.stringify(nightGet))
+  assert.equal(nightGet.enabled, false, '夜间开关默认应该是关（false）')
+  assert.ok(
+    nightCalls.some(call => call.argv.join(' ') === 'config get sleep.whale.enabled' && call.json === true),
+    `GET 没有按契约读配置：${JSON.stringify(nightCalls)}`,
+  )
+
+  const nightOnRes = await fetch(nightBase + '/dsh-pmem/api/night-llm', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ enabled: true }),
+  })
+  assert.equal(nightOnRes.status, 200, '夜间开关 POST 失败')
+  const nightOn = await nightOnRes.json()
+  assert.equal(nightOn.ok, true, JSON.stringify(nightOn))
+  assert.equal(nightOn.enabled, true, 'POST {enabled:true} 后应该回 enabled=true')
+  assert.ok(
+    nightCalls.some(call => call.argv.join(' ') === 'config set sleep.whale.enabled true' && call.json === true),
+    `POST 没有按契约写配置：${JSON.stringify(nightCalls)}`,
+  )
+
   // M9.7c：实时刷新必须走增量，否则每 1.5 秒重画一份 370 KB 的离线单文件，
 // 而且旧星位置会被重算（画面会跳）。
 const webSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'web.js'), 'utf8')
@@ -837,6 +924,7 @@ console.log('dsh-pmem web ok')
 } finally {
   try { plugin.stop() } catch { /* ignore */ }
   try { await stream?.body?.cancel?.() } catch { /* 已经读完 */ }
+  try { await nightCleanup?.() } catch { /* 夜间 mock 服务已关 */ }
   await new Promise(done => server.close(done))
   // Windows 上 sqlite / SSE 的句柄释放比 close 慢一拍：等一会儿再删，还要能重试。
   await new Promise(done => setTimeout(done, 300))

@@ -154,6 +154,11 @@ class McpServer:
                 filters=args.get("filters"),
                 client="mcp",
             )
+        if name == "memory_selfcheck":
+            return self.app.selfcheck(
+                args.get("answer", ""),
+                question=args.get("question"),
+            )
         if name == "memory_get":
             return self.app.get(args.get("id", ""))
         if name == "memory_update":
@@ -372,10 +377,14 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(prog="pmem-mcp", description="PMem MCP server (stdio)")
     parser.add_argument("--db", default=None, help="库文件路径")
-    parser.add_argument("--config", default=None, help="TOML 配置")
+    parser.add_argument("--config", default=None, help="TOML 配置（默认 ~/.dsh/pmem/config.toml）")
     parser.add_argument("--subject", default="self")
     parser.add_argument("--scope-key", default=None)
     args = parser.parse_args(argv)
+    if args.config is None:
+        from ..base.config import default_config_path
+
+        args.config = str(default_config_path())
 
     extra_kwargs: dict[str, Any] = {}
     if args.scope_key:

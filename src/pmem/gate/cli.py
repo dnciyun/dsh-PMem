@@ -15,6 +15,14 @@ from pathlib import Path
 from typing import Any
 
 import pmem
+from ..base.config import (
+    Config,
+    default_config_path,
+    parse_config_value,
+    read_config_file,
+    set_config_value,
+    write_config_file,
+)
 from ..base.db import Database
 from ..memory.store import DEFAULT_SCOPE
 from .sdk import PMem
@@ -269,6 +277,68 @@ def _print_human(data: dict[str, Any]) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2))
 
 
+def _cmd_config(args: argparse.Namespace) -> int:
+    """``config get/set/list/path``：读写 ``~/.dsh/pmem/config.toml``。
+
+    为什么要有这条命令：插件设置页里的 PMem 级开关（例如夜间鲸眠）需要一个
+    持久化出口；写回用点号键 TOML，CLI/MCP 下次启动就生效。
+    """
+    path = Path(args.config) if args.config else default_config_path()
+    action = str(args.action)
+    if action == "path":
+        print(str(path))
+        return 0
+    data = read_config_file(path)
+    if action == "get":
+        value = Config.load(path).get(args.key, None)
+        if args.json:
+            print(json.dumps(
+                {"ok": True, "data": {"key": args.key, "value": value, "path": str(path)}},
+                ensure_ascii=False, indent=2,
+            ))
+        elif isinstance(value, str):
+            print(value)
+        else:
+            print(json.dumps(value, ensure_ascii=False))
+        return 0
+    if action == "set":
+        value = parse_config_value(args.value)
+        set_config_value(data, args.key, value)
+        write_config_file(path, data)
+        effective = Config.load(path).get(args.key, None)
+        if args.json:
+            print(json.dumps(
+                {
+                    "ok": True,
+                    "data": {"key": args.key, "value": effective, "path": str(path)},
+                },
+                ensure_ascii=False, indent=2,
+            ))
+        else:
+            print(f"已写入 {args.key} = {json.dumps(effective, ensure_ascii=False)}  ({path})")
+        return 0
+    # list：只列配置文件里**显式写过**的键（未写 = 用默认值，不在这里刷屏）
+    lines: list[str] = []
+
+    def walk(node: dict[str, Any], prefix: str) -> None:
+        for key, value in node.items():
+            dotted = f"{prefix}.{key}" if prefix else str(key)
+            if isinstance(value, dict):
+                walk(value, dotted)
+            else:
+                lines.append(f"{dotted} = {json.dumps(value, ensure_ascii=False)}")
+
+    walk(data, "")
+    if args.json:
+        print(json.dumps({"ok": True, "data": {"path": str(path), "items": lines}},
+                         ensure_ascii=False, indent=2))
+    elif lines:
+        print("\n".join(lines))
+    else:
+        print(f"（配置文件是空的：{path}）")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     # Windows 控制台默认 GBK，✓/✗ 会直接炸；只改编码，不改行为
     for stream_name in ("stdout", "stderr"):
@@ -297,6 +367,17 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("stats", help="体检统计")
     sub.add_parser("capabilities", help="能力与降级状态")
     sub.add_parser("doctor", help="完整性检查")
+
+    # 配置文件（0.36.0）：设置页的 PMem 级开关从这里落盘；默认 ~/.dsh/pmem/config.toml。
+    p_cfg = sub.add_parser("config", help="配置文件：get / set / list / path（默认 ~/.dsh/pmem/config.toml）")
+    cfg_sub = p_cfg.add_subparsers(dest="action", required=True)
+    p_cfg_get = cfg_sub.add_parser("get", help="读一个键（点号路径；返回生效值，未写=默认值）")
+    p_cfg_get.add_argument("key")
+    p_cfg_set = cfg_sub.add_parser("set", help="写一个键（true/false/数字/字符串；点号路径）")
+    p_cfg_set.add_argument("key")
+    p_cfg_set.add_argument("value")
+    cfg_sub.add_parser("list", help="列出配置文件里显式写过的键")
+    cfg_sub.add_parser("path", help="打印配置文件路径")
 
     p_vac = sub.add_parser("vacuum", help="VACUUM：压缩数据库并回收已删空间，输出前后体积")
     p_vac.add_argument(
@@ -333,6 +414,11 @@ def main(argv: list[str] | None = None) -> int:
     p_search.add_argument("--group", default=None, help="只看某个分组（含子组）")
     p_search.add_argument("--grade", action="append", default=None, choices=["S", "A", "B", "C", "D"])
     p_search.add_argument("--pinned-only", action="store_true")
+
+    # 作答后自检（0.36.0）：草稿回答里的日期/专名有没有记忆出处（确定性，0 模型调用）。
+    p_self = sub.add_parser("selfcheck", help="作答后自检：草稿回答里的日期/专名有没有记忆出处")
+    p_self.add_argument("answer", nargs="?", default=None, help="草稿回答；不传则从 stdin 读")
+    p_self.add_argument("--question", default=None, help="原问题（可选，只记录）")
 
     p_trace = sub.add_parser("trace", help="按字查原话（一字不差）：会话 / 行号 / 角色")
     p_trace.add_argument("query")
@@ -900,6 +986,14 @@ def main(argv: list[str] | None = None) -> int:
         from ..base import clock as clock_mod
 
         clock_mod.set_now(args.now)
+
+    # 默认配置文件（0.36.0）：插件只传 --db，过去不传 --config 就等于永远用内置默认值。
+    # 现在没显式给就用 `~/.dsh/pmem/config.toml`；文件不存在 = 行为完全不变。
+    if args.config is None:
+        args.config = str(default_config_path())
+
+    if args.cmd == "config":
+        return _cmd_config(args)
 
     if args.cmd == "mcp":
         from .mcp_server import main as mcp_main
@@ -2329,6 +2423,17 @@ def main(argv: list[str] | None = None) -> int:
                            filters=filters, client="cli"),
                 args.json,
             )
+        if args.cmd == "selfcheck":
+            # 不传位置参数就从 stdin 读（方便管道：Get-Content draft.txt | pmem selfcheck）
+            answer = args.answer
+            if answer is None:
+                answer = sys.stdin.read()
+            result = app.selfcheck(answer, question=args.question)
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            data = result.get("data") or {}
+            print(data.get("report") or "")
+            return 0
         if args.cmd == "trace":
             result = app.trace(
                 args.query,

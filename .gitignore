@@ -34,6 +34,7 @@ docs/*
 !docs/07-hippocampus.md
 !docs/archive-semantics.md
 !docs/whale-sleep.md
+!docs/time-routing-selfcheck.md
 !docs/README.md
 !docs/console-design.md
 !docs/console-requirements.md

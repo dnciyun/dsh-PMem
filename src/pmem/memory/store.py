@@ -1022,6 +1022,14 @@ class MemoryStore:
                 "reason": vec_reason,
                 "vectors": int(vec_rows),
             },
+            # 夜间开关（0.36.0）：夜间整理用不用真模型（鲸眠）。默认关——关着只跑
+            # 本地模板日记 + 8 阶段，0 模型调用；开着由宿主会话（DSH）来想。
+            # 放在 capabilities 里，是为了让「夜间定时任务」不必再读配置文件就能问。
+            "night": {
+                "llm": bool(self.cfg.get("sleep.whale.enabled", False)),
+                "whale_model": str(self.cfg.get("sleep.whale.model", "") or ""),
+                "journal_model": str(self.cfg.get("journal.model", "") or ""),
+            },
             "degraded": degraded,
             "limits": {
                 "max_text_chars": self.cfg.get("limits.max_text_chars", 8000),

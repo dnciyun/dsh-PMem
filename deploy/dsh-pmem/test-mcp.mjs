@@ -1,5 +1,5 @@
 /**
- * MCP 接入契约测试：临时库 → initialize → tools/list（26）→ tools/call。
+ * MCP 接入契约测试：临时库 → initialize → tools/list（27）→ tools/call。
  * 不启动 DSH，不碰真实 data/pmem.db。
  */
 
@@ -24,11 +24,12 @@ assert.equal(init.status, 0, init.stderr || init.stdout)
 try {
   const probe = await probeMcp(config)
   assert.equal(probe.ok, true, probe.error || probe.stderr)
-  assert.equal(probe.count, 26, `工具数不是 26：${probe.count}`)
+  assert.equal(probe.count, 27, `工具数不是 27：${probe.count}`)
   assert.ok(probe.tools.includes('memory_search'))
   assert.ok(probe.tools.includes('memory_stats'))
   assert.ok(probe.tools.includes('memory_whale_prep'))
   assert.ok(probe.tools.includes('memory_whale_finish'))
+assert.ok(probe.tools.includes('memory_selfcheck'))
 
   const client = createMcpClient(config)
   try {

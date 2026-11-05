@@ -79,5 +79,64 @@ class OccurredTimeRenderCase(unittest.TestCase):
         self.assertIsNone(butterfly["valid_from"])
 
 
+class AgeLabelCase(unittest.TestCase):
+    """0.36.0 时间路由：检索条目带「距今 N 天」，渲染侧也补上。"""
+
+    def setUp(self) -> None:
+        self._dir = temp_dir("age-label")
+        self.app = PMem.open(
+            self._dir / "pmem.db",
+            config=Config({"retrieval": {"vector": {"enabled": False}}}),
+        )
+        self.app.db.init()
+        clock.set_now("2026-11-05T10:00:00+00:00")
+
+    def tearDown(self) -> None:
+        clock.reset_now()
+        self.app.close()
+        drop_dir(self._dir)
+
+    def test_search_items_carry_age_days(self) -> None:
+        self.app.store.add(
+            "青鸟七号 代码 模块 全部对上",
+            valid_from="2026-10-26T09:00:00+00:00",
+            day_key="2026-10-26",
+        )
+        result = self.app.search("青鸟七号", k=5)
+        self.assertTrue(result["ok"], result)
+        item = result["data"]["items"][0]
+        self.assertEqual(item["age_days"], 10)
+        self.assertEqual(item["age_label"], "距今 10 天")
+
+    def test_render_context_ages_the_line(self) -> None:
+        text = PMem.render_context(
+            [
+                {
+                    "day": "2026-10-26",
+                    "valid_from": "2026-10-26T09:00:00+00:00",
+                    "text": "青鸟七号 代码 模块 全部对上",
+                    "provenance": "user_explicit",
+                },
+                {"day": "2026-11-05", "text": "今天的事", "provenance": "observed"},
+            ]
+        )
+        self.assertIn("距今 10 天", text)
+        # 今天那条不该补「距今 0 天」这种废话
+        self.assertNotIn("距今 0 天", text)
+
+    def test_capabilities_reports_night_switch(self) -> None:
+        data = self.app.capabilities()["data"]
+        self.assertFalse(data["night"]["llm"], "夜间真模型开关默认必须是关")
+        app2 = PMem.open(
+            self._dir / "pmem2.db",
+            config=Config({"sleep": {"whale": {"enabled": True}}}),
+        )
+        try:
+            app2.db.init()
+            self.assertTrue(app2.capabilities()["data"]["night"]["llm"])
+        finally:
+            app2.close()
+
+
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

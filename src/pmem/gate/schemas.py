@@ -621,6 +621,32 @@ TOOLS: list[dict[str, Any]] = [
             "additionalProperties": False,
         },
     },
+    {
+        "name": "memory_selfcheck",
+        "description": (
+            "作答后自检（0.36.0）：拿一段**草稿回答**核对记忆——里面提到的日期、人名/专名"
+            "在长期记忆里到底有没有出处。确定性核对，不调模型、0 成本。"
+            "返回 issues 列表（编造日期 / 库里查无此人）与证据。"
+            "回答里说「不知道」不算错；这条工具是用来抓「编得很像」的。"
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "answer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 20000,
+                    "description": "要核对的草稿回答（中文原文）",
+                },
+                "question": {
+                    "type": "string",
+                    "description": "可选：原问题，用来判断「答非所问」类问题（只做记录，不参与判定）",
+                },
+            },
+            "required": ["answer"],
+            "additionalProperties": False,
+        },
+    },
 ]
 
 

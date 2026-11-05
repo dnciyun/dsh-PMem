@@ -12,7 +12,7 @@
 3. 会话结束时自动 handoff；
 4. `/pmem` 命令；
 5. 5 个 `pmem_*` 原生工具；
-6. 同一 bundle 通过官方 MCP client 带上 24 个 `memory_*` 工具；
+6. 同一 bundle 通过官方 MCP client 带上 27 个 `memory_*` 工具；
 7. 侧边栏一行**「记忆控制台」**：整页可视化控制台（总览 / 记忆 / 实体 / 睡眠 / 设置），替代原来只能窝在设置弹窗里的卡片窗口。
 
 上下文清空、换会话、换天之后，模型不该从零开始。插件会在 system prompt 里放一张
@@ -35,7 +35,7 @@
 
 DSH 里 MCP server 拿不到 system prompt，也没有 hook（`docs/04-interface.md` §6.3）。
 MCP 只能“模型主动调工具”，而醒来卡必须在模型开口之前就在。所以自动注入只能由
-宿主插件做；PMem 的 24 个 MCP 工具仍然可以另接，两者不冲突。
+宿主插件做；PMem 的 27 个 MCP 工具仍然可以另接，两者不冲突。
 
 ## 安装（M9.8：一条命令）
 
@@ -151,7 +151,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 | 记忆 | 搜索（auto/keyword/vector/recent）+ 分组树过滤 + 排序 + 多选批量；详情含正文、元数据编辑（kind/grade/分组/敏感级/重要度/状态/置顶）、证据原话、变更历史、冲突、相关记忆、使用统计；反馈/撤回/删除（默认软删、二次确认） |
 | 实体 | 实体列表/详情（别名、提及记忆、1 跳关系）、2 跳查询、合并（先 dry_run 预览再确认）、跳星图 |
 | 睡眠 | 八阶段 run 列表 + 每阶段耗时/条数小条形图 + 进行中进度轮询 + 最近 14 次质量趋势；现在入睡 / 大睡一场（模板 / DSH） |
-| 设置 | 运行时开关与数值、检索/大睡默认值（localStorage）、排查面板（请求日志/醒来卡缓存/MCP/路径/doctor/体积/配置差异）、危险区（备份/恢复需输入 RESTORE/重建索引/运维白名单/批量删除） |
+| 设置 | 运行时开关与数值、**夜间：用不用真模型思考（鲸眠）开关，默认关**、检索/大睡默认值（localStorage）、排查面板（请求日志/醒来卡缓存/MCP/路径/doctor/体积/配置差异）、危险区（备份/恢复需输入 RESTORE/重建索引/运维白名单/批量删除） |
 
 ![记忆控制台 · 总览](docs/images/console-overview.png)
 
@@ -169,6 +169,21 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 
 所有操作都走同源 `fetch`，不开新窗口、不整页跳转（桌面壳会静默 deny / 401）。
 空库时总览给引导卡（建库 / 写第一条 / 导入 JSONL / 看文档）。
+
+### 夜间开关（插件 0.8.2 / PMem 0.36.0）
+
+设置页「夜间」面板一个开关：**夜间用真模型思考（鲸眠）**，默认关。
+
+| 状态 | 夜里发生什么 | 成本 |
+|---|---|---|
+| 关（默认） | 本地模板日记 + 固定 8 阶段巩固 | 0 模型调用、0 成本 |
+| 开 | 由 DSH 会话（宿主模型）把当天原文想成日记，再跑 8 阶段 | 用宿主额度，不需要 API key |
+
+- 值落在 PMem 自己的配置文件（`$DSH_HOME/pmem/config.toml`，缺省 `~/.dsh/pmem/config.toml`）：
+  `sleep.whale.enabled = true|false`，也可以 `pmem config set sleep.whale.enabled true` 改。
+- 走 CLI 的 `config get/set`，插件不直接读写 TOML；接口是 `GET/POST /dsh-pmem/api/night-llm`。
+- 夜间定时任务先看 `memory_capabilities` 的 `night.llm`，再决定走鲸眠还是本地 8 阶段。
+- 改完下一晚生效（不是立即）。
 
 星图**不占标签**，只在概览留一行开关 + 两个入口：
 
@@ -263,7 +278,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 运行时开关写在 `~/.dsh/pmem/runtime.json`（`surface` / `starmap` / `starmapLive`），
 不改 profile；profile 里关掉的能力运行时打不开。
 
-## MCP（24 个工具）
+## MCP（27 个工具）
 
 `cordis.patch.yml` 里除了 `dsh-pmem`，还 insert 了一条官方
 `@deepseek-ai/dsh-mcp-client`：
@@ -278,7 +293,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
     args: ['-m', 'pmem.gate.mcp_server', '--db', '...']
 ```
 
-- 24 个 `memory_*` 工具由 MCP 提供；原生 5 个 `pmem_*` 保留；
+- 27 个 `memory_*` 工具由 MCP 提供；原生 5 个 `pmem_*` 保留；
 - MCP 起不来不影响醒来卡和原生工具（`failOnStartupError: false`）；
 - `/pmem mcp` 或 `probeMcp()` 可查 20 工具/延迟；
 - 包内 patch 只注册插件本体；MCP 那一段由 `pmem dsh install` 按本机路径生成
@@ -312,4 +327,4 @@ node deploy/dsh-pmem/test-starmap.mjs  # 星图静态契约
 第一个用假 ctx 确认：注册了 `dsh-pmem:wake` 的 system prompt、5 个工具、`/pmem` 命令，
 并且能从真实库读到含 `PMEM_WAKE` 的卡。第二个用临时库跑完整 handoff 链路：
 假会话 → `我们/停在哪` → 醒来卡出现「上次」。第三个用临时库确认 MCP：
-`initialize` → 24 个 `memory_*` 工具 → `memory_add` → `memory_stats`。
+`initialize` → 27 个 `memory_*` 工具 → `memory_add` → `memory_stats`。

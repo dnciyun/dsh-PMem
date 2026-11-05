@@ -3364,6 +3364,9 @@ window.__ModuleLoader__.load({
       const [prefMode, setPrefMode] = useState(defaults.mode)
       const [bigTemplate, setBigTemplate] = useState(defaults.bigTemplate === true)
       const [bigLimit, setBigLimit] = useState(String(defaults.bigLimit ?? 0))
+      // 夜间用真模型思考（鲸眠）：落 PMem 配置 sleep.whale.enabled，默认关。
+      const [nightLlm, setNightLlm] = useState(false)
+      const [nightBusy, setNightBusy] = useState(false)
       // 危险区（真路由）：备份列表/生成/下载、向量重建（可取消）、运维动作白名单。
       const [backups, setBackups] = useState(null)
       const [backupBusy, setBackupBusy] = useState('')
@@ -3389,6 +3392,15 @@ window.__ModuleLoader__.load({
         return () => { alive = false }
       }, [])
 
+      // 夜间开关：进设置页就回显后端当前值（默认关；读不到就保持关）。
+      useEffect(() => {
+        let alive = true
+        api('/night-llm')
+          .then(data => { if (alive) setNightLlm(data?.enabled === true) })
+          .catch(() => {})
+        return () => { alive = false }
+      }, [])
+
       const runtime = status?.runtime ?? {}
       const locked = runtime.locked ?? {}
       const db = status?.db ?? {}
@@ -3405,6 +3417,27 @@ window.__ModuleLoader__.load({
           setError(`保存失败：${cause.message}`)
         } finally {
           setBusy('')
+        }
+      }
+
+      // 夜间开关不写 runtime.json，走 PMem 配置；失败要退回原值，别让界面显示成已开。
+      const saveNightLlm = async value => {
+        const previous = nightLlm
+        setNightLlm(value)
+        setNightBusy(true)
+        setError('')
+        try {
+          const data = await api('/night-llm', {
+            method: 'POST',
+            body: JSON.stringify({ enabled: value }),
+          })
+          setNightLlm(data?.enabled === true)
+          say('已保存（下一晚生效）')
+        } catch (cause) {
+          setNightLlm(previous)
+          setError(`夜间开关保存失败：${cause.message}`)
+        } finally {
+          setNightBusy(false)
         }
       }
 
@@ -3708,6 +3741,27 @@ window.__ModuleLoader__.load({
           ),
         ),
 
+        // ── 夜间：用真模型思考（鲸眠）。默认关；写 PMem 配置，改完下一晚生效。──
+        h(
+          Panel,
+          {
+            title: '夜间',
+            note: '默认关。决定夜里谁把当天原文写成日记：本地模板，还是 DSH 会话（模型是我）。改完下一晚生效。',
+          },
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '夜间用真模型思考（鲸眠）'),
+            h('span', null, h(Switch, {
+              checked: nightLlm,
+              disabled: nightBusy,
+              onChange: value => void saveNightLlm(value),
+              label: nightLlm ? '开' : '关',
+            }))),
+          h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } },
+            '关 = 夜间只跑本地模板日记 + 8 阶段（0 模型调用、0 成本）；'
+            + '开 = 夜间由 DSH 会话（模型是我）把当天原文想成日记，用宿主额度，不需要 API key。'
+            + '默认关，改完下一晚生效。'),
+        ),
+
         // ── 排查面板 ──────────────────────────────────────────────────────────
         h(
           Panel,
@@ -3744,7 +3798,7 @@ window.__ModuleLoader__.load({
             h('span', null, h('span', { className: 'pconsole-chip' }, status?.mcp?.serverName ?? 'pmem'))),
           h('div', { className: 'pconsole-kv' },
             h('span', null, 'MCP 工具数'),
-            h('span', null, `${status?.mcp?.tools ?? 24} 个`)),
+            h('span', null, `${status?.mcp?.tools ?? 27} 个`)),
           h('div', { className: 'pconsole-kv' },
             h('span', null, '原生工具'),
             h('span', null, '5 个（pmem_wake / recall / remember / soul / stats）')),
@@ -3952,7 +4006,7 @@ window.__ModuleLoader__.load({
             h('span', null, `${countText(pickNumber(db.memory_total, boot?.counts?.memory_total))} 条 · ${fmtBytes(db.db_size_bytes)}`)),
           h('div', { className: 'pconsole-kv' },
             h('span', null, 'MCP 工具'),
-            h('span', null, '24 个（含 memory_* / export / import / stats）')),
+            h('span', null, '27 个（含 memory_* / export / import / stats）')),
           h('p', { className: 'pconsole-subhead' }, '命令行速查'),
           h('div', { className: 'pconsole-actions', style: { margin: 0 } },
             h('button', { className: 'pconsole-btn', type: 'button', onClick: () => copy('pmem status --json') }, 'pmem status'),

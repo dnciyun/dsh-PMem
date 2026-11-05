@@ -607,7 +607,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
         turns: config.handoffTurns,
         minMs: config.handoffMinMs,
       },
-      mcp: { serverName: 'pmem', tools: 24 },
+      mcp: { serverName: 'pmem', tools: 27 },
     }
   }
 
@@ -664,8 +664,69 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     return json(res, 200, { ok: true, runtime: publicRuntime() })
   })
 
+  // ---- 夜间用真模型思考（鲸眠） ---------------------------------------------
+  // 落到 PMem 自己的配置文件（sleep.whale.enabled），不是 runtime.json：
+  //   · 关（默认）：夜里只跑本地模板日记 + 8 阶段，0 模型调用、0 成本；
+  //   · 开：夜间由 DSH 会话（宿主模型）把当天原文想成日记，用宿主额度，不需要 API key。
+  // 插件不自己读写 TOML，一律走 CLI 的 config get / set（和 CLI 契约一致）。
+  // CLI 的 JSON 信封是 {ok:true, data:{key,value,path}}；也兼容顶层的 {ok:true,key,value}，
+  // 免得信封改一次就把设置页弄哑。
+  const nightLlmValue = payload => {
+    if (!payload || typeof payload !== 'object') return undefined
+    const fromData = payload.data?.value
+    return fromData === undefined ? payload.value : fromData
+  }
+
+  const nightLlmEnabled = async () => {
+    const payload = await callPmem(config, ['config', 'get', 'sleep.whale.enabled'], {
+      json: true,
+      timeout: 15000,
+    })
+    if (payload?.ok === false) {
+      const detail = payload?.error?.message ?? payload?.error ?? '读取夜间开关失败'
+      throw new Error(String(detail))
+    }
+    return nightLlmValue(payload) === true
+  }
+
+  route('exact', `${API}/night-llm`, async (req, res) => {
+    if (req.method === 'GET') {
+      try {
+        return json(res, 200, { ok: true, enabled: await nightLlmEnabled() })
+      } catch (error) {
+        // 读不到就当关：夜里宁可不花模型额度，也不能因为一个开关读失败让设置页炸。
+        return json(res, 500, { ok: false, enabled: false, error: String(error?.message ?? error) })
+      }
+    }
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 GET / POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    if (!body || typeof body !== 'object' || typeof body.enabled !== 'boolean') {
+      return json(res, 400, { ok: false, enabled: false, error: 'body 需要 { enabled: true | false }' })
+    }
+    try {
+      const payload = await callPmem(
+        config,
+        ['config', 'set', 'sleep.whale.enabled', body.enabled ? 'true' : 'false'],
+        { json: true, timeout: 15000 },
+      )
+      if (payload?.ok === false) {
+        const detail = payload?.error?.message ?? payload?.error ?? '保存夜间开关失败'
+        throw new Error(String(detail))
+      }
+      return json(res, 200, { ok: true, enabled: nightLlmValue(payload) === true })
+    } catch (error) {
+      return json(res, 500, { ok: false, enabled: false, error: String(error?.message ?? error) })
+    }
+  })
+
   route('exact', `${API}/mcp`, async (req, res) => {
-    return json(res, 200, { ok: true, serverName: 'pmem', tools: 24, note: 'MCP 由官方 client 管理；这里是静态摘要' })
+    return json(res, 200, { ok: true, serverName: 'pmem', tools: 27, note: 'MCP 由官方 client 管理；这里是静态摘要' })
   })
 
   // ---- 星图 ----------------------------------------------------------------

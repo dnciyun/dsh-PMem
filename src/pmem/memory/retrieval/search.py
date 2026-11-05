@@ -23,6 +23,7 @@ from .. import scoring
 from .. import temporal as temporal_mod
 from .. import vector as vector_mod
 from ..text import ALIAS_TOKENS, char_ngrams, estimate_tokens, jaccard, normalize, query_variants
+from . import timecue
 
 
 def run_search(
@@ -48,6 +49,16 @@ def run_search(
         raise ValidationError("query 不能为空", field="query")
     k = min(k or store.cfg.get("retrieval.top_k", 8), store.cfg.get("limits.max_k", 50))
     budget = budget or store.cfg.get("retrieval.token_budget", 600)
+    # 时间路由：问时间的句子（上周/昨天/10月29号/3天前…）答案通常只有一两条，
+    # 大 k / 大预算只会把 600 token 摊薄、把真正那一天的那条挤到后面。
+    # 这里只**本次检索**收敛，不改 cfg、不写库；默认 cap 8 条 / 600 token，
+    # 可用 retrieval.time_router.{enabled,cap_k,cap_budget} 覆盖。
+    router_cfg = store.cfg.get("retrieval.time_router")
+    router_cfg = router_cfg if isinstance(router_cfg, dict) else {}
+    time_routed = bool(router_cfg.get("enabled", True)) and timecue.is_time_question(q)
+    if time_routed:
+        k = min(int(k), max(1, int(router_cfg.get("cap_k", 8) or 8)))
+        budget = min(int(budget), max(1, int(router_cfg.get("cap_budget", 600) or 600)))
     filters = filters or {}
     rrf_k = store.cfg.get("retrieval.rrf_k", 60)
 
@@ -1007,6 +1018,15 @@ def run_search(
         "total_candidates": len(fused),
         "budget_used": used,
         "latency_ms": latency_ms,
+        # 时间路由（只增字段，不改原有键）：调用方/评测能看到这次到底有没有被收敛，
+        # 以及实际生效的 k/budget——不然「为什么只回了 8 条」只能靠猜。
+        "meta": {
+            "time_router": {
+                "routed": time_routed,
+                "k": int(k),
+                "budget": int(budget),
+            }
+        },
         "channels": {name: len(ranks) for name, ranks in channels.items()},
         "spread": spread_info,
         **({"episode": episode_info} if episode_info else {}),

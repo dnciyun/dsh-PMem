@@ -214,6 +214,20 @@ DEFAULTS: dict[str, Any] = {
             "enabled": True,
             "entities": 3,
         },
+        # 时间路由（0.36.0）：外部靶场 714 题实测——把检索预算从 k=8 放宽到 k=40，
+        # 时间类题反而被更多上下文干扰（时间约定 −6、时间题 −5、相对日期 −3）。
+        # 所以问句里带时间线索的题走窄配置（k≤8 / budget≤600），并把检索条目的日期
+        # 补上「距今 N 天」，让模型算相对日期时有锚点（B 层 29 道相对日期失败里
+        # 27 道是「捞到了但算错/不敢算」，不是检索问题）。
+        # 离线估算（同一批答案按 router 回退）：+11 题（762→573 口径见靶场 REPORT §6.3）。
+        # 纯确定性、无模型调用、0 成本；只压上限，不会把调用方要的 k 抬高。
+        "time_router": {
+            "enabled": True,
+            "cap_k": 8,
+            "cap_budget": 600,
+            # 检索条目日期后补「（距今 N 天）」。0 天（今天）不补，避免每条都涨价。
+            "age_labels": True,
+        },
         # 向量通道（M13）：本地 bge-small-zh-v1.5（ONNX int8）语义检索。
         # 只在**词法覆盖率低于 trigger_coverage** 时跑（第二手段），只补候选不重排；
         # 缺模型/缺 onnxruntime 时整条通道静默降级，词法链路完全不受影响。
@@ -375,6 +389,17 @@ DEFAULTS: dict[str, Any] = {
         "recent_days": 2,          # 醒来卡「最近」往回看几天
         "recent_items": 2,         # 「最近」最多几行
     },
+    # 作答自检（0.36.0）：回答完再看一遍草稿——日期/专名这些「容易编」的东西
+    # 到底在不在记忆里。确定性核对（只读 SQL，0 模型调用、0 成本）；填了 model
+    # 且环境有凭证才会多跑一遍模型复核。
+    "selfcheck": {
+        "enabled": True,
+        "model": "",               # 留空 = 只做确定性核对
+        "max_dates": 40,
+        "max_names": 20,
+        "max_answer_chars": 4000,
+        "evidence_per_issue": 3,
+    },
     "evolve": {
         "auto_resolve_conflicts": True,
         "conflict_escalate_days": 14,
@@ -487,3 +512,137 @@ class Config:
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"Config({sorted(self._data)})"
+
+
+# ---------------------------------------------------------------------------
+# 配置文件（0.36.0）：``~/.dsh/pmem/config.toml``
+#
+# 为什么要有默认路径：插件/宿主调 CLI 时只传 ``--db``，以前不传 ``--config`` 就等于
+# 「永远只用内置默认值」——设置页里就没有任何能持久化的 PMem 级开关（比如夜间的
+# 鲸眠开关）。现在 CLI 默认读这个文件；文件不存在 = 与过去完全一致（纯默认值）。
+#
+# 写回策略：整份重写成**点号键**（``sleep.whale.enabled = true``），只保证标量/标量
+# 数组/嵌套标量表；注释不保留（这是机器管理的文件，不是手写文档）。
+# ---------------------------------------------------------------------------
+
+
+def default_config_path() -> Path:
+    """默认配置文件位置：``$DSH_HOME/pmem/config.toml``，缺省 ``~/.dsh/pmem/config.toml``。"""
+    import os
+
+    home = os.environ.get("DSH_HOME", "").strip()
+    base = Path(home) if home else Path.home() / ".dsh"
+    return base / "pmem" / "config.toml"
+
+
+def read_config_file(path: str | Path | None = None) -> dict[str, Any]:
+    """读配置文件；不存在/读不动都当空（和 ``Config.load`` 的语义一致）。"""
+    p = Path(path) if path else default_config_path()
+    try:
+        if not p.exists():
+            return {}
+        with p.open("rb") as fh:
+            data = tomllib.load(fh)
+    except (OSError, tomllib.TOMLDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _toml_key(part: str) -> str:
+    import re
+
+    if re.fullmatch(r"[A-Za-z0-9_-]+", part or ""):
+        return part
+    import json
+
+    return json.dumps(str(part), ensure_ascii=False)
+
+
+def _toml_value(value: Any) -> str:
+    import json
+
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if value != value or value in (float("inf"), float("-inf")):  # noqa: PLR0124
+            raise ValueError("TOML 不支持 NaN/Inf")
+        return repr(value)
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    if isinstance(value, (list, tuple)):
+        if any(isinstance(item, (dict, list, tuple)) for item in value):
+            raise TypeError("配置文件只支持标量数组（不支持嵌套表数组）")
+        return "[" + ", ".join(_toml_value(item) for item in value) + "]"
+    raise TypeError(f"配置文件不支持的值类型：{type(value).__name__}")
+
+
+def _flatten_config(data: dict[str, Any], prefix: tuple[str, ...] = ()) -> list[str]:
+    lines: list[str] = []
+    for key, value in data.items():
+        path = prefix + (str(key),)
+        if isinstance(value, dict):
+            if value:
+                lines.extend(_flatten_config(value, path))
+            continue
+        dotted = ".".join(_toml_key(part) for part in path)
+        lines.append(f"{dotted} = {_toml_value(value)}")
+    return lines
+
+
+def write_config_file(path: str | Path | None, data: dict[str, Any]) -> Path:
+    """整份写回点号键 TOML（原子写：先写临时文件再替换）。返回写到的路径。"""
+    p = Path(path) if path else default_config_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
+    body = "\n".join(_flatten_config(data))
+    text = f"# 由 pmem config set 维护；手写注释会被重写覆盖。\n{body}\n" if body else "# 空配置\n"
+    tmp = p.with_suffix(p.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(p)
+    return p
+
+
+def parse_config_value(raw: str) -> Any:
+    """把 CLI 的字符串值转成 TOML 标量：true/false → bool，整数/小数 → 数字，其余当字符串。"""
+    text = str(raw).strip()
+    low = text.lower()
+    if low in ("true", "yes", "on", "1"):
+        return True
+    if low in ("false", "no", "off", "0"):
+        return False
+    if len(text) >= 2 and text[0] == text[-1] and text[0] in ("'", '"'):
+        return text[1:-1]
+    try:
+        return int(text)
+    except ValueError:
+        pass
+    try:
+        return float(text)
+    except ValueError:
+        return text
+
+
+def set_config_value(data: dict[str, Any], dotted: str, value: Any) -> dict[str, Any]:
+    """在嵌套 dict 里按点号路径写一个值（原地改并返回，便于链式调用）。"""
+    parts = [part for part in str(dotted).split(".") if part]
+    if not parts:
+        raise ValueError("配置键不能为空")
+    node: dict[str, Any] = data
+    for part in parts[:-1]:
+        nxt = node.get(part)
+        if not isinstance(nxt, dict):
+            nxt = {}
+            node[part] = nxt
+        node = nxt
+    node[parts[-1]] = value
+    return data
+
+
+def get_config_value(data: dict[str, Any], dotted: str, default: Any = None) -> Any:
+    node: Any = data
+    for part in str(dotted).split("."):
+        if not isinstance(node, dict) or part not in node:
+            return default
+        node = node[part]
+    return node
