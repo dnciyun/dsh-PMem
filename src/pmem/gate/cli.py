@@ -55,6 +55,26 @@ def _print_sleep(data: dict[str, Any]) -> None:
         print(f"  报告：{data['report_path']}")
 
 
+def _print_big_day(item: dict[str, Any]) -> None:
+    """大睡一场的逐天进度（一行一天）。"""
+    day = item.get("day")
+    if item.get("error"):
+        print(f"  {day}  ✗ {item['error']}", flush=True)
+        return
+    diary = item.get("diary") or {}
+    sleep = item.get("sleep") or {}
+    if diary.get("skipped"):
+        mode = f"跳过（{diary['skipped']}）"
+    else:
+        mode = diary.get("mode") or "?"
+        if diary.get("episode_id"):
+            mode += f" 日记 {str(diary['episode_id'])[:8]}"
+        if diary.get("facts"):
+            mode += f" 事实 {diary['facts']} 条"
+    stage = sleep.get("status") or sleep.get("skipped") or "?"
+    print(f"  {day}  {mode}  睡眠 {stage}", flush=True)
+
+
 def _print_evolve(data: dict[str, Any]) -> None:
     """进化层的人读输出：清单/统计用结构化 JSON，匹配结果逐条列。"""
     if data.get("rendered"):
@@ -582,6 +602,16 @@ def main(argv: list[str] | None = None) -> int:
     p_slw.add_argument("--no-sleep", action="store_true", help="只写日记，不接着跑固定 8 阶段")
     p_slw.add_argument("--show", action="store_true", help="跑完把鲸眠会话转录打印出来")
     p_slw.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    p_slb = sl_sub.add_parser(
+        "big", help="大睡一场（0.35.1）：把已有的记忆按天从头睡一遍（默认全部）"
+    )
+    p_slb.add_argument("--from", dest="start", default=None, help="起始日期 YYYY-MM-DD（含）")
+    p_slb.add_argument("--to", dest="end", default=None, help="结束日期 YYYY-MM-DD（含）")
+    p_slb.add_argument("--limit", type=int, default=0, help="最多睡几天（默认 0 = 全部）")
+    p_slb.add_argument("--dry-run", action="store_true", help="整体演练：不落库，只算")
+    p_slb.add_argument("--template", action="store_true", help="强制模板写日记，不调模型")
+    p_slb.add_argument("--skip-digested", action="store_true", help="只睡还没消化过的日子")
+    p_slb.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
 
     p_ev = sub.add_parser("evolve", help="进化引擎（M5）：复核 / 经验复用 / 冲突升级 / 调参")
     ev_sub = p_ev.add_subparsers(dest="evolve_action", required=True)
@@ -1406,6 +1436,30 @@ def main(argv: list[str] | None = None) -> int:
                     text = _Path(str(data.get("transcript"))).read_text(encoding="utf-8")
                     print("---- 鲸眠会话（末尾） ----")
                     print("\n".join(text.splitlines()[-30:]))
+                return 0
+            if args.sleep_action == "big":
+                result = app.sleep_big(
+                    start=args.start,
+                    end=args.end,
+                    limit=args.limit,
+                    dry_run=args.dry_run,
+                    use_whale=not args.template,
+                    skip_digested=args.skip_digested,
+                    on_day=_print_big_day,
+                )
+                if getattr(args, "json", False):
+                    return _emit(result, True)
+                if not result.get("ok"):
+                    return _emit(result, False)
+                data = result["data"]
+                print(
+                    f"— 大睡一场：{data.get('days')} 天（鲸眠 {data.get('whale_days')} / "
+                    f"模板 {data.get('template_days')} / 跳过 {data.get('skipped_days')} / "
+                    f"失败 {data.get('failed_days')}），token {data.get('tokens')}，"
+                    f"用时 {data.get('elapsed_s')}s，模式 {data.get('mode')}"
+                )
+                if data.get("note"):
+                    print(f"  注意：{data['note']}")
                 return 0
             if args.sleep_action == "run":
                 result = app.sleep(

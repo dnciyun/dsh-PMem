@@ -801,6 +801,60 @@ class PMem:
             return self._fail(exc, started)
         return self._ok(data, started)
 
+    def sleep_big(
+        self,
+        *,
+        start: str | None = None,
+        end: str | None = None,
+        limit: int = 0,
+        dry_run: bool = False,
+        use_whale: bool = True,
+        skip_digested: bool = False,
+        model: Any = None,
+        on_day: Any = None,
+    ) -> dict[str, Any]:
+        """大睡一场（0.35.1）：按天把已有的记忆从头睡一遍（默认全部，可限定日期范围）。
+
+        每天：有模型就走鲸眠会话写日记，否则走模板 digest；然后跑固定 8 阶段。
+        ``on_day`` 是逐天回调（CLI 用来打进度）。
+        """
+        started = time.perf_counter()
+        from ..sleep import big, whale
+
+        try:
+            big.validate_range(start, end)
+            client = None
+            note = ""
+            if use_whale:
+                try:
+                    if model is not None and not isinstance(model, str):
+                        client = model
+                    else:
+                        client = whale.build_model(self.config, model)
+                except PmemError as exc:
+                    note = f"没有可用的鲸眠模型，本轮改用模板写日记：{exc}"
+                    use_whale = False
+            data = big.run(
+                self.db,
+                subject=self.subject,
+                store=self.store,
+                app=self,
+                config=self.config,
+                model=client,
+                start=start,
+                end=end,
+                limit=limit,
+                dry_run=dry_run,
+                use_whale=use_whale,
+                skip_digested=skip_digested,
+                on_day=on_day,
+            )
+            if note:
+                data["note"] = note
+        except PmemError as exc:
+            return self._fail(exc, started)
+        return self._ok(data, started)
+
     def sleep_status(self, *, day_key: str | None = None) -> dict[str, Any]:
         started = time.perf_counter()
         from ..sleep import orchestrator
