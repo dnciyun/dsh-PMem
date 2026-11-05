@@ -908,6 +908,11 @@ class MemoryStore:
         return channels_mod.raw_fallback(self, q=q, terms=terms, k=k, cov_best=cov_best,
                                          got=got, have_graph=have_graph)
 
+    def _assistant_voice(self, *, q, terms, limit=2):
+        # assistant 原话按设计不进 memory（facts 只从用户行派生），只能回 journal 里找；
+        # 通道实现在 channels.py，这里只做一行委托，和 _raw_fallback 同一套签名风格。
+        return channels_mod.assistant_voice(self, q=q, terms=terms, limit=limit)
+
     def _fetch_scored(self, fused, filters, *, limit):
         return channels_mod.fetch_scored(self, fused, filters, limit=limit)
 

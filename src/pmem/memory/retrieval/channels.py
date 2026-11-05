@@ -9,6 +9,7 @@ store from here would create a cycle. Keep the two implementations identical.
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from ...base import events
@@ -22,6 +23,21 @@ from .. import vector as vector_mod
 from ..text import estimate_tokens, normalize, tokenize
 
 VISIBLE_STATUS = ("active", "contested", "dormant", "candidate")
+
+# 「问我自己的话」线索：只有这类问句才值得去查 assistant 原话。
+# 不放宽成「任何低覆盖率问句」——助手的话是证据，不是用户事实；拿它顶用户陈述
+# 比漏答更糟（模型会把自己的推测当成用户说过的话）。
+ASSISTANT_VOICE_CLUES = re.compile(
+    r"你说过|你上次说|你上回说|你之前说|你讲过|你上次讲|你答应|你承诺|"
+    r"你自己说|你的设定|你叫什么|你自称"
+)
+
+
+def _assistant_voice_query(q: str) -> list[str]:
+    """把含线索的问句切成 FTS 词；和 raw_fallback 一样用整句双字。"""
+    tokens = tokenize(q).split()
+    return tokens[:64]
+
 
 
 def _json_dump(data: dict[str, Any] | None) -> str:
@@ -535,6 +551,73 @@ def raw_fallback(
                 "importance": 0.5,
                 "confidence": 0.6,
                 "provenance": "user_explicit" if row["role"] == "user" else "observed",
+                "channels": ["journal"],
+                "truncated": False,
+                "groups": [],
+                "grade": None,
+                "source": "journal",
+            }
+        )
+    return out
+
+
+def assistant_voice(
+    store: Any,
+    *,
+    q: str,
+    terms: list[str],  # noqa: ARG001 - 与 raw_fallback 同签名，保留调用侧一致性
+    limit: int = 2,
+) -> list[dict[str, Any]]:
+    """只在问「我（助手）自己说过什么」时，召回 assistant 原话。
+
+    为什么单独一路而不是放开 raw_fallback：原话兜底是「派生事实不够用时回原文」，
+    它和用户事实抢同一份预算；assistant 的话是**证据**，只该在问句明确指向
+    「你说过/你答应」时出现。否则模型会把自己的推测当成用户陈述。
+    为什么 score 压低：这是低置信度的补充证据，不能把真正的事实候选挤下去。
+    """
+    text = str(q or "")
+    if not ASSISTANT_VOICE_CLUES.search(text):
+        return []
+    tokens = _assistant_voice_query(text)
+    if not tokens:
+        return []
+    expr = " OR ".join(f'"{token}"' for token in tokens)
+    try:
+        rows = store.db.conn.execute(
+            "SELECT jl.id, jl.text, jl.day_key, jl.role, jl.ts, bm25(journal_fts) AS bm25 "
+            "FROM journal_fts JOIN journal_line jl ON jl.seq=journal_fts.rowid "
+            "WHERE journal_fts MATCH ? AND jl.subject_id=? AND jl.role='assistant' "
+            "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
+            "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id) "
+            "ORDER BY bm25(journal_fts) LIMIT ?",
+            (expr, str(store.subject), max(1, int(limit or 2))),
+        ).fetchall()
+    except Exception:  # noqa: BLE001 老库没建 FTS：当没有这条通道，不影响词法
+        return []
+    query_grams = query_mod.bigrams(text)
+    out: list[dict[str, Any]] = []
+    seen_text: set[str] = set()
+    for row in rows:
+        body = str(row["text"] or "")
+        key = normalize(body)
+        if not body or not key or key in seen_text:
+            continue
+        seen_text.add(key)
+        overlap = len(query_grams & query_mod.bigrams(body))
+        out.append(
+            {
+                "id": row["id"],
+                "text": body,
+                # 低分：assistant 原话是补充证据，不能和用户事实抢头部。
+                "score": round(min(0.8, 0.30 + 0.1 * overlap), 4),
+                "kind": "journal",
+                "day": row["day_key"],
+                "valid_from": row["ts"],
+                "role": "assistant",
+                "author": "assistant",
+                "importance": 0.5,
+                "confidence": 0.6,
+                "provenance": "observed",
                 "channels": ["journal"],
                 "truncated": False,
                 "groups": [],

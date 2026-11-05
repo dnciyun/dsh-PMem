@@ -47,6 +47,26 @@ DEFAULTS: dict[str, Any] = {
         "raw_fallback": True,
         "raw_fallback_coverage": 0.30,
         "raw_fallback_max": 3,
+        # 低覆盖自适应加深（0.32.0）：只在「命中太少 / 覆盖率太低」时，用一次
+        # query.expand_for_memory 的确定性改写再检索一遍，把新条目填进空位。
+        # 为什么不做全局 k=20：B 层 44 道 miss@10 且 gold 存在的题，k=20 只补中 2 道，
+        # 却让每题都多花候选/延迟；加深只服务低覆盖这一类失败，代价按需支付。
+        # 预算/条数是硬上限：主结果优先，深捞只填空位（总条数 ≤ 原 k、token ≤ budget）。
+        "adaptive": {
+            "enabled": True,
+            # 触发线：cov_best 低于它视为「词法没对上」，才值得换说法再找一次。
+            # 0.45 与 graph/raw_fallback 的弱覆盖线同一量级。
+            "coverage": 0.45,
+            # 第二遍放大的候选数：比首遍 k 大，才有机会把排在第 9–20 名的答案带回来。
+            "k": 20,
+            # 最多补几条；默认等于首遍 k（再大也会被 k 个槽位卡住）。
+            "max_add": 8,
+        },
+        # 「我说过的话」通道（0.32.0）：assistant 原话按设计不进 memory（facts 只从
+        # 用户行派生），所以「你上次答应我什么」这类问题只能回 journal 原话里找。
+        # 只有查询里出现明确自指线索（你说过/你答应/你上次讲…）时才查，默认最多 2 条、
+        # 放在尾巴：问用户事实的句子不能被我的旧话顶掉。
+        "assistant_voice": {"enabled": True, "limit": 2},
         # 关联扩散通道（M12）：词法命中做种子，在稀有词共现图上做 PPR。
         # 默认只做**补候选**（append）；重排（rerank）默认关：
         # 90 天语料上实测 append 净 +1 题且零损失，rerank 反而会挤掉对的（-2 题）。

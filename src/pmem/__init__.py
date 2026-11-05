@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-__version__ = "0.31.0"
+__version__ = "0.32.0"
 __name_cn__ = "可塑性记忆"
 __name_en__ = "PMemories"
 __codename__ = "PMem"

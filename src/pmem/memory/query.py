@@ -102,6 +102,69 @@ def bigrams(text: str) -> set[str]:
     return out
 
 
+# ---- 问句说法 → 记忆说法（0.32.0 低覆盖加深用） --------------------------
+#
+# 为什么要单独一张表：B 层 152 道失败里 24 道是「库里明明有、问法完全不同」。
+# 「填个表 我全名咋写 多大来着」和记忆里的「用户叫沈知夏…24」没有一个双字交集。
+# 这不是模型改写能稳定解决的（而且检索层不该依赖模型），所以只做**确定性的词级补充**：
+# 把问句里的属性词，换成记忆里常见的写法（叫/名字、岁/年龄、住/搬/城市……）。
+# 只加词、不换整句——改写错了不能把原来命中的结果挤掉（加深结果永远排在主结果之后）。
+_QUERY_FLUFF = (
+    "填个表", "填个表格", "填一下表", "填表",
+    "帮我看看", "帮我查", "帮我", "麻烦你", "麻烦", "请问", "告诉我", "我想知道",
+    "咋写", "咋说", "咋念", "怎么写", "怎么说", "怎么念",
+    "来着", "一下", "说说", "查一下", "看一下", "问一下",
+)
+_FLUFF_TAIL = re.compile(r"[吗呢吧啊呀嘛哦？?！!。.，,、\s]+$")
+
+# (问句里的说法, 补进去的记忆说法)。补充用空格分隔，交给 FTS/双字切分照常处理。
+# 「用户叫」是记忆层的常见句式（「用户叫沈知夏…」），比单字「叫」更能在双字索引里命中。
+_ATTR_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
+    (("全名", "姓名", "名字"), "用户叫 叫 名字"),
+    (("多大", "几岁", "多少岁"), "岁 年龄"),
+    (("生日",), "生日 出生"),
+    (("住在哪", "住哪儿", "住哪"), "住 搬 城市"),
+    (("干什么", "做什么", "职业"), "做 上班 职业"),
+    (("电话", "手机号", "号码"), "电话 号码"),
+)
+
+
+def expand_for_memory(query: str) -> str:
+    """把口语问句改写成更接近「记忆写法」的查询（确定性，不调模型）。
+
+    两件事，都是词级操作：
+
+    1. 去掉问句/口语修饰（填个表、咋写、来着、帮我、一下、请问、句尾吗/呢…）；
+    2. 按 ``_ATTR_HINTS`` 补记忆侧属性词（全名 → 用户叫/叫/名字；多大 → 岁/年龄…）。
+
+    **不整句替换**：原句去掉口语词后保留，只在尾巴追加属性词；这样即使猜错，
+    原句仍然在，深捞也只会在主结果之后填空位。没有可删可加的东西就返回原串
+    （调用方据此跳过第二次检索）。
+    """
+    raw = str(query or "").strip()
+    if not raw:
+        return raw
+    cleaned = raw
+    removed_fluff = False
+    for phrase in sorted(_QUERY_FLUFF, key=len, reverse=True):
+        if phrase in cleaned:
+            removed_fluff = True
+            cleaned = cleaned.replace(phrase, " ")
+    cleaned = _FLUFF_TAIL.sub("", re.sub(r"\s+", " ", cleaned).strip())
+
+    additions: list[str] = []
+    for triggers, hint in _ATTR_HINTS:
+        if any(word in raw for word in triggers):
+            if hint not in additions:
+                additions.append(hint)
+    if not additions:
+        # 只去掉句尾标点（「…改成了什么？」→「…改成了什么」）不算改写：
+        # 返回原串，调用方据此跳过第二次检索，避免为了一个问号多跑一遍。
+        return cleaned if (removed_fluff and cleaned) else raw
+    return f"{cleaned} {' '.join(additions)}".strip()
+
+
+
 def coverage(terms: list[str], text: str) -> float:
     """查询内容词被正文覆盖的比例（0..1）。分母是查询自己，和正文长短无关。"""
     if not terms:

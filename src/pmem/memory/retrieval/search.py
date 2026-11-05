@@ -35,7 +35,13 @@ def run_search(
     filters: dict[str, Any] | None = None,
     client: str | None = None,
     record: bool = True,
+    _deep: bool = False,
 ) -> dict[str, Any]:
+    """检索编排。
+
+    ``_deep``：内部参数，低覆盖加深跑第二遍时置 True，防止无限递归；
+    外部调用方（``MemoryStore.search``）不传。
+    """
     started = time.perf_counter()
     q = normalize(query or "")
     if not q:
@@ -495,6 +501,101 @@ def run_search(
     # 每条已选结果现在有多「有实词依据」：补候选时只用覆盖率为 0 的尾巴换。
     payload_cov = [float(cov_by_seq.get(seq, 0.0) or 0.0) for seq in payload_seq]
 
+    # ---- 低覆盖自适应加深（0.32.0） ---------------------------------------
+    # 只在「命中太少（got < k）或覆盖率太低」时，用 query.expand_for_memory 的
+    # 确定性改写**再检索一遍**，把首遍没出现过的条目填进空位。
+    # 三条硬纪律：
+    #   1. 主结果优先：不重排、不挤掉已有条目，只填空位（总量 ≤ 原 k）；
+    #   2. 预算双上限：adaptive.max_add 与 budget 都不能突破；
+    #   3. 只跑一次：内部参数 ``_deep=True`` 防递归。
+    # 为什么不做全局 k=20：B 层实测 44 道 miss@10 里 k=20 只补中 2 道，全局放大
+    # 只是每题多花钱；加深只在低覆盖这一类失败上按需支付。
+    deepen_info: dict[str, Any] = {}
+    deepen_top_cov = 0.0
+    adaptive_cfg = store.cfg.get("retrieval.adaptive", {}) or {}
+    if isinstance(adaptive_cfg, dict) and bool(adaptive_cfg.get("enabled", True)) and not _deep:
+        threshold = float(adaptive_cfg.get("coverage", 0.45) or 0.0)
+        got = len(payload)
+        weak_items = got < k
+        weak_coverage = cov_best < threshold
+        if weak_items or weak_coverage:
+            trigger = "few_items" if weak_items else "low_coverage"
+            deepen_k = max(int(adaptive_cfg.get("k", 20) or 20), k)
+            raw_max_add = adaptive_cfg.get("max_add", k)
+            max_add = k if raw_max_add is None else max(0, int(raw_max_add))
+            expanded = query_mod.expand_for_memory(query) or query
+            if normalize(expanded) == q:
+                # 没有可改写的词：不花第二次检索，元信息里如实标「没扩大」。
+                deepen_info = {
+                    "trigger": trigger,
+                    "added": 0,
+                    "expanded": False,
+                    "skipped": "no_expansion",
+                }
+            elif got >= k:
+                # 槽位已经满了。契约要求「深捞只填空位」，没有空位就不做第二次检索。
+                deepen_info = {
+                    "trigger": trigger,
+                    "added": 0,
+                    "expanded": True,
+                    "skipped": "no_slot",
+                }
+            else:
+                deep = run_search(
+                    store,
+                    expanded,
+                    k=deepen_k,
+                    budget=budget,
+                    mode=mode,
+                    filters=filters,
+                    client=client,
+                    record=False,
+                    _deep=True,
+                )
+                deepen_top_cov = float((deep.get("uncertainty") or {}).get("coverage") or 0.0)
+                seen_ids = {str(item.get("id")) for item in payload if item.get("id")}
+                remaining = max(0, int(budget) - int(spent))
+                free_slots = max(0, k - got)
+                cap = min(free_slots, max_add)
+                added_items: list[dict[str, Any]] = []
+                for item in deep.get("items") or []:
+                    if len(added_items) >= cap:
+                        break
+                    item_id = str(item.get("id") or "")
+                    if not item_id or item_id in seen_ids:
+                        continue
+                    cost = estimate_tokens(str(item.get("text") or "")) + 12
+                    if cost > remaining:
+                        continue
+                    added_items.append(item)
+                    seen_ids.add(item_id)
+                    remaining -= cost
+                if added_items:
+                    payload.extend(added_items)
+                    payload_seq.extend([0] * len(added_items))
+                    # 补 seq：后面的时效链/图补候选按 payload_seq 查重，0 会让它们判重失真。
+                    id_marks = ",".join("?" for _ in added_items)
+                    seq_map = {
+                        str(row["id"]): int(row["seq"])
+                        for row in store.db.conn.execute(
+                            f"SELECT id, seq FROM memory WHERE id IN ({id_marks})",
+                            tuple(str(item.get("id")) for item in added_items),
+                        )
+                    }
+                    for index, item in enumerate(added_items):
+                        payload_seq[got + index] = seq_map.get(str(item.get("id")), 0)
+                    # 覆盖率用深捞这一遍的最佳值占位：既不冒充精确值，也不让后续
+                    # "只换覆盖率 0 的尾巴" 把刚补进来的答案当成噪音换掉。
+                    payload_cov.extend([float(deepen_top_cov)] * len(added_items))
+                    spent = sum(estimate_tokens(item["text"]) + 12 for item in payload)
+                deepen_info = {
+                    "trigger": trigger,
+                    "added": len(added_items),
+                    "expanded": True,
+                    "k": deepen_k,
+                    "coverage": round(cov_best, 3),
+                }
+
     graph_items: list[dict[str, Any]] = []
     if bool(graph_cfg.get("append", False)):
         graph_items, extra = store._graph_append(mass=mass_out, picked=picked, graph_cfg=graph_cfg)
@@ -632,6 +733,36 @@ def run_search(
         if fitted:
             keep = max(1, k - len(fitted))
             payload = payload[:keep] + fitted
+    # 「我说过的话」通道（0.32.0）：原话兜底只在弱覆盖时开，而且和图/向量互斥；
+    # 但「你上次答应我什么」问的不是覆盖率，是**我说过的原话**——它按设计永远不进
+    # memory（facts 只从用户行派生），只能回 journal 里找。线索不命中就不查：
+    # 宁可漏掉，也不拿助手的话去顶用户事实。
+    assistant_info: dict[str, Any] = {}
+    av_cfg = store.cfg.get("retrieval.assistant_voice", {}) or {}
+    if isinstance(av_cfg, dict) and bool(av_cfg.get("enabled", True)):
+        av_items = store._assistant_voice(
+            q=q,
+            terms=terms,
+            limit=max(1, int(av_cfg.get("limit", 2) or 2)),
+        )
+        if av_items:
+            # 原话兜底（raw_fallback）不按 role 过滤，同一条 assistant 原话可能已经进了
+            # payload；这里按 id 去重，避免同一句话说两遍占预算。
+            seen_ids = {str(item.get("id")) for item in payload if item.get("id")}
+            remaining = max(0, int(budget) - int(spent))
+            av_fitted: list[dict[str, Any]] = []
+            for item in av_items:
+                if str(item.get("id")) in seen_ids:
+                    continue
+                cost = estimate_tokens(item["text"]) + 12
+                if cost > remaining:
+                    continue
+                remaining -= cost
+                av_fitted.append(item)
+            if av_fitted:
+                keep = max(1, k - len(av_fitted))
+                payload = payload[:keep] + av_fitted
+                assistant_info = {"added": len(av_fitted)}
     # 日记通道（M18）：「上周咱们都干嘛了」问的是**那几天的经过**，不是某一条事实。
     # 日记不参与候选池重排（它和记忆不是一个量纲），只在一种情况下出现：
     # 明确的时间窗 + 问经过（或词法明显没把握）→ 放最前面，它就是答案。
@@ -734,6 +865,7 @@ def run_search(
         or spread_info.get("added")
         or temporal_info.get("added")
         or entity_append_info.get("added")
+        or deepen_info.get("added")
     ):
         used = sum(estimate_tokens(item["text"]) + 12 for item in payload)
     # 「不确定就说出来」（M18）：把「这次召回有多有把握」算成确定性信号，交给渲染层说人话。
@@ -743,6 +875,10 @@ def run_search(
     if isinstance(doubt_cfg, dict) and bool(doubt_cfg.get("enabled", True)):
         first = payload[0] if payload else {}
         top_cov = float(cov_by_seq.get(payload_seq[0], 0.0)) if payload_seq else 0.0
+        # 加深补进来的条目没有单独覆盖率（深捞只报最佳），首条就是它时用深捞覆盖率占位；
+        # 这样「加深之后还是没把握」和「加深之后找到高覆盖答案」在 uncertainty 里分得开。
+        if top_cov == 0.0 and deepen_info.get("added") and deepen_top_cov:
+            top_cov = float(deepen_top_cov)
         # 分差只在**同一种东西**之间比：日记/原话的分数是另算的，混进来会永远报「咬得紧」。
         mem_scores = [
             float(item.get("score") or 0.0)
@@ -831,6 +967,8 @@ def run_search(
         **({"uncertainty": uncertainty} if uncertainty else {}),
         **({"vector": vector_info} if vector_info else {}),
         **({"entity": entity_info} if entity_info else {}),
+        **({"deepen": deepen_info} if deepen_info else {}),
+        **({"assistant_voice": assistant_info} if assistant_info else {}),
         **({"temporal": {**temporal_info, **temporal_info_cap}} if (temporal_info or temporal_info_cap) else {}),
         **(
             {

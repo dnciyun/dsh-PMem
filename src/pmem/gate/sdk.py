@@ -1356,6 +1356,10 @@ class PMem:
                 meta.append(str(item["grade"]))
             if item.get("groups"):
                 meta.append(" / ".join(str(g) for g in item["groups"]))
+            # assistant 原话是「我自己说过的」，不是用户陈述。放在元信息里给模型一个
+            # 明确的可信来源提示；不加指令句、不改条目形状，避免把记忆数据变成命令。
+            if str(item.get("role") or item.get("author") or "") == "assistant":
+                meta.append("我说过的")
             ents = [str(n) for n in (item.get("entities") or []) if str(n) in shared_ents]
             if ents:
                 meta.append("涉及：" + "、".join(ents))
