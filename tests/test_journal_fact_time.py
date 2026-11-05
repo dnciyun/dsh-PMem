@@ -65,8 +65,15 @@ class OccurredDayHelperCase(unittest.TestCase):
         """
         self.assertEqual(clock.occurred_day("2026-10-29T23:20:00"), "2026-10-29")
         self.assertEqual(clock.occurred_day("2026-10-29T00:10:00"), "2026-10-29")
-        # 带时区的照旧按本机时区折算（这条是 UTC 深夜，本机在 +01/+02 已经跨日）
-        self.assertNotEqual(clock.occurred_day("2026-10-29T23:20:00Z"), "2026-10-29")
+        # 带时区的照旧按本机时区折算：23:20Z 在 +01/+02 是第二天，在 UTC 机器上仍是当天。
+        # 所以不能写死「一定跨日」——UTC 的 CI runner 会假红（2026-11-05 实测）。
+        # 这里按同一条语义现算期望值：折叠后应等于「该瞬间在本机时区的日历日」。
+        aware = "2026-10-29T23:20:00Z"
+        local_date = clock.parse_iso(aware).astimezone().date().isoformat()
+        self.assertEqual(clock.occurred_day(aware), local_date)
+        # 无时区的字面日期与时区无关；带时区的结果只在「本机时区确实跨日」时才不同于字面日期。
+        if local_date != "2026-10-29":
+            self.assertNotEqual(clock.occurred_day(aware), "2026-10-29")
 
     def test_occurred_day_is_not_derived_from_now(self) -> None:
         """必须只看传入的时间，不能被 ``clock.set_now`` 影响。"""
