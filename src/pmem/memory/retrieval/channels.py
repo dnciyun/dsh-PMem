@@ -27,9 +27,26 @@ VISIBLE_STATUS = ("active", "contested", "dormant", "candidate")
 # 「问我自己的话」线索：只有这类问句才值得去查 assistant 原话。
 # 不放宽成「任何低覆盖率问句」——助手的话是证据，不是用户事实；拿它顶用户陈述
 # 比漏答更糟（模型会把自己的推测当成用户说过的话）。
+# 0.33.0 放宽：外部靶场 58 道真在问「助手说过什么」的题，旧词表只命中 23 道；
+# 漏掉的全是**同一语义的另一种口语说法**——时间副词（上回讲/先前/当时）、
+# 言说动词（提/给）、所有格与给予（你给我/你的/你给自己）、交付核对（交齐）、
+# 个人习惯（习惯/规矩/原则）。补全后 58/58，其余 656 题仍 0 误命中。
+# 为什么不放「上次说/之前说」这种省略「你」的说法：那会多命中 67 道**用户事实**题
+# （「我上回说下雨才挪货架」「上次说的夜班见闻，我还欠你几件」），而只多找回 11 道——
+# 拿助手的话去顶用户事实，是这条通道最不能犯的错。
+# 两处刻意收紧：
+#   - 「你说」必须带后接词（过/的/给/自己/平时/当时/上次/之前），裸「你说」会吃
+#     「跟我说岔过」这类闲聊；
+#   - 「答应/承诺」允许中间夹 0-4 字（「你当时答应」），但不再放宽到无「你」。
+# 「交齐」是最语料特定的一条（通用问句「房租交齐了吗」也会触发），它在这里换来 5 道题；
+# 真机部署如果嫌吵，删掉它只损失交付核对这一类（S2-safe 版）。
 ASSISTANT_VOICE_CLUES = re.compile(
-    r"你说过|你上次说|你上回说|你之前说|你讲过|你上次讲|你答应|你承诺|"
-    r"你自己说|你的设定|你叫什么|你自称"
+    r"你上回讲|你先前|你说自己|你给自己|你给我|你给了|你那个|你这边|你当时|"
+    r"你之前|你说(?:过|的|给|自己|平时|当时|上次|之前)|"
+    r"按你说的|照你说的|按你的|照你的|"
+    r"你[^，。？！\n]{0,4}(?:答应|承诺)|你[^，。？！\n]{0,12}(?:习惯|规矩|原则)|"
+    r"你说过|你上次说|你上回说|你讲过|你上次讲|你自己说|你的设定|你叫什么|你自称|"
+    r"交齐"
 )
 
 
@@ -466,6 +483,101 @@ def append_items(
         len(fitted),
         len(evict),
     )
+
+
+def place_items(
+    store: Any,  # noqa: ARG001 - 与 append_items 同签名，保留调用侧一致性
+    items: list[dict[str, Any]],
+    *,
+    payload: list[dict[str, Any]],
+    payload_seq: list[int],
+    payload_cov: list[float],
+    k: int,
+    budget: int,
+    spent: int,
+    head: int = 3,
+    max_evict: int = 2,
+    victim_cov_max: float | None = None,
+    cov_value: float | None = None,
+) -> tuple[list[dict[str, Any]], list[int], list[float], int, int, int]:
+    """把补来的条目放进 k 个槽位：先占空位，必要时挤掉**头部之后的弱尾巴**。
+
+    和 ``append_items`` 的分工：那个是通用补候选（``policy='score'`` 会让尾部按分数
+    重排），会重排既有结果；这里只做**一次保守置换**——头部 ``head`` 条永不动，
+    受害者按 ``(覆盖率, 分数)`` 升序挑最弱的那几条，``victim_cov_max`` 给了就再加
+    一道「覆盖率必须够低」的门槛。换进来的条目按调用方给的顺序接在尾部。
+
+    为什么需要它：加深/原话这两路都是「问句已经明说缺的是什么」时才跑，命中率比
+    普通补候选高；但它们的失败有一半是「k 个槽位已经满了，没地方放」。只填空位等于
+    把最该救的那一类直接跳过。置换上限 ``max_evict`` 与头部保护一起，把「换错」的
+    风险限死在尾部几条最弱的条目上。
+
+    返回 ``(payload, payload_seq, payload_cov, spent, added, evicted)``。
+    """
+    if not items:
+        return payload, payload_seq, payload_cov, spent, 0, 0
+    payload = list(payload)
+    payload_seq = list(payload_seq)
+    payload_cov = list(payload_cov)
+    # 防御：编排里凡是用 `payload = ... + items` 改过 payload 的分支（原话兜底/日记），
+    # 都可能让 seq/覆盖率数组落后于 payload。这里补齐，别让「挑尾巴」变成索引越界。
+    if len(payload_seq) < len(payload):
+        payload_seq += [0] * (len(payload) - len(payload_seq))
+    if len(payload_cov) < len(payload):
+        payload_cov += [0.0] * (len(payload) - len(payload_cov))
+    head_n = max(0, min(int(head), len(payload)))
+    # 受害者候选：头部之后、覆盖率不超过门槛的条目，最弱的排前面。
+    # ``victim_cov_max=None`` 表示不限覆盖率（调用方已经用别的理由说明「这条该让位」）。
+    victims = [
+        index
+        for index in range(head_n, len(payload))
+        if victim_cov_max is None or payload_cov[index] <= float(victim_cov_max)
+    ]
+    victims.sort(
+        key=lambda index: (float(payload_cov[index]), float(payload[index].get("score") or 0.0))
+    )
+    avail = max(0, int(budget) - int(spent))
+    slots_left = max(0, int(k) - len(payload))
+    fitted: list[dict[str, Any]] = []
+    evicted: list[int] = []
+    for item in items:
+        cost = estimate_tokens(str(item.get("text") or "")) + 12
+        if slots_left > 0:
+            if cost > avail:
+                continue
+            fitted.append(item)
+            avail -= cost
+            slots_left -= 1
+            continue
+        # 槽位已满：想放就得挤一条最弱的尾巴，且挤出来的预算要够付新条目。
+        if len(evicted) >= max(0, int(max_evict)) or not victims:
+            break
+        victim = victims[0]
+        release = estimate_tokens(str(payload[victim].get("text") or "")) + 12
+        if cost > avail + release:
+            break
+        victims.pop(0)
+        evicted.append(victim)
+        avail += release
+        avail -= cost
+        fitted.append(item)
+    if not fitted:
+        return payload, payload_seq, payload_cov, spent, 0, 0
+    drop = set(evicted)
+    kept = [item for index, item in enumerate(payload) if index not in drop]
+    kept_seq = [seq for index, seq in enumerate(payload_seq) if index not in drop]
+    kept_cov = [cov for index, cov in enumerate(payload_cov) if index not in drop]
+    added_cov = [
+        float(cov_value) if cov_value is not None else float(item.get("reach") or 0.0)
+        for item in fitted
+    ]
+    result_payload = kept + fitted
+    result_seq = kept_seq + [0] * len(fitted)
+    result_cov = kept_cov + added_cov
+    # spent 是「payload 实际占的 token」，按结果重算最诚实：加法账在置换（退预算）时
+    # 很容易和真实值差出十几 token，而调用方拿它当后续通道的上限。
+    result_spent = sum(estimate_tokens(str(item.get("text") or "")) + 12 for item in result_payload)
+    return result_payload, result_seq, result_cov, result_spent, len(fitted), len(evicted)
 
 
 def raw_fallback(

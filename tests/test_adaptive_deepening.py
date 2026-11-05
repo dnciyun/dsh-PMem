@@ -120,6 +120,66 @@ class AdaptiveEnabledCase(_Case):
         self.assertNotIn("deepen", data, "查询不弱时不该做第二次检索")
 
 
+class AdaptiveEvictsFullPayloadCase(_Case):
+    """0.33.0：低覆盖但槽位已满时，允许深捞换掉最弱的尾巴（0.32.0 会直接跳过）。
+
+    小库上覆盖率只有 0/1 两档（IDF 只在语料里出现过的词上算），构造不出真实的
+    「低覆盖 + 满槽位」；所以把触发线调到 1 以上（覆盖率恒低于它），专门测接线。
+    """
+
+    config_maker = staticmethod(
+        lambda: Config(
+            {
+                "retrieval": {
+                    "vector": {"enabled": False, "channel": False},
+                    "graph": {"append": False},
+                    # 触发线 > 1：所有查询都算「低覆盖」，等价于真实语料里覆盖率不足的情形；
+                    # 门槛 > 1：小库上覆盖率恒为 1，不抬高门槛就永远挑不出「更弱」的尾巴；
+                    # evict 显式打开（0.33.0 默认关，理由见 config 注释）。
+                    "adaptive": {"enabled": True, "coverage": 1.1, "evict": True, "evict_cover": 1.5},
+                }
+            }
+        )
+    )
+
+    def setUp(self) -> None:
+        super().setUp()
+        # 8 条「全名」噪声：和 WEAK_QUERY 只共享一个双字，足以占满 k=8 个槽位。
+        for index in range(8):
+            self.store.add(f"全名登记表第 {index} 号，别的没写", session_id="s3")
+
+    def test_deepen_replaces_weak_tail(self) -> None:
+        data = self._search(WEAK_QUERY, k=8)
+        deep = data.get("deepen") or {}
+        self.assertEqual(deep.get("trigger"), "low_coverage", deep)
+        self.assertGreaterEqual(int(deep.get("added") or 0), 1, deep)
+        self.assertGreaterEqual(int(deep.get("evicted") or 0), 1, deep)
+        self.assertLessEqual(len(data["items"]), 8)
+        ids = self._ids(data)
+        self.assertIn(self.target["id"], ids, "深捞应该把「用户叫沈知夏」换进槽位")
+        # 头部保护：前三条词法结果不动。
+        self.assertTrue(all("全名登记表" in str(item["text"]) for item in data["items"][:3]))
+
+    def test_evict_off_keeps_old_contract(self) -> None:
+        """默认配置（evict 关）保持 0.32 契约：槽位满就如实标 no_slot，绝不置换。"""
+        overrides = copy.deepcopy(BASE_OVERRIDES)
+        overrides["retrieval"]["adaptive"] = {"enabled": True, "coverage": 1.1}
+        app = PMem.open(self.dir / "pmem-evict-off.db", config=Config(overrides))
+        try:
+            store = app.store
+            target = store.add(TARGET, session_id="s1")
+            for text in NOISE:
+                store.add(text, session_id="s1")
+            for index in range(8):
+                store.add(f"全名登记表第 {index} 号，别的没写", session_id="s3")
+            data = store.search(WEAK_QUERY, k=8, record=False)
+            deep = data.get("deepen") or {}
+            self.assertEqual(deep.get("skipped"), "no_slot", deep)
+            self.assertNotIn(target["id"], [str(item["id"]) for item in data["items"]])
+        finally:
+            app.close()
+
+
 class AdaptiveDisabledCase(_Case):
     config_maker = staticmethod(lambda: _config(adaptive=False))
 

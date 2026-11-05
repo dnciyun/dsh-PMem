@@ -904,6 +904,15 @@ class MemoryStore:
                                          payload_cov=payload_cov, k=k, budget=budget,
                                          spent=spent, policy=policy, head=head)
 
+    def _place_items(self, items, *, payload, payload_seq, payload_cov, k, budget, spent,
+                     head=3, max_evict=2, victim_cov_max=None, cov_value=None):
+        # 保守置换（0.33.0）：先占空位，必要时挤掉头部之后的弱尾巴。
+        # 加深/原话这两路都用它——它们的失败有一半是「槽位已满放不进来」。
+        return channels_mod.place_items(self, items, payload=payload, payload_seq=payload_seq,
+                                        payload_cov=payload_cov, k=k, budget=budget,
+                                        spent=spent, head=head, max_evict=max_evict,
+                                        victim_cov_max=victim_cov_max, cov_value=cov_value)
+
     def _raw_fallback(self, *, q, terms, k, cov_best, got, have_graph=False):
         return channels_mod.raw_fallback(self, q=q, terms=terms, k=k, cov_best=cov_best,
                                          got=got, have_graph=have_graph)

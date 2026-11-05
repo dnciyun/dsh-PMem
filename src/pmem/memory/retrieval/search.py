@@ -524,6 +524,7 @@ def run_search(
             raw_max_add = adaptive_cfg.get("max_add", k)
             max_add = k if raw_max_add is None else max(0, int(raw_max_add))
             expanded = query_mod.expand_for_memory(query) or query
+            evict_enabled = bool(adaptive_cfg.get("evict", True))
             if normalize(expanded) == q:
                 # 没有可改写的词：不花第二次检索，元信息里如实标「没扩大」。
                 deepen_info = {
@@ -532,8 +533,8 @@ def run_search(
                     "expanded": False,
                     "skipped": "no_expansion",
                 }
-            elif got >= k:
-                # 槽位已经满了。契约要求「深捞只填空位」，没有空位就不做第二次检索。
+            elif got >= k and not evict_enabled:
+                # 槽位已经满了、置换也关着：按旧契约只填空位，不做第二次检索。
                 deepen_info = {
                     "trigger": trigger,
                     "added": 0,
@@ -554,46 +555,63 @@ def run_search(
                 )
                 deepen_top_cov = float((deep.get("uncertainty") or {}).get("coverage") or 0.0)
                 seen_ids = {str(item.get("id")) for item in payload if item.get("id")}
-                remaining = max(0, int(budget) - int(spent))
-                free_slots = max(0, k - got)
-                cap = min(free_slots, max_add)
                 added_items: list[dict[str, Any]] = []
                 for item in deep.get("items") or []:
-                    if len(added_items) >= cap:
+                    if len(added_items) >= max_add:
                         break
                     item_id = str(item.get("id") or "")
                     if not item_id or item_id in seen_ids:
                         continue
-                    cost = estimate_tokens(str(item.get("text") or "")) + 12
-                    if cost > remaining:
-                        continue
-                    added_items.append(item)
                     seen_ids.add(item_id)
-                    remaining -= cost
-                if added_items:
-                    payload.extend(added_items)
-                    payload_seq.extend([0] * len(added_items))
+                    added_items.append(item)
+                # 槽位满了才允许置换：受害者只能是头部之后的弱尾巴，条数受 max_evict 卡住。
+                # 只在「问句已经明说缺什么」这条通路上开，比通用补候选的 score 竞争更保守。
+                if got >= k and evict_enabled:
+                    evict_head = max(0, int(adaptive_cfg.get("evict_head", 3) or 0))
+                    max_evict = max(0, int(adaptive_cfg.get("max_evict", 2) or 0))
+                    victim_cov_max = float(adaptive_cfg.get("evict_cover", 0.5) or 0.0) * cov_best
+                else:
+                    evict_head = 0
+                    max_evict = 0
+                    victim_cov_max = None
+                payload, payload_seq, payload_cov, spent, added, evicted = store._place_items(
+                    added_items,
+                    payload=payload,
+                    payload_seq=payload_seq,
+                    payload_cov=payload_cov,
+                    k=k,
+                    budget=int(budget),
+                    spent=spent,
+                    head=evict_head,
+                    max_evict=max_evict,
+                    victim_cov_max=victim_cov_max,
+                    # 覆盖率用深捞这一遍的最佳值占位：既不冒充精确值，也不让后续
+                    # "只换覆盖率 0 的尾巴" 把刚补进来的答案当成噪音换掉。
+                    cov_value=deepen_top_cov,
+                )
+                if added:
+                    placed = payload[-added:]
                     # 补 seq：后面的时效链/图补候选按 payload_seq 查重，0 会让它们判重失真。
-                    id_marks = ",".join("?" for _ in added_items)
+                    id_marks = ",".join("?" for _ in placed)
                     seq_map = {
                         str(row["id"]): int(row["seq"])
                         for row in store.db.conn.execute(
                             f"SELECT id, seq FROM memory WHERE id IN ({id_marks})",
-                            tuple(str(item.get("id")) for item in added_items),
+                            tuple(str(item.get("id")) for item in placed),
                         )
                     }
-                    for index, item in enumerate(added_items):
-                        payload_seq[got + index] = seq_map.get(str(item.get("id")), 0)
-                    # 覆盖率用深捞这一遍的最佳值占位：既不冒充精确值，也不让后续
-                    # "只换覆盖率 0 的尾巴" 把刚补进来的答案当成噪音换掉。
-                    payload_cov.extend([float(deepen_top_cov)] * len(added_items))
+                    for index, item in enumerate(placed):
+                        payload_seq[len(payload_seq) - added + index] = seq_map.get(
+                            str(item.get("id")), 0
+                        )
                     spent = sum(estimate_tokens(item["text"]) + 12 for item in payload)
                 deepen_info = {
                     "trigger": trigger,
-                    "added": len(added_items),
+                    "added": added,
                     "expanded": True,
                     "k": deepen_k,
                     "coverage": round(cov_best, 3),
+                    **({"evicted": evicted} if evicted else {}),
                 }
 
     graph_items: list[dict[str, Any]] = []
@@ -720,6 +738,7 @@ def run_search(
         or bool(vector_info.get("added"))
         or bool(temporal_info.get("added")),
     )
+    raw_inserted = 0
     if raw_items:
         # 兜底也要守预算：主结果已经花掉一部分，剩下的才给原文
         remaining = max(0, int(budget) - int(spent))
@@ -733,6 +752,11 @@ def run_search(
         if fitted:
             keep = max(1, k - len(fitted))
             payload = payload[:keep] + fitted
+            # seq/覆盖率数组要和 payload 同步：原话没有 memory seq、也不参与词法覆盖率，
+            # 但后面的保守置换要按位置挑「最弱的尾巴」，长度对不上会直接索引越界。
+            payload_seq = payload_seq[:keep] + [0] * len(fitted)
+            payload_cov = payload_cov[:keep] + [0.0] * len(fitted)
+            raw_inserted = len(fitted)
     # 「我说过的话」通道（0.32.0）：原话兜底只在弱覆盖时开，而且和图/向量互斥；
     # 但「你上次答应我什么」问的不是覆盖率，是**我说过的原话**——它按设计永远不进
     # memory（facts 只从用户行派生），只能回 journal 里找。线索不命中就不查：
@@ -749,20 +773,36 @@ def run_search(
             # 原话兜底（raw_fallback）不按 role 过滤，同一条 assistant 原话可能已经进了
             # payload；这里按 id 去重，避免同一句话说两遍占预算。
             seen_ids = {str(item.get("id")) for item in payload if item.get("id")}
-            remaining = max(0, int(budget) - int(spent))
-            av_fitted: list[dict[str, Any]] = []
-            for item in av_items:
-                if str(item.get("id")) in seen_ids:
-                    continue
-                cost = estimate_tokens(item["text"]) + 12
-                if cost > remaining:
-                    continue
-                remaining -= cost
-                av_fitted.append(item)
-            if av_fitted:
-                keep = max(1, k - len(av_fitted))
-                payload = payload[:keep] + av_fitted
-                assistant_info = {"added": len(av_fitted)}
+            fitted_items = [item for item in av_items if str(item.get("id")) not in seen_ids]
+            # 置换只给「真和问句有共同实词」的原话开：线索正则放宽之后（0.33.0 补了
+            # 你上回讲/你给自己/你之前…这些口语变体），最坏情况是线索命中但原话其实
+            # 不相关；这时它只能占空位，不许挤掉用户的记忆。overlap≥1 ⇔ score>0.30。
+            best_overlap_hit = bool(
+                fitted_items and float(fitted_items[0].get("score") or 0.0) > 0.30
+            )
+            # 预算只够塞一条时，剩下的尾巴不该继续占着：问句已经明说是「我说过的话」，
+            # 这时最弱的尾巴（探针里 P12 那几道只剩 13–21 token）比我的原话更没价值。
+            # 置换仍然守纪律：头部 av_evict_head 条不动，最多换 av_max_evict 条。
+            # 原话兜底已经插进来的条目不让：那是「派生事实没答上」时捞到的唯一证据，
+            # 拿它给助手的话让位等于拆东墙补西墙——这时助手原话只占空位。
+            payload, payload_seq, payload_cov, spent, added, evicted = store._place_items(
+                fitted_items,
+                payload=payload,
+                payload_seq=payload_seq,
+                payload_cov=payload_cov,
+                k=k,
+                budget=int(budget),
+                spent=spent,
+                head=max(0, int(av_cfg.get("evict_head", 3) or 0)),
+                max_evict=0
+                if raw_inserted or not best_overlap_hit
+                else max(0, int(av_cfg.get("max_evict", 2) or 0)),
+            )
+            if added:
+                assistant_info = {
+                    "added": added,
+                    **({"evicted": evicted} if evicted else {}),
+                }
     # 日记通道（M18）：「上周咱们都干嘛了」问的是**那几天的经过**，不是某一条事实。
     # 日记不参与候选池重排（它和记忆不是一个量纲），只在一种情况下出现：
     # 明确的时间窗 + 问经过（或词法明显没把握）→ 放最前面，它就是答案。
@@ -866,6 +906,8 @@ def run_search(
         or temporal_info.get("added")
         or entity_append_info.get("added")
         or deepen_info.get("added")
+        or assistant_info.get("added")
+        or raw_inserted
     ):
         used = sum(estimate_tokens(item["text"]) + 12 for item in payload)
     # 「不确定就说出来」（M18）：把「这次召回有多有把握」算成确定性信号，交给渲染层说人话。
