@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pmem"
-version = "0.30.1"
+version = "0.30.0"
 description = "dsh-PMem · 可塑性记忆 —— 给你家那条大肥鱼的记忆器官：原话记得住，出处查得到，说错了能撤回"
 readme = "README.md"
 requires-python = ">=3.11"
