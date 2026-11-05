@@ -57,7 +57,7 @@ class Case(unittest.TestCase):
         try:
             tools = mcp.call("tools/list")["result"]["tools"]
             names = {tool["name"] for tool in tools}
-            self.assertEqual(len(tools), 24)
+            self.assertEqual(len(tools), 26)
             self.assertEqual(
                 names,
                 {
@@ -85,6 +85,8 @@ class Case(unittest.TestCase):
                     "memory_profile",
                     "memory_reflect",
                     "memory_soul",
+                    "memory_whale_prep",
+                    "memory_whale_finish",
                 },
             )
         finally:

@@ -233,6 +233,18 @@ class McpServer:
                 lines=args.get("lines") or [],
                 dry_run=bool(args.get("dry_run", False)),
             )
+        if name == "memory_whale_prep":
+            return self.app.whale_prep(day_key=args.get("day_key"))
+        if name == "memory_whale_finish":
+            return self.app.whale_finish(
+                day_key=args.get("day_key"),
+                title=args.get("title", ""),
+                lines=args.get("lines") or [],
+                loops=args.get("loops") or [],
+                session_id=args.get("session_id", ""),
+                run_sleep=bool(args.get("run_sleep", True)),
+                dry_run=bool(args.get("dry_run", False)),
+            )
         if name == "memory_trace":
             return self.app.trace(
                 args.get("query", ""),

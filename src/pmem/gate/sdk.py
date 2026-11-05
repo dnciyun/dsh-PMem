@@ -752,6 +752,99 @@ class PMem:
             )
         return self._ok(data, started)
 
+    def whale_prep(self, *, day_key: str | None = None, budget: int = 300) -> dict[str, Any]:
+        """鲸眠·宿主模式：给宿主里的模型准备材料（不调外部模型、不要凭证）。"""
+        started = time.perf_counter()
+        from ..sleep import whale
+        from ..sleep.common import yesterday_key
+
+        day = day_key or yesterday_key()
+        try:
+            wake = (self.wake(budget=budget) or {}).get("data") or {}
+            materials = whale.collect_materials(
+                self.db,
+                subject=self.subject,
+                day_key=day,
+                config=self.config,
+                wake_text=str(wake.get("live") or wake.get("text") or ""),
+                recent_episodes=whale.recent_episodes(self.db, subject=self.subject, day_key=day, limit=3),
+            )
+        except PmemError as exc:
+            return self._fail(exc, started)
+        data = {
+            "day": day,
+            "session": whale.SESSION_NAME,
+            "pending": materials["raw_count"],
+            "materials": whale.render_materials(materials),
+            "rules": whale.WHALE_SYSTEM,
+            "output": {"title": "string", "lines": ["string"], "loops": ["string"]},
+            "next": "想好之后调用 memory_whale_finish(title, lines, loops)；没有原文就别硬编。",
+        }
+        return self._ok(data, started)
+
+    def whale_finish(
+        self,
+        *,
+        day_key: str | None = None,
+        title: str = "",
+        lines: list[str] | None = None,
+        loops: list[str] | None = None,
+        session_id: str = "",
+        run_sleep: bool = True,
+        dry_run: bool = False,
+    ) -> dict[str, Any]:
+        """鲸眠·宿主模式：把宿主会话里写好的日记交回来（写库 + 转录 + 可选 8 阶段）。"""
+        started = time.perf_counter()
+        from ..memory import journal
+        from ..sleep import orchestrator, whale
+        from ..sleep.common import yesterday_key
+
+        day = day_key or yesterday_key()
+        try:
+            result = journal.write_episode(
+                self.db,
+                subject=self.subject,
+                day_key=day,
+                title=title,
+                lines=lines or [],
+                store=self.store,
+                config=self.config,
+                dry_run=dry_run,
+            )
+            transcript = ""
+            if result.get("ok") and not dry_run:
+                path = whale.transcript_path(self.config, day)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with path.open("a", encoding="utf-8", newline="\n") as handle:
+                    handle.write(json.dumps({
+                        "type": "meta",
+                        "session": whale.SESSION_NAME,
+                        "session_id": session_id or f"host:{day}",
+                        "source": "dsh_host",
+                        "day": day,
+                    }, ensure_ascii=False) + "\n")
+                    handle.write(json.dumps({
+                        "type": "result",
+                        "verdict": "host",
+                        "loops": list(loops or []),
+                        "applied": {
+                            "episode_id": result.get("episode_id"),
+                            "title": result.get("title"),
+                            "lines": result.get("lines"),
+                            "mode": result.get("mode"),
+                            "facts": len(result.get("facts") or []),
+                            "problems": result.get("problems") or [],
+                        },
+                    }, ensure_ascii=False) + "\n")
+                transcript = str(path)
+            if run_sleep and result.get("ok") and not dry_run:
+                result["sleep"] = orchestrator.run(
+                    self.db, subject=self.subject, day_key=day, trigger="manual", config=self.config
+                )
+        except PmemError as exc:
+            return self._fail(exc, started)
+        return self._ok({"day": day, "diary": result, "transcript": transcript}, started)
+
     def sleep_whale(
         self,
         *,

@@ -411,10 +411,12 @@ class ReindexFtsCase(_Case):
 
 
 class ToolCountSchemaCase(unittest.TestCase):
-    def test_mcp_tool_count_is_24(self) -> None:
-        self.assertEqual(MCP_TOOL_COUNT, 24)
+    def test_mcp_tool_count_is_26(self) -> None:
+        self.assertEqual(MCP_TOOL_COUNT, 26)
         names = {tool["name"] for tool in TOOLS}
         self.assertIn("memory_export", names)
+        self.assertIn("memory_whale_prep", names)
+        self.assertIn("memory_whale_finish", names)
         self.assertEqual(len(names), MCP_TOOL_COUNT)
 
 

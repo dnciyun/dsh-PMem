@@ -39,6 +39,37 @@ session_id = whale-sleep:<YYYY-MM-DD>
 `tool`（工具名、参数、结果）、`result`（判定、回合数、token、日记落库结果）。
 所以「鲸眠那天想了什么」事后可以完整翻出来，不是黑盒。
 
+## 两种跑法：宿主模式（不要 key） vs CLI 模式
+
+模型的凭证在**宿主**手里，不在 PMem 手里。所以鲸眠分两种接法：
+
+| | 宿主模式（推荐） | CLI 模式 |
+| --- | --- | --- |
+| 谁调模型 | 宿主（DSH 会话，就是「我」） | PMem 进程自己 |
+| 要不要 API key | **不要** | 要（`PMEM_BENCH_API_KEY` / `DEEPSEEK_API_KEY`） |
+| 适用 | 平时在 DSH 里用 | 无宿主的服务器 / 系统计划任务 |
+| 会话与转录 | 新开的「鲸眠」DSH 会话本身就是思考过程 | 转录写在 `~/.dsh/pmem/whale-sleep/<day>.jsonl` |
+| 成本 | 走宿主已有的模型额度 | 单独计费 |
+
+**宿主模式**（0.35.2）只用两个 MCP 工具，PMem 不碰任何凭证：
+
+```
+宿主在夜里新建一个会话（名字「鲸眠」）
+  → memory_whale_prep(day_key?)     拿到：当天原文 + 醒来卡 + 最近日记 + 写作规则
+  → 模型在这个会话里过一遍、必要时 memory_search / memory_get 核对
+  → memory_whale_finish(title, lines, loops, session_id=本会话 id)
+      → journal.write_episode 落日记（校验不过回落模板）
+      → 追加一条鲸眠转录（source=dsh_host，带宿主会话 id）
+      → 默认接着跑固定 8 阶段
+```
+
+在 DSH 里定时做这件事：建一个每天 03:30 的定时任务，目标是**新会话**，提示词写
+「你是鲸眠：先调 memory_whale_prep，读完材料再写日记，最后调 memory_whale_finish」。
+本机已经建好这样一个任务（见下面的「本机配置」）。
+
+**CLI 模式**保留给没有宿主的环境：`pmem sleep whale` / `pmem sleep big` 由 PMem 进程
+直接调模型，所以要自己配 key；JSON 不合规、模型报错都会回落模板，日记不会丢。
+
 ## 怎么开
 
 配置（`pmem.toml` 或 `--config`）：
@@ -89,4 +120,12 @@ pmem sleep big --dry-run                          # 演练：不落库，只算
 ## 测试
 
 `tests/test_whale_sleep.py` 用假模型覆盖五条：正常写日记、编造专名被打回、
-工具调用往返、没有原文时 `no_lines`、`--dry-run` 不落库。全仓测试照旧离线可跑。
+工具调用往返、没有原文时 `no_lines`、`--dry-run` 不落库；`tests/test_whale_host.py`
+覆盖宿主模式：prep 材料、finish 落库+转录+8 阶段、编造回落、MCP 分发。
+全仓测试照旧离线可跑。
+
+## 本机配置
+
+这台机器上：DSH 定时任务每天 03:30 新建一个标题为「鲸眠：睡前整理今天的记忆」的会话，
+不配 API key，用 DSH 自己的模型；提示词里只让它调 `memory_whale_prep` / `memory_whale_finish`。
+CLI 模式只在手动补睡历史时用：`pmem sleep big --template` 或（配了 key 时）`pmem sleep big`。

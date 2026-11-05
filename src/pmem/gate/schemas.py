@@ -329,6 +329,52 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "memory_whale_prep",
+        "description": (
+            "「鲸眠」夜间会话的准备材料（宿主模式，不调外部模型、不要凭证）。"
+            "返回：当天全部原文（你：/我：）、醒来卡、最近几篇日记，以及鲸眠的写作规则与输出格式。"
+            "宿主里的模型读完这些，像睡前过电影一样想一遍，再调用 memory_whale_finish 交日记。"
+            "和 memory_journal 的区别：journal 是通用日记工具，这个是专给鲸眠会话的一站式材料包。"
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "day_key": {"type": "string", "description": "哪一天（本地 YYYY-MM-DD），默认昨天"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "memory_whale_finish",
+        "description": (
+            "鲸眠会话结束：把想好的日记交回来（title + lines + loops）。"
+            "落库走 journal.write_episode：facts 由原文派生，编造专名/自造句子会被校验打回模板；"
+            "默认随后跑固定 8 阶段巩固。只写日记，不调外部模型、不要凭证。"
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "day_key": {"type": "string", "description": "哪一天（本地 YYYY-MM-DD），默认昨天"},
+                "title": {"type": "string", "description": "日记标题，不超过 20 字，别写日期"},
+                "lines": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "日记正文，每行一件事、不超过 30 字，「你」指对方、「我」指你自己",
+                },
+                "loops": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "还没闭环的事（不替对方补结果）",
+                },
+                "session_id": {"type": "string", "description": "宿主会话 id，写进鲸眠转录，便于回看"},
+                "run_sleep": {"type": "boolean", "default": True, "description": "写完是否接着跑固定 8 阶段"},
+                "dry_run": {"type": "boolean", "default": False, "description": "只校验，不落库、不跑睡眠"},
+            },
+            "required": ["title", "lines"],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "memory_trace",
         "description": (
             "按字查原话（一字不差）：查 PMem 的原话流水里有没有这句话，返回会话 / 行号 / 角色 / 时间。"
