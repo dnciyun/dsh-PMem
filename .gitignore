@@ -28,6 +28,10 @@ wake-live.txt
 !/bench/stress/
 !/bench/stress/run.py
 !/bench/stress/corpus.json
+# 外部独立基准（大肥鱼 chat-memory-benchmark）的 A 层接入脚本要发布：
+# 跑的是 .tmp 里 clone 的数据，不进仓库；脚本/README 可重复运行。
+!/bench/external/
+!/bench/external/**
 
 # 设计文档只放行两篇（其余是开发过程记录，含本地跑分与对比，不发布）
 docs/*
@@ -49,3 +53,4 @@ _qa_tmp/
 tests/test_holdout.py
 1.md
 PLAN.md
+bench/external/__pycache__/
