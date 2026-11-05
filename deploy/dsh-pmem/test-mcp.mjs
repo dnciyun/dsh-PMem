@@ -1,5 +1,5 @@
 /**
- * MCP 接入契约测试：临时库 → initialize → tools/list（22）→ tools/call。
+ * MCP 接入契约测试：临时库 → initialize → tools/list（24）→ tools/call。
  * 不启动 DSH，不碰真实 data/pmem.db。
  */
 
@@ -24,7 +24,7 @@ assert.equal(init.status, 0, init.stderr || init.stdout)
 try {
   const probe = await probeMcp(config)
   assert.equal(probe.ok, true, probe.error || probe.stderr)
-  assert.equal(probe.count, 22, `工具数不是 22：${probe.count}`)
+  assert.equal(probe.count, 24, `工具数不是 24：${probe.count}`)
   assert.ok(probe.tools.includes('memory_search'))
   assert.ok(probe.tools.includes('memory_stats'))
 

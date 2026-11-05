@@ -14,9 +14,22 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from ..base import events
 from ..base.clock import now_iso
 from ..base.db import Database
 from ..base.ids import ulid
+
+
+def _write_anchor(db: Database) -> object:
+    """快照成功后补一条事件锚点（W2 的 ``events.write_anchor``）；未接线时静默跳过。"""
+    fn = getattr(events, "write_anchor", None)
+    if fn is None:
+        return None
+    try:
+        with db.tx() as conn:
+            return fn(conn)
+    except Exception:  # noqa: BLE001 锚点是增强，不能把成功快照变成失败
+        return None
 
 
 def sha256_file(path: Path) -> str:
@@ -136,6 +149,7 @@ def create(
                 kind,
             ),
         )
+    anchor = _write_anchor(db)
     return {
         "snapshot_id": snapshot_id,
         "path": str(target),
@@ -145,4 +159,5 @@ def create(
         "verified": verify,
         "skipped": False,
         "kind": kind,
+        "anchor": anchor,
     }

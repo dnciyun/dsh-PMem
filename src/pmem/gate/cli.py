@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sqlite3
 import sys
 from datetime import datetime as _datetime
 from pathlib import Path
@@ -277,6 +278,17 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("capabilities", help="能力与降级状态")
     sub.add_parser("doctor", help="完整性检查")
 
+    p_vac = sub.add_parser("vacuum", help="VACUUM：压缩数据库并回收已删空间，输出前后体积")
+    p_vac.add_argument(
+        "--analyze",
+        action="store_true",
+        help="VACUUM 后同时跑 PRAGMA optimize（更新查询计划统计）；默认只 VACUUM",
+    )
+
+    p_rs = sub.add_parser("restore", help="从备份文件恢复整个库（会覆盖当前库）")
+    p_rs.add_argument("backup", help="备份文件路径（pmem backup run / backup list 产出的 .db）")
+    p_rs.add_argument("--force", action="store_true", help="目标库已有数据时也覆盖")
+
     p_add = sub.add_parser("add", help="写一条记忆")
     p_add.add_argument("text")
     p_add.add_argument("--kind", default="semantic")
@@ -294,8 +306,8 @@ def main(argv: list[str] | None = None) -> int:
 
     p_search = sub.add_parser("search", help="召回")
     p_search.add_argument("query")
-    p_search.add_argument("--k", type=int, default=8)
-    p_search.add_argument("--budget", type=int, default=600)
+    p_search.add_argument("--k", type=int, default=None, help="返回几条；默认读 [retrieval].top_k")
+    p_search.add_argument("--budget", type=int, default=None, help="token 预算；默认读 [retrieval].token_budget")
     p_search.add_argument("--mode", default="auto", choices=["auto", "keyword", "vector"])
     p_search.add_argument("--kind", action="append", default=None)
     p_search.add_argument("--group", default=None, help="只看某个分组（含子组）")
@@ -332,6 +344,11 @@ def main(argv: list[str] | None = None) -> int:
     p_del = sub.add_parser("delete", help="删除")
     p_del.add_argument("id")
     p_del.add_argument("--hard", action="store_true")
+    p_del.add_argument(
+        "--vacuum",
+        action="store_true",
+        help="hard 删除后 VACUUM 回收空间（维护窗口内拒绝执行）",
+    )
 
     p_hist = sub.add_parser("history", help="变更时间线")
     p_hist.add_argument("id")
@@ -397,7 +414,7 @@ def main(argv: list[str] | None = None) -> int:
     p_ne = net_sub.add_parser("entities", help="列出实体")
     p_ne.add_argument("--type", default=None)
     p_ne.add_argument("--query", default=None)
-    p_ne.add_argument("--limit", type=int, default=30)
+    p_ne.add_argument("--limit", type=int, default=None, help="默认走 SDK 的 50")
     p_nq = net_sub.add_parser("query", help="1/2 跳图查询")
     p_nq.add_argument("src", nargs="?", default=None)
     p_nq.add_argument("--dst", default=None)
@@ -519,7 +536,19 @@ def main(argv: list[str] | None = None) -> int:
     p_sll.add_argument("--limit", type=int, default=14)
     p_slr = sl_sub.add_parser("run", help="跑/续跑一轮睡眠")
     p_slr.add_argument("--day", default=None, help="处理哪一天，默认昨天")
-    p_slr.add_argument("--resume", action="store_true", help="续跑未完成的 run")
+    p_slr.add_argument(
+        "--resume",
+        dest="resume",
+        action="store_true",
+        default=True,
+        help="有未完成 run 时续跑（默认开，与 SDK/MCP 一致）",
+    )
+    p_slr.add_argument(
+        "--no-resume",
+        dest="resume",
+        action="store_false",
+        help="忽略未完成的 run，从 s1 重新跑",
+    )
     p_slr.add_argument("--dry-run", action="store_true", help="计算后整体回滚，只写报告")
     p_slr.add_argument("--catchup", type=int, default=0, help="补跑最近 N 天")
     p_slr.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
@@ -620,12 +649,25 @@ def main(argv: list[str] | None = None) -> int:
     p_backup = sub.add_parser("backup", help="备份与恢复演练（M9）")
     backup_sub = p_backup.add_subparsers(dest="backup_action", required=True)
     p_bk_run = backup_sub.add_parser("run", help="在线备份一份并校验")
+    p_bk_run.add_argument(
+        "--kind",
+        default="manual",
+        choices=["daily", "manual", "pre-migrate"],
+        help="备份类别（决定保留池）：默认 manual",
+    )
     p_bk_run.add_argument("--keep", type=int, default=None, help="保留多少份 manual 备份")
     p_bk_list = backup_sub.add_parser("list", help="列出备份/快照")
     p_bk_drill = backup_sub.add_parser("drill", help="只读恢复演练：验哈希、事件链、外键、恢复耗时")
     p_bk_drill.add_argument("--source", default=None, help="指定备份文件；默认最近一份")
     p_bk_counts = backup_sub.add_parser("counts", help="按 kind 统计快照数量（看 daily 保留现状）")
     p_bk_counts.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+
+    p_reidx = sub.add_parser("reindex", help="重建派生索引")
+    reidx_sub = p_reidx.add_subparsers(dest="reindex_action", required=True)
+    p_reidx_fts = reidx_sub.add_parser(
+        "fts", help="重建 FTS 索引：memory_fts_tok / memory_fts_tri / journal_fts / episode_fts"
+    )
+    p_reidx_fts.add_argument("--dry-run", action="store_true", help="只报当前行数，不重建")
 
     p_mnt = sub.add_parser("maintenance", help="维护窗口闸：窗口内 daemon 只自愈、不执行任务")
     mnt_sub = p_mnt.add_subparsers(dest="maintenance_action", required=True)
@@ -726,7 +768,7 @@ def main(argv: list[str] | None = None) -> int:
     p_tl = tr_sub.add_parser("list", help="列出特质")
     p_tl.add_argument("--status", default=None, choices=["hypothesis", "established", "deprecated"])
     p_tl.add_argument("--scope", default=None, choices=["self", "person", "topic"])
-    p_tl.add_argument("--limit", type=int, default=30)
+    p_tl.add_argument("--limit", type=int, default=None, help="默认走 SDK 的 50")
     p_tl.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     p_ts = tr_sub.add_parser("show", help="看某个特质的版本链与时间线")
     p_ts.add_argument("ref", help="trait id 或 key")
@@ -826,6 +868,109 @@ def main(argv: list[str] | None = None) -> int:
             return _emit(app.capabilities(), args.json)
         if args.cmd == "doctor":
             return _doctor(app, args.json)
+        if args.cmd == "vacuum":
+            if not hasattr(app.db, "vacuum"):
+                return _emit(
+                    {
+                        "ok": False,
+                        "error": {
+                            "code": "E_UNSUPPORTED",
+                            "message": "当前版本没有 Database.vacuum；等它落库后再用",
+                        },
+                    },
+                    args.json,
+                )
+            before = _db_pages(app.db)
+            # 显式传 analyze：CLI 的 --analyze 才是开关，不靠 DB 默认值，避免「两个默认」。
+            result = app.db.vacuum(analyze=bool(args.analyze))
+            after = _db_pages(app.db)
+            if result.get("ok") is False:
+                return _emit(
+                    {
+                        "ok": False,
+                        "error": {
+                            "code": "E_VACUUM",
+                            "message": str(result.get("error") or result.get("reason") or "VACUUM 失败"),
+                        },
+                    },
+                    args.json,
+                )
+            data = {
+                "before": {
+                    "pages": int(result.get("before_pages", before["pages"])),
+                    "bytes": int(result.get("before_bytes", before["bytes"])),
+                },
+                "after": {
+                    "pages": int(result.get("after_pages", after["pages"])),
+                    "bytes": int(result.get("after_bytes", after["bytes"])),
+                },
+                "freed_bytes": int(
+                    result.get("saved_bytes", max(0, before["bytes"] - after["bytes"]))
+                ),
+                "analyze": bool(args.analyze),
+                "duration_ms": result.get("duration_ms"),
+                "result": result,
+            }
+            if args.json:
+                return _emit({"ok": True, "data": data}, True)
+            print(
+                f"✓ VACUUM 完成（analyze={'on' if args.analyze else 'off'}）"
+                f"  页 {data['before']['pages']} → {data['after']['pages']}"
+                f"  库文件 {_fmt_bytes(data['before']['bytes'])} → {_fmt_bytes(data['after']['bytes'])}"
+            )
+            if data["freed_bytes"]:
+                print(f"  含 -wal 共省 {_fmt_bytes(data['freed_bytes'])}")
+            return 0
+        if args.cmd == "restore":
+            try:
+                from ..ops.restore import restore_backup
+            except ImportError:
+                return _emit(
+                    {
+                        "ok": False,
+                        "error": {
+                            "code": "E_UNSUPPORTED",
+                            "message": "当前版本没有 ops.restore.restore_backup；等它落库后再用",
+                        },
+                    },
+                    args.json,
+                )
+            db_path = str(app.db.path)
+            config = app.config
+            app.close()  # 先放掉本进程的文件句柄：Windows 上不关会判「正在使用」
+            try:
+                result = restore_backup(db_path, args.backup, force=args.force, config=config)
+            except Exception as exc:  # noqa: BLE001 恢复失败要给可读原因，不是 traceback
+                return _emit(
+                    {
+                        "ok": False,
+                        "error": {"code": "E_RESTORE", "message": f"{type(exc).__name__}: {exc}"},
+                    },
+                    args.json,
+                )
+            if result.get("ok") is False:
+                return _emit(
+                    {
+                        "ok": False,
+                        "error": {
+                            "code": "E_RESTORE",
+                            "message": str(result.get("error") or "恢复失败"),
+                        },
+                        "data": result,
+                    },
+                    args.json,
+                )
+            if args.json:
+                return _emit({"ok": True, "data": result}, True)
+            print(f"✓ 已从备份恢复 → {result.get('db_path', db_path)}")
+            print(f"  来源 {result.get('restored_from', args.backup)}")
+            if result.get("replaced"):
+                print(f"  覆盖了已有库：{result['replaced']}")
+            for check in result.get("checks") or []:
+                mark = "✓" if check.get("ok") else "✗"
+                print(f"  {mark} {check.get('name', '')}: {check.get('detail', '')}")
+            print(f"  耗时 {result.get('duration_ms', '-')} ms")
+            return 0
         if args.cmd == "eval":
             from ..eval import runner
 
@@ -866,9 +1011,11 @@ def main(argv: list[str] | None = None) -> int:
             if args.net_action == "stats":
                 return _emit(app.net_stats(), args.json)
             if args.net_action == "entities":
-                return _emit(
-                    app.entities(type_=args.type, query=args.query, limit=args.limit), args.json
-                )
+                # --limit 默认 None：不传就让 SDK 用自己的默认（50），别在 CLI 里再写一个数。
+                kwargs: dict[str, Any] = {"type_": args.type, "query": args.query}
+                if args.limit is not None:
+                    kwargs["limit"] = args.limit
+                return _emit(app.entities(**kwargs), args.json)
             if args.net_action == "query":
                 return _emit(
                     app.relation(
@@ -1346,7 +1493,14 @@ def main(argv: list[str] | None = None) -> int:
 
             action = args.backup_action
             if action == "run":
-                result = backup.run(app.db, config=app.config, subject=args.subject, keep=args.keep)
+                result = backup.run(
+                    app.db,
+                    config=app.config,
+                    subject=args.subject,
+                    kind=args.kind,
+                    tag=args.kind,
+                    keep=args.keep,
+                )
             elif action == "drill":
                 result = backup.drill(app.db, config=app.config, subject=args.subject, source=args.source)
             elif action == "counts":
@@ -1392,6 +1546,36 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {'✓' if check['ok'] else '✗'} {check['name']:<22} {check['detail']}")
             print(f"  恢复耗时 {result['restore_ms']} ms · 来源 {result['source']}")
             return 0 if ok else 1
+        if args.cmd == "reindex":
+            if args.reindex_action == "fts":
+                data = _reindex_fts(app, dry_run=bool(args.dry_run))
+                if args.json:
+                    return _emit({"ok": True, "data": data}, True)
+                verb = "当前" if args.dry_run else "重建后"
+                print(f"— FTS 索引（{verb}文档数 / 基表行数）：")
+                for name in ("memory_fts_tok", "memory_fts_tri", "journal_fts", "episode_fts"):
+                    item = data[name]
+                    if item.get("skipped"):
+                        print(f"  {name:<16} 跳过：{item['skipped']}")
+                        continue
+                    if args.dry_run:
+                        print(f"  {name:<16} {item.get('docs')} 篇 / 基表 {item.get('rows')} 行")
+                    else:
+                        print(
+                            f"  {name:<16} {item.get('docs_before')} → {item.get('docs')} 篇"
+                            f" / 基表 {item.get('rows')} 行"
+                        )
+                return 0
+            return _emit(
+                {
+                    "ok": False,
+                    "error": {
+                        "code": "E_UNSUPPORTED",
+                        "message": f"未知 reindex 子命令 {args.reindex_action}",
+                    },
+                },
+                args.json,
+            )
         if args.cmd == "maintenance":
             from ..ops import maintenance
 
@@ -1868,9 +2052,15 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.cmd == "trait":
             if args.trait_action == "list":
-                result = app.trait(
-                    action="list", status=args.status, scope=args.scope, limit=args.limit
-                )
+                # --limit 默认 None：不传就让 SDK 用自己的默认（50）。
+                list_kwargs: dict[str, Any] = {
+                    "action": "list",
+                    "status": args.status,
+                    "scope": args.scope,
+                }
+                if args.limit is not None:
+                    list_kwargs["limit"] = args.limit
+                result = app.trait(**list_kwargs)
             elif args.trait_action == "show":
                 result = app.trait(action="show", ref=args.ref, limit=args.limit)
             elif args.trait_action == "history":
@@ -2074,7 +2264,49 @@ def main(argv: list[str] | None = None) -> int:
                 args.json,
             )
         if args.cmd == "delete":
-            return _emit(app.delete(args.id, hard=args.hard, reason="cli"), args.json)
+            if args.vacuum and not args.hard:
+                return _emit(
+                    {
+                        "ok": False,
+                        "error": {
+                            "code": "E_VALIDATION",
+                            "message": "--vacuum 只能配合 --hard 使用",
+                            "hint": "软删只是停放，VACUUM 回收不到它占的空间",
+                        },
+                    },
+                    args.json,
+                )
+            if args.hard and args.vacuum:
+                from ..ops import maintenance
+
+                state = maintenance.active(app.db, config=app.config)
+                if state.get("active"):
+                    return _emit(
+                        {
+                            "ok": False,
+                            "error": {
+                                "code": "E_MAINTENANCE",
+                                "message": "维护窗口内拒绝执行 VACUUM（hard 删除也没有执行）",
+                                "hint": "等维护窗口结束后重试，或先 pmem maintenance off",
+                            },
+                        },
+                        args.json,
+                    )
+            result = app.delete(args.id, hard=args.hard, reason="cli")
+            if result.get("ok") and args.hard and args.vacuum:
+                if hasattr(app.db, "vacuum"):
+                    result["data"]["vacuum"] = {
+                        "ok": True,
+                        "before": _db_pages(app.db),
+                        "result": app.db.vacuum(),
+                        "after": _db_pages(app.db),
+                    }
+                else:
+                    result["data"]["vacuum"] = {
+                        "ok": False,
+                        "message": "当前版本没有 Database.vacuum；删除已生效，空间未回收",
+                    }
+            return _emit(result, args.json)
         if args.cmd == "history":
             return _emit(app.history(args.id, limit=args.limit), args.json)
         if args.cmd == "export":
@@ -2114,6 +2346,89 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     finally:
         app.close()
+
+
+def _fts_docs(conn: Any, name: str) -> int | None:
+    """FTS 索引里的真实文档数（shadow 表 ``<name>_docsize``）；取不到返回 None。"""
+    try:
+        row = conn.execute(f"SELECT COUNT(*) FROM {name}_docsize").fetchone()
+        return int(row[0]) if row else None
+    except sqlite3.DatabaseError:
+        return None
+
+
+def _reindex_fts(app: PMem, *, dry_run: bool) -> dict[str, Any]:
+    """重建三套 FTS 索引，返回每套的文档数与基表行数（供 CLI/脚本核对 I21）。"""
+    from ..memory import journal as journal_mod
+
+    conn = app.db.conn
+    out: dict[str, Any] = {"dry_run": dry_run}
+
+    def rows_of(sql: str) -> int:
+        return int(conn.execute(sql).fetchone()[0])
+
+    for name in ("memory_fts_tok", "memory_fts_tri"):
+        item: dict[str, Any] = {
+            "rows": rows_of("SELECT COUNT(*) FROM memory"),
+            "docs": _fts_docs(conn, name),
+            "docs_before": None,
+            "rebuilt": False,
+        }
+        if not dry_run:
+            item["docs_before"] = item["docs"]
+            with app.db.tx() as tx:
+                tx.execute(f"INSERT INTO {name}({name}) VALUES('rebuild')")
+            item["docs"] = _fts_docs(conn, name)
+            item["rebuilt"] = True
+        out[name] = item
+
+    journal_item: dict[str, Any] = {
+        "rows": rows_of("SELECT COUNT(*) FROM journal_line"),
+        "docs": _fts_docs(conn, "journal_fts"),
+        "docs_before": None,
+        "rebuilt": False,
+    }
+    if not dry_run:
+        journal_item["docs_before"] = journal_item["docs"]
+        stats = journal_mod.rebuild_index(app.db)
+        journal_item["docs"] = _fts_docs(conn, "journal_fts")
+        journal_item["rebuilt"] = True
+        journal_item["lines"] = stats.get("lines")
+    out["journal_fts"] = journal_item
+
+    episode_item: dict[str, Any] = {
+        "rows": rows_of("SELECT COUNT(*) FROM episode"),
+        "docs": _fts_docs(conn, "episode_fts"),
+        "docs_before": None,
+        "rebuilt": False,
+    }
+    if not dry_run:
+        rebuild_episodes = getattr(journal_mod, "rebuild_episode_index", None)
+        if rebuild_episodes is None:
+            episode_item["skipped"] = "journal.rebuild_episode_index 尚未实现"
+        else:
+            episode_item["docs_before"] = episode_item["docs"]
+            rebuild_episodes(app.db)
+            episode_item["docs"] = _fts_docs(conn, "episode_fts")
+            episode_item["rebuilt"] = True
+    out["episode_fts"] = episode_item
+    return out
+
+
+def _db_pages(db: Any) -> dict[str, int]:
+    """库的页数与名义字节数（page_count × page_size）——VACUUM 前后对比用。"""
+    pages = int(db.conn.execute("PRAGMA page_count").fetchone()[0])
+    page_size = int(db.conn.execute("PRAGMA page_size").fetchone()[0])
+    return {"pages": pages, "bytes": pages * page_size}
+
+
+def _fmt_bytes(value: int) -> str:
+    size = float(max(0, int(value)))
+    for unit in ("KB", "MB", "GB"):
+        size /= 1024
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+    return f"{size:.1f} GB"
 
 
 def _local_stamp(value: Any) -> str:
@@ -2190,23 +2505,40 @@ def _doctor(app: PMem, as_json: bool) -> int:
 
     chain_ok, chain_msg = events.verify_chain(app.db.conn)
     inv = invariants.summary(invariants.check_all(app.db))
+    detail = app.db.integrity_detail()
+    integrity = bool(detail.get("ok"))
+    integrity_errors: list[str] = list(detail.get("errors") or [])
+    if detail.get("error"):
+        integrity_errors.append(str(detail["error"]))
     checks = {
-        "integrity": app.db.integrity_ok(),
+        "integrity": integrity,
+        "integrity_errors": integrity_errors,
+        "sqlite_version": sqlite3.sqlite_version,
         "event_chain": chain_ok,
         "chain_detail": chain_msg,
         "schema_version": app.db.meta("schema_version"),
         "memory_total": app.store.stats()["memory_total"],
         "invariants": inv,
     }
-    result = {"ok": checks["integrity"] and chain_ok and inv["ok"], "data": checks}
+    result = {"ok": integrity and chain_ok and inv["ok"], "data": checks}
     if as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
-        print(f"完整性：{'ok' if checks['integrity'] else 'FAIL'}")
+        print(f"SQLite：{sqlite3.sqlite_version}")
+        print(f"完整性：{'ok' if integrity else 'FAIL'}")
+        if not integrity:
+            for message in integrity_errors[:5]:
+                print(f"  ✗ {message}")
+            print(
+                "  提示：FTS/原话索引不一致可跑 pmem reindex fts 重建"
+                "（memory/journal/episode 三套；只重建原话索引是 pmem journal reindex）"
+            )
         print(f"事件链：{'ok' if chain_ok else 'FAIL'}（{chain_msg}）")
         print(f"不变量：{inv['passed']}/{inv['total']} 通过")
         for item in inv["failed"]:
             print(f"  ✗ {item['id']}: {item['detail']}")
+        if any(item.get("id") == "I21" for item in inv["failed"]):
+            print("  提示：I21 是 FTS 行数漂移，跑 pmem reindex fts 重建三套索引")
     return 0 if result["ok"] else 1
 
 

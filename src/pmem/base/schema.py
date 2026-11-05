@@ -37,6 +37,10 @@ ENTITY_DDL = """
 ENTITY_INDEXES = [
     "CREATE UNIQUE INDEX IF NOT EXISTS uq_entity_name ON entity(subject_id, type, name_norm) WHERE status='active'",
     "CREATE INDEX IF NOT EXISTS idx_entity_name ON entity(name_norm)",
+    # 实体桥（M22）每次检索都会取 subject 下 mention_count 最高的实体。
+    # 没有这条索引时 SQLite 只能按 uq_entity_name(subject) 取全部实体再 TEMP B-TREE 排序，
+    # 实体多了之后这一步会随库线性变慢。
+    "CREATE INDEX IF NOT EXISTS idx_entity_bridge ON entity(subject_id, status, mention_count DESC)",
 ]
 
 DDL: list[str] = [
@@ -143,6 +147,9 @@ DDL: list[str] = [
     "CREATE INDEX IF NOT EXISTS idx_mem_canonical ON memory(canonical_id)",
     "CREATE INDEX IF NOT EXISTS idx_mem_last_used ON memory(last_used_at)",
     "CREATE INDEX IF NOT EXISTS idx_mem_last_surfaced ON memory(last_surfaced_at)",
+    # 日记派生事实的归属：journal.digest 写 memory.episode_id，journal repair / I20 诊断
+    # 要按 episode 查事实。SQLite 不会自动给外键建索引，缺它时只能全表扫。
+    "CREATE INDEX IF NOT EXISTS idx_mem_episode ON memory(episode_id)",
     # ---- 原文不可变（P1 的机器执法） --------------------------------------
     """
     CREATE TRIGGER IF NOT EXISTS mem_immutable BEFORE UPDATE ON memory

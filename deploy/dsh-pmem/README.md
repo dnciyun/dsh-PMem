@@ -11,8 +11,8 @@
 2. 每轮按线索/情境/节律**浮现**最多一条记忆（M9.65）；
 3. 会话结束时自动 handoff；
 4. `/pmem` 命令；
-5. 4 个 `pmem_*` 原生工具；
-6. 同一 bundle 通过官方 MCP client 带上 20 个 `memory_*` 工具。
+5. 5 个 `pmem_*` 原生工具；
+6. 同一 bundle 通过官方 MCP client 带上 24 个 `memory_*` 工具。
 
 上下文清空、换会话、换天之后，模型不该从零开始。插件会在 system prompt 里放一张
 ≤300 token 的**醒来卡**：
@@ -34,7 +34,7 @@
 
 DSH 里 MCP server 拿不到 system prompt，也没有 hook（`docs/04-interface.md` §6.3）。
 MCP 只能“模型主动调工具”，而醒来卡必须在模型开口之前就在。所以自动注入只能由
-宿主插件做；PMem 的 20 个 MCP 工具仍然可以另接，两者不冲突。
+宿主插件做；PMem 的 24 个 MCP 工具仍然可以另接，两者不冲突。
 
 ## 安装（M9.8：一条命令）
 
@@ -91,7 +91,7 @@ qq-bridge 的区块。
 | `budget` | `300` | 醒来卡 token 预算 |
 | `refreshMs` | `300000` | 卡刷新间隔（5 分钟） |
 | `injectCard` | `true` | 是否注入 system prompt |
-| `tools` | `true` | 是否注册 4 个工具 |
+| `tools` | `true` | 是否注册 5 个工具 |
 | `commands` | `true` | 是否注册 `/pmem` |
 | `handoff` | `true` | 会话结束是否写「上次停在哪」 |
 | `handoffTurns` | `6` | 长会话每 N 轮落一次 |
@@ -230,7 +230,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 运行时开关写在 `~/.dsh/pmem/runtime.json`（`surface` / `starmap` / `starmapLive`），
 不改 profile；profile 里关掉的能力运行时打不开。
 
-## MCP（20 个工具）
+## MCP（24 个工具）
 
 `cordis.patch.yml` 里除了 `dsh-pmem`，还 insert 了一条官方
 `@deepseek-ai/dsh-mcp-client`：
@@ -245,7 +245,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
     args: ['-m', 'pmem.gate.mcp_server', '--db', '...']
 ```
 
-- 20 个 `memory_*` 工具由 MCP 提供；原生 4 个 `pmem_*` 保留；
+- 24 个 `memory_*` 工具由 MCP 提供；原生 5 个 `pmem_*` 保留；
 - MCP 起不来不影响醒来卡和原生工具（`failOnStartupError: false`）；
 - `/pmem mcp` 或 `probeMcp()` 可查 20 工具/延迟；
 - 包内 patch 只注册插件本体；MCP 那一段由 `pmem dsh install` 按本机路径生成
@@ -272,7 +272,7 @@ node deploy/dsh-pmem/test-handoff.mjs
 node deploy/dsh-pmem/test-mcp.mjs
 ```
 
-第一个用假 ctx 确认：注册了 `dsh-pmem:wake` 的 system prompt、4 个工具、`/pmem` 命令，
+第一个用假 ctx 确认：注册了 `dsh-pmem:wake` 的 system prompt、5 个工具、`/pmem` 命令，
 并且能从真实库读到含 `PMEM_WAKE` 的卡。第二个用临时库跑完整 handoff 链路：
 假会话 → `我们/停在哪` → 醒来卡出现「上次」。第三个用临时库确认 MCP：
-`initialize` → 20 个 `memory_*` 工具 → `memory_add` → `memory_stats`。
+`initialize` → 24 个 `memory_*` 工具 → `memory_add` → `memory_stats`。

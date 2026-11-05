@@ -510,11 +510,13 @@ TOOLS: list[dict[str, Any]] = [
         "description": (
             "导出 JSONL（首行 header，其后每行一条记忆）。"
             "secret 默认打码；导出不含向量，导入后重算。"
+            "include_events=true 时追加 event 行（事件是哈希链，只能导入空 event_log 的库）。"
         ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "redact": {"type": "boolean", "default": True},
+                "include_events": {"type": "boolean", "default": False},
             },
             "additionalProperties": False,
         },

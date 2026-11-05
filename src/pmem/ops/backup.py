@@ -1,11 +1,13 @@
 """M9 备份与**恢复演练**。
 
-备份不是「复制一个 .db 文件」：WAL 模式下直接复制可能拿到半截状态。这里用
-SQLite 的在线备份 API（``Connection.backup``）生成一致副本，再做：
+备份不是「复制一个 .db 文件」：WAL 模式下直接复制可能拿到半截状态，而
+SQLite 的在线备份 API 会把已删行的 freelist 页也一起带过去。这里用
+``VACUUM INTO`` 生成**物理紧凑**的一致副本：删过的内容不会留在备份里。
+源库用只读连接执行，不写活库。生成后做：
 
-1. ``PRAGMA integrity_check``；
+1. ``PRAGMA integrity_check`` / 外键 / 事件哈希链；
 2. ``sha256``；
-3. 写入 ``snapshot`` 表 + ``event_log``。
+3. 写入 ``snapshot`` 表 + ``event_log``（成功后再补一条锚点事件，见 W2）。
 
 恢复演练会**真的把副本打开**，验事件哈希链、外键、记忆条数，再统计恢复耗时；
 整个过程只读副本，不碰活库。
@@ -127,6 +129,44 @@ def _record_metric(db: Database, name: str, value: float, day: str | None = None
     )
 
 
+def _vacuum_into(db: Database, target: Path) -> None:
+    """用 ``VACUUM INTO`` 生成一致副本（源库只读连接；产物不含 freelist 残留）。
+
+    为什么不用在线备份 API：``Connection.backup`` 复制的是**页级快照**，
+    删掉的行所占的页会原样进备份文件——恢复/取证时还能从字节里翻出旧内容。
+    ``VACUUM INTO`` 重写为紧凑文件，已删页不会出现。
+    """
+    if target.exists():
+        target.unlink()
+    if db.path == ":memory:":
+        # 内存库没有文件路径可开只读连接；用同一个连接 VACUUM INTO 即可。
+        db.conn.execute("VACUUM INTO ?", (str(target),))
+        return
+    source = sqlite3.connect(
+        f"file:{Path(db.path).as_posix()}?mode=ro", uri=True, timeout=db.timeout
+    )
+    try:
+        source.execute("VACUUM INTO ?", (str(target),))
+    finally:
+        source.close()
+
+
+def _write_anchor(db: Database) -> Any:
+    """成功备份后补写事件锚点（W2 的 ``events.write_anchor``）；未接线时静默跳过。
+
+    锚点不能影响备份主流程：备份已经成功，锚点只是给「事件链尾在哪里」留个记号。
+    """
+    fn = getattr(events, "write_anchor", None)
+    if fn is None:
+        return None
+    try:
+        with db.tx() as conn:
+            return fn(conn)
+    except Exception:  # noqa: BLE001 锚点是增强，不能把成功备份变成失败
+        return None
+
+
+
 def run(
     db: Database,
     *,
@@ -136,7 +176,12 @@ def run(
     tag: str = "manual",
     keep: int | None = None,
 ) -> dict[str, Any]:
-    """在线备份一份，校验并登记。``tag`` 只写进事件，便于区分手动/定时。"""
+    """在线备份一份（``VACUUM INTO``），校验并登记。
+
+    ``kind`` 取 daily / monthly / manual / pre-migrate（非法值回落到 manual）；
+    ``tag`` 只写进事件，便于区分手动/定时。成功后会顺手补一条事件锚点
+    （``events.write_anchor``，W2 提供；未接线时跳过）。
+    """
     cfg = config or Config()
     directory = _dir(db, cfg)
     directory.mkdir(parents=True, exist_ok=True)
@@ -145,13 +190,9 @@ def run(
     temp = directory / f".{target.name}.tmp"
     started = time.perf_counter()
     db.checkpoint()
-    dst = sqlite3.connect(str(temp))
-    try:
-        db.conn.backup(dst)
-    finally:
-        dst.close()
 
     try:
+        _vacuum_into(db, temp)
         checked = _check_copy(temp)
         if not checked["ok"]:
             raise RuntimeError("backup verification failed: " + json.dumps(checked["checks"], ensure_ascii=False))
@@ -204,6 +245,7 @@ def run(
         _record_metric(db, "ops.backup.duration_ms", elapsed_ms)
         _record_metric(db, "ops.backup.memories", int(counts.get("memory", 0)))
 
+    anchor = _write_anchor(db)
     pruned = prune(db, config=cfg, keep=keep)
     return {
         "ok": True,
@@ -219,6 +261,7 @@ def run(
         "pruned": pruned,
         "kind": final_kind,
         "tag": tag,
+        "anchor": anchor,
     }
 
 

@@ -425,7 +425,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
         turns: config.handoffTurns,
         minMs: config.handoffMinMs,
       },
-      mcp: { serverName: 'pmem', tools: 20 },
+      mcp: { serverName: 'pmem', tools: 24 },
     })
   })
 
@@ -479,7 +479,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
   })
 
   route('exact', `${API}/mcp`, async (req, res) => {
-    return json(res, 200, { ok: true, serverName: 'pmem', tools: 20, note: 'MCP 由官方 client 管理；这里是静态摘要' })
+    return json(res, 200, { ok: true, serverName: 'pmem', tools: 24, note: 'MCP 由官方 client 管理；这里是静态摘要' })
   })
 
   // ---- 星图 ----------------------------------------------------------------

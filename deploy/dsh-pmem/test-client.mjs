@@ -80,6 +80,15 @@ const labels = client.TABS.map(([, label]) => label)
 assert.deepEqual(labels, ['概览', '醒来卡', '记忆', '自动 handoff', 'MCP', '高级', '夜间'])
 assert.ok(!labels.some(label => label.includes('星图')), '星图不应该占设置标签页')
 
+// 工具数契约：MCP 实际 24 个（schemas.TOOLS），原生 5 个（含 pmem_soul）。
+// 设置页不要把旧数字写死（20/4）；API 没给时兜底也必须是 24。
+assert.ok(source.includes('?? 24'), '工具数兜底应该是 24（MCP 实际工具数）')
+assert.ok(
+  source.includes('pmem_wake / pmem_recall / pmem_remember / pmem_soul / pmem_stats'),
+  '原生工具清单少了 pmem_soul',
+)
+assert.ok(source.includes("'5 个'"), '原生工具数量应显示 5 个')
+
 // 注册契约
 const registered = []
 const ctx = {

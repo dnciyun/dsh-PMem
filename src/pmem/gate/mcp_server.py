@@ -272,7 +272,10 @@ class McpServer:
         if name == "memory_stats":
             return self.app.stats()
         if name == "memory_export":
-            return self.app.export_bundle(redact=bool(args.get("redact", True)))
+            return self.app.export_bundle(
+                redact=bool(args.get("redact", True)),
+                include_events=bool(args.get("include_events", False)),
+            )
         if name == "memory_import":
             return self.app.import_bundle(
                 args.get("data", ""),

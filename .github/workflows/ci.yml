@@ -26,3 +26,27 @@ jobs:
           python -m pip install pytest
       - name: Test
         run: python -m pytest tests -q
+
+  plugin-tests:
+    name: plugin (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Node tests
+        env:
+          PYTHONPATH: src
+          PYTHONIOENCODING: utf-8
+        run: |
+          node deploy/dsh-pmem/test-client.mjs
+          node deploy/dsh-pmem/test-web.mjs
+          node deploy/dsh-pmem/test-mcp.mjs

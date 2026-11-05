@@ -12,8 +12,10 @@ from __future__ import annotations
 
 import contextlib
 import sqlite3
+import time
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from . import schema
 from .clock import now_iso
@@ -86,6 +88,9 @@ class Database:
         self._migrate_event_log_run(conn)
         for stmt in schema.DDL:
             conn.execute(stmt)
+        # 老库补建 0.30.0 新增的索引：DDL 里已有 CREATE INDEX IF NOT EXISTS，
+        # 这里再显式跑一遍（幂等），保证「先有表、后加索引」的旧库开一次就能补上。
+        self._migrate_indexes(conn)
         conn.execute(f"PRAGMA application_id = {APPLICATION_ID}")
         ts = now_iso()
         meta = {
@@ -150,6 +155,21 @@ class Database:
         cols = {row["name"] for row in conn.execute("PRAGMA table_info(event_log)")}  # type: ignore[attr-defined]
         if "run_id" not in cols:
             conn.execute("ALTER TABLE event_log ADD COLUMN run_id TEXT")  # type: ignore[attr-defined]
+
+    # 0.30.0 新增、且要能补到老库上的索引（DDL 里也有同样语句，这里两个入口都幂等）。
+    _EXTRA_INDEXES = (
+        "CREATE INDEX IF NOT EXISTS idx_mem_episode ON memory(episode_id)",
+        "CREATE INDEX IF NOT EXISTS idx_entity_bridge ON entity(subject_id, status, mention_count DESC)",
+    )
+
+    def _migrate_indexes(self, conn: object) -> None:
+        """老库幂等补建新索引（缺表/缺列时静默跳过，下一次 init 再补）。"""
+        for stmt in self._EXTRA_INDEXES:
+            try:
+                conn.execute(stmt)  # type: ignore[attr-defined]
+            except sqlite3.DatabaseError:
+                # 只读库 / 更老的库结构：索引是增强，不能因此让库打不开。
+                continue
 
     def _migrate_entity_org(self, conn: object) -> None:
         """1.0.0 → 1.1.0：实体表补 ``org`` 类型。
@@ -308,6 +328,81 @@ class Database:
     def checkpoint(self) -> None:
         with contextlib.suppress(sqlite3.DatabaseError):
             self.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+
+    def vacuum(self, *, analyze: bool = True) -> dict[str, Any]:
+        """物理擦除：checkpoint → ``VACUUM`` →（可选）``PRAGMA optimize`` → 再 checkpoint。
+
+        为什么要 VACUUM 而不是只删行：SQLite 删行只是把页挂回 freelist，
+        **已删内容的字节还留在文件里**。VACUUM 会把全库重写进新文件，
+        freelist 里的旧字节随之消失——「真删」才算真删。
+
+        前置条件与代价：
+        - 只读连接直接拒绝（返回 ``ok=False``，不抛异常，方便 CLI 统一处理）；
+        - VACUUM 需要独占写锁、耗时与库大小成正比，期间其它写入会被 busy_timeout
+          挡在外面。调用方应开维护窗口（``ops.maintenance``）再跑；
+        - 内存库（``:memory:``）也能 VACUUM，但没有文件大小可报（记 0）。
+
+        返回 ``{ok, before_bytes, after_bytes, before_pages, after_pages,
+        freelist_before, freelist_after, before_total_bytes, after_total_bytes,
+        saved_bytes, wal_before_bytes, wal_after_bytes, analyze, duration_ms}``。
+        ``before/after_total_bytes`` 把 ``-wal`` 一起算（VACUUM 会把 WAL 并回主文件，
+        只看 db 文件大小会出现假增长）。
+        """
+        if self.read_only:
+            return {"ok": False, "reason": "read-only", "error": "只读连接不能 VACUUM"}
+        path = Path(self.path) if self.path != ":memory:" else None
+        started = time.perf_counter()
+
+        def file_size(candidate: Path | None) -> int:
+            return int(candidate.stat().st_size) if candidate is not None and candidate.exists() else 0
+
+        def wal_path(candidate: Path | None) -> Path | None:
+            return Path(str(candidate) + "-wal") if candidate is not None else None
+
+        before_bytes = file_size(path)
+        wal_before = file_size(wal_path(path))
+        before_pages = int(self.conn.execute("PRAGMA page_count").fetchone()[0])
+        freelist_before = int(self.conn.execute("PRAGMA freelist_count").fetchone()[0])
+        self.checkpoint()
+        try:
+            self.conn.execute("VACUUM")
+            if analyze:
+                self.conn.execute("PRAGMA optimize")
+        except sqlite3.DatabaseError as exc:
+            return {
+                "ok": False,
+                "error": f"{type(exc).__name__}: {exc}",
+                "before_bytes": before_bytes,
+                "before_pages": before_pages,
+                "freelist_before": freelist_before,
+            }
+        # WAL 模式下 VACUUM 的结果可能先落在 -wal 里：再 checkpoint 一次，
+        # 主库文件才是重写后的紧凑版本（「物理擦除」才有可验证的意义）。
+        self.checkpoint()
+        after_bytes = file_size(path)
+        wal_after = file_size(wal_path(path))
+        after_pages = int(self.conn.execute("PRAGMA page_count").fetchone()[0])
+        freelist_after = int(self.conn.execute("PRAGMA freelist_count").fetchone()[0])
+        # WAL 里的数据 VACUUM 时会并回主文件：只比 db 文件大小会出现「4 KB → 569 KB」
+        # 这种假增长，所以总量把 WAL 一起算，saved_bytes 用总量差。
+        before_total = before_bytes + wal_before
+        after_total = after_bytes + wal_after
+        return {
+            "ok": True,
+            "before_bytes": before_bytes,
+            "after_bytes": after_bytes,
+            "before_pages": before_pages,
+            "after_pages": after_pages,
+            "freelist_before": freelist_before,
+            "freelist_after": freelist_after,
+            "before_total_bytes": before_total,
+            "after_total_bytes": after_total,
+            "saved_bytes": max(0, before_total - after_total),
+            "wal_before_bytes": wal_before,
+            "wal_after_bytes": wal_after,
+            "analyze": bool(analyze),
+            "duration_ms": int((time.perf_counter() - started) * 1000),
+        }
 
     def integrity_ok(self) -> bool:
         row = self.conn.execute("PRAGMA integrity_check").fetchone()

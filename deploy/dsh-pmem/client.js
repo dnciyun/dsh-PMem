@@ -744,9 +744,9 @@ window.__ModuleLoader__.load({
         h(Row, { title: 'MCP server', sub: '官方 @deepseek-ai/dsh-mcp-client，stdio 拉起 pmem.gate.mcp_server' },
           h('span', { className: 'pmem-chip' }, status?.mcp?.serverName ?? 'pmem')),
         h(Row, { title: '工具数', sub: 'memory_add / search / get / update / delete / history / export / import / stats …' },
-          h('span', { className: 'pmem-row-sub' }, `${status?.mcp?.tools ?? 20} 个`)),
-        h(Row, { title: '原生工具', sub: 'pmem_wake / pmem_recall / pmem_remember / pmem_stats' },
-          h('span', { className: 'pmem-row-sub' }, '4 个')),
+          h('span', { className: 'pmem-row-sub' }, `${status?.mcp?.tools ?? 24} 个`)),
+        h(Row, { title: '原生工具', sub: 'pmem_wake / pmem_recall / pmem_remember / pmem_soul / pmem_stats' },
+          h('span', { className: 'pmem-row-sub' }, '5 个')),
         h('p', { className: 'pmem-note' },
           'MCP 工具和原生工具并存、不重名。连接状态由宿主管理；想手工探活可以在终端跑 /pmem mcp。'),
       )

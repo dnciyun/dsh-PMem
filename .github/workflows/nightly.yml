@@ -1,9 +1,10 @@
 name: Nightly
 
-# 每晚跑一次「慢测试」：多进程并发写 + 崩溃恢复。
-# 这两个文件默认规模（4×100 / 3 轮）也会在 ci.yml 的全量 pytest 里跑；
-# 这里用 PMEM_SLOW=1 放大（8×200 / 8 轮 + 超 busy_timeout 的锁等待），
-# 只跑这两个文件，不重复全量、不影响 PR 阻断。
+# 每晚跑一次两类「全量 pytest 之外」的门：
+#   1. pressure：多进程并发写 + 崩溃恢复（PMEM_SLOW=1 放大档）；
+#   2. quality ：308 题检索质量回归门（308 + 277 硬负例 + 100 留出集，冻结时钟）。
+# 两者都不在 PR 阻断里：质量门只拦「夜间发现的漂移」，白天 PR 仍由 ci.yml 的
+# 943 个单测把关。
 
 on:
   schedule:
@@ -34,3 +35,19 @@ jobs:
         env:
           PMEM_SLOW: "1"
         run: python -m pytest tests/test_pressure_concurrency.py tests/test_durability.py -q
+
+  quality:
+    name: retrieval quality gate (ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Retrieval quality gate (308 + hard negatives + holdout)
+        run: python scripts/eval_gate.py

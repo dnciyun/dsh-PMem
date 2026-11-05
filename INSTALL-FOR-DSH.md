@@ -229,6 +229,8 @@ pmem search "跨端记忆"          # 消化后，B站/主会话也搜得到
 pmem export --out pexport.jsonl      # 记忆原文 + 元数据（不含向量，导入后按需重算）
 pmem import pexport.jsonl --dry-run
 pmem import pexport.jsonl
+# 默认导出不含事件日志；要整条账本加 --with-events。
+# 事件是哈希链，只能导进空 event_log 的库（换机器建议直接拷备份文件）。
 ```
 
 ---
@@ -257,7 +259,7 @@ pmem import pexport.jsonl
 
 ```bash
 pmem dsh status      # 装在不在、MCP 片段对不对、python 是不是同一个
-pmem doctor          # 完整性 / 事件链 / 17 条不变量
+pmem doctor          # 完整性 / 事件链 / SQLite 版本 / 19 项不变量
 pmem stats           # integrity_ok / db_path / 条数分布
 pmem trace "那句话"   # 按字查原话：在不在、谁说的、哪次会话第几行
 ```

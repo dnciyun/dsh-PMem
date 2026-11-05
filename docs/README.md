@@ -17,7 +17,7 @@
 可以从这几处入手（都在公开仓库里）：
 
 - 数据结构：`src/pmem/base/schema.py`（建表语句自带「为什么这么设计」注释）；
-- 检索打分：`src/pmem/memory/store.py` 里的 `search()`（每一路通道都有实测注释）；
+- 检索打分：`src/pmem/memory/retrieval/search.py` 里的 `run_search()`（每一路通道都有实测注释）；
 - 接口契约：`README.md` 的「测试数据」与 `deploy/`；
 - 行为边界：`tests/` 里每个用例的文件头（很多测试文件开头就是一篇设计说明）。
 

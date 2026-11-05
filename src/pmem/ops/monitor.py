@@ -64,6 +64,73 @@ def _db_size(db: Database) -> int:
     return total
 
 
+def _wal_bytes(db: Database) -> int:
+    if db.path == ":memory:":
+        return 0
+    path = Path(str(db.path) + "-wal")
+    return int(path.stat().st_size) if path.exists() else 0
+
+
+def _add_wal(
+    checks: list[dict[str, Any]],
+    metrics: dict[str, Any],
+    db: Database,
+    cfg: Config,
+    *,
+    record: bool = False,
+) -> None:
+    """WAL 体积：大 WAL 说明 checkpoint 被长读连接/持续写入拖住了，不代表数据坏。
+
+    ``record=True``（daemon 的定时拍子）时，超过 warn 阈值就真的做一次
+    ``Database.checkpoint()``；``record=False`` 的只读快照只报告 + 建议。
+    """
+    size = _wal_bytes(db)
+    metrics["wal_bytes"] = size
+    mb = size / 1024 / 1024
+    warn_mb = float(cfg.get("runtime.wal_warn_mb", 64) or 64)
+    fail_mb = float(cfg.get("runtime.wal_fail_mb", 512) or 512)
+    hint = "建议 idle 时调用 Database.checkpoint()（wal_checkpoint(TRUNCATE)），并检查长读连接"
+    if mb >= warn_mb and record:
+        db.checkpoint()
+        trimmed = _wal_bytes(db)
+        metrics["wal_bytes_after_checkpoint"] = trimmed
+        size = trimmed
+        mb = size / 1024 / 1024
+        hint = f"已执行 Database.checkpoint()，WAL 降到 {mb:.2f} MB"
+    if mb >= fail_mb:
+        _add(checks, "wal", "fail", f"WAL {mb:.1f} MB ≥ {fail_mb:.0f} MB；{hint}")
+    elif mb >= warn_mb:
+        _add(checks, "wal", "warn", f"WAL {mb:.1f} MB ≥ {warn_mb:.0f} MB；{hint}")
+    else:
+        _add(checks, "wal", "ok", f"WAL {mb:.2f} MB")
+
+
+def _check_event_anchor(conn: Any) -> tuple[str, str, dict[str, Any]]:
+    """调 W2 的 ``events.check_anchor`` 并归一成 (status, detail, extra)。
+
+    锚点未接线时只报 info（不假装系统有锚点，也不把老库判坏）。
+    """
+    fn = getattr(events, "check_anchor", None)
+    if fn is None:
+        return "info", "events.check_anchor 未接线（等 W2 锚点）", {"wired": False}
+    try:
+        result = fn(conn)
+    except Exception as exc:  # noqa: BLE001 检查失败不等于锚点错
+        return "warn", f"check_anchor 失败：{type(exc).__name__}: {exc}", {"wired": True, "error": str(exc)}
+    if isinstance(result, bool):
+        return ("ok" if result else "warn"), ("锚点一致" if result else "锚点与事件链尾不一致"), {"wired": True, "ok": result}
+    if isinstance(result, dict):
+        ok = result.get("ok")
+        if ok is None:
+            ok = result.get("status") == "ok"
+        detail = str(result.get("detail") or result.get("message") or result)
+        return ("ok" if ok else "warn"), detail, {"wired": True, "ok": bool(ok), "anchor": result}
+    if isinstance(result, (tuple, list)) and len(result) >= 2:
+        ok = bool(result[0])
+        return ("ok" if ok else "warn"), str(result[1]), {"wired": True, "ok": ok}
+    return "ok", str(result), {"wired": True}
+
+
 def collect(
     db: Database,
     *,
@@ -82,6 +149,12 @@ def collect(
 
     chain_ok, chain_detail = events.verify_chain(db.conn)
     _add(checks, "event_chain", "ok" if chain_ok else "fail", chain_detail)
+
+    anchor_status, anchor_detail, anchor_extra = _check_event_anchor(db.conn)
+    _add(checks, "event_anchor", anchor_status, anchor_detail, **anchor_extra)
+    metrics["event_anchor_ok"] = 1.0 if anchor_status == "ok" else 0.0
+
+    _add_wal(checks, metrics, db, cfg, record=record)
 
     from . import invariants
 
@@ -229,6 +302,7 @@ def _record(db: Database, result: dict[str, Any], *, subject: str) -> None:
     mapping = {
         "ops.memory_total": result["metrics"].get("memory_total"),
         "ops.db_size_bytes": result["metrics"].get("db_size_bytes"),
+        "ops.wal_bytes": result["metrics"].get("wal_bytes"),
         "ops.jobs_dead": result["metrics"].get("jobs_dead"),
         "ops.quality": result["metrics"].get("quality"),
         "ops.recall_at_5": result["metrics"].get("recall_at_5"),

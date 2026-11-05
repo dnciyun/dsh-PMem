@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "generated_at": "2026-11-05T11:40:16.055934+01:00",
+  "frozen_now": "2026-11-05T00:00:00Z",
+  "k": 8,
+  "vector": "disabled-for-determinism",
+  "tolerance": {
+    "answer_rate": 0.5,
+    "mrr": 0.005,
+    "long_horizon": 0.5,
+    "temporal": 0.5,
+    "noise_resistance": 0.5,
+    "faithfulness": 0.5,
+    "hardneg_top3_purity": 0.5,
+    "holdout_answer_rate": 0.5,
+    "holdout_mrr": 0.005
+  },
+  "metrics": {
+    "answer_rate": 97.9,
+    "mrr": 0.813,
+    "long_horizon": 96.9,
+    "temporal": 100.0,
+    "noise_resistance": 84.8,
+    "faithfulness": 100.0,
+    "hardneg_top3_purity": 57.8,
+    "holdout_answer_rate": 98.9,
+    "holdout_mrr": 0.79
+  },
+  "counts": {
+    "personas": 10,
+    "probes": 308,
+    "hardneg_probes": 277,
+    "hardneg_distinct_queries": 137,
+    "holdout_probes": 100
+  },
+  "extras": {
+    "retrieval_p50_ms": 4.46,
+    "inject_tokens_mean": 395.0,
+    "hardneg_by_tier": {
+      "1": {
+        "probes": 56,
+        "purity": 33.9,
+        "coexist": 37
+      },
+      "2": {
+        "probes": 69,
+        "purity": 49.3,
+        "coexist": 35
+      },
+      "3": {
+        "probes": 152,
+        "purity": 70.4,
+        "coexist": 45
+      }
+    }
+  }
+}
