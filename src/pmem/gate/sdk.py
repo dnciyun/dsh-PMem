@@ -752,6 +752,55 @@ class PMem:
             )
         return self._ok(data, started)
 
+    def sleep_whale(
+        self,
+        *,
+        day_key: str | None = None,
+        model: Any = None,
+        dry_run: bool = False,
+        transcript_dir: str | None = None,
+        run_sleep: bool = True,
+    ) -> dict[str, Any]:
+        """鲸眠（0.35.0）：开一个 LLM 会话写当天日记，随后仍跑一遍固定 8 阶段。
+
+        ``model`` 可以传 None（按配置/环境变量造）；测试时也可以直接注入一个假模型。
+        """
+        started = time.perf_counter()
+        from ..sleep import orchestrator, whale
+        from ..sleep.common import yesterday_key
+
+        day = day_key or yesterday_key()
+        try:
+            if model is not None and not isinstance(model, str):
+                client = model
+            else:
+                client = whale.build_model(self.config, model)
+            wake = (self.wake(budget=300) or {}).get("data") or {}
+            wake_text = str(wake.get("live") or wake.get("text") or "")
+            recent = whale.recent_episodes(self.db, subject=self.subject, day_key=day, limit=3)
+            data = whale.run(
+                self.db,
+                subject=self.subject,
+                day_key=day,
+                store=self.store,
+                app=self,
+                config=self.config,
+                model=client,
+                dry_run=dry_run,
+                transcript_dir=transcript_dir,
+                wake_text=wake_text,
+                recent_episodes=recent,
+            )
+            if run_sleep and data.get("ok") and not dry_run:
+                # sleep_run.trigger 的 CHECK 只允许 schedule/manual/catchup/cli，鲸眠沿用 manual；
+                # 「这一轮是鲸眠触发的」记在鲸眠自己的转录里（session_id=whale-sleep:<day>）。
+                data["sleep"] = orchestrator.run(
+                    self.db, subject=self.subject, day_key=day, trigger="manual", config=self.config
+                )
+        except PmemError as exc:
+            return self._fail(exc, started)
+        return self._ok(data, started)
+
     def sleep_status(self, *, day_key: str | None = None) -> dict[str, Any]:
         started = time.perf_counter()
         from ..sleep import orchestrator

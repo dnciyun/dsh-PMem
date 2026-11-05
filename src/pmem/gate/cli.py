@@ -573,6 +573,15 @@ def main(argv: list[str] | None = None) -> int:
     p_srp = sl_sub.add_parser("report", help="打印最近的睡眠报告（Markdown）")
     p_srp.add_argument("--day", default=None)
     p_srp.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+    p_slw = sl_sub.add_parser(
+        "whale", help="鲸眠（0.35.0）：开一个「鲸眠」LLM 会话把当天原文消化成日记"
+    )
+    p_slw.add_argument("--day", default=None, help="处理哪一天，默认昨天")
+    p_slw.add_argument("--model", default=None, help="覆盖模型名（默认读 [sleep.whale].model）")
+    p_slw.add_argument("--dry-run", action="store_true", help="只跑会话、不落库、不跑固定 8 阶段")
+    p_slw.add_argument("--no-sleep", action="store_true", help="只写日记，不接着跑固定 8 阶段")
+    p_slw.add_argument("--show", action="store_true", help="跑完把鲸眠会话转录打印出来")
+    p_slw.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
 
     p_ev = sub.add_parser("evolve", help="进化引擎（M5）：复核 / 经验复用 / 冲突升级 / 调参")
     ev_sub = p_ev.add_subparsers(dest="evolve_action", required=True)
@@ -1362,6 +1371,41 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"    {name}: {str(rest)[:110]}")
                     if run.get("error"):
                         print(f"    错误：{run['error']}")
+                return 0
+            if args.sleep_action == "whale":
+                result = app.sleep_whale(
+                    day_key=args.day,
+                    model=args.model,
+                    dry_run=args.dry_run,
+                    run_sleep=not args.no_sleep,
+                )
+                if getattr(args, "json", False):
+                    return _emit(result, True)
+                if not result.get("ok"):
+                    return _emit(result, False)
+                data = result["data"]
+                print(
+                    f"— 鲸眠 · {data.get('day_key')} · {data.get('verdict')} · "
+                    f"回合 {data.get('replies')} · token {data.get('usage_total')}"
+                )
+                diary = data.get("diary") or {}
+                if diary.get("episode_id"):
+                    print(
+                        f"    日记：{diary.get('title')}（{diary.get('lines')} 行，"
+                        f"派生事实 {len(diary.get('facts') or [])} 条，模式 {diary.get('mode')}）"
+                    )
+                elif diary.get("reason"):
+                    print(f"    日记没写成：{diary.get('reason')}")
+                if data.get("sleep"):
+                    stages = data["sleep"].get("stages") or []
+                    print(f"    固定 8 阶段：{len(stages)} 个完成")
+                print(f"    转录：{data.get('transcript')}")
+                if args.show:
+                    from pathlib import Path as _Path
+
+                    text = _Path(str(data.get("transcript"))).read_text(encoding="utf-8")
+                    print("---- 鲸眠会话（末尾） ----")
+                    print("\n".join(text.splitlines()[-30:]))
                 return 0
             if args.sleep_action == "run":
                 result = app.sleep(

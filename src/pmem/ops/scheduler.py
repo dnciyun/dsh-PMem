@@ -298,6 +298,11 @@ def journal_tick(db: Database, cfg: Config, subject: str) -> dict[str, Any]:
         prune_error = f"{type(exc).__name__}: {exc}"
     idle = int(cfg.get("journal.idle_minutes", 45) or 45)
     verdict = journal.due(db, subject=subject, idle_minutes=idle)
+    whale_enabled = bool(cfg.get("sleep.whale.enabled", False))
+    if not verdict.get("due") and whale_enabled and verdict.get("reason") == "awaiting_model":
+        # 跨天的流水本来要等「在场的模型」自己写日记（journal.due 的 awaiting_model）；
+        # 开了鲸眠，这个角色就由夜里的鲸眠会话担任，所以这里把它当成到期。
+        verdict = {"due": True, "day_key": verdict.get("day_key"), "reason": "whale"}
     if not verdict.get("due"):
         note: dict[str, Any] = {
             "ok": prune_error is None,
@@ -312,9 +317,41 @@ def journal_tick(db: Database, cfg: Config, subject: str) -> dict[str, Any]:
         from ..memory.store import MemoryStore
 
         store = MemoryStore(db, config=cfg, subject=subject)
-        result = journal.digest(
-            db, subject=subject, day_key=verdict.get("day_key"), store=store, config=cfg
-        )
+        if whale_enabled:
+            # 鲸眠（0.35.0）：让 LLM 在「鲸眠」会话里写日记；失败就退回模板，夜里不能没有日记。
+            whale_error = ""
+            try:
+                from ..gate.sdk import PMem
+                from ..sleep import whale as whale_mod
+
+                app = PMem(db, config=cfg, subject=subject)
+                wake = (app.wake(budget=300) or {}).get("data") or {}
+                day = verdict.get("day_key")
+                result = whale_mod.run(
+                    db,
+                    subject=subject,
+                    day_key=day,
+                    store=store,
+                    app=app,
+                    config=cfg,
+                    model=whale_mod.build_model(cfg),
+                    wake_text=str(wake.get("live") or wake.get("text") or ""),
+                    recent_episodes=whale_mod.recent_episodes(db, subject=subject, day_key=day, limit=3),
+                )
+                if result.get("ok"):
+                    result["pruned"] = pruned
+                    return {"ok": prune_error is None, "due": verdict, "whale": result}
+                whale_error = f"鲸眠没写成：{result.get('reason') or result.get('verdict')}"
+            except Exception as exc:  # noqa: BLE001 鲸眠失败不能拖垮调度器，也不能丢日记
+                whale_error = f"{type(exc).__name__}: {exc}"
+            result = journal.digest(
+                db, subject=subject, day_key=verdict.get("day_key"), store=store, config=cfg
+            )
+            result["whale_error"] = whale_error
+        else:
+            result = journal.digest(
+                db, subject=subject, day_key=verdict.get("day_key"), store=store, config=cfg
+            )
     except Exception as exc:  # 写日记失败不能拖垮调度器
         note = {"ok": False, "error": f"{type(exc).__name__}: {exc}", "due": verdict, "pruned": pruned}
         if prune_error:

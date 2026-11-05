@@ -353,6 +353,15 @@ DEFAULTS: dict[str, Any] = {
         "window_days": 90,
         "report_dir": "",
         "backup_dir": "",
+        # 鲸眠（0.35.0）：夜间用一个 LLM 会话（session_id = whale-sleep:<day>）把当天原文
+        # 消化成日记。默认关——不配模型时保持原来的纯本地 8 阶段；配上模型才多花钱。
+        "whale": {
+            "enabled": False,
+            "model": "",           # 留空 = 继承 journal.model / PMEM_WHALE_MODEL / PMEM_JOURNAL_MODEL
+            "max_rounds": 6,
+            "max_chars": 6000,     # 当天原文进 prompt 的上限
+            "transcript_dir": "~/.dsh/pmem/whale-sleep",
+        },
     },
     # 日记（M10）：把当天的原话消化成一篇 episode。
     # 流水是易失原料，日记是派生结论，抽出来的事实进 memory 才会进星图。

@@ -29,10 +29,11 @@ wake-live.txt
 !/bench/stress/run.py
 !/bench/stress/corpus.json
 
-# 设计文档只放行两篇（其余是开发过程记录，含本地跑分与对比，不发布）
+# 设计文档只放行功能文档（其余是开发过程记录，含本地跑分与对比，不发布）
 docs/*
 !docs/07-hippocampus.md
 !docs/archive-semantics.md
+!docs/whale-sleep.md
 !docs/README.md
 # README 用的渲染图（演示数据生成，不含真实记忆）
 !docs/images
