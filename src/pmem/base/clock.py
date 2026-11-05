@@ -100,15 +100,23 @@ def occurred_day(value: str | None, *, fallback: str | None = None) -> str | Non
     事实就整体晚一天；agent 面板和召回 payload 都拿这个字段当日期显示，用户看到的
     就是错日期（实测 B 层 6 个库 2118/2227 条偏 +1 天，本机真实库 166 条全偏 1–2 天）。
 
-    派生事实的日期必须回到原料那一行的 ``ts``，所以这里只做一件事：把任意 ISO
-    字符串折成本地日期。解析失败返回 ``fallback``（不抛：一条脏时间不该让整篇日记写不进去）。
+    **无时区的 ISO 按「字面本地时间」处理**（取它写的日期本身），不能套 ``parse_iso``
+    的「naive = UTC」：手工数据/评测集里 23:20 这种写法会被折成次日 00:20，整整一天
+    的流水就漏掉不消化（0.31.0 真踩过：p09 第 62 天那条 23:20 的原话被算到 10-30，
+    当天的 digest 永远看不到它，一条该有的记忆直接消失）。
     """
     if not value:
         return fallback
     try:
-        return day_key(parse_iso(str(value)))
+        text = str(value).strip()
+        if text.endswith("Z"):
+            text = text[:-1] + "+00:00"
+        dt = datetime.fromisoformat(text)
     except (TypeError, ValueError):
         return fallback
+    if dt.tzinfo is None:
+        return dt.date().isoformat()
+    return dt.astimezone().date().isoformat()
 
 
 def days_between(earlier_iso: str, later_iso: str | None = None) -> float:

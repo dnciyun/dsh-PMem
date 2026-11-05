@@ -56,6 +56,18 @@ class OccurredDayHelperCase(unittest.TestCase):
         self.assertEqual(clock.occurred_day("不是时间", fallback="2026-01-01"), "2026-01-01")
         self.assertIsNone(clock.occurred_day(""))
 
+    def test_naive_timestamp_keeps_its_literal_date(self) -> None:
+        """无时区的 ISO 按字面日期算，不能被当成 UTC 推到第二天。
+
+        真踩过：评测语料里 ``2026-10-29T23:20:00``（naive）被 parse_iso 当 UTC，
+        折到本机时区就成了 10-30，于是那一天的流水永远不会被对应日期的 digest 消化，
+        一条该有的记忆直接消失（内部检索门 temporal 从 100 掉到 97.1 就是这一条）。
+        """
+        self.assertEqual(clock.occurred_day("2026-10-29T23:20:00"), "2026-10-29")
+        self.assertEqual(clock.occurred_day("2026-10-29T00:10:00"), "2026-10-29")
+        # 带时区的照旧按本机时区折算（这条是 UTC 深夜，本机在 +01/+02 已经跨日）
+        self.assertNotEqual(clock.occurred_day("2026-10-29T23:20:00Z"), "2026-10-29")
+
     def test_occurred_day_is_not_derived_from_now(self) -> None:
         """必须只看传入的时间，不能被 ``clock.set_now`` 影响。"""
         clock.set_now(datetime.fromisoformat("2027-01-01T10:00:00+00:00"))
