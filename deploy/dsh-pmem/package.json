@@ -1,14 +1,15 @@
 {
   "name": "dsh-pmem",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
-  "description": "把可塑性记忆（PMem）接进 DSH：醒来卡 + 每轮浮现 + 自动 handoff + 设置页 + WebGL2 星图 + 26 个 MCP 工具。",
+  "description": "把可塑性记忆（PMem）接进 DSH：醒来卡 + 每轮浮现 + 自动 handoff + 设置页 + 可视化控制台 + WebGL2 星图 + 26 个 MCP 工具。",
   "type": "module",
   "main": "./index.js",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
     "./web": "./web.js",
+    "./console": "./console.js",
     "./mcp": "./mcp.js",
     "./package.json": "./package.json"
   },
@@ -28,11 +29,13 @@
     "index.js",
     "client.js",
     "web.js",
+    "console.js",
     "standalone.js",
     "mcp.js",
     "starmap.html",
     "starmap",
     "test-starmap.mjs",
+    "test-console.mjs",
     "cordis.patch.yml",
     "README.md"
   ],

@@ -353,6 +353,12 @@ def main(argv: list[str] | None = None) -> int:
 
     p_upd = sub.add_parser("update", help="改元数据 / 纠错")
     p_upd.add_argument("id")
+    p_upd.add_argument(
+        "--kind",
+        default=None,
+        choices=["episodic", "semantic", "person", "relation", "experience", "goal", "meta"],
+        help="改 kind（控制台批量改元数据用；store.update 已支持这个字段）",
+    )
     p_upd.add_argument("--status", default=None)
     p_upd.add_argument("--sensitivity", default=None)
     p_upd.add_argument("--importance", type=float, default=None)
@@ -2369,6 +2375,8 @@ def main(argv: list[str] | None = None) -> int:
             return _emit(app.get(args.id), args.json)
         if args.cmd == "update":
             set_fields: dict[str, Any] = {}
+            if args.kind:
+                set_fields["kind"] = args.kind
             if args.status:
                 set_fields["status"] = args.status
             if args.sensitivity:

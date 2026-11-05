@@ -35,12 +35,15 @@ docs/*
 !docs/archive-semantics.md
 !docs/whale-sleep.md
 !docs/README.md
+!docs/console-design.md
+!docs/console-requirements.md
 # README 用的渲染图（演示数据生成，不含真实记忆）
 !docs/images
 docs/images/*
 !docs/images/architecture.png
 !docs/images/live-card.png
 !docs/images/starmap.png
+!docs/images/console-*.png
 
 # 开发草稿（tools/ 里只发布 cordis 注册片段的静态检查器，测试要用）
 /tools/**

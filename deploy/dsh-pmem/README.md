@@ -1,6 +1,6 @@
 # dsh-pmem
 
-把「可塑性记忆 / PMem」接进 DSH 的插件。它做六件事：
+把「可塑性记忆 / PMem」接进 DSH 的插件。它做七件事：
 
 > **每次新会话开头，先认出你；每一轮干活时，想起一点；会话结束时，把“停在哪”留下。**
 
@@ -12,7 +12,8 @@
 3. 会话结束时自动 handoff；
 4. `/pmem` 命令；
 5. 5 个 `pmem_*` 原生工具；
-6. 同一 bundle 通过官方 MCP client 带上 24 个 `memory_*` 工具。
+6. 同一 bundle 通过官方 MCP client 带上 24 个 `memory_*` 工具；
+7. 侧边栏一行**「记忆控制台」**：整页可视化控制台（总览 / 记忆 / 实体 / 睡眠 / 设置），替代原来只能窝在设置弹窗里的卡片窗口。
 
 上下文清空、换会话、换天之后，模型不该从零开始。插件会在 system prompt 里放一张
 ≤300 token 的**醒来卡**：
@@ -136,9 +137,38 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 这是**下限估计**：改写、转述都不算。所以 `use_count` 涨了是硬证据，不涨不代表没用。
 插件 0.5.0 起生效，回执失败不影响会话。
 
-## 设置页与星图（M9.7a → M9.7b 重做）
+## 设置页与星图（M9.7a → M9.7b 重做；控制台见 M22）
 
-设置 → **可塑性记忆**，七个标签：概览 / 醒来卡 / 记忆 / 自动 handoff / MCP / 高级 / 夜间。
+设置 → **可塑性记忆**：只剩一行「控制台已独立」+「打开控制台」按钮；原七个标签全部搬进侧边栏的整页控制台。
+
+### 记忆控制台（M22 / 插件 0.8.0）
+
+左侧导航五个分区，右侧内容区，桌面大屏优先：
+
+| 分区 | 做什么 |
+|---|---|
+| 总览 | 指标条（总量/今日新增/今日召回/未决冲突/使用次数）、token 用量、请求健康一行、睡眠状态、最近 10 条记忆、快捷（星图/体检/刷新醒来卡） |
+| 记忆 | 搜索（auto/keyword/vector/recent）+ 分组树过滤 + 排序 + 多选批量；详情含正文、元数据编辑（kind/grade/分组/敏感级/重要度/状态/置顶）、证据原话、变更历史、冲突、相关记忆、使用统计；反馈/撤回/删除（默认软删、二次确认） |
+| 实体 | 实体列表/详情（别名、提及记忆、1 跳关系）、2 跳查询、合并（先 dry_run 预览再确认）、跳星图 |
+| 睡眠 | 八阶段 run 列表 + 每阶段耗时/条数小条形图 + 进行中进度轮询 + 最近 14 次质量趋势；现在入睡 / 大睡一场（模板 / DSH） |
+| 设置 | 运行时开关与数值、检索/大睡默认值（localStorage）、排查面板（请求日志/醒来卡缓存/MCP/路径/doctor/体积/配置差异）、危险区（备份/恢复需输入 RESTORE/重建索引/运维白名单/批量删除） |
+
+![记忆控制台 · 总览](docs/images/console-overview.png)
+
+侧边栏入口 + 五个分区：
+
+| 截图 | 看什么 |
+|---|---|
+| ![](docs/images/console-sidebar.png) | 侧边栏「记忆控制台」入口（海马图标） |
+| ![](docs/images/console-memory.png) | 记忆页：搜索/过滤/列表 + 详情/元数据编辑/证据/历史 |
+| ![](docs/images/console-entity.png) | 实体页：实体列表 + 详情（别名/提及记忆/1 跳关系） |
+| ![](docs/images/console-entity-merge.png) | 合并预览（dry_run，不写库） |
+| ![](docs/images/console-sleep.png) | 睡眠页：八阶段 + 每阶段耗时/条数 + 质量趋势 |
+| ![](docs/images/console-settings.png) | 设置页：旧七标签已删，只剩「打开控制台」 |
+| ![](docs/images/console-settings-open.png) | 点「打开控制台」后弹窗关闭、整页控制台接管 |
+
+所有操作都走同源 `fetch`，不开新窗口、不整页跳转（桌面壳会静默 deny / 401）。
+空库时总览给引导卡（建库 / 写第一条 / 导入 JSONL / 看文档）。
 
 星图**不占标签**，只在概览留一行开关 + 两个入口：
 
@@ -224,6 +254,9 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 | `GET /dsh-pmem/starmap/ui.js` | 界面层（白名单） |
 | `GET /dsh-pmem/starmap/space.css` | 样式（白名单） |
 
+控制台路由（前缀 `/dsh-pmem/api/console`，共 20 条；详见 `docs/console-design.md` 与 `docs/console-requirements.md`）：
+`bootstrap`、`memories`、`memory`、`memory/feedback`、`memory/update`、`memory/delete`、`memory/batch`、`entities`、`entity`、`net/query`、`net/merge`、`backup`（GET/POST）、`backup/file`、`vector/rebuild`、`action`、`profile`、`groups`、`conflicts`、`stats`、`doctor`。
+
 安全：只接受回环；写操作要同源 + `application/json` + body ≤ 256 KB；
 再过 `connection.requestRejection`；只读白名单文件，不接受路径参数。
 
@@ -270,6 +303,10 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 node deploy/dsh-pmem/test.mjs
 node deploy/dsh-pmem/test-handoff.mjs
 node deploy/dsh-pmem/test-mcp.mjs
+node deploy/dsh-pmem/test-client.mjs   # 设置入口 + 侧边栏/整页面板注册契约
+node deploy/dsh-pmem/test-console.mjs  # 控制台纯函数 / 视图归一化 / 写动作
+node deploy/dsh-pmem/test-web.mjs      # 真 HTTP：既有 API + 控制台 20 条路由
+node deploy/dsh-pmem/test-starmap.mjs  # 星图静态契约
 ```
 
 第一个用假 ctx 确认：注册了 `dsh-pmem:wake` 的 system prompt、5 个工具、`/pmem` 命令，

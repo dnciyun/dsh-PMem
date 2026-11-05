@@ -21,6 +21,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFil
 import { createRequire } from 'node:module'
 import { randomUUID } from 'node:crypto'
 import { createStandalone, openInBrowser } from './standalone.js'
+import { createConsole } from './console.js'
 import { dirname } from 'node:path'
 
 const require = createRequire(import.meta.url)
@@ -513,19 +514,21 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     }
   })
 
-  route('exact', `${API}/status`, async (req, res) => {
-    const [dbStats, card, receipts, tokens] = await Promise.all([
+  // /status 的快照抽成函数：控制台 bootstrap 也要同一份（传 card 复用刚取到的醒来卡，
+  // 不重复 spawn Python）。返回字段和原来的 /status 一字不差。
+  const statusSnapshot = async ({ card } = {}) => {
+    const cardText = typeof card === 'string' ? card : await wake(config.budget).catch(() => '')
+    const [dbStats, receipts, tokens] = await Promise.all([
       stats().catch(() => null),
-      wake(config.budget).catch(() => ''),
       surfaceReceipts().catch(() => null),
       tokenStats().catch(() => null),
     ])
-    return json(res, 200, {
+    return {
       ok: true,
       version,
       runtime: publicRuntime(),
       db: dbStats,
-      wake: { tokens: Math.ceil(card.length / 3), chars: card.length, head: card.split('\n')[1] ?? '' },
+      wake: { tokens: Math.ceil(cardText.length / 3), chars: cardText.length, head: cardText.split('\n')[1] ?? '' },
       surface: receipts,
       tokens,
       starmap: starmapInfo(),
@@ -535,7 +538,11 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
         minMs: config.handoffMinMs,
       },
       mcp: { serverName: 'pmem', tools: 24 },
-    })
+    }
+  }
+
+  route('exact', `${API}/status`, async (req, res) => {
+    return json(res, 200, await statusSnapshot())
   })
 
   route('exact', `${API}/wake`, async (req, res) => {
@@ -748,6 +755,30 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     req.on('error', cleanup)
   })
 
+  // ---- M22 控制台 API ------------------------------------------------------
+  // 后端只做「聚合只读 + 三个管理动作」，全部复用 callPmem；路由同样走上面的
+  // guarded()（回环 / 同源 / JSON / body 上限 / requestRejection 一条不少）。
+  const consoleApi = createConsole({
+    config,
+    callPmem,
+    version,
+    runtime: publicRuntime,
+    wake,
+    stats,
+    starmap: starmapInfo,
+    snapshot: statusSnapshot,
+    logger: {
+      warn(message) {
+        try {
+          const target = webCtx?.logger
+          if (target && typeof target.warn === 'function') target.warn(message)
+          else console.warn(message)
+        } catch { /* 日志失败不影响请求 */ }
+      },
+    },
+  })
+  routes.push(...consoleApi.routes)
+
   return {
     routes,
     runtimeFile,
@@ -757,6 +788,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     get live() {
       return runtime
     },
+    console: consoleApi,
     /** 挂到 ctx.webServer 上；返回 disposer。 */
     register(ctx) {
       webCtx = ctx
