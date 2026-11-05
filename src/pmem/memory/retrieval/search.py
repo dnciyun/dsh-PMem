@@ -785,13 +785,17 @@ def run_search(
             # 置换仍然守纪律：头部 av_evict_head 条不动，最多换 av_max_evict 条。
             # 原话兜底已经插进来的条目不让：那是「派生事实没答上」时捞到的唯一证据，
             # 拿它给助手的话让位等于拆东墙补西墙——这时助手原话只占空位。
+            # 「预留预算」（0.34.0）：问「我说过什么」时，600 token 里常常只剩几十，
+            # 连一条 40 token 的原话都塞不下。允许为这类问句多花 `reserve` 个 token
+            # （有上限、只在这条通路上），把「查得到」变成「放得进」。
+            av_budget = int(budget) + max(0, int(av_cfg.get("reserve", 0) or 0))
             payload, payload_seq, payload_cov, spent, added, evicted = store._place_items(
                 fitted_items,
                 payload=payload,
                 payload_seq=payload_seq,
                 payload_cov=payload_cov,
                 k=k,
-                budget=int(budget),
+                budget=av_budget,
                 spent=spent,
                 head=max(0, int(av_cfg.get("evict_head", 3) or 0)),
                 max_evict=0

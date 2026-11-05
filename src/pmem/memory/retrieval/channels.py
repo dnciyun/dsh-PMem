@@ -673,6 +673,21 @@ def raw_fallback(
     return out
 
 
+def _assistant_rank_score(body: str, query_grams: set[str], query_terms: list[str]) -> float:
+    """assistant 原话的重排分：问句实词命中×2 + 双字重合 − 问号惩罚。
+
+    为什么权重这样定：实词命中比双字重合更可信（双字会撞虚词接缝），问号惩罚是因为
+    助手行里带问号的多半在反问用户、不是陈述答案。三个权重在探针里是一张平坦曲面
+    （gold 进 top-2 在 44–45 之间，见 .tmp/analysis-034/weight_surface.json），
+    说明它不是对 58 道题的尖峰拟合。
+    """
+    key = normalize(body)
+    term_hits = sum(1 for term in query_terms if term in key)
+    overlap = len(query_grams & query_mod.bigrams(key))
+    penalty = 0.5 if ("？" in body or "?" in body) else 0.0
+    return 2.0 * float(term_hits) + float(overlap) - penalty
+
+
 def assistant_voice(
     store: Any,
     *,
@@ -686,6 +701,12 @@ def assistant_voice(
     它和用户事实抢同一份预算；assistant 的话是**证据**，只该在问句明确指向
     「你说过/你答应」时出现。否则模型会把自己的推测当成用户陈述。
     为什么 score 压低：这是低置信度的补充证据，不能把真正的事实候选挤下去。
+
+    0.34.0 加了「多扫候选 + 确定性重排」：bm25 把「和问句用词相近」的闲聊排前面，
+    而真正的答案往往用词完全不同（问「你给我想的标记」答「一盆画小雨滴」）。
+    实测 58 道问助手原话的题里，gold 落在 bm25 第 3–8 名的有 20 道；扫 12 条再按
+    「问句实词命中×2 + 双字重合 − 问号惩罚」重排，gold 进 top-2 从 33 提到 44–45。
+    权重在一张平坦曲面上都稳定（见 .tmp/analysis-034/weight_surface.json），不是尖峰拟合。
     """
     text = str(q or "")
     if not ASSISTANT_VOICE_CLUES.search(text):
@@ -693,6 +714,13 @@ def assistant_voice(
     tokens = _assistant_voice_query(text)
     if not tokens:
         return []
+    cfg = store.cfg.get("retrieval.assistant_voice") or {}
+    cfg = cfg if isinstance(cfg, dict) else {}
+    want = max(1, int(limit or 2))
+    # 扫描条数是内部上限，不受 limit 影响：多扫几条只是 SQL 成本，进 payload 的仍是 limit 条。
+    scan = max(want, int(cfg.get("scan", 8) or 8))
+    scan = min(scan, 32)
+    rerank = bool(cfg.get("rerank", True))
     expr = " OR ".join(f'"{token}"' for token in tokens)
     try:
         rows = store.db.conn.execute(
@@ -702,12 +730,13 @@ def assistant_voice(
             "AND NOT EXISTS (SELECT 1 FROM journal_retraction r "
             "WHERE r.subject_id=jl.subject_id AND r.line_id=jl.id) "
             "ORDER BY bm25(journal_fts) LIMIT ?",
-            (expr, str(store.subject), max(1, int(limit or 2))),
+            (expr, str(store.subject), scan),
         ).fetchall()
     except Exception:  # noqa: BLE001 老库没建 FTS：当没有这条通道，不影响词法
         return []
     query_grams = query_mod.bigrams(text)
-    out: list[dict[str, Any]] = []
+    query_terms = query_mod.content_terms(normalize(text))
+    ranked: list[tuple[float, float, Any, str, int]] = []
     seen_text: set[str] = set()
     for row in rows:
         body = str(row["text"] or "")
@@ -716,6 +745,18 @@ def assistant_voice(
             continue
         seen_text.add(key)
         overlap = len(query_grams & query_mod.bigrams(body))
+        if rerank:
+            rank_score = _assistant_rank_score(body, query_grams, query_terms)
+            ranked.append((rank_score, float(row["bm25"] or 0.0), row, body, overlap))
+        else:
+            ranked.append((0.0, float(row["bm25"] or 0.0), row, body, overlap))
+    if rerank:
+        # 同分时用 bm25 兜底：SQL 已经是 bm25 升序，这里稳定排序保持它的相对顺序。
+        ranked.sort(key=lambda item: (-item[0], item[1]))
+    out: list[dict[str, Any]] = []
+    for _rank_score, _bm25, row, body, overlap in ranked:
+        if len(out) >= want:
+            break
         out.append(
             {
                 "id": row["id"],
