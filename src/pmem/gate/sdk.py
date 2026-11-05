@@ -218,20 +218,38 @@ class PMem:
             return self._fail(exc, started)
 
     def selfcheck(self, answer: str, *, question: str | None = None) -> dict[str, Any]:
-        """作答后自检：草稿回答里的日期/专名有没有记忆出处（确定性，0 模型调用）。"""
+        """作答后自检：草稿回答里的日期/专名有没有记忆出处（确定性，0 模型调用）。
+
+        ``[selfcheck] model = "..."`` 且环境里有凭证时，额外跑一遍模型复核（按次计费）；
+        凭证缺失/模型报错都只写进 note，不影响确定性结论。
+        """
         started = time.perf_counter()
         try:
             if not str(answer or "").strip():
                 raise ValidationError("answer 不能为空", field="answer")
             from ..memory import selfcheck as selfcheck_mod
 
+            run_model = None
+            model_note = ""
+            model_name = str(self.config.get("selfcheck.model", "") or "").strip()
+            if model_name:
+                try:
+                    from ..bench.model import OpenAICompatModel
+
+                    run_model = OpenAICompatModel(model=model_name, max_tokens=2048)
+                except Exception as exc:  # noqa: BLE001 没凭证就退回确定性核对
+                    model_note = f"selfcheck.model={model_name} 没跑起来：{exc}"
             data = selfcheck_mod.check_answer(
                 self.store,
                 answer,
                 question=question,
                 max_dates=int(self.config.get("selfcheck.max_dates", 40) or 40),
                 max_names=int(self.config.get("selfcheck.max_names", 20) or 20),
+                model=run_model,
             )
+            if model_note:
+                note = str(data.get("note") or "")
+                data["note"] = f"{note}；{model_note}" if note else model_note
             data["report"] = selfcheck_mod.format_report(data)
             return self._ok(data, started)
         except PmemError as exc:

@@ -1030,6 +1030,11 @@ class MemoryStore:
                 "whale_model": str(self.cfg.get("sleep.whale.model", "") or ""),
                 "journal_model": str(self.cfg.get("journal.model", "") or ""),
             },
+            # 作答自检（0.36.0）：确定性核对始终可用；填了 selfcheck.model 才有模型复核。
+            "selfcheck": {
+                "enabled": bool(self.cfg.get("selfcheck.enabled", True)),
+                "llm": bool(str(self.cfg.get("selfcheck.model", "") or "").strip()),
+            },
             "degraded": degraded,
             "limits": {
                 "max_text_chars": self.cfg.get("limits.max_text_chars", 8000),

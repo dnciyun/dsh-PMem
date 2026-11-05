@@ -498,8 +498,9 @@ def check_answer(
     question: str | None = None,
     max_dates: int = 40,
     max_names: int = 20,
+    model: Any = None,
 ) -> dict[str, Any]:
-    """核对一条回答里的日期与专名。
+    """核对一条回答里的日期与专名；可选再加一层模型复核。
 
     参数：
         store      ``MemoryStore``（用 ``store.db.conn`` / ``store.subject``，只读）
@@ -508,15 +509,19 @@ def check_answer(
                    答案有没有编日期/人名，只看库里的证据本身。
         max_dates  最多核对多少个日期
         max_names  最多核对多少个名字候选
+        model      可选。传了才做「模型复核」（``complete(messages) -> reply`` 的对象，
+                   例如 ``pmem.bench.model.OpenAICompatModel``）：让模型对照检索到的
+                   记忆判断草稿里有没有「记忆里没有却说得像真的」的陈述。默认 None
+                   = 只做确定性核对（0 模型调用、结果可复现）。
 
     截断长度与单条证据条数取 ``selfcheck.max_answer_chars`` / ``selfcheck.evidence_per_issue``
     （配置缺失时用模块默认值），和 config.py 里的默认口径一致。
 
-    返回：``{"clean", "issues", "checked": {"dates", "names"}, "note"}``。
+    返回：``{"clean", "issues", "checked": {"dates", "names"}, "note", "model"}``。
     ``clean`` 是「这一遍没发现对不上的东西」——**不要叫它 ok**：gate 的 ``_ok()``
     已经把整条结果包成 ``{"ok": true, "data": ...}``，两处 ok 语义打架会让调用方
     看到 ``{"ok": true, "data": {"ok": false}}`` 这种自相矛盾的东西。
-    单条 issue 形如 ``{"kind": "date"|"name", "span", "reason", "evidence"}``，
+    单条 issue 形如 ``{"kind": "date"|"name"|"claim", "span", "reason", "evidence"}``，
     evidence 里是 1–3 条 ``{"id", "text", "day"}`` 摘要（没有可参照的记载时为空）。
     """
     cfg = getattr(store, "cfg", None)
@@ -551,12 +556,148 @@ def check_answer(
     if names_cut:
         notes.append(f"名字超过 {name_limit} 个，只核了前 {name_limit} 个")
     issues = date_issues + name_issues
+    # 可选模型复核：确定性那一遍抓「库里没有的日期/人名」，这一遍抓「记忆里没有却说得
+    # 像真的陈述」。模型挂了/没配都不能影响确定性结论，所以整段包在 try 里，只往 note 写一句。
+    model_info: dict[str, Any] = {
+        "skipped": True,
+        "note": "未配置模型复核（只做了确定性核对）",
+        "issues": [],
+    }
+    if model is not None:
+        try:
+            model_info = model_check(
+                store,
+                text,
+                question=question,
+                model=model,
+                evidence_limit=evidence_cap,
+            )
+        except Exception as exc:  # noqa: BLE001 模型是增强，挂了不能带崩自检
+            model_info = {
+                "skipped": True,
+                "note": f"模型复核失败：{type(exc).__name__}: {exc}",
+                "issues": [],
+            }
+        issues = issues + list(model_info.get("issues") or [])
+        if model_info.get("note"):
+            notes.append(str(model_info["note"]))
     return {
         "clean": not issues,
         "issues": issues,
         "checked": {"dates": checked_dates, "names": checked_names},
         "note": "；".join(notes),
+        "model": model_info,
     }
+
+
+SELFCHECK_SYSTEM = """你是「答后校对员」。给你一道问题、一段草稿回答、以及从长期记忆里检索到的证据。
+只做一件事：找出草稿里「说得很确定、但证据里找不到出处」的陈述。
+
+规则：
+1. 只依据证据判断，不用你自己的常识补；
+2. 回答里明确说「不知道 / 不确定 / 没印象」不算问题；
+3. 证据不足以下结论时，宁可不说（宁少报不多报）；
+4. 最多列 5 条，每条给原文片段（span，尽量短）和一句原因；
+5. 只输出 JSON，不要解释：
+{"unsupported": [{"span": "...", "reason": "..."}], "should_say_unknown": false}"""
+
+
+def _evidence_lines(store: Any, query: str, *, limit: int = 6) -> list[str]:
+    """检索几条记忆当复核证据；只读（record=False，不写 recall_log）。"""
+    try:
+        result = store.search(str(query or "")[:120], k=limit, record=False)
+    except Exception:  # noqa: BLE001 检索失败就当没有证据
+        return []
+    out: list[str] = []
+    for item in (result or {}).get("items") or []:
+        day = str(item.get("day") or "")
+        text = str(item.get("text") or "").replace("\n", " ")[:120]
+        if text:
+            out.append(f"- [{day}] {text}")
+    return out
+
+
+def model_check(
+    store: Any,
+    answer: str,
+    *,
+    question: str | None = None,
+    model: Any,
+    evidence_limit: int = 6,
+) -> dict[str, Any]:
+    """模型复核：对照检索证据，列出「没有出处却说得像真的」的陈述（可选、按次计费）。
+
+    返回 ``{"skipped": False, "issues": [...], "note": ..., "tokens": int}``；
+    issue 的 ``kind`` 是 ``"claim"``（和确定性那遍的 date/name 区分开）。
+    """
+    query = str(question or "").strip() or str(answer or "")[:120]
+    evidence = _evidence_lines(store, query, limit=evidence_limit)
+    body = "\n".join(evidence) if evidence else "（这次没检索到相关记忆）"
+    user = (
+        f"问题：{question or '（未提供）'}\n\n"
+        f"证据：\n{body}\n\n"
+        f"草稿回答：\n{answer}\n"
+    )
+    messages = [
+        {"role": "system", "content": SELFCHECK_SYSTEM},
+        {"role": "user", "content": user},
+    ]
+    reply = model.complete(messages, None, hint={"temperature": 0})
+    content = str(getattr(reply, "content", "") or "")
+    parsed = _parse_model_json(content)
+    tokens = int(getattr(getattr(reply, "usage", None), "total", 0) or 0)
+    if parsed is None:
+        return {
+            "skipped": False,
+            "issues": [],
+            "note": "模型复核没给出合法 JSON（只采用确定性结论）",
+            "tokens": tokens,
+        }
+    raw = parsed.get("unsupported") if isinstance(parsed, dict) else None
+    issues: list[dict[str, Any]] = []
+    for item in (raw or [])[:5]:
+        if not isinstance(item, dict):
+            continue
+        span = str(item.get("span") or "").strip()
+        reason = str(item.get("reason") or "").strip()
+        if not span and not reason:
+            continue
+        issues.append(
+            {
+                "kind": "claim",
+                "span": span[:80],
+                "reason": reason[:160] or "证据里找不到出处",
+                "evidence": [],
+            }
+        )
+    should_unknown = bool(parsed.get("should_say_unknown")) if isinstance(parsed, dict) else False
+    note = "模型复核完成"
+    if should_unknown:
+        note = "模型复核完成：这题更该说「不知道」"
+    return {"skipped": False, "issues": issues, "note": note, "tokens": tokens}
+
+
+def _parse_model_json(text: str) -> Any:
+    """从模型回复里抠 JSON（容忍 ```json 代码围栏和前后废话）。"""
+    import json
+
+    body = str(text or "").strip()
+    if body.startswith("```"):
+        body = body.strip("`")
+        if body.lower().startswith("json"):
+            body = body[4:]
+    try:
+        return json.loads(body.strip())
+    except ValueError:
+        pass
+    start = body.find("{")
+    end = body.rfind("}")
+    if start >= 0 and end > start:
+        try:
+            return json.loads(body[start : end + 1])
+        except ValueError:
+            return None
+    return None
 
 
 def format_report(result: dict[str, Any]) -> str:
@@ -565,8 +706,9 @@ def format_report(result: dict[str, Any]) -> str:
     if not issues:
         return "日期/专名都对得上。"
     lines = [f"自检发现 {len(issues)} 处对不上："]
+    kind_labels = {"date": "日期", "name": "专名", "claim": "陈述"}
     for issue in issues:
-        kind = "日期" if str(issue.get("kind")) == "date" else "专名"
+        kind = kind_labels.get(str(issue.get("kind")), "对不上")
         line = f"- [{kind}] {issue.get('span')}：{issue.get('reason')}"
         evidence = issue.get("evidence") or []
         if evidence:
