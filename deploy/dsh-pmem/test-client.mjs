@@ -79,6 +79,11 @@ for (const rule of ['.pmem-btn-primary{', '.pconsole-btn-primary{']) {
 }
 assert.ok(source.includes('打开控制台'))
 assert.ok(source.includes('function ConsolePage'))
+// 模型通道灯：数据来自 /console/bootstrap 的 model 块；不能永远是灰
+assert.ok(source.includes('boot?.model'), '状态灯要读 bootstrap.model')
+assert.ok(source.includes('modelInfo.available === true'), '模型通道绿灯判定要用 available')
+assert.ok(source.includes('宿主没有可用的模型通道'), 'available=false 时要有明确文案')
+assert.ok(source.includes('已配置：'), 'available=true 时要显示 provider/model')
 // P1 真路由
 for (const endpoint of [
   "apiConsole('/entities?",
@@ -273,6 +278,7 @@ globalThis.fetch = async () => {
 const bootFull = {
   version: '0.8.0',
   status: { db: { memory_total: 12, integrity_ok: true, db_size_bytes: 4096, schema_version: 3 }, mcp: { tools: 24 } },
+  model: { available: true, provider: 'deepseek-account', model: 'deepseek-flash', providers: ['deepseek-account'], source: 'default', note: null },
   counts: { memory_total: 12, today_new: 2, today_recalls: 7, open_conflicts: 1, uses: 30 },
   wake: { text: '卡', tokens: 100, chars: 260 },
   profile: { traits: [], open_goals: [] },

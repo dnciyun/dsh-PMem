@@ -728,6 +728,7 @@ export function openMemoryReader(dbPath) {
  * @param {Function} [options.stats]    async () => 统计 JSON
  * @param {Function} [options.starmap]  () => 星图摘要
  * @param {Function} [options.snapshot] async ({card}) => web.js 的 /status 快照
+ * @param {Function} [options.model]    () => 宿主模型通道探测（web.js 的 modelChannelInfo）
  * @param {object}   [options.reader]   覆盖只读读取器（测试用）
  * @param {object}   [options.logger]   { warn(message) }
  */
@@ -741,6 +742,7 @@ export function createConsole(options = {}) {
     stats = null,
     starmap = null,
     snapshot = null,
+    model = null,
     logger = null,
   } = options
 
@@ -758,6 +760,29 @@ export function createConsole(options = {}) {
     try {
       if (logger && typeof logger.warn === 'function') logger.warn(`[pmem-console] ${message}`)
     } catch { /* 日志不能影响请求 */ }
+  }
+
+  /**
+   * 模型通道快照：控制台顶栏那盏「模型通道」灯的数据来源。
+   * 宿主没给探测函数时如实返回 unknown，不假装有/没有。
+   */
+  function modelInfoOf() {
+    const fallback = { available: false, provider: null, model: null, providers: [], source: 'unknown', note: '宿主未提供模型探测' }
+    if (typeof model !== 'function') return fallback
+    try {
+      const value = model()
+      if (!value || typeof value !== 'object') return fallback
+      return {
+        available: value.available === true,
+        provider: textOrNull(value.provider),
+        model: textOrNull(value.model),
+        providers: Array.isArray(value.providers) ? value.providers.map(String) : [],
+        source: textOrNull(value.source) ?? 'unknown',
+        note: textOrNull(value.note),
+      }
+    } catch (error) {
+      return { ...fallback, note: String(error?.message ?? error) }
+    }
   }
 
   // ---- CLI 调用的统一出口 ---------------------------------------------------
@@ -1132,6 +1157,7 @@ export function createConsole(options = {}) {
           head: String(card).split('\n')[1] ?? '',
         },
         profile: profileOf(profileOut),
+        model: modelInfoOf(),
         recent: recentRows.slice(0, 10).map(normalizeMemory),
         counts: {
           memory_total: numberOrNull(db?.memory_total) ?? numberOrNull(counts?.total),

@@ -43,6 +43,76 @@ function sessionService() {
   }
 }
 
+/**
+ * 模型通道探测：控制台顶栏的「模型通道」灯。
+ *
+ * 只做**只读探测**，不替宿主做可用性判断：
+ *   - agentDefaultModel.currentSelection() 有 provider/model → 宿主有默认模型；
+ *   - llm.listProviders() 能列出 provider → 至少装了一个适配器；
+ *   - 两样都拿不到 → available=false，灯保持灰，并带 note 说明原因。
+ *
+ * 注意：这里不代表凭证一定有效（真正失败要到发请求时才暴露），只是「有没有配」。
+ */
+function modelChannelInfo() {
+  const out = {
+    available: false,
+    provider: null,
+    model: null,
+    providers: [],
+    source: 'unknown',
+    note: null,
+  }
+  const ctx = webCtx
+  if (!ctx) {
+    out.note = '插件还没挂到宿主上下文'
+    return out
+  }
+  const get = name => {
+    try {
+      return typeof ctx.get === 'function' ? ctx.get(name) : null
+    } catch {
+      return null
+    }
+  }
+  const llm = get('llm')
+  if (llm && typeof llm.listProviders === 'function') {
+    try {
+      const list = llm.listProviders()
+      if (Array.isArray(list)) {
+        out.providers = list
+          .map(item => (typeof item === 'string'
+            ? item
+            : item?.id ?? item?.name ?? item?.provider ?? item?.route ?? null))
+          .filter(Boolean)
+          .map(String)
+      }
+    } catch { /* 目录查询失败只影响 provider 列表，不影响灯 */ }
+  }
+  const settings = get('agentDefaultModel')
+  if (settings && typeof settings.currentSelection === 'function') {
+    try {
+      const selection = settings.currentSelection()
+      if (selection && selection.provider) {
+        out.provider = String(selection.provider)
+        out.model = selection.model ? String(selection.model) : null
+        out.source = 'default'
+      }
+    } catch { /* 同上 */ }
+  }
+  // 有默认选择就算「已配置」（provider 目录可能没实现 listProviders）；
+  // 没有默认选择但至少有一个 provider 适配器，也算「有通道可用」。
+  if (out.provider) {
+    out.available = true
+    out.source = 'default'
+  } else if (out.providers.length) {
+    out.available = true
+    out.source = 'catalog'
+  } else {
+    out.note = '宿主没有暴露 llm / agentDefaultModel，或两者都没注册'
+  }
+  return out
+}
+
 /** 一次「大睡」批次的提示词：让宿主模型在会话里逐天调 memory_whale_prep / finish。 */
 function whaleBigPrompt(days) {
   const list = days.join('、')
@@ -767,6 +837,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     stats,
     starmap: starmapInfo,
     snapshot: statusSnapshot,
+    model: modelChannelInfo,
     logger: {
       warn(message) {
         try {

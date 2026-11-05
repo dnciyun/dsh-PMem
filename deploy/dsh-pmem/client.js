@@ -794,9 +794,16 @@ window.__ModuleLoader__.load({
       const mcpLevel = status?.mcp && typeof status.mcp.tools === 'number'
         ? (status.mcp.tools > 0 ? 'ok' : 'bad')
         : 'unknown'
-      // 模型通道宿主没暴露；能拿到蛛丝马迹才给状态，否则灰。
-      const modelInfo = status?.runtime?.modelChannel ?? status?.model ?? null
-      const modelLevel = modelInfo ? 'ok' : 'unknown'
+      // 模型通道：宿主经 /console/bootstrap 的 model 块给出只读探测结果。
+      // available=true → 绿；false → 红（宿主明确说没通道）；没拿到 → 灰，不装懂。
+      // 注意：这只代表「配置里有」，不代表凭证一定有效（那要发请求才知道）。
+      const modelInfo = boot?.model ?? status?.model ?? null
+      const modelLevel = modelInfo && typeof modelInfo === 'object'
+        ? (modelInfo.available === true ? 'ok' : 'bad')
+        : 'unknown'
+      const modelName = modelInfo && typeof modelInfo === 'object'
+        ? [modelInfo.provider, modelInfo.model].filter(Boolean).join(' / ') || (modelInfo.providers?.length ? modelInfo.providers.join(' / ') : '')
+        : ''
       return {
         db: {
           level: dbLevel,
@@ -809,8 +816,10 @@ window.__ModuleLoader__.load({
           level: modelLevel,
           label: '模型通道',
           hint: modelLevel === 'ok'
-            ? `已配置：${typeof modelInfo === 'string' ? modelInfo : '见 /status'}`
-            : '宿主未暴露模型状态（灰）',
+            ? `已配置：${modelName || '见宿主导出'}`
+            : modelLevel === 'bad'
+              ? `宿主没有可用的模型通道${modelInfo?.note ? `（${modelInfo.note}）` : ''}`
+              : '宿主还没返回模型状态（灰）',
         },
         mcp: {
           level: mcpLevel,

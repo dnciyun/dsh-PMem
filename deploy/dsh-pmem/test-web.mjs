@@ -85,6 +85,10 @@ const ctx = {
   get: name => {
     if (name === 'connection') return { requestRejection: () => undefined }
     if (name === 'sessionController') return sessionController
+    if (name === 'llm') return { listProviders: () => ['deepseek-account'] }
+    if (name === 'agentDefaultModel') {
+      return { currentSelection: () => ({ provider: 'deepseek-account', model: 'deepseek-flash' }) }
+    }
     return undefined
   },
   sessionController,
@@ -403,6 +407,11 @@ try {
   assert.equal(typeof consoleBootstrap.body.counts.pinned, 'number', 'counts.pinned 不是数字')
   assert.equal(consoleBootstrap.body.starmap.ready, true, 'bootstrap 星图未就绪')
   assert.equal(typeof consoleBootstrap.body.sleep.runs, 'number', 'bootstrap sleep.runs 不是数字')
+  // 模型通道灯：宿主暴露 agentDefaultModel/llm 时必须报 available=true，而不是永远灰
+  assert.equal(consoleBootstrap.body.model?.available, true, `bootstrap.model 没探测到宿主模型：${JSON.stringify(consoleBootstrap.body.model)}`)
+  assert.equal(consoleBootstrap.body.model.provider, 'deepseek-account')
+  assert.equal(consoleBootstrap.body.model.model, 'deepseek-flash')
+  assert.equal(consoleBootstrap.body.model.source, 'default')
 
   const consoleSearch = await get('/dsh-pmem/api/console/memories?q=' + encodeURIComponent('项目'))
   assert.equal(consoleSearch.status, 200, JSON.stringify(consoleSearch.body))

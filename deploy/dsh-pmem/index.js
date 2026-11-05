@@ -32,7 +32,7 @@ export const inject = ['systemPrompt', 'tools', 'commands', 'webServer', 'connec
 const execFileAsync = promisify(execFile)
 const PLUGIN_DIR = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = resolve(PLUGIN_DIR, '..', '..')
-const VERSION = '0.7.1'
+const VERSION = '0.8.1'
 const CACHE_DIR = join(process.env.DSH_HOME?.trim() || join(homedir(), '.dsh'), 'pmem')
 const CACHE_FILE = join(CACHE_DIR, 'wake-card.txt')
 // 每轮背景条（M21）：整卡只在会话开始/交接时给一次，每轮注入这一条（~210 token）。

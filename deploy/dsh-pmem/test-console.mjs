@@ -1,4 +1,4 @@
-﻿/**
+/**
  * M22 控制台后端单测：不启 HTTP、不碰真库、不 spawn Python。
  *
  * 覆盖：
@@ -212,6 +212,7 @@ function makeConsole(overrides = {}) {
     starmap,
     snapshot,
     reader,
+    ...(overrides.model !== undefined ? { model: overrides.model } : {}),
     logger: { warn() {} },
   })
   return { api, callPmem, routes: api.routes }
@@ -386,6 +387,10 @@ function makeConsole(overrides = {}) {
   assert.equal(out.body.sleep.latest.day, '2026-11-04')
   assert.equal(out.body.starmap.ready, true)
   assert.deepEqual(out.body.degraded, [])
+  // 没给探测函数时必须如实说 unknown，不能假装有模型
+  assert.equal(out.body.model.available, false)
+  assert.equal(out.body.model.source, 'unknown')
+  assert.match(String(out.body.model.note), /模型探测/)
   // 用的还是既有 CLI：profile / sleep log / conflicts list
   assert.ok(callPmem.argsOf('profile').length === 1)
   assert.ok(callPmem.argsOf('sleep').some(args => args[1] === 'log'))
@@ -406,6 +411,27 @@ function makeConsole(overrides = {}) {
   assert.ok(degraded.body.degraded.includes('profile'))
   assert.ok(degraded.body.degraded.includes('sleep'))
   assert.ok(degraded.body.degraded.includes('conflicts') === false)
+}
+
+// bootstrap 的模型通道探测：宿主给了默认选择 → available=true，provider/model 原样带出
+{
+  const { routes } = makeConsole({
+    model: () => ({
+      available: true,
+      provider: 'deepseek-account',
+      model: 'deepseek-flash',
+      providers: ['deepseek-account'],
+      source: 'default',
+      note: null,
+    }),
+  })
+  const out = await callRoute(routes, PATHS.bootstrap)
+  assert.equal(out.status, 200)
+  assert.equal(out.body.model.available, true)
+  assert.equal(out.body.model.provider, 'deepseek-account')
+  assert.equal(out.body.model.model, 'deepseek-flash')
+  assert.deepEqual(out.body.model.providers, ['deepseek-account'])
+  assert.equal(out.body.model.source, 'default')
 }
 
 // bootstrap 的 status 兜底：没有 snapshot 时用 stats() 拼一个
