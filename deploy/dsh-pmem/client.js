@@ -5,7 +5,7 @@
  * 侧边栏一行「记忆控制台」→ root main 的 keyed slot（key = pmem-console）。
  *
  * 控制台分区（左侧二级导航 + 右侧内容区）：
- *   总览 / 记忆 / 实体 / 睡眠 / 设置
+ *   总览 / 醒来卡 / 记忆 / 实体 / 睡眠 / 设置
  *
  * 约束：
  *   · 所有数据走同源 fetch：/dsh-pmem/api/console/* 与既有 /dsh-pmem/api/*；
@@ -31,6 +31,7 @@ window.__ModuleLoader__.load({
     // 左侧二级导航：分区要少、名字要短，桌面大屏优先。
     const CONSOLE_NAV = [
       ['overview', '总览'],
+      ['wake', '醒来卡'],
       ['memory', '记忆'],
       ['entities', '实体'],
       ['sleep', '睡眠'],
@@ -1004,19 +1005,25 @@ window.__ModuleLoader__.load({
 
       const version = boot?.version ?? status?.version ?? '—'
       const lights = deriveLights(boot, status)
-      const body = nav === 'memory'
-        ? h(ConsoleMemory, {
-            notify,
-            initialId: memoryTarget,
-            onConsumeInitial: () => setMemoryTarget(''),
-          })
-        : nav === 'entities'
-          ? h(ConsoleEntities, { notify, goto })
-          : nav === 'sleep'
-            ? h(ConsoleSleep, { notify })
-            : nav === 'settings'
-              ? h(ConsoleSettings, { boot, notify })
-              : h(ConsoleOverview, { boot, status, loading, notify, goto, refreshedAt })
+      // 分区多了以后用 if 链别再套三元：嵌套 `? :` 一深，插一个分区就要重排缩进。
+      let body
+      if (nav === 'memory') {
+        body = h(ConsoleMemory, {
+          notify,
+          initialId: memoryTarget,
+          onConsumeInitial: () => setMemoryTarget(''),
+        })
+      } else if (nav === 'wake') {
+        body = h(ConsoleWake, { boot, status, goto, notify })
+      } else if (nav === 'entities') {
+        body = h(ConsoleEntities, { notify, goto })
+      } else if (nav === 'sleep') {
+        body = h(ConsoleSleep, { notify })
+      } else if (nav === 'settings') {
+        body = h(ConsoleSettings, { boot, notify })
+      } else {
+        body = h(ConsoleOverview, { boot, status, loading, notify, goto, refreshedAt })
+      }
 
       return h(
         'div',
@@ -1031,7 +1038,7 @@ window.__ModuleLoader__.load({
             h('h1', { className: 'pconsole-title' }, '记忆控制台',
               h('span', { className: 'pconsole-chip' }, `v${version}`)),
             h('p', { className: 'pconsole-sub' },
-              '整页管理台：总览 / 记忆 / 实体 / 睡眠 / 设置。全部同源 fetch，不开新窗口。'),
+              '整页管理台：总览 / 醒来卡 / 记忆 / 实体 / 睡眠 / 设置。全部同源 fetch，不开新窗口。'),
           ),
           h(
             'div',
@@ -1435,6 +1442,11 @@ window.__ModuleLoader__.load({
             h('button', {
               className: 'pconsole-btn',
               type: 'button',
+              onClick: () => goto?.('wake'),
+            }, '看醒来卡'),
+            h('button', {
+              className: 'pconsole-btn',
+              type: 'button',
               onClick: () => void refreshWake(),
             }, '刷新醒来卡'),
           ),
@@ -1444,6 +1456,147 @@ window.__ModuleLoader__.load({
             : null,
           doctor
             ? h('pre', { className: 'pconsole-pre', style: { marginTop: '8px' } }, formatDoctor(doctor))
+            : null,
+        ),
+      )
+    }
+
+    // 醒来卡：每轮注入 system prompt 的那张卡，控制台里给一页能看见全文的地方。
+    // 数据和注入走同一条 `pmem wake` 通道（index.js 的 systemPrompt.context）；
+    // 这里的「重取」只是重算一遍，不落库、不改记忆。预算写的是 runtime.json 的 budget，
+    // 和设置页那个数值是同一个键——改完下一轮生效。
+    function ConsoleWake({ boot, status, notify, goto }) {
+      const card = boot?.wake ?? null
+      const runtime = status?.runtime ?? {}
+      const [text, setText] = useState(card?.text ?? '')
+      const [budget, setBudget] = useState(String(pickNumber(runtime.budget) ?? 300))
+      const [busy, setBusy] = useState('')
+      const [err, setErr] = useState('')
+      const [takenAt, setTakenAt] = useState(card?.text ? new Date() : null)
+
+      // 总览每 30s 轮询一次 bootstrap，卡内容变了就跟着换。
+      useEffect(() => {
+        if (!card?.text) return
+        setText(card.text)
+        setTakenAt(new Date())
+      }, [card?.text])
+
+      const budgetOf = () => Math.max(80, Math.min(1200, Math.trunc(Number(budget) || 300)))
+
+      const fetchCard = async n => {
+        const data = await api(`/wake?budget=${n}`)
+        setText(String(data?.text ?? ''))
+        setTakenAt(new Date())
+      }
+
+      const refresh = async () => {
+        setBusy('refresh')
+        setErr('')
+        try {
+          await fetchCard(budgetOf())
+          notify?.('醒来卡已重取（不落库）')
+        } catch (cause) {
+          setErr(`重取醒来卡失败：${cause.message}`)
+        } finally {
+          setBusy('')
+        }
+      }
+
+      const saveBudget = async () => {
+        const n = budgetOf()
+        setBusy('save')
+        setErr('')
+        try {
+          const saved = await api('/config', { method: 'POST', body: JSON.stringify({ budget: n }) })
+          setBudget(String(pickNumber(saved?.runtime?.budget) ?? n))
+          notify?.(`每轮预算已存为 ${n}（下一轮生效）`)
+          await fetchCard(n)
+        } catch (cause) {
+          setErr(`保存预算失败：${cause.message}`)
+        } finally {
+          setBusy('')
+        }
+      }
+
+      const chars = text.length
+      const tokens = Math.ceil(chars / 3)
+      const firstLine = text.split('\n').find(line => line.trim()) ?? ''
+
+      return h(
+        'div',
+        null,
+        err ? h('p', { className: 'pconsole-banner', role: 'alert' }, err) : null,
+
+        h(
+          Panel,
+          {
+            title: '醒来卡',
+            actions: [
+              h('button', {
+                key: 'refresh',
+                className: 'pconsole-btn',
+                type: 'button',
+                disabled: busy === 'refresh',
+                onClick: () => void refresh(),
+              }, busy === 'refresh' ? '重取中…' : '重取'),
+              h('button', {
+                key: 'copy',
+                className: 'pconsole-btn',
+                type: 'button',
+                disabled: !text,
+                onClick: () => void copyText(text, notify, '醒来卡已复制'),
+              }, '复制全文'),
+              h('button', {
+                key: 'settings',
+                className: 'pconsole-btn',
+                type: 'button',
+                onClick: () => goto?.('settings'),
+              }, '去设置'),
+            ],
+          },
+          h('p', { className: 'pconsole-note', style: { margin: '0 0 8px' } },
+            '这张卡每轮注入 system prompt：我是谁 / 我们为什么做这个 / 现在在做什么 / 下次从哪里接 / 相处里长出的句子。'
+            + '这里看到的就是同一份 `pmem wake` 的输出；「重取」不落库，也不改记忆。'),
+          h(
+            'div',
+            { className: 'pconsole-toolbar', style: { margin: 0 } },
+            h('label', { className: 'pconsole-field' },
+              h('span', null, '每轮预算'),
+              h('input', {
+                className: 'pconsole-input',
+                type: 'number',
+                min: 80,
+                max: 1200,
+                step: 20,
+                style: { width: '90px' },
+                'aria-label': '醒来卡预算',
+                value: budget,
+                onChange: event => setBudget(event.target.value),
+              }),
+              h('span', { className: 'pconsole-note', style: { margin: 0 } }, 'token')),
+            h('button', {
+              className: 'pconsole-btn',
+              type: 'button',
+              disabled: busy === 'save',
+              onClick: () => void saveBudget(),
+            }, busy === 'save' ? '保存中…' : '存为每轮预算'),
+            h('span', { className: 'pconsole-note', style: { margin: 0 } },
+              `${countText(chars)} 字 · 约 ${countText(tokens)} token`
+              + (takenAt ? ` · 取于 ${fmtTimeShort(takenAt)}` : '')),
+          ),
+          text
+            ? h('pre', {
+                className: 'pconsole-pre',
+                style: { marginTop: '8px', maxHeight: '62vh' },
+                'aria-label': '醒来卡全文',
+              }, text)
+            : h('p', { className: 'pconsole-empty' },
+                boot
+                  ? '这张卡现在是空的：库里还没有可唤醒的记忆。去「记忆」页写一条，或 /pmem remember <内容>。'
+                  : '正在读醒来卡…'),
+          firstLine
+            ? h('p', { className: 'pconsole-note' },
+                '开头：', h('code', { className: 'pconsole-code' }, firstLine))
             : null,
         ),
       )
@@ -4086,6 +4239,7 @@ window.__ModuleLoader__.load({
     exports.ConsolePage = ConsolePage
     exports.ConsolePanelIcon = ConsolePanelIcon
     exports.ConsoleOverview = ConsoleOverview
+    exports.ConsoleWake = ConsoleWake
     exports.ConsoleMemory = ConsoleMemory
     exports.ConsoleEntities = ConsoleEntities
     exports.ConsoleSleep = ConsoleSleep

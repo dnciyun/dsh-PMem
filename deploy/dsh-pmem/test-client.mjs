@@ -2,7 +2,7 @@
  * 客户端契约（不启浏览器）：
  *   · client.js 能被 __ModuleLoader__ 加载，inject 含 slots + layout；
  *   · 三个 slot：设置页一行入口（带宿主 close）/ 侧边栏海马图标 / root main keyed slot；
- *   · 控制台 5 个分区（总览/记忆/实体/睡眠/设置），没有问答、没有键盘快捷键；
+ *   · 控制台 6 个分区（总览/醒来卡/记忆/实体/睡眠/设置），没有问答、没有键盘快捷键；
  *   · 顶栏状态灯、记忆排序/加载更多/分组树、实体真路由、危险区真路由都在；
  *   · 不开新窗口、不整页导航、不用 innerHTML、不引 UI primitives；
  *   · 组件在假 React（记录节点）+ mock fetch 下各渲染一次不炸，渲染期不发请求。
@@ -47,8 +47,8 @@ assert.equal(client.CONSOLE, '/dsh-pmem/api/console')
 assert.equal(client.STARMAP, '/dsh-pmem/starmap')
 assert.deepEqual(
   client.CONSOLE_NAV.map(([, label]) => label),
-  ['总览', '记忆', '实体', '睡眠', '设置'],
-  '控制台应该是五个分区',
+  ['总览', '醒来卡', '记忆', '实体', '睡眠', '设置'],
+  '控制台应该是六个分区（醒来卡不能没有页面）',
 )
 
 // ── 源码契约 ────────────────────────────────────────────────────────────────
@@ -307,6 +307,10 @@ assert.doesNotThrow(
 assert.doesNotThrow(() => client.ConsoleEntities({ notify: idle, goto: idle }), 'ConsoleEntities 渲染不炸')
 assert.doesNotThrow(() => client.ConsoleSleep({ notify: idle }), 'ConsoleSleep 渲染不炸')
 assert.doesNotThrow(
+  () => client.ConsoleWake({ boot: bootFull, status: statusFull, notify: idle, goto: idle }),
+  'ConsoleWake 渲染不炸',
+)
+assert.doesNotThrow(
   () => client.ConsoleSettings({ boot: bootFull, notify: idle }),
   'ConsoleSettings 渲染不炸',
 )
@@ -319,8 +323,8 @@ const tablist = findAll(pageTree, node => node.props?.role === 'tablist')[0]
 assert.ok(tablist, '缺少 tablist')
 assert.equal(tablist.props.onKeyDown, undefined, '不加键盘快捷键（tablist 不要 onKeyDown）')
 const tabs = findAll(pageTree, node => node.props?.role === 'tab')
-assert.equal(tabs.length, 5)
-assert.deepEqual(tabs.map(tab => textOf(tab.children)), ['总览', '记忆', '实体', '睡眠', '设置'])
+assert.equal(tabs.length, 6)
+assert.deepEqual(tabs.map(tab => textOf(tab.children)), ['总览', '醒来卡', '记忆', '实体', '睡眠', '设置'])
 const lights = findAll(pageTree, byClass('pconsole-dot'))
 assert.equal(lights.length, 3, '顶栏应该有 3 个状态灯（数据库/模型/MCP）')
 
@@ -385,6 +389,30 @@ const emptyText = textOf(client.ConsoleOverview({
   refreshedAt: new Date(),
 }))
 assert.ok(emptyText.includes('空库引导'), '空库要有引导卡')
+
+// 醒来卡页：能看见卡全文（之前只有「刷新醒来卡」按钮，卡本身在界面上看不见）
+const wakeTree = client.ConsoleWake({ boot: bootFull, status: statusFull, notify: idle, goto: idle })
+const wakePageText = textOf(wakeTree)
+assert.ok(wakePageText.includes('醒来卡'), '醒来卡页要有标题')
+assert.ok(wakePageText.includes('卡'), '要能看见 bootstrap.wake.text 的全文')
+assert.equal(
+  findAll(wakeTree, node => node.props?.['aria-label'] === '醒来卡全文').length,
+  1,
+  '醒来卡要有全文块（pre）',
+)
+assert.equal(
+  findAll(wakeTree, node => node.props?.['aria-label'] === '醒来卡预算').length,
+  1,
+  '醒来卡要有每轮预算输入',
+)
+assert.ok(source.includes("api('/config'"), '改预算要写回 runtime（/config）')
+const emptyWakeText = textOf(client.ConsoleWake({
+  boot: { ...bootFull, wake: { text: '' } },
+  status: statusFull,
+  notify: idle,
+  goto: idle,
+}))
+assert.ok(emptyWakeText.includes('还没有可唤醒的记忆'), '空卡要有说明，不能白屏')
 
 // ── 纯函数 ──────────────────────────────────────────────────────────────────
 assert.deepEqual(client.highlightParts('薄荷和薄荷糖', '薄荷'), ['', '薄荷', '和', '薄荷', '糖'])
