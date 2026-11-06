@@ -3607,6 +3607,10 @@ window.__ModuleLoader__.load({
       // 夜间用真模型思考（鲸眠）：落 PMem 配置 sleep.whale.enabled，默认关。
       const [nightLlm, setNightLlm] = useState(false)
       const [nightBusy, setNightBusy] = useState(false)
+      // 夜间怎么睡（0.10.0）：时间 / 空闲阈值 / 定时开关都在 /night 一处读写。
+      const [night, setNight] = useState(null)
+      const [nightAt, setNightAt] = useState('03:30')
+      const [nightIdle, setNightIdle] = useState('45')
       // 危险区（真路由）：备份列表/生成/下载、向量重建（可取消）、运维动作白名单。
       const [backups, setBackups] = useState(null)
       const [backupBusy, setBackupBusy] = useState('')
@@ -3632,11 +3636,17 @@ window.__ModuleLoader__.load({
         return () => { alive = false }
       }, [])
 
-      // 夜间开关：进设置页就回显后端当前值（默认关；读不到就保持关）。
+      // 夜间设置：进设置页就回显后端当前值（默认关；读不到就保持关）。
       useEffect(() => {
         let alive = true
-        api('/night-llm')
-          .then(data => { if (alive) setNightLlm(data?.enabled === true) })
+        api('/night')
+          .then(data => {
+            if (!alive) return
+            setNight(data)
+            setNightLlm(data?.whale?.enabled === true)
+            if (data?.schedule?.at) setNightAt(data.schedule.at)
+            if (data?.idle?.minutes) setNightIdle(String(data.idle.minutes))
+          })
           .catch(() => {})
         return () => { alive = false }
       }, [])
@@ -3660,22 +3670,21 @@ window.__ModuleLoader__.load({
         }
       }
 
-      // 夜间开关不写 runtime.json，走 PMem 配置；失败要退回原值，别让界面显示成已开。
-      const saveNightLlm = async value => {
-        const previous = nightLlm
-        setNightLlm(value)
+      // 夜间设置不写 runtime.json，走 PMem 配置（+ 同步宿主定时任务）；失败要重读，别让界面停在猜的状态。
+      const saveNight = async (patch, message = '已保存（下一晚生效）') => {
         setNightBusy(true)
         setError('')
         try {
-          const data = await api('/night-llm', {
-            method: 'POST',
-            body: JSON.stringify({ enabled: value }),
-          })
-          setNightLlm(data?.enabled === true)
-          say('已保存（下一晚生效）')
+          const data = await api('/night', { method: 'POST', body: JSON.stringify(patch) })
+          setNight(data)
+          setNightLlm(data?.whale?.enabled === true)
+          if (data?.schedule?.at) setNightAt(data.schedule.at)
+          if (data?.idle?.minutes) setNightIdle(String(data.idle.minutes))
+          const warnings = Array.isArray(data?.warnings) ? data.warnings : []
+          say(warnings.length ? `已保存；${warnings[0]}` : message)
         } catch (cause) {
-          setNightLlm(previous)
-          setError(`夜间开关保存失败：${cause.message}`)
+          setError(`夜间设置保存失败：${cause.message}`)
+          api('/night').then(setNight).catch(() => {})
         } finally {
           setNightBusy(false)
         }
@@ -3981,25 +3990,109 @@ window.__ModuleLoader__.load({
           ),
         ),
 
-        // ── 夜间：用真模型思考（鲸眠）。默认关；写 PMem 配置，改完下一晚生效。──
+        // ── 夜间：谁写日记（鲸眠）+ 几点睡 + 闲多久算该睡。写 PMem 配置，改完下一晚生效。──
         h(
           Panel,
           {
             title: '夜间',
-            note: '默认关。决定夜里谁把当天原文写成日记：本地模板，还是 DSH 会话（模型是我）。改完下一晚生效。',
+            note: '决定夜里谁把当天原文写成日记、几点写、闲多久算该睡。时间与空闲写 PMem 配置；'
+              + '定时鲸眠会话由 DSH 定时任务执行，保存时会跟着时间对齐。改完下一晚生效。',
           },
           h('div', { className: 'pconsole-kv' },
             h('span', null, '夜间用真模型思考（鲸眠）'),
             h('span', null, h(Switch, {
               checked: nightLlm,
               disabled: nightBusy,
-              onChange: value => void saveNightLlm(value),
+              onChange: value => void saveNight({ whale: value }),
               label: nightLlm ? '开' : '关',
             }))),
           h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } },
-            '关 = 夜间只跑本地模板日记 + 8 阶段（0 模型调用、0 成本）；'
-            + '开 = 夜间由 DSH 会话（模型是我）把当天原文想成日记，用宿主额度，不需要 API key。'
-            + '默认关，改完下一晚生效。'),
+            '关 = 夜里只跑本地模板日记 + 8 阶段（0 模型调用、0 成本）；'
+            + '开 = 由 DSH 会话（模型是我）把当天原文想成日记，用宿主额度，不需要 API key。'),
+
+          h('div', { className: 'pconsole-kv', style: { marginTop: '8px' } },
+            h('span', null, '每天定时入睡'),
+            h('span', null, h(Switch, {
+              checked: night?.schedule?.enabled === true,
+              disabled: nightBusy || !night,
+              onChange: value => void saveNight({ schedule: { enabled: value } }),
+              label: night?.schedule?.enabled === true ? '开' : '关',
+            }))),
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '几点睡'),
+            h('span', { style: { display: 'inline-flex', gap: '6px', alignItems: 'center' } },
+              h('input', {
+                className: 'pconsole-input',
+                type: 'time',
+                'aria-label': '夜间整理时间',
+                value: nightAt,
+                disabled: nightBusy,
+                onChange: event => setNightAt(event.target.value),
+              }),
+              h('button', {
+                className: 'pconsole-btn',
+                type: 'button',
+                disabled: nightBusy || !/^\d{1,2}:\d{2}$/.test(nightAt),
+                onClick: () => void saveNight({ schedule: { at: nightAt } }, `已存 ${nightAt}（下一晚生效）`),
+              }, '存时间'))),
+
+          h('div', { className: 'pconsole-kv', style: { marginTop: '8px' } },
+            h('span', null, '空闲也算该睡'),
+            h('span', null, h(Switch, {
+              checked: night?.idle?.enabled !== false,
+              disabled: nightBusy || !night,
+              onChange: value => void saveNight({ idle: { enabled: value } }),
+              label: night?.idle?.enabled === false ? '关' : '开',
+            }))),
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '闲多久算该睡'),
+            h('span', { style: { display: 'inline-flex', gap: '6px', alignItems: 'center' } },
+              h('input', {
+                className: 'pconsole-input',
+                type: 'number',
+                min: 5,
+                max: 240,
+                step: 5,
+                style: { width: '90px' },
+                'aria-label': '空闲分钟',
+                value: nightIdle,
+                disabled: nightBusy,
+                onChange: event => setNightIdle(event.target.value),
+              }),
+              h('span', { className: 'pconsole-note', style: { margin: 0 } }, '分钟'),
+              h('button', {
+                className: 'pconsole-btn',
+                type: 'button',
+                disabled: nightBusy,
+                onClick: () => void saveNight({ idle: { minutes: Number(nightIdle) } }, '已保存空闲阈值'),
+              }, '存'))),
+          h('p', { className: 'pconsole-note', style: { margin: '6px 0 0' } },
+            'pmem-daemon 每 10 分钟 tick 一次：到点跑固定 8 阶段；安静够久就把当天流水写日记（模板或鲸眠）。'
+            + '关掉「空闲也算该睡」= 只等定时 / 手动。'),
+
+          h('div', { className: 'pconsole-kv', style: { marginTop: '8px' } },
+            h('span', null, 'pmem-daemon'),
+            h('span', { className: 'pconsole-code' },
+              clampText(night?.daemon?.task ?? night?.daemon?.error ?? '—', 120))),
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '最近心跳'),
+            h('span', { className: 'pconsole-code' },
+              clampText(night?.daemon?.log ?? '—', 160))),
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, 'DSH 定时任务'),
+            h('span', null, night?.schedule?.task
+              ? `每天 ${night.schedule.at} · ${night.schedule.task.status === 'active' ? '开' : '暂停'}`
+                + (night.schedule.task.scheduledAt
+                  ? ` · 下次 ${fmtTime(night.schedule.task.scheduledAt)}`
+                  : '')
+              : (night?.schedule?.enabled ? '正在建…' : '还没建（打开开关会建）'))),
+          night?.schedule?.sync === 'drift'
+            ? h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } },
+                '任务时间跟配置不一致，点一次「存时间」会把它对齐。')
+            : null,
+          night?.schedule?.error
+            ? h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } }, night.schedule.error)
+            : null,
         ),
 
         // ── 排查面板 ──────────────────────────────────────────────────────────

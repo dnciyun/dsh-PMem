@@ -374,6 +374,14 @@ for (const label of ['生成备份', '重建索引', '运维动作（白名单�
   assert.ok(settingsText.includes(label), `危险区缺少：${label}`)
 }
 
+// 夜间（0.10.0）：时间 / 空闲阈值 / 开关都在设置页，读写走 /night
+assert.ok(settingsText.includes('每天定时入睡'), '夜间缺少「每天定时入睡」开关')
+assert.ok(settingsText.includes('几点睡'), '夜间缺少时间输入')
+assert.ok(settingsText.includes('闲多久算该睡'), '夜间缺少空闲阈值')
+assert.ok(settingsText.includes('pmem-daemon'), '夜间缺少 daemon 状态')
+assert.ok(source.includes("api('/night'"), '夜间设置要走 /night')
+assert.ok(source.includes('schedule: { at: nightAt }'), '存时间要发 schedule.at')
+
 // 总览：今日召回 + 空库引导；不再有「待办」
 const overviewText = textOf(client.ConsoleOverview({
   boot: bootFull, status: statusFull, loading: false, notify: idle, goto: idle, refreshedAt: new Date(),

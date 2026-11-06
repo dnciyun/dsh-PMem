@@ -44,6 +44,24 @@ function sessionService() {
 }
 
 /**
+ * 宿主的定时任务服务（dsh-schedule，服务名 `schedule`）。
+ *
+ * 为什么需要它：设置页的「夜里几点睡」不能只写 PMem 配置——真正在 DSH 里开鲸眠会话的是
+ * 一条定时任务。时间以 PMem 配置（sleep.at）为真源，这里只负责把任务跟着它对齐。
+ * 没装 schedule 插件时返回 null，面板降级成「只写配置 + 说明」，不假装同步成功。
+ */
+function scheduleService() {
+  try {
+    const ctx = webCtx
+    if (!ctx) return null
+    const svc = typeof ctx.get === 'function' ? ctx.get('schedule') : null
+    return svc && typeof svc.list === 'function' ? svc : null
+  } catch {
+    return null
+  }
+}
+
+/**
  * 模型通道探测：控制台顶栏的「模型通道」灯。
  *
  * 只做**只读探测**，不替宿主做可用性判断：
@@ -728,6 +746,254 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     } catch (error) {
       return json(res, 500, { ok: false, enabled: false, error: String(error?.message ?? error) })
     }
+  })
+
+  // ---- 夜里怎么睡（0.10.0）：几点 / 闲多久 / 开关 -----------------------------
+  // 单一真源是 PMem 配置：
+  //   sleep.at              几点跑夜间整理（pmem-daemon 的 tick 按它算下次）
+  //   journal.idle_minutes  安静多久算「该睡了」
+  //   journal.enabled       空闲时要不要把当天流水写成日记
+  //   sleep.whale.enabled   写日记用不用模型（DSH 会话）
+  // DSH 里真正开鲸眠会话的是宿主的定时任务，所以时间一改就把那条任务对齐；
+  // 没装 schedule 插件时降级成「只写配置 + 说清楚」，不假装同步成功。
+  const NIGHT_TITLE = '鲸眠：睡前整理今天的记忆'
+  const NIGHT_PROMPT = [
+    '你是「鲸眠」，夜间睡眠里的那一轮记忆整理会话。现在是人类睡觉的时间。',
+    '',
+    '第 0 步：先调 `memory_capabilities`，看 `data.night.llm` 是 true 还是 false。',
+    '',
+    '如果是 false：只跑本地整理——① `memory_journal`（action=digest，模板写日记，0 模型调用）；② `memory_sleep`（不传参数=昨天，跑固定 8 阶段）。然后两三行汇报，不要硬写日记。',
+    '',
+    '如果是 true（鲸眠）：',
+    '1) `memory_whale_prep`（不传 day_key 就用昨天）拿当天原文、醒来卡、最近日记与写作规则；',
+    '2) 按规则想一遍：只用原文里出现过的信息，专名照抄，不编不猜，没说完的事进 loops；',
+    '3) `memory_whale_finish`（title / lines 3–6 行每行 ≤30 字 / loops）落库并跑固定 8 阶段。',
+    '',
+    'prep 返回 pending=0 就说一句「今晚没有要消化的流水」然后结束，不要硬编。',
+    '完成后两三行汇报：日记写成没有、标题、派生几条事实、8 阶段是否完成。',
+  ].join('\n')
+
+  const cfgValue = payload => {
+    if (!payload || typeof payload !== 'object') return undefined
+    const fromData = payload.data?.value
+    return fromData === undefined ? payload.value : fromData
+  }
+
+  const cfgGet = async key => {
+    const payload = await callPmem(config, ['config', 'get', key], { json: true, timeout: 15000 })
+    if (payload?.ok === false) {
+      throw new Error(String(payload?.error?.message ?? payload?.error ?? `读取 ${key} 失败`))
+    }
+    return cfgValue(payload)
+  }
+
+  const cfgSet = async (key, value) => {
+    const payload = await callPmem(config, ['config', 'set', key, String(value)], {
+      json: true,
+      timeout: 15000,
+    })
+    if (payload?.ok === false) {
+      throw new Error(String(payload?.error?.message ?? payload?.error ?? `写入 ${key} 失败`))
+    }
+    return cfgValue(payload)
+  }
+
+  /** HH:MM 规范化；非法返回 null。 */
+  const normalizeAt = raw => {
+    const match = /^(\d{1,2}):(\d{2})$/.exec(String(raw ?? '').trim())
+    if (!match) return null
+    const hour = Number(match[1])
+    const minute = Number(match[2])
+    if (!(hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59)) return null
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+  }
+
+  /** 每天 at 点的 RRULE（用宿主机时区，和定时任务自己的写法一致）。 */
+  const rruleAt = at => {
+    let zone = 'UTC'
+    try {
+      zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    } catch {
+      zone = 'UTC'
+    }
+    const now = new Date()
+    const pad = value => String(value).padStart(2, '0')
+    const [hour, minute] = String(at).split(':')
+    const start = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}T${hour}${minute}00`
+    return `DTSTART;TZID=${zone}:${start}\nRRULE:FREQ=DAILY`
+  }
+
+  /** 找插件管的那条「鲸眠」定时任务（按标题前缀认，不记 id）。 */
+  const findNightTask = async () => {
+    const svc = scheduleService()
+    if (!svc) return { svc: null, task: null }
+    const page = await svc.list({ limit: 200 })
+    const items = Array.isArray(page?.items) ? page.items : []
+    return { svc, task: items.find(item => String(item?.title ?? '').startsWith('鲸眠')) ?? null }
+  }
+
+  const nightSnapshot = async () => {
+    const out = {
+      ok: true,
+      whale: { enabled: false },
+      schedule: { enabled: false, at: '03:30', task: null, error: null, sync: 'unknown' },
+      idle: { enabled: true, minutes: 45 },
+      daemon: null,
+      degraded: [],
+    }
+    try {
+      out.whale.enabled = (await cfgGet('sleep.whale.enabled')) === true
+    } catch {
+      out.degraded.push('sleep.whale.enabled')
+    }
+    try {
+      const at = normalizeAt(await cfgGet('sleep.at'))
+      if (at) out.schedule.at = at
+    } catch {
+      out.degraded.push('sleep.at')
+    }
+    try {
+      out.idle.enabled = (await cfgGet('journal.enabled')) !== false
+    } catch {
+      out.degraded.push('journal.enabled')
+    }
+    try {
+      const minutes = Number(await cfgGet('journal.idle_minutes'))
+      if (Number.isFinite(minutes) && minutes > 0) out.idle.minutes = Math.trunc(minutes)
+    } catch {
+      out.degraded.push('journal.idle_minutes')
+    }
+
+    try {
+      const { svc, task } = await findNightTask()
+      if (!svc) {
+        out.schedule.error = '宿主没有 schedule 服务：时间只能写进 PMem 配置，定时开鲸眠会话要自己建'
+        out.schedule.sync = 'unavailable'
+      } else if (task) {
+        out.schedule.task = {
+          id: task.id,
+          title: task.title,
+          status: task.status,
+          scheduledAt: task.scheduledAt ?? null,
+          rrule: task.rrule ?? null,
+        }
+        out.schedule.enabled = task.status === 'active'
+        const found = /T(\d{2})(\d{2})00/.exec(String(task.rrule ?? ''))
+        out.schedule.sync = found && `${found[1]}:${found[2]}` === out.schedule.at ? 'ok' : 'drift'
+      } else {
+        out.schedule.sync = 'missing'
+      }
+    } catch (error) {
+      out.schedule.error = String(error?.message ?? error).slice(0, 300)
+      out.schedule.sync = 'error'
+    }
+
+    // pmem-daemon：真正的「每 10 分钟看一眼」的执行者；心跳在它的日志末行。
+    try {
+      const payload = await callPmem(config, ['schedule', 'status'], { json: true, timeout: 20000 })
+      const steps = Array.isArray(payload?.data?.steps) ? payload.data.steps : []
+      const row = steps.find(step => step?.name === 'pmem-daemon')
+      const log = steps.find(step => step?.name === 'pmem-daemon:log')
+      out.daemon = { task: row?.detail ?? null, log: log?.detail ?? null }
+    } catch (error) {
+      out.daemon = { error: String(error?.message ?? error).slice(0, 300) }
+    }
+    return out
+  }
+
+  route('exact', `${API}/night`, async (req, res) => {
+    if (req.method === 'GET') {
+      try {
+        return json(res, 200, await nightSnapshot())
+      } catch (error) {
+        return json(res, 500, { ok: false, error: String(error?.message ?? error) })
+      }
+    }
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 GET / POST' })
+
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) body = {}
+    const schedule = body.schedule && typeof body.schedule === 'object' ? body.schedule : {}
+    const idle = body.idle && typeof body.idle === 'object' ? body.idle : {}
+
+    let at = null
+    if (schedule.at !== undefined) {
+      at = normalizeAt(schedule.at)
+      if (!at) return json(res, 400, { ok: false, error: '时间要写成 HH:MM（00:00–23:59）' })
+    }
+    let minutes = null
+    if (idle.minutes !== undefined) {
+      const parsed = Math.trunc(Number(idle.minutes))
+      if (!Number.isFinite(parsed) || parsed < 5 || parsed > 240) {
+        return json(res, 400, { ok: false, error: '空闲分钟要在 5–240 之间' })
+      }
+      minutes = parsed
+    }
+
+    const applied = []
+    const warnings = []
+    try {
+      if (typeof body.whale === 'boolean') {
+        await cfgSet('sleep.whale.enabled', body.whale)
+        applied.push('whale')
+      }
+      if (at) {
+        await cfgSet('sleep.at', at)
+        applied.push('sleep.at')
+      }
+      if (minutes !== null) {
+        await cfgSet('journal.idle_minutes', minutes)
+        applied.push('journal.idle_minutes')
+      }
+      if (typeof idle.enabled === 'boolean') {
+        await cfgSet('journal.enabled', idle.enabled)
+        applied.push('journal.enabled')
+      }
+
+      // 定时任务只在「开/关」或「时间变了且它本来在跑」时动；别每次保存都重写宿主任务。
+      const wants = typeof schedule.enabled === 'boolean' ? schedule.enabled : null
+      if (wants !== null || at !== null) {
+        try {
+          const { svc, task } = await findNightTask()
+          if (!svc) {
+            if (wants === true) warnings.push('宿主没有 schedule 服务：定时鲸眠会话要自己建')
+          } else if (wants === false) {
+            if (task && task.status === 'active') {
+              await svc.edit({ id: task.id, action: 'update', patch: { active: false } })
+              applied.push('schedule.paused')
+            }
+          } else if (wants === true || (task && task.status === 'active')) {
+            const targetAt = at ?? normalizeAt(await cfgGet('sleep.at')) ?? '03:30'
+            const timing = { kind: 'rrule', rrule: rruleAt(targetAt) }
+            if (!task) {
+              await svc.create({
+                title: NIGHT_TITLE,
+                prompt: NIGHT_PROMPT,
+                timing,
+                target: { kind: 'new', create: { cwd: config.cwd } },
+              })
+              applied.push('schedule.created')
+            } else {
+              await svc.edit({ id: task.id, action: 'update', patch: { timing, active: true } })
+              applied.push('schedule.updated')
+            }
+          }
+        } catch (error) {
+          warnings.push(`定时任务没同步：${String(error?.message ?? error).slice(0, 200)}`)
+        }
+      }
+    } catch (error) {
+      return json(res, 500, { ok: false, error: String(error?.message ?? error), applied })
+    }
+
+    const snapshot = await nightSnapshot()
+    return json(res, 200, { ...snapshot, applied, warnings })
   })
 
   route('exact', `${API}/mcp`, async (req, res) => {

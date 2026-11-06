@@ -170,3 +170,21 @@
 - 内容五块：① 想让它记住（说「记住：…」/ `/pmem remember` / `pmem add`）；② 想找回来（直接问 / `/pmem recall` / 记忆页搜索）；③ 想改·纠错·忘掉（记忆页详情、supersede 不删原文、撤回留墓碑）；④ 夜里的整理（模板 vs 鲸眠，大睡一场先小范围）；⑤ 速查表 8 行（记忆 / 搜索 / 醒来卡 / 更新 / 撤回 / 夜睡 / 自检 / 配置）。
 - 速查表底下一个「复制这份速查」（纯文本，方便贴给别人）。
 - 原则：教程只做**入口**，正文仍以仓库 `README.md` / `docs/` 为准，不在前端复制第二份会过期的文档。
+
+## 第 12 轮补充（插件 0.10.0）：夜间要有时间 / 空闲 / 开关
+
+- 现象：设置页「夜间」只有一个「用不用真模型思考」的开关；几点睡、闲多久算该睡、定时任务开不开，
+  都只能改 `~/.dsh/pmem/config.toml` 或去宿主的自动化任务页，用户找不到。
+- 定稿（单一真源 = PMem 配置）：
+  | 控件 | 键 | 默认 |
+  |---|---|---|
+  | 用不用真模型（鲸眠） | `sleep.whale.enabled` | false |
+  | 几点睡 | `sleep.at` | 03:30 |
+  | 空闲也算该睡 | `journal.enabled` | true |
+  | 闲多久 | `journal.idle_minutes` | 45 |
+- 定时开关不在 PMem 配置里：它控制宿主那条「鲸眠」定时任务（`dsh-schedule`，按标题前缀认领）。
+  开 = 建/恢复并改时间，关 = 暂停；时间变了且任务在跑 = 只改时间，**不顺手把暂停的任务打开**。
+- 新增 `GET/POST /dsh-pmem/api/night`：GET 回 `{whale, schedule:{enabled,at,task,sync,error}, idle, daemon}`，
+  POST 收 `{whale?, schedule?:{enabled?,at?}, idle?:{enabled?,minutes?}}`，校验 HH:MM 与 5–240 分钟。
+- 面板底部显示 `pmem-daemon` 登记状态 + 日志末行（心跳）与定时任务下次触发；`sync=drift` 时提示「存时间会对齐」。
+- 宿主没有 schedule 插件：降级成「只写配置 + 面板说明」，不假装同步成功。

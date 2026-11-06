@@ -842,15 +842,74 @@ try {
   // mock 返回的是 CLI 现在的真实信封 {ok:true, data:{key,value,path}}（不是顶层 value）。
   // 把这段放最后：createWeb.register() 会覆盖模块级的 webCtx，不能影响前面的路由断言。
   const nightCalls = []
+  // /night（0.10.0）要读写的四个键 + daemon 状态；mock 只维护内存，不碰真实 config.toml。
+  const nightCfg = new Map([
+    ['sleep.whale.enabled', false],
+    ['sleep.at', '03:30'],
+    ['journal.enabled', true],
+    ['journal.idle_minutes', 45],
+  ])
+  // 定时任务服务（dsh-schedule）的假实现：只验插件有没有按契约对齐「鲸眠」那条任务。
+  const nightTasks = new Map()
+  let nightSeq = 0
+  const nightSchedule = {
+    async list() {
+      const items = [...nightTasks.values()]
+      return { items, shown: items.length, total: items.length, limit: 200, offset: 0 }
+    },
+    async create(request) {
+      const id = `schedule-night-${++nightSeq}`
+      const task = {
+        id,
+        title: request.title,
+        prompt: request.prompt,
+        status: 'active',
+        rrule: request.timing?.rrule ?? null,
+        scheduledAt: '2026-11-07T03:15:00.000Z',
+      }
+      nightTasks.set(id, task)
+      return task
+    },
+    async edit(request) {
+      const task = nightTasks.get(request.id)
+      if (!task) return { id: request.id, code: 'schedule_not_found' }
+      if (request.patch?.active !== undefined) task.status = request.patch.active ? 'active' : 'paused'
+      if (request.patch?.timing?.rrule) task.rrule = request.patch.timing.rrule
+      if (request.patch?.title) task.title = request.patch.title
+      return task
+    },
+  }
   const nightMock = createWeb({
     config: plugin.config,
     callPmem: async (cfg, argv, opts = {}) => {
       nightCalls.push({ argv: [...argv], json: opts.json === true })
-      if (argv[0] === 'config' && argv[1] === 'get' && argv[2] === 'sleep.whale.enabled') {
-        return { ok: true, data: { key: 'sleep.whale.enabled', value: false, path: 'mock' } }
+      if (argv[0] === 'config' && argv[1] === 'get') {
+        const key = argv[2]
+        if (!nightCfg.has(key)) throw new Error(`mock 没准备这个键：${key}`)
+        return { ok: true, data: { key, value: nightCfg.get(key), path: 'mock' } }
       }
-      if (argv[0] === 'config' && argv[1] === 'set' && argv[2] === 'sleep.whale.enabled') {
-        return { ok: true, data: { key: 'sleep.whale.enabled', value: argv[3] === 'true', path: 'mock' } }
+      if (argv[0] === 'config' && argv[1] === 'set') {
+        const key = argv[2]
+        const raw = argv[3]
+        const value = raw === 'true'
+          ? true
+          : raw === 'false'
+            ? false
+            : Number.isFinite(Number(raw)) && String(Number(raw)) === raw ? Number(raw) : raw
+        nightCfg.set(key, value)
+        return { ok: true, data: { key, value, path: 'mock' } }
+      }
+      if (argv[0] === 'schedule' && argv[1] === 'status') {
+        return {
+          ok: true,
+          data: {
+            home: 'mock',
+            steps: [
+              { name: 'pmem-daemon', ok: true, detail: '已登记 · 启动脚本 pmem-daemon.py' },
+              { name: 'pmem-daemon:log', ok: true, detail: '128 字节 · 心跳 2026-11-06 12:36 · ok 没到期任务' },
+            ],
+          },
+        }
       }
       throw new Error(`mock callPmem 没准备这张命令：${argv.join(' ')}`)
     },
@@ -862,7 +921,7 @@ try {
   })
   const nightRoutes = []
   const nightDispose = nightMock.register({
-    get: () => undefined,
+    get: name => (name === 'schedule' ? nightSchedule : undefined),
     webServer: {
       register(item) {
         nightRoutes.push(item)
@@ -917,6 +976,60 @@ try {
     nightCalls.some(call => call.argv.join(' ') === 'config set sleep.whale.enabled true' && call.json === true),
     `POST 没有按契约写配置：${JSON.stringify(nightCalls)}`,
   )
+
+  // ---- 夜里怎么睡（/night）：时间 / 空闲 / 定时任务对齐（0.10.0）----
+  // 上一步把鲸眠打开过，先归位，别让后面的快照断言读到一个被改过的值。
+  nightCfg.set('sleep.whale.enabled', false)
+  const nightPost = payload => fetch(nightBase + '/dsh-pmem/api/night', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+
+  const nightSnapRes = await fetch(nightBase + '/dsh-pmem/api/night', {
+    headers: { accept: 'application/json' },
+  })
+  assert.equal(nightSnapRes.status, 200, '夜间设置 GET 失败')
+  const nightSnap = await nightSnapRes.json()
+  assert.equal(nightSnap.ok, true, JSON.stringify(nightSnap))
+  assert.equal(nightSnap.schedule.at, '03:30', '默认时间应该读 sleep.at=03:30')
+  assert.equal(nightSnap.idle.minutes, 45, '默认空闲阈值应该读 journal.idle_minutes=45')
+  assert.equal(nightSnap.idle.enabled, true)
+  assert.equal(nightSnap.whale.enabled, false)
+  assert.equal(nightSnap.schedule.sync, 'missing', '还没建任务时 sync 应该是 missing')
+  assert.ok(/pmem-daemon/.test(String(nightSnap.daemon?.task)), '没有回 pmem-daemon 状态')
+
+  const badAt = await nightPost({ schedule: { at: '25:99' } })
+  assert.equal(badAt.status, 400, '非法时间要 400')
+  const badIdle = await nightPost({ idle: { minutes: 1 } })
+  assert.equal(badIdle.status, 400, '空闲分钟越界要 400')
+
+  const savedRes = await nightPost({ schedule: { at: '04:15', enabled: true }, idle: { minutes: 30 } })
+  assert.equal(savedRes.status, 200, '夜间设置 POST 失败')
+  const saved = await savedRes.json()
+  assert.equal(saved.schedule.at, '04:15')
+  assert.equal(saved.schedule.enabled, true)
+  assert.equal(saved.schedule.sync, 'ok', '时间写进配置后任务应该对齐')
+  assert.equal(saved.idle.minutes, 30)
+  assert.equal(nightCfg.get('sleep.at'), '04:15', '时间没有写进 PMem 配置')
+  assert.equal(nightCfg.get('journal.idle_minutes'), 30)
+  assert.equal(nightTasks.size, 1, '应该建了一条鲸眠定时任务')
+  const nightTask = [...nightTasks.values()][0]
+  assert.match(String(nightTask.title), /鲸眠/, '定时任务标题不对')
+  assert.match(String(nightTask.rrule), /T041500/, 'rrule 时间没跟着改')
+  assert.equal(nightTask.status, 'active')
+
+  const offRes = await nightPost({ schedule: { enabled: false } })
+  const nightOff = await offRes.json()
+  assert.equal(nightOff.schedule.enabled, false)
+  assert.equal(nightTask.status, 'paused', '关掉定时应该暂停任务')
+
+  // 只改时间、任务还暂停着：不能把它偷偷打开。
+  const atOnlyRes = await nightPost({ schedule: { at: '05:00' } })
+  const atOnly = await atOnlyRes.json()
+  assert.equal(atOnly.schedule.enabled, false)
+  assert.equal(nightTask.status, 'paused', '暂停状态不应该被「只改时间」打开')
+  assert.equal(nightCfg.get('sleep.at'), '05:00')
 
   // M9.7c：实时刷新必须走增量，否则每 1.5 秒重画一份 370 KB 的离线单文件，
 // 而且旧星位置会被重算（画面会跳）。
