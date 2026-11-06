@@ -185,6 +185,18 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 - 夜间定时任务先看 `memory_capabilities` 的 `night.llm`，再决定走鲸眠还是本地 8 阶段。
 - 改完下一晚生效（不是立即）。
 
+### 大睡一场（插件 0.8.3）
+
+设置 → 海马体 → 夜间 → 「大睡一场」默认由 DSH 来：先 `pmem sleep plan` 算出要补睡的日子，
+再开新会话，把鲸眠提示词投递进去，由宿主模型逐天调 `memory_whale_prep` / `memory_whale_finish`。
+每批一个新会话（默认 6 天），PMem 进程本身不碰模型凭证。
+
+> **0.8.2 的坑**：点按钮报 `Cannot read properties of undefined (reading 'throwIfAborted')`。
+> 宿主的 `sessionController.prompt(request, signal)` 第一条语句就是 `signal.throwIfAborted()`
+> （DSH 0.2.2-rc.1，`dsh-api-session-controller`），而 0.8.2 只传了 `request`。
+> 0.8.3 起每批传自己的 `AbortSignal`；`test-web.mjs` 的 mock 也照宿主的写法要求 `signal`，
+> 再漏传会直接测挂，不会只在真机上才炸。
+
 星图**不占标签**，只在概览留一行开关 + 两个入口：
 
 只剩一个入口：**在浏览器打开**。插件自己起一个只绑 `127.0.0.1`、端口随机的小服务，

@@ -122,6 +122,10 @@ pmem sleep big --dry-run                          # 演练：不落库，只算
 **新建 DSH 会话**并把鲸眠提示词投进去，让宿主模型逐天调 `memory_whale_prep` /
 `memory_whale_finish`。PMem 进程不碰模型凭证。面板上的「模板模式」勾上才改成本地模板跑。
 
+> 插件 0.8.2 点这个按钮会报 `Cannot read properties of undefined (reading 'throwIfAborted')`：
+> 宿主的 `sessionController.prompt(request, signal)` 第一句就是 `signal.throwIfAborted()`，
+> 只传 `request` 就会这样。0.8.3 起每批传自己的 `AbortSignal`，测试 mock 也按宿主契约要求 `signal`。
+
 ```sh
 pmem sleep plan --from 2026-05-01 --to 2026-05-31 --json   # 只列计划，不执行
 ```

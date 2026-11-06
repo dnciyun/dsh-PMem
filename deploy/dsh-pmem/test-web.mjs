@@ -69,12 +69,16 @@ const routes = []
 // 大睡（宿主模式）会通过这些 mock 验证：确实新建了会话、确实把鲸眠提示词投递进去。
 const hostSessions = []
 const hostPrompts = []
+// 和真实宿主一致：prompt(request, signal) 第一步就检查 signal。
+// 0.8.2 少传第二个参数时报的就是 "Cannot read properties of undefined (reading 'throwIfAborted')"，
+// 这里照着宿主的写法复现，免得下次又漏。
 const sessionController = {
   async create(payload) {
     hostSessions.push(payload)
     return { sessionId: payload.sessionId }
   },
-  async prompt(payload) {
+  async prompt(payload, signal) {
+    signal.throwIfAborted()
     hostPrompts.push(payload)
   },
 }

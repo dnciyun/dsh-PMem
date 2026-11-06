@@ -571,11 +571,16 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
       const sessions = []
       for (const batch of batches) {
         const sessionId = randomUUID()
+        // 宿主的 `sessionController.prompt(request, signal)` 第一步就是
+        // `signal.throwIfAborted()`：少了第二个参数会直接抛
+        // "Cannot read properties of undefined (reading 'throwIfAborted')"（0.8.2 的坑）。
+        // 每批一个不主动取消的 signal：中途出错只影响这一批，已投递的照常跑。
         await controller.create({ sessionId, cwd: config.cwd })
         await controller.prompt({
           sessionId,
+          requestId: randomUUID(),
           content: [{ type: 'text', text: whaleBigPrompt(batch) }],
-        })
+        }, new AbortController().signal)
         sessions.push(sessionId)
       }
       return json(res, 200, { ok: true, count: days.length, days, batches, sessions })
