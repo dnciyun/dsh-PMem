@@ -38,6 +38,19 @@ window.__ModuleLoader__.load({
       ['settings', '设置'],
     ]
 
+    // 醒来卡页里折叠的速查：默认不展开，但一键能复制成纯文本带走。
+    const WAKE_CHEATSHEET = [
+      'PMem 速查',
+      '记一条：memory_add（对话里说「记住：…」也会自动调）/ pmem add "…"',
+      '找回来：memory_search / memory_get（直接问也会自动检索）/ pmem search "…"',
+      '看醒来卡：memory_wake / pmem wake（控制台「醒来卡」页）',
+      '改与纠错：memory_update / memory_feedback；更正旧条标 superseded，不删原文',
+      '撤回：memory_retract（留墓碑，默认检索不再返回）',
+      '夜间整理：memory_journal（模板日记）/ memory_sleep（固定 8 阶段）/ pmem sleep run',
+      '自检回答：memory_selfcheck（日期/人名在库里有没有出处）',
+      '配置：pmem config get/set/list（sleep.whale.enabled 等）',
+    ].join('\n')
+
     const MEMORY_MODES = [
       ['auto', '自动'],
       ['keyword', '关键词'],
@@ -227,6 +240,11 @@ window.__ModuleLoader__.load({
 .pconsole-confirm p{margin:0}
 .pconsole-danger{margin-top:14px;padding:10px 12px;border:1px solid rgba(229,72,77,.4);border-radius:10px;background:rgba(229,72,77,.04)}
 .pconsole-danger summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--dsw-alias-state-error-primary,#e5484d)}
+.pconsole-help{margin-top:12px;padding:10px 12px;border:1px solid var(--dsw-alias-border-l2,#d0d5dd);border-radius:10px;background:rgba(127,127,127,.03)}
+.pconsole-help summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--dsw-alias-button-primary-fill,#2f6fed)}
+.pconsole-help[open] summary{margin-bottom:6px}
+.pconsole-help h4{margin:10px 0 2px;font-size:11.5px;font-weight:600;color:var(--dsw-alias-label-secondary,#5b6472)}
+.pconsole-help .pconsole-table{margin-top:2px}
 .pconsole-empty{margin:0;padding:18px 0;color:var(--dsw-alias-label-secondary,#5b6472);font-size:12.5px}
 .pconsole-code{font-family:ui-monospace,Consolas,monospace;font-size:11px;overflow-wrap:anywhere}
 .pconsole-stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin-top:8px}
@@ -1598,6 +1616,75 @@ window.__ModuleLoader__.load({
             ? h('p', { className: 'pconsole-note' },
                 '开头：', h('code', { className: 'pconsole-code' }, firstLine))
             : null,
+          // 用法速查默认折叠（不展示出来），要用的时候点开——第一次用的人不用翻文档。
+          h(
+            'details',
+            { className: 'pconsole-help' },
+            h('summary', null, 'PMem 怎么用？（点开 · 记 / 找 / 改 / 夜里的整理）'),
+            h('p', { className: 'pconsole-note', style: { margin: '0 0 2px' } },
+              '这张卡每轮自动注入，什么都不做也会一直用下去；下面是手动操作的口子，对话里说、斜杠命令、终端都行。'),
+
+            h('h4', null, '① 想让它记住'),
+            h('ul', { className: 'pconsole-bullets' },
+              h('li', null, '直接说「记住：明天下午三点跟阿七对稿」→ 我会调 ',
+                h('code', { className: 'pconsole-code' }, 'memory_add')),
+              h('li', null, '斜杠命令 ',
+                h('code', { className: 'pconsole-code' }, '/pmem remember 明天下午三点跟阿七对稿')),
+              h('li', null, '终端 ',
+                h('code', { className: 'pconsole-code' }, 'pmem add "明天下午三点跟阿七对稿" --kind semantic --grade B')),
+            ),
+
+            h('h4', null, '② 想找回来'),
+            h('ul', { className: 'pconsole-bullets' },
+              h('li', null, '直接问「上次说的薄荷糖是哪家店？」→ 先检索，找不到就说不知道，不硬编'),
+              h('li', null, '斜杠命令 ', h('code', { className: 'pconsole-code' }, '/pmem recall 薄荷糖')),
+              h('li', null, '控制台「记忆」页：关键词 / 语义 / 最近 + 分组树过滤 + 排序 + 翻页'),
+            ),
+
+            h('h4', null, '③ 想改 / 纠错 / 忘掉'),
+            h('ul', { className: 'pconsole-bullets' },
+              h('li', null, '「记忆」页详情：反馈（有用 / 无关 / 错了 / 确认）、置顶、改等级与分组、改敏感级'),
+              h('li', null, '更正：旧条标 superseded，不删原文；撤回：留墓碑，默认检索不再返回'),
+              h('li', null, '工具 ',
+                h('code', { className: 'pconsole-code' }, 'memory_update / memory_feedback / memory_retract')),
+            ),
+
+            h('h4', null, '④ 夜里的整理（不用管，但可以调）'),
+            h('ul', { className: 'pconsole-bullets' },
+              h('li', null, '默认：本地模板日记 + 固定 8 阶段巩固，0 模型调用、0 成本'),
+              h('li', null, '设置页「夜间」可开「用真模型思考（鲸眠）」，改完下一晚生效'),
+              h('li', null, '想补睡历史：睡眠页「大睡一场」，先小范围跑，别一次全量'),
+            ),
+
+            h('h4', null, '⑤ 速查'),
+            h('table', { className: 'pconsole-table' },
+              h('thead', null, h('tr', null,
+                h('th', null, '想做什么'),
+                h('th', null, '对话 / 工具'),
+                h('th', null, '命令行'))),
+              h('tbody', null, ...[
+                ['记一条', 'memory_add', 'pmem add "…"'],
+                ['找回来', 'memory_search / memory_get', 'pmem search "…"'],
+                ['看醒来卡', 'memory_wake', 'pmem wake'],
+                ['改 / 纠错', 'memory_update / memory_feedback', 'pmem update …'],
+                ['撤回（留墓碑）', 'memory_retract', 'pmem retract <id>'],
+                ['夜间整理', 'memory_journal / memory_sleep', 'pmem sleep run'],
+                ['自检回答', 'memory_selfcheck', 'pmem selfcheck "…"'],
+                ['配置', '—', 'pmem config get/set/list'],
+              ].map(([what, tool, cmd]) =>
+                h('tr', { key: `cheat-${what}` },
+                  h('td', null, what),
+                  h('td', null, h('code', { className: 'pconsole-code' }, tool)),
+                  h('td', null, h('code', { className: 'pconsole-code' }, cmd))))),
+            ),
+            h('div', { className: 'pconsole-actions' },
+              h('button', {
+                className: 'pconsole-btn',
+                type: 'button',
+                onClick: () => void copyText(WAKE_CHEATSHEET, notify, '速查已复制'),
+              }, '复制这份速查'),
+            ),
+          ),
         ),
       )
     }

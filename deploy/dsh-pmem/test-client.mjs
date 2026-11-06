@@ -414,6 +414,20 @@ const emptyWakeText = textOf(client.ConsoleWake({
 }))
 assert.ok(emptyWakeText.includes('还没有可唤醒的记忆'), '空卡要有说明，不能白屏')
 
+// 醒来卡里的用法教程：默认折叠（不占版面），点开有记/找/改/夜间 + 速查表 + 可复制
+const help = findAll(wakeTree, node => node.type === 'details')
+assert.equal(help.length, 1, '醒来卡要有折叠的用法教程')
+assert.equal(help[0].props.open, undefined, '用法教程默认不展开（不展示出来）')
+const helpText = textOf(help[0])
+for (const keyword of ['PMem 怎么用', '记住', '记忆」页', '大睡一场', '速查']) {
+  assert.ok(helpText.includes(keyword), `用法教程缺少：${keyword}`)
+}
+assert.ok(
+  findAll(help[0], node => node.type === 'tr').length >= 8,
+  '速查表至少 8 行（记/找/看卡/改/撤回/夜间/自检/配置）',
+)
+assert.ok(helpText.includes('复制这份速查'), '速查要能一键复制')
+
 // ── 纯函数 ──────────────────────────────────────────────────────────────────
 assert.deepEqual(client.highlightParts('薄荷和薄荷糖', '薄荷'), ['', '薄荷', '和', '薄荷', '糖'])
 assert.deepEqual(client.highlightParts('任意正文', ''), ['任意正文'])
