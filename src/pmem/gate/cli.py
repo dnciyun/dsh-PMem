@@ -567,6 +567,97 @@ def _print_claim(data: dict[str, Any], action: str) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2))
 
 
+# 常驻三栏笔记（1.12.0，默认关）：show / prep / apply。产品内不调模型，
+# prep 只出任务书给宿主，apply 校验后写回（和 claim extract 的 prep/apply 同构）。
+def notes_show_payload(app: PMem) -> dict[str, Any]:
+    from ..memory import notes as notes_mod
+
+    subject = getattr(app, "subject", "self") or "self"
+    return {
+        "ok": True,
+        "data": {
+            "enabled": notes_mod.enabled(app.config),
+            "subject": subject,
+            "items": notes_mod.get(app.db, subject=subject),
+            "render": notes_mod.render(app.db, app.config, subject=subject),
+            "person_cards": notes_mod.render_person_cards(app.db, app.config, subject=subject),
+            "line_seq": notes_mod.latest_line_seq(app.db, subject=subject),
+        },
+    }
+
+
+def notes_prep_payload(app: PMem, *, max_lines: Any = None) -> dict[str, Any]:
+    from ..memory import notes as notes_mod
+
+    data = notes_mod.prep(
+        app.db,
+        subject=getattr(app, "subject", "self") or "self",
+        config=app.config,
+        max_lines=None if max_lines is None else int(max_lines),
+    )
+    return {"ok": True, "data": data}
+
+
+def notes_apply_payload(app: PMem, *, payload: Any = None) -> dict[str, Any]:
+    from ..memory import notes as notes_mod
+
+    if payload is None:
+        return {
+            "ok": False,
+            "error": {
+                "code": "E_VALIDATION",
+                "message": "payload 不能为空（{\"about_user\",\"about_self\",\"open\"} 对象）",
+                "field": "payload",
+            },
+        }
+    try:
+        data = notes_mod.apply(
+            app.db,
+            subject=getattr(app, "subject", "self") or "self",
+            payload=payload,
+            config=app.config,
+        )
+    except PmemError as exc:
+        return {"ok": False, "error": exc.to_dict()}
+    return {"ok": True, "data": data}
+
+
+def _print_notes(data: dict[str, Any], action: str) -> None:
+    """``pmem notes ...`` 的人读输出（--json 时走 _emit，不经过这里）。"""
+    if action == "show":
+        state = "开" if data.get("enabled") else "关"
+        print(f"— 常驻三栏笔记（notes.enabled={state}，已整理到 line_seq={data.get('line_seq')}）")
+        rendered = str(data.get("render") or "")
+        print(rendered if rendered else "  （三栏都为空：先 prep → 宿主产出 JSON → apply）")
+        cards = str(data.get("person_cards") or "")
+        if cards:
+            print(cards)
+        return
+    if action == "prep":
+        if data.get("enabled") is False:
+            print(f"— {data.get('note') or 'notes.enabled=false，跳过整理'}")
+            return
+        if data.get("needed") is False:
+            print(f"— {data.get('note') or '没有新的流水，本次不用整理'}")
+            return
+        material = data.get("material") or []
+        print(f"— 任务书已就绪（原话 {len(material)} 行，line_seq "
+              f"{data.get('min_line_seq')}→{data.get('max_line_seq')}）")
+        print(data.get("task") or "")
+        return
+    if action == "apply":
+        if data.get("enabled") is False:
+            print(f"— {data.get('note') or 'notes.enabled=false，不写库'}")
+            return
+        print(f"✓ 三栏已写回：更新 {len(data.get('updated') or {})} 栏，"
+              f"line_seq={data.get('line_seq')}")
+        skipped = data.get("skipped") or {}
+        if skipped:
+            print(f"  未更新的栏：{skipped}")
+        return
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+
+
 def main(argv: list[str] | None = None) -> int:
     # Windows 控制台默认 GBK，✓/✗ 会直接炸；只改编码，不改行为
     for stream_name in ("stdout", "stderr"):
@@ -698,6 +789,19 @@ def main(argv: list[str] | None = None) -> int:
     p_ce.add_argument("--rule", action="store_true", help="无宿主时的确定性规则降级抽取")
     p_ce.add_argument(
         "--max-source-chars", type=int, default=None, help="只取最近 N 字符原话（0=全读）"
+    )
+
+    # 常驻三栏笔记（1.12.0，默认关）：show 看现状 / prep 出任务书 / apply 回填。
+    # 产品内不调模型：prep 只把材料与禁止事项给宿主，apply 只做校验与落库。
+    p_notes = sub.add_parser("notes", help="常驻三栏笔记（默认关）：show / prep / apply")
+    notes_sub = p_notes.add_subparsers(dest="notes_action", required=True)
+    notes_sub.add_parser("show", help="看当前三栏与渲染结果")
+    p_np = notes_sub.add_parser("prep", help="输出整理任务书（最近新流水 + 现有三栏 + 禁止事项）")
+    p_np.add_argument("--max-lines", type=int, default=None, help="最多取多少行新流水")
+    p_na = notes_sub.add_parser("apply", help="把宿主产出的 JSON 校验后写回三栏")
+    p_na.add_argument(
+        "--file", default=None, metavar="JSON",
+        help="宿主产出 JSON 文件；省略则从 stdin 读",
     )
 
     p_trace = sub.add_parser("trace", help="按字查原话（一字不差）：会话 / 行号 / 角色")
@@ -2794,6 +2898,52 @@ def main(argv: list[str] | None = None) -> int:
             if args.json or not result.get("ok"):
                 return _emit(result, args.json)
             _print_claim(result.get("data") or {}, action)
+            return 0
+        if args.cmd == "notes":
+            action = str(args.notes_action)
+            if action == "show":
+                result = notes_show_payload(app)
+            elif action == "prep":
+                result = notes_prep_payload(app, max_lines=args.max_lines)
+            else:  # apply
+                payload: Any = None
+                raw = ""
+                if getattr(args, "file", None):
+                    try:
+                        raw = Path(args.file).read_text(encoding="utf-8")
+                    except OSError as exc:
+                        return _emit(
+                            {
+                                "ok": False,
+                                "error": {
+                                    "code": "E_VALIDATION",
+                                    "message": f"--file 读不到：{exc}",
+                                    "field": "file",
+                                },
+                            },
+                            args.json,
+                        )
+                else:
+                    raw = sys.stdin.read()
+                if raw.strip():
+                    try:
+                        payload = json.loads(raw)
+                    except ValueError as exc:
+                        return _emit(
+                            {
+                                "ok": False,
+                                "error": {
+                                    "code": "E_VALIDATION",
+                                    "message": f"payload 不是合法 JSON：{exc}",
+                                    "field": "payload",
+                                },
+                            },
+                            args.json,
+                        )
+                result = notes_apply_payload(app, payload=payload)
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            _print_notes(result.get("data") or {}, action)
             return 0
         if args.cmd == "plan":
             question = args.question

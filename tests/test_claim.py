@@ -63,7 +63,7 @@ class ClaimSchemaTest(ClaimCase):
         self.assertEqual(tables, {"claim", "claim_link", "person_card"})
         self.assertEqual(
             conn.execute("SELECT value FROM schema_meta WHERE key='schema_version'").fetchone()[0],
-            "1.11.0",
+            "1.12.0",
         )
         columns = {row[1] for row in conn.execute("PRAGMA table_info(memory)")}
         self.assertIn("claim_group", columns)
@@ -102,7 +102,7 @@ class ClaimSchemaTest(ClaimCase):
         )
         self.assertEqual(
             conn.execute("SELECT value FROM schema_meta WHERE key='schema_version'").fetchone()[0],
-            "1.11.0",
+            "1.12.0",
         )
 
     def test_claim_switch_off_keeps_tables_empty_and_search_unchanged(self) -> None:

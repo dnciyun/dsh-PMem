@@ -254,6 +254,10 @@ def run_search(
     second_cfg: dict[str, Any] = second_raw if isinstance(second_raw, dict) else {}
     second_on = bool(second_cfg.get("enabled", False))
     entity_bridge: dict[str, Any] = {}
+    rawline_cfg = store.cfg.get("retrieval.rawline")
+    rawline_on = isinstance(rawline_cfg, dict) and bool(rawline_cfg.get("enabled", False))
+    rerank_cfg = store.cfg.get("retrieval.rerank")
+    rerank_on = isinstance(rerank_cfg, dict) and bool(rerank_cfg.get("enabled", False))
     claim_cfg = store.cfg.get("claim.index")
     claim_index_on = isinstance(claim_cfg, dict) and bool(claim_cfg.get("enabled", False))
     claim_hits: list[dict[str, Any]] = []
@@ -408,6 +412,36 @@ def run_search(
         relevance = (0.6 * cov + 0.4 * rrf_norm) if terms else rrf_norm
         pending.append((row, relevance))
         ngram_cache[row["seq"]] = char_ngrams(row["text_norm"][:200])
+
+    # 两阶段检索（task-49，默认关）：对前 pool 条候选做交叉编码器重排。
+    # 只在开关打开且模型/onnxruntime 齐全时才 import；缺件/异常静默走原路径。
+    rerank_scores: dict[int, float] = {}
+    rerank_mod: Any = None
+    rerank_weight = 1.0
+    if rerank_on and pending:
+        try:
+            from . import rerank as rerank_mod_local
+
+            ready_ok, _why = rerank_mod_local.ready(store.cfg)
+            if ready_ok:
+                rerank_mod = rerank_mod_local
+                rerank_settings = rerank_mod.settings(store.cfg)
+                rerank_weight = float(rerank_settings.get("blend", 1.0) or 0.0)
+                pool_rows = sorted(pending, key=lambda pair: -float(pair[1]))[
+                    : int(rerank_settings.get("pool", 40) or 40)
+                ]
+                docs = [str(row["text_raw"] or "") for row, _rel in pool_rows]
+                raw_scores = rerank_mod.score(q, docs, store.cfg)
+                low = min(raw_scores)
+                high = max(raw_scores)
+                span = high - low
+                for (row, _rel), raw in zip(pool_rows, raw_scores):
+                    rerank_scores[int(row["seq"])] = (
+                        1.0 if span <= 0 else (float(raw) - low) / span
+                    )
+        except Exception:  # noqa: BLE001 重排是增强：挂了就当没开
+            rerank_scores = {}
+            rerank_mod = None
 
     # 关联扩散（M12）：先用**覆盖率**选种子，再在稀有词共现图上做 PPR，
     # 把扩散质量当 ``graph_affinity`` 记进 final_score —— 只重排已有候选，不额外注入。
@@ -588,6 +622,10 @@ def run_search(
         boost = group_mod.boost_for(grade_map.get(row["id"]))
         if boost:
             score = max(0.0, min(1.0, score + boost))
+        if rerank_scores and int(row["seq"]) in rerank_scores:
+            # blend=1 完全听重排；<1 与未归一化前的原分混合（原分本来就在 0..1）。
+            rerank_value = rerank_scores[int(row["seq"])]
+            score = rerank_weight * rerank_value + (1.0 - rerank_weight) * score
         if decay_on:
             idle_days = days_between(str(row["last_used_at"] or row["created_at"]))
             factor = scoring.decay_factor(
@@ -712,6 +750,8 @@ def run_search(
                 "grade": grade_map.get(row["id"]),
             }
         )
+        if int(row["seq"]) in rerank_scores:
+            payload[-1]["rerank_score"] = round(float(rerank_scores[int(row["seq"])]), 6)
         row_dict = row if isinstance(row, dict) else dict(row)
         if not row_dict.get("claim_id"):
             payload_memory_refs[str(row_dict.get("id") or "")] = str(
@@ -1461,6 +1501,39 @@ def run_search(
                     if extra_id:
                         shown_ids.add(extra_id)
             used = sum(estimate_tokens(item["text"]) + 12 for item in payload)
+
+    # 原话通道（task-53，默认关）：正常 payload 打包/裁剪之后**只追加**。
+    # 为什么放这里：原有条目顺序/数量必须不变（A/B 时 B 的上下文是 A 的超集），
+    # 因此不能参与 RRF/排序；只从 journal_line 补「字面分 × 时间衰减」的原话，
+    # 追加前去重（12 字窗口）并受 budget_share 字符上限与总 token 预算约束。
+    if rawline_on:
+        try:
+            from . import rawline as rawline_mod
+
+            rawline_candidates = rawline_mod.candidates(
+                store, q, cutoff_ts=now().isoformat(), cfg=store.cfg
+            )
+            rawline_picked = rawline_mod.pick(
+                payload,
+                q,
+                cfg=store.cfg,
+                candidates=rawline_candidates,
+                budget=int(budget),
+            )
+        except Exception:  # noqa: BLE001 原话通道是增强：挂了不能带崩检索
+            rawline_picked = []
+        if rawline_picked:
+            used = sum(estimate_tokens(item["text"]) + 12 for item in payload)
+            added_raw = 0
+            for item in rawline_picked:
+                cost = estimate_tokens(item["text"]) + 12
+                if used + cost > int(budget):
+                    break
+                payload.append(item)
+                payload_seq.append(-(3000 + added_raw))
+                payload_cov.append(0.0)
+                added_raw += 1
+                used += cost
 
     # claim 命中回查原话（task-48）：claim 只当索引/路由，不跟 memory 抢主排序。
     # 规则：①只用剩余预算；②同 source_line 的 memory 已进 top-k 就不重复；

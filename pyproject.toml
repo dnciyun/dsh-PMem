@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pmem"
-version = "0.40.0"
-description = "dsh-PMem · 可塑性记忆 —— 给你家那条大肥鱼的记忆器官：原话记得住，出处查得到，说错了能撤回"
+version = "0.41.0"
+description = "dsh-PMem 路 鍙鎬ц蹇?鈥斺€?缁欎綘瀹堕偅鏉″ぇ鑲ラ奔鐨勮蹇嗗櫒瀹橈細鍘熻瘽璁板緱浣忥紝鍑哄鏌ュ緱鍒帮紝璇撮敊浜嗚兘鎾ゅ洖"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "PolyForm-Noncommercial-1.0.0" }
@@ -13,8 +13,8 @@ authors = [{ name = "dnciyun" }]
 dependencies = []
 
 [project.optional-dependencies]
-# 核心零依赖；以下按需安装
-# 向量通道（可选）：不装也能跑词法链路，只是语义改写类问题会弱一些
+# 鏍稿績闆朵緷璧栵紱浠ヤ笅鎸夐渶瀹夎
+# 鍚戦噺閫氶亾锛堝彲閫夛級锛氫笉瑁呬篃鑳借窇璇嶆硶閾捐矾锛屽彧鏄涔夋敼鍐欑被闂浼氬急涓€浜?
 vector = ["numpy>=1.24", "onnxruntime>=1.16"]
 embed = ["sentence-transformers>=2.2", "jieba>=0.42"]
 dev = ["pytest>=7", "ruff>=0.4"]

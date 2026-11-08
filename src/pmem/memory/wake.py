@@ -211,6 +211,35 @@ def _journal_hint(db: Any, subject: str, *, idle_minutes: int = 45) -> str:
     return f"{count} 行原话还没整理成日记 · 用 memory_journal(action=write) 写"
 
 
+def _with_notes(
+    data: dict[str, Any], *, db: Any, config: Any, subject: str
+) -> dict[str, Any]:
+    """把常驻三栏笔记（+可选人物卡）拼到醒来卡末尾；默认关时原样返回。
+
+    为什么放在最后一步、且关时直接 return：``notes.enabled=false`` 是默认态，必须保证
+    输出与 0.40.0 逐字节一致（有测试钉住）。只有真的渲染出内容才动 text/live，
+    连 tokens 都不重算——避免「开关关着，token 数字却变了」这种隐蔽差异。
+    """
+    from ..memory import notes as notes_mod
+
+    if not notes_mod.enabled(config):
+        return data
+    try:
+        block = notes_mod.render(db, config, subject=subject)
+        cards = notes_mod.render_person_cards(db, config, subject=subject)
+    except Exception:  # noqa: BLE001 增强层失败不能挡住醒来卡（降级而不是失忆）
+        return data
+    addition = "\n".join(part for part in (block, cards) if part)
+    if not addition:
+        return data
+    for key in ("text", "live"):
+        base = str(data.get(key) or "").rstrip()
+        data[key] = (base + "\n\n" + addition) if base else addition
+    data["tokens"] = estimate_tokens(str(data.get("text") or ""))
+    data["tokens_live"] = estimate_tokens(str(data.get("live") or ""))
+    return data
+
+
 def build(
     db: Any,
     *,
@@ -290,7 +319,7 @@ def build(
                 live = soul_mod.render_live(soul_cfg, data=soul)
             except Exception:  # noqa: BLE001 算不出来就退回整卡（降级而不是失忆）
                 live = text
-            return {
+            return _with_notes({
                 "version": 2,
                 "source": "soul",
                 "built_at": now_iso(),
@@ -304,7 +333,7 @@ def build(
                 "tokens": estimate_tokens(text),
                 "loops": soul.get("loops") or [],
                 "text": text,
-            }
+            }, db=db, config=config, subject=subject)
     budget = max(80, int(budget or (config.get("wake.budget", DEFAULT_BUDGET) if config is not None else DEFAULT_BUDGET)))
     seen: set[str] = set()
     lines: list[dict[str, Any]] = []
@@ -425,7 +454,7 @@ def build(
     if estimate_tokens(text) + estimate_tokens(footer) + 4 <= budget:
         text = text.replace(END_MARK, footer + chr(10) + END_MARK)
 
-    return {
+    return _with_notes({
         "version": 1,
         "built_at": now_iso(),
         "budget": budget,
@@ -438,7 +467,7 @@ def build(
         "live_budget": budget,
         "tokens_live": estimate_tokens(text),
         "text": text,
-    }
+    }, db=db, config=config, subject=subject)
 
 
 def render(sections: list[dict[str, Any]]) -> str:

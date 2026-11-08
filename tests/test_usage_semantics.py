@@ -237,7 +237,7 @@ class MigrationCase(unittest.TestCase):
             version = app.db.conn.execute(
                 "SELECT value FROM schema_meta WHERE key='schema_version'"
             ).fetchone()["value"]
-            self.assertEqual(version, "1.11.0")
+            self.assertEqual(version, "1.12.0")
         finally:
             app.close()
 

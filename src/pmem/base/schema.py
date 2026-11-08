@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-SCHEMA_VERSION = "1.11.0"
+SCHEMA_VERSION = "1.12.0"
 
 # 实体表单独提出来：M3 的迁移要重建它（SQLite 不支持改 CHECK 约束）
 ENTITY_DDL = """
@@ -720,6 +720,21 @@ DDL: list[str] = [
       updated_at TEXT NOT NULL
     )
     """,
+    # ---- 常驻三栏笔记（1.12.0，默认关）------------------------------------
+    # 为什么单独一表、不写 memory：笔记是「压缩后的长期状态」（关于你 / 关于我 /
+    # 还没了的事），每轮都在场、不占检索预算；写进 memory 会被检索/去重/淡忘当成
+    # 普通事实处理，还会挤占召回名额。这里只存每次整理的快照行（同 kind 取最新一
+    # 行），line_seq 记「整理到哪条原话」，用它判断是否攒够了新流水再整理。
+    """
+    CREATE TABLE IF NOT EXISTS state_note (
+      seq        INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind       TEXT NOT NULL CHECK (kind IN ('about_user','about_self','open')),
+      text       TEXT NOT NULL,
+      line_seq   INTEGER NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_state_note_kind ON state_note(kind, seq)",
 ]
 
 # 初始谓词表（03 §8.2；M3 扩到 12 个，后续睡眠/进化阶段再拆细）

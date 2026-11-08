@@ -137,6 +137,9 @@ class OpenAICompatModel:
         self.retries = retries
         self.max_tokens = max_tokens
         self.name = self.model
+        # 推理强度（可选）：DeepSeek V4.1 系列支持 low/high/max。不设时请求体与旧版逐字节一致。
+        # 只加这一个字段；回放时设 PMEM_BENCH_REASONING_EFFORT=low 可避免「思路吃掉全部 completion」。
+        self.reasoning_effort = os.environ.get("PMEM_BENCH_REASONING_EFFORT", "").strip()
         if not self.api_key:
             raise ValueError(
                 "没有模型凭证：设置 PMEM_BENCH_API_KEY（或 DEEPSEEK_API_KEY），"
@@ -156,6 +159,8 @@ class OpenAICompatModel:
             "temperature": (hint or {}).get("temperature", self.temperature),
             "max_tokens": self.max_tokens,
         }
+        if self.reasoning_effort:
+            body["reasoning_effort"] = self.reasoning_effort
         if tools:
             body["tools"] = tools
             body["tool_choice"] = "auto"

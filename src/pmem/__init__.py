@@ -16,12 +16,12 @@
 
 from __future__ import annotations
 
-__version__ = "0.40.0"
+__version__ = "0.41.0"
 __name_cn__ = "可塑性记忆"
 __name_en__ = "PMemories"
 __codename__ = "PMem"
 
-SCHEMA_VERSION = "1.11.0"
+SCHEMA_VERSION = "1.12.0"
 
 
 def __getattr__(name: str):  # lazy: 避免 gate → pmem → gate 的循环导入
