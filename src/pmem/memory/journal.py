@@ -606,6 +606,11 @@ def _finish(
     if dry_run:
         return result
 
+    # 主体归属/时间归一都只在真的写记忆库、且开关打开时才算（默认态 0 额外 SQL/计算）。
+    links_enabled = store is not None and _subject_links_enabled(config)
+    time_enabled = store is not None and _time_normalize_enabled(config)
+    entities = _known_entities(db, subject) if links_enabled else []
+
     with db.tx():
         db.conn.execute(
             "INSERT INTO episode(id, subject_id, channel, started_at, ended_at, day_key, title, "
@@ -651,13 +656,29 @@ def _finish(
             # 一天里上午和晚上说的两件事，日期相同、时刻不同；用第一条代表全天的
             # 话，「几点说的」就再也分不出来了（而这是记忆系统仅剩的时间粒度）。
             source_ts = str(source["ts"]) if source is not None else rows[0]["ts"]
+            kwargs = _fact_kwargs(episode_id, index, mode=draft.mode, valid_from=source_ts)
+            links = _match_subject_links(text, entities) if links_enabled else None
+            time_info = (
+                _normalize_time(str(source["text"]) if source is not None else text, source_ts)
+                if time_enabled
+                else None
+            )
+            extra_payload: dict[str, Any] = {}
+            if links:
+                extra_payload.update(links)
+            if time_info:
+                extra_payload.update(time_info)
+            if extra_payload:
+                kwargs["extra"] = extra_payload
             try:
-                saved = store.add(
-                    text, **_fact_kwargs(episode_id, index, mode=draft.mode, valid_from=source_ts)
-                )
+                saved = store.add(text, **kwargs)
             except Exception as exc:  # 一条事实写不进去，不能带崩整篇日记
                 result.setdefault("errors", []).append({"text": text, "error": str(exc)})
                 continue
+            if links:
+                result.setdefault("subject_links", []).append({"index": index, **links})
+            if time_info:
+                result.setdefault("time_normalized", []).append({"index": index, **time_info})
             if isinstance(saved, dict) and saved.get("id"):
                 result["memory_ids"].append(saved["id"])
 
@@ -750,6 +771,175 @@ def _facts(draft: DayDraft, *, rows: list[Any]) -> list[str]:
     「用户我妈说明天过来」，是人称串了的直接后果。
     """
     return [text for text, _source in _facts_with_sources(draft, rows=rows)]
+
+
+# -- 写入侧主体归属（P1-8，默认关）----------------------------------------
+#
+# 目的：让「各/分别/哪几」这类聚合题能按主体取全同一主体的多条事实。
+# 做法刻意最小：只把**库里已经抽取过的实体**按名字/别名在 fact 文本里做一次
+# 最长匹配，挂到 fact 的 extra 上；不重新抽实体、不加新规则表、不改写原文。
+# 为什么不是直接查 entity_mention：mention 挂在 memory(seq) 上，而 fact 是这一轮
+# **新建**的行，写之前还不存在；journal_line 也没有 mention。所以等价地复用
+# 「同一套已抽取实体」（entity / entity_alias），挂出来的 id 与 mention 一致。
+# 关时（默认）不查、不挂，fact 结构与 0.38.0 逐字相同。
+
+def _subject_links_enabled(config: Any) -> bool:
+    links = _cfg(config).get("subject_links")
+    return bool(isinstance(links, dict) and links.get("enabled", False))
+
+
+def _known_entities(db: Any, subject: str) -> list[tuple[str, str, str, float]]:
+    """(surface, entity_id, type, confidence)，长名优先。一次查询，只读。"""
+    rows: list[tuple[str, str, str, float]] = []
+    try:
+        for row in db.conn.execute(
+            "SELECT id, name, type, confidence FROM entity "
+            "WHERE subject_id=? AND status='active'",
+            (subject,),
+        ).fetchall():
+            name = str(row["name"] or "").strip()
+            if name:
+                rows.append(
+                    (name, str(row["id"]), str(row["type"] or ""), float(row["confidence"] or 0.0))
+                )
+        for row in db.conn.execute(
+            "SELECT a.alias AS name, a.entity_id AS id, e.type AS type, e.confidence AS confidence "
+            "FROM entity_alias a JOIN entity e ON e.id=a.entity_id "
+            "WHERE e.subject_id=? AND e.status='active'",
+            (subject,),
+        ).fetchall():
+            name = str(row["name"] or "").strip()
+            if name:
+                rows.append(
+                    (name, str(row["id"]), str(row["type"] or ""), float(row["confidence"] or 0.0))
+                )
+    except Exception:  # noqa: BLE001 实体表缺/坏只是少挂几个 id，不能挡住写日记
+        return []
+    # 长名先匹配（「沈知夏」优先于「知夏」）；同长按置信度、id 稳定排序。
+    rows.sort(key=lambda item: (-len(item[0]), -item[3], item[1]))
+    return rows
+
+
+def _match_subject_links(
+    text: str, entities: list[tuple[str, str, str, float]]
+) -> dict[str, Any] | None:
+    """在 fact 文本里找**已抽取**的实体；命中返回 ``{subject_entity_ids, subject}``。"""
+    body = str(text or "")
+    if not body or not entities:
+        return None
+    matched: list[tuple[str, str, str, float]] = []
+    for name, entity_id, type_, confidence in entities:
+        if len(name) < 2:  # 单字实体（「家」「钱」）噪音太大，不挂
+            continue
+        if name not in body:
+            continue
+        if any(name in longer[0] for longer in matched):  # 已被更长的名字覆盖
+            continue
+        matched.append((name, entity_id, type_, confidence))
+        if len(matched) >= 3:
+            break
+    if not matched:
+        return None
+    # ``subject`` 取置信度最高的人/概念；没有就退回置信度最高的那个。
+    preferred = sorted(
+        [item for item in matched if item[2] in ("person", "concept")],
+        key=lambda item: (-item[3], item[1]),
+    )
+    fallback = sorted(matched, key=lambda item: (-item[3], item[1]))
+    subject_name = (preferred or fallback)[0][0]
+    ids = list(dict.fromkeys(item[1] for item in matched))
+    return {"subject_entity_ids": ids, "subject": subject_name}
+
+
+# -- 写时时间归一（P2-16，默认关）------------------------------------------
+#
+# 目的：把「上周五 / 下周一 / 三天前 / 半个月前 / 3月27日」在**写入时**按这条记忆
+# 自己的逻辑时间（行 ts）落成绝对日期，存进 fact 的 extra（time_expr / time_abs）。
+# 为什么不在渲染时算：渲染时算已经证明≈0（G3 A 实验 94→94），而且每条都要重算；
+# 写时只算一次，下游（检索过滤 / 自检 / 契约）都读同一个字段。
+#
+# 纪律（对齐 docs/roadmap §5.1 与 config 注释）：
+# 1. 只认**明确**说法；「上次/那次/以前/后来/当时」这类模糊词**不猜**——猜错窗口比不猜更糟；
+# 2. 原文与 facts 文本一个字都不动，只在 extra 上加两个字段；
+# 3. 换不出来（如 2 月 30 日）就只留 ``time_expr``，不写 ``time_abs``；
+# 4. 关时（默认）不算、不查、不挂，结构与 0.38.0 逐字相同。
+
+_DATE_YMD_RE = re.compile(
+    r"(?<!\d)(?P<y>\d{4})\s*[-/.年]\s*(?P<m>\d{1,2})\s*[-/.月]\s*(?P<d>\d{1,2})\s*[日号]?"
+)
+_DATE_MD_RE = re.compile(r"(?<!\d)(?P<m>\d{1,2})\s*月\s*(?P<d>\d{1,2})\s*[日号]")
+# 模糊说法：即使匹配到了也不换算（防御性，当前 timeresolve 的显式规则本来就不会匹配它们）。
+_VAGUE_TIME_WORDS = ("上次", "上回", "那次", "以前", "之前", "后来", "当时", "那阵子", "前段时间")
+
+
+def _time_normalize_enabled(config: Any) -> bool:
+    value = _cfg(config).get("time_normalize")
+    return bool(isinstance(value, dict) and value.get("enabled", False))
+
+
+def _as_date(value: str | None) -> Any:
+    """ISO 字符串 → date；解析不了返回 None（不猜）。"""
+    from datetime import date
+
+    raw = str(value or "")
+    try:
+        return date.fromisoformat(raw[:10])
+    except ValueError:
+        return None
+
+
+def _resolve_ymd(year: int | None, month: int, day: int, base: Any) -> Any:
+    """年月日 → date；没写年份按「最近一次」（和 selfcheck/temporal 同一口径）。"""
+    from datetime import date
+
+    if base is None:
+        return None
+    try:
+        if year is None:
+            candidate = date(base.year, month, day)
+            if candidate > base:
+                candidate = date(base.year - 1, month, day)
+            return candidate
+        return date(year, month, day)
+    except ValueError:  # 2 月 30 日这种不存在的日期
+        return None
+
+
+def _normalize_time(text: str, base_iso: str | None) -> dict[str, str] | None:
+    """一句话 + 这行的逻辑时间 → ``{time_expr, time_abs?}``；没有明确说法返回 None。
+
+    返回的是「原话片段 + 绝对日期」两个字段，**不改原文**。多说法时选先出现的
+    明确日期，其次才是 timeresolve 认出的第一个相对说法（确定性，不按概率挑）。
+    """
+    body = str(text or "")
+    base = _as_date(base_iso)
+    if not body or base is None:
+        return None
+    # 1) 明确日期：2026-03-27 / 2026年3月27日 / 3月27日（无年份按最近一次推）
+    match = _DATE_YMD_RE.search(body)
+    if match:
+        expr = match.group(0).strip()
+        resolved = _resolve_ymd(
+            int(match.group("y")), int(match.group("m")), int(match.group("d")), base
+        )
+        return {"time_expr": expr, "time_abs": resolved.isoformat()} if resolved else {
+            "time_expr": expr
+        }
+    match = _DATE_MD_RE.search(body)
+    if match:
+        expr = match.group(0).strip()
+        resolved = _resolve_ymd(None, int(match.group("m")), int(match.group("d")), base)
+        return {"time_expr": expr, "time_abs": resolved.isoformat()} if resolved else {
+            "time_expr": expr
+        }
+    # 2) 明确相对说法：复用 timeresolve（周日起算、按这条记忆自己的日期算）
+    from .timeresolve import relative_dates
+
+    for phrase, stamp in relative_dates(body, base_iso):
+        if not phrase or any(word in phrase for word in _VAGUE_TIME_WORDS):
+            continue
+        return {"time_expr": phrase, "time_abs": stamp}
+    return None
 
 
 # -- 派生事实的写入与补写（digest / repair 共用）-----------------------------
@@ -1036,6 +1226,10 @@ def repair(
     # 分组扫描各一次（逐篇 COUNT/LIKE 会退化成 O(篇数 × 全表)）。
     derived_map = _derived_counts(db)
     attempted_map = _attempted_counts(db)
+    # 主体归属/时间归一（默认关）：补写路径与 digest 走同一套匹配，避免两边慢慢走偏。
+    links_enabled = _subject_links_enabled(config)
+    time_enabled = _time_normalize_enabled(config)
+    entities = _known_entities(db, subject) if links_enabled else []
     for episode in episodes:
         ep_id = str(episode["id"])
         claimed = int(episode["memory_count"] or 0)
@@ -1114,13 +1308,23 @@ def repair(
             if dry_run:
                 stats["items"].append({**item, "status": "would-add"})
                 continue
+            kwargs = _fact_kwargs(
+                ep_id, index, mode=mode, valid_from=valid_froms[index]
+            )
+            links = _match_subject_links(text, entities) if links_enabled else None
+            # 补写时只剩事实正文（原文清单没一起返回）；按事实文本归一，换算不了就不写。
+            time_info = (
+                _normalize_time(text, valid_froms[index]) if time_enabled else None
+            )
+            extra_payload: dict[str, Any] = {}
+            if links:
+                extra_payload.update(links)
+            if time_info:
+                extra_payload.update(time_info)
+            if extra_payload:
+                kwargs["extra"] = extra_payload
             try:
-                saved = store.add(
-                    text,
-                    **_fact_kwargs(
-                        ep_id, index, mode=mode, valid_from=valid_froms[index]
-                    ),
-                )
+                saved = store.add(text, **kwargs)
             except Exception as exc:  # noqa: BLE001 补写失败要留痕、可重试
                 stats["failed"] += 1
                 stats["errors"].append(
@@ -1129,7 +1333,18 @@ def repair(
                 continue
             stats["added"] += 1
             memory_id = saved.get("id") if isinstance(saved, dict) else None
-            stats["items"].append({**item, "status": "added", "memory_id": memory_id})
+            item = {**item, "status": "added", "memory_id": memory_id}
+            if links:
+                item["subject"] = links["subject"]
+                stats.setdefault("subject_links", []).append(
+                    {"episode_id": ep_id, "index": index, **links}
+                )
+            if time_info:
+                item.update(time_info)
+                stats.setdefault("time_normalized", []).append(
+                    {"episode_id": ep_id, "index": index, **time_info}
+                )
+            stats["items"].append(item)
 
     if not dry_run:
         # 补完再核对一遍：还剩几篇对不上（补了但失败 / 原料没了）。

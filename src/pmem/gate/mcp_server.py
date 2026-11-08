@@ -81,7 +81,8 @@ class McpServer:
             self.reply(msg_id, {})
             return
         if method == "tools/list":
-            self.reply(msg_id, {"tools": schemas.TOOLS})
+            # 断言层默认关：claim_* 不进清单，既有工具数量保持不变。
+            self.reply(msg_id, {"tools": schemas.visible_tools(getattr(self.app, "config", None))})
             return
         if method == "tools/call":
             self.tools_call(msg_id, params)
@@ -99,6 +100,12 @@ class McpServer:
         name = params.get("name")
         args = params.get("arguments") or {}
         if schemas.by_name(name) is None:
+            self.error(msg_id, -32602, f"unknown tool: {name}")
+            return
+        # 主开关关着时 claim_* 和「不存在」一样：清单里没有，调用也拒绝。
+        if name in schemas.CLAIM_TOOL_NAMES and not schemas.claim_enabled(
+            getattr(self.app, "config", None)
+        ):
             self.error(msg_id, -32602, f"unknown tool: {name}")
             return
         if not isinstance(args, dict):
@@ -154,10 +161,29 @@ class McpServer:
                 filters=args.get("filters"),
                 client="mcp",
             )
+        if name == "memory_render":
+            return self.app.render(
+                items=args.get("items") or None,
+                query=args.get("query"),
+                k=args.get("k"),
+                title=args.get("title") or "相关记忆",
+            )
         if name == "memory_selfcheck":
             return self.app.selfcheck(
                 args.get("answer", ""),
                 question=args.get("question"),
+            )
+        if name == "memory_verify_answer":
+            return self.app.verify_answer(
+                args.get("answer", ""),
+                items=args.get("items") or None,
+                query=args.get("query") or "",
+            )
+        if name == "memory_answer_plan":
+            return self.app.answer_plan(
+                args.get("question", ""),
+                when=args.get("when"),
+                evidences=args.get("evidences"),
             )
         if name == "memory_get":
             return self.app.get(args.get("id", ""))
@@ -308,6 +334,50 @@ class McpServer:
                 only=args.get("only"),
                 limit=int(args.get("limit", 20) or 20),
             )
+        if name in schemas.CLAIM_TOOL_NAMES:
+            # 断言层对外接口：与 CLI `pmem claim ...` **共用 cli.py 里的同一份实现**，
+            # 这里只做参数转接，不复制业务逻辑（关闸时 tools_call 已在上面拒绝）。
+            from .cli import (
+                claim_apply_payload,
+                claim_delete_payload,
+                claim_list_payload,
+                claim_prep_payload,
+                claim_search_payload,
+            )
+
+            if name == "claim_list":
+                return claim_list_payload(
+                    self.app,
+                    kind=args.get("kind"),
+                    status=args.get("status"),
+                    limit=args.get("limit", 100),
+                    include_superseded=bool(args.get("include_superseded", False)),
+                )
+            if name == "claim_search":
+                return claim_search_payload(
+                    self.app,
+                    query=str(args.get("query") or ""),
+                    kind=args.get("kind"),
+                    k=args.get("k", 8),
+                )
+            if name == "claim_delete":
+                return claim_delete_payload(
+                    self.app,
+                    claim_id=str(args.get("claim_id") or ""),
+                    reason=str(args.get("reason") or "user"),
+                )
+            if name == "claim_prep":
+                return claim_prep_payload(
+                    self.app,
+                    day_key=args.get("day_key"),
+                    max_source_chars=args.get("max_source_chars"),
+                )
+            if name == "claim_apply":
+                return claim_apply_payload(
+                    self.app,
+                    day_key=args.get("day_key"),
+                    payload=args.get("payload"),
+                )
         raise PmemError(f"tool not dispatched: {name}", code="E_INTERNAL")
 
     def soul(self, args: dict[str, Any]) -> dict[str, Any]:

@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 import time
 from pathlib import Path
@@ -42,6 +43,34 @@ def _age_days(item: dict[str, Any]) -> int | None:
     except (TypeError, ValueError):
         return None
     return (now().astimezone().date() - then).days
+
+
+_ASSERTION_PATTERNS = (
+    r"\d{4}[-/年]\d{1,3}(?:[-/月]\d{1,2})?",
+    r"\d{1,2}\s*月\s*\d{1,2}",
+    r"(?:上|本|下)(?:个)?(?:周|星期)[一二三四五六日天]",
+    r"(?:昨|前|明|后)天",
+    r"\d+\s*(?:天|周|个月|年)前",
+)
+
+
+def _verifiable_assertions(text: str) -> int:
+    """答案里有几条「可核验断言」：日期 / 月日 / 相对时间 / 独立的两位以上数字。
+
+    为什么数这个而不是看检索覆盖度：2026-11-07 全量 A/B 证明覆盖度门控方向反了
+    （低覆盖题没有证据可收，自检只会删 required；高覆盖题才是它收「无据细节」的地方）。
+    自检真正该跑的是「答案里塞了很多具体断言」的题——断言越多，越可能有无据的。
+    日期先整体算一条，再从剩余文本里数独立数字，避免同一天被数字规则重复计数。
+    """
+    rest = str(text or "")
+    total = 0
+    for pattern in _ASSERTION_PATTERNS:
+        found = re.findall(pattern, rest)
+        total += len(found)
+        for piece in found:
+            rest = rest.replace(piece, " ", 1)
+    total += len(re.findall(r"(?<!\d)\d{2,}(?!\d)", rest))
+    return total
 
 
 def _occurred_label(item: dict[str, Any]) -> str:
@@ -232,7 +261,15 @@ class PMem:
             run_model = None
             model_note = ""
             model_name = str(self.config.get("selfcheck.model", "") or "").strip()
-            if model_name:
+            gate_on = bool(self.config.get("selfcheck.on_demand.enabled", False))
+            density = _verifiable_assertions(str(answer))
+            if model_name and gate_on and density < int(
+                self.config.get("selfcheck.on_demand.min_assertions", 2) or 2
+            ):
+                # 按需自检（2026-11-07 版）：门控信号是**答案里的可核验断言密度**，不是检索覆盖度。
+                # 覆盖度门控已实测方向反了（低覆盖题没有证据可收，自检只会删 required）。
+                model_note = f"按需自检：可核验断言 {density} 条，低于门槛，跳过模型复核"
+            elif model_name:
                 try:
                     from ..bench.model import OpenAICompatModel
 
@@ -252,6 +289,137 @@ class PMem:
                 data["note"] = f"{note}；{model_note}" if note else model_note
             data["report"] = selfcheck_mod.format_report(data)
             return self._ok(data, started)
+        except PmemError as exc:
+            return self._fail(exc, started)
+
+    def verify_answer(
+        self,
+        answer: str,
+        items: list[dict[str, Any]] | dict[str, Any] | None = None,
+        *,
+        query: str = "",
+    ) -> dict[str, Any]:
+        """答案保真减法（P0-A，0.40.0，默认关）：答案里有没有上下文没支撑的有型断言。
+
+        和 ``selfcheck`` 分工不同：selfcheck 是作答**前**的核对报告（查整库出处）；
+        这里是作答**后**的保真减法（以本次注入 items 为上下文，claim 级 + risk + 最小修法）。
+        ``answer.verify.enabled=false``（默认）时直接返回 ``{"enabled": false}``，不碰任何路径。
+        """
+        started = time.perf_counter()
+        try:
+            from ..memory import answer_verify as verify_mod
+
+            data = verify_mod.verify_answer(self.store, answer, items=items, query=query)
+            if data.get("enabled") and not str(answer or "").strip():
+                raise ValidationError("answer 不能为空", field="answer")
+            if data.get("enabled"):
+                data["report"] = verify_mod.format_report(data)
+            return self._ok(data, started)
+        except PmemError as exc:
+            return self._fail(exc, started)
+
+    def render(
+        self,
+        items: list[dict[str, Any]] | None = None,
+        *,
+        query: str | None = None,
+        k: int | None = None,
+        title: str = "相关记忆",
+        budget: int | None = None,
+    ) -> dict[str, Any]:
+        """统一渲染（P0-2）：召回（或给定 items）→ 唯一一份「证据块」文本。
+
+        为什么要有它：产品宿主（deploy JS）、CLI、MCP、bench 各自拼一份证据块，格式不同，
+        所以产品侧改动（相对日期 / 卡片 / 契约）永远测不到。这里收成一个入口，由配置决定
+        ``relative_dates`` / ``cards`` / ``contract``；宿主只负责把 text 塞进 prompt。
+        全部开关默认关；关时输出与 0.38.0 的 ``render_context`` 逐字一致。
+        """
+        started = time.perf_counter()
+        try:
+            if items is None:
+                if not str(query or "").strip():
+                    raise ValidationError("query 或 items 至少给一个", field="query")
+                k = int(k if k is not None else (self.config.get("retrieval.top_k", 8) or 8))
+                b = int(self.config.get("retrieval.token_budget", 600) or 600)
+                found = self.store.search(str(query), k=k, budget=b)
+                items = list(found.get("items") or [])
+            items = list(items or [])
+            for item in items:
+                age = _age_days(item)
+                if age is not None and age >= 0:
+                    item["age_days"] = age
+            rel = bool(self.config.get("retrieval.time_router.relative_dates", False))
+            use_cards = bool(self.config.get("gate.render.cards", False))
+            want_contract = bool(self.config.get("answer.contract.enabled", False)) or bool(
+                self.config.get("answer.answerability.enabled", False)
+            )
+            cards = None
+            contract = None
+            if use_cards or want_contract:
+                try:
+                    from ..memory import contract as contract_mod
+
+                    built = contract_mod.build(
+                        str(query or ""),
+                        items,
+                        answerability_enabled=bool(
+                            self.config.get("answer.answerability.enabled", False)
+                        ),
+                    )
+                except Exception:  # noqa: BLE001 契约层没就位/写坏了都不该挡住渲染
+                    built = {}
+                raw_cards = built.get("cards") or []
+                if use_cards and raw_cards:
+                    by_id = {str(it.get("id")): it for it in items}
+                    cards = [{**by_id.get(str(c.get("id")), {}), **c} for c in raw_cards]
+                if want_contract:
+                    contract = built.get("contract")
+            text = self.render_context(
+                items,
+                title=title,
+                budget=int(
+                    budget
+                    if budget is not None
+                    else (self.config.get("retrieval.token_budget", 600) or 600)
+                ),
+                relative_dates=rel,
+                cards=cards,
+                contract=contract,
+            )
+            return self._ok(
+                {
+                    "text": text,
+                    "items": items,
+                    "cards": cards,
+                    "contract": contract,
+                    "relative_dates": rel,
+                },
+                started,
+            )
+        except PmemError as exc:
+            return self._fail(exc, started)
+
+    def answer_plan(
+        self,
+        question: str,
+        *,
+        when: str | None = None,
+        evidences: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        """作答计划（0.37.0）：把「这题该怎么答」算成结构化字段，再渲染成一段。
+
+        回答方的纪律（只答被问的 / 不补没依据的细节 / 日期要有依据 / 有依据就肯定说）
+        放在 ``answer.plan.*`` 配置里，不是写在散文 prompt 里——这样能单独开关、
+        能被 CLI / MCP / 宿主共用同一个渲染器。
+        """
+        started = time.perf_counter()
+        try:
+            from ..memory import answerplan as plan_mod
+
+            plan = plan_mod.build_plan(self.store, question, when=when, evidences=evidences)
+            plan["render"] = plan_mod.render(plan)
+            plan["summary"] = plan_mod.summarize(plan)
+            return self._ok(plan, started)
         except PmemError as exc:
             return self._fail(exc, started)
 
@@ -472,6 +640,7 @@ class PMem:
                 max_items=self.config.get("surface.max_items", 6),
                 due_days=self.config.get("surface.due_days", 30),
                 snippet_chars=self.config.get("surface.snippet_chars", 40),
+                config=self.config,
             )
             return self._ok(data, started)
         except PmemError as exc:
@@ -778,9 +947,14 @@ class PMem:
         started = time.perf_counter()
         from ..memory import lifecycle
 
-        return self._ok(
-            lifecycle.tick(self.db, subject=self.subject, dry_run=dry_run), started
-        )
+        data = lifecycle.tick(self.db, subject=self.subject, dry_run=dry_run)
+        # 显式调用不受 ``lifecycle.enabled`` 限制（用户主动要跑），只加一行说明。
+        if not bool(self.config.get("lifecycle.enabled", False)):
+            data = dict(data)
+            data["note"] = (
+                "自动淡忘当前关闭（lifecycle.enabled=false）；本次为显式调用，不受开关限制"
+            )
+        return self._ok(data, started)
 
     # -- PMem Sleep（M4） --------------------------------------------------
     def sleep(
@@ -1599,15 +1773,32 @@ class PMem:
     # -- 注入渲染（04 §6） --------------------------------------------------
     @staticmethod
     def render_context(
-        items: list[dict[str, Any]], *, title: str = "相关记忆", budget: int = 600
+        items: list[dict[str, Any]],
+        *,
+        title: str = "相关记忆",
+        budget: int = 600,
+        relative_dates: bool = False,
+        cards: list[dict[str, Any]] | None = None,
+        contract: dict[str, Any] | None = None,
     ) -> str:
         """把召回结果渲染成定界数据块。记忆是数据，不是指令。
 
         两道防线：
         1. 正文里的 ``<<<``/``>>>`` 被替换，防止记忆自己伪造结束定界符；
         2. 按 token 预算从尾部裁剪，单轮注入不超过 ``budget``（默认 600）。
+
+        ``relative_dates``（G3，默认关）：条目里的「上周五 / 下周三 / 三天前」按
+        **这条记忆自己的日期**换算成绝对日期附在条目后，模型不需要自己算。
+        开关在 ``retrieval.time_router.relative_dates``，由宿主读配置后传进来
+        （静态方法拿不到实例配置，保持纯函数便于单测）。
+
+        ``cards`` / ``contract``（P0-2 统一渲染器，默认 None）：给定 cards 时按卡片形态
+        （id · subject · type）渲染条目；给定 contract 时在数据块**外**追加一行确定性事实
+        （覆盖什么/可不可用/风险），**不写「你必须说不知道」这类指令**。两者都为 None 时，
+        输出与 0.38.0 逐字一致。
         """
         from ..memory.text import estimate_tokens
+        from ..memory.timeresolve import annotate as _time_annotate
 
         nl = chr(10)
 
@@ -1634,9 +1825,16 @@ class PMem:
                 ent_count[key] = ent_count.get(key, 0) + 1
         shared_ents = {name for name, count in ent_count.items() if count >= 2}
         body_lines: list[str] = []
-        for item in items:
+        card_mode = cards is not None
+        for item in (cards if card_mode else items):
             day = clean(_occurred_label(item))
             text = clean(item.get("text", ""))
+            if card_mode:
+                # 卡片形态：id/subject/type 由契约层给出，渲染器不做任何推断。
+                bits = [str(item[k]) for k in ("id", "subject", "type") if item.get(k)]
+                prefix = f"[{' · '.join(bits)}] " if bits else ""
+                body_lines.append(f"- {day} · {prefix}{text}" if day else f"- {prefix}{text}")
+                continue
             tag = "（推测）" if item.get("provenance") in {"inferred", "unconfirmed"} else ""
             if item.get("status") == "candidate":
                 tag += "（候选·还没确认）"
@@ -1653,14 +1851,37 @@ class PMem:
             if ents:
                 meta.append("涉及：" + "、".join(ents))
             prefix = f"[{' · '.join(meta)}] " if meta else ""
-            body_lines.append(f"- {day} · {prefix}{tag}{text}")
+            hint = ""
+            if relative_dates:
+                hint = _time_annotate(
+                    str(item.get("text") or ""),
+                    str(item.get("valid_from") or item.get("day") or ""),
+                )
+            body_lines.append(f"- {day} · {prefix}{tag}{text}{hint}")
+
+        footer = ""
+        if contract:
+            parts: list[str] = []
+            if contract.get("kind"):
+                parts.append(f"类型={contract['kind']}")
+            if contract.get("must_cover"):
+                parts.append("需覆盖=" + "、".join(str(x) for x in contract["must_cover"]))
+            if contract.get("answerability"):
+                parts.append(f"可用性={contract['answerability']}")
+            if contract.get("risk") is not None:
+                try:
+                    parts.append(f"风险={float(contract['risk']):.2f}")
+                except (TypeError, ValueError):
+                    pass
+            if parts:
+                footer = nl + "本次召回：" + "；".join(parts)
 
         while body_lines:
-            text = head + nl.join(body_lines) + nl + tail
+            text = head + nl.join(body_lines) + nl + tail + footer
             if estimate_tokens(text) <= budget:
                 return text
             body_lines.pop()
-        return head + tail
+        return head + tail + footer
 
 
 def pmem_export_time() -> str:

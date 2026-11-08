@@ -24,6 +24,7 @@ from ..base.config import (
     write_config_file,
 )
 from ..base.db import Database
+from ..base.errors import PmemError
 from ..memory.store import DEFAULT_SCOPE
 from .sdk import PMem
 
@@ -184,6 +185,8 @@ def _print_human(data: dict[str, Any]) -> None:
         print(f"— 生命周期：移动 {data['moved']} 条  {data['by_status'] or ''}")
         if data.get("by_dormant_grade"):
             print(f"  按等级休眠：{data['by_dormant_grade']}")
+        if data.get("note"):
+            print(f"  说明：{data['note']}")
         return
     if "groups_by_depth" in data:  # group stats
         print(f"— 分组 {data['groups']} 个  成员关系 {data['memberships']} 条")
@@ -339,6 +342,231 @@ def _cmd_config(args: argparse.Namespace) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------
+# 断言层（claim，0.41.0，默认关）对外接口。
+#
+# CLI 的 ``pmem claim ...`` 与 MCP 的 ``claim_*`` 工具**共用这一份实现**（MCP 侧只做
+# 参数转接，不复制业务逻辑）。内核在 ``pmem.memory.claim`` / ``pmem.memory.claim_extract``；
+# 这里只负责：目标日归一、limit/k 夹取、统一 ``{ok, data}`` 信封。
+# 关闸（``claim.enabled=false``）时 prep/apply/rule 由内核直接返回 enabled=false，
+# 不读材料、不写任何表；list/search/delete 仍可显式调用（用户主动要看/删）。
+# ---------------------------------------------------------------------------
+_CLAIM_LIMIT_DEFAULT = 100
+_CLAIM_LIMIT_MAX = 500
+_CLAIM_K_DEFAULT = 8
+_CLAIM_K_MAX = 50
+_CLAIM_SOURCE_MAX = 200000
+
+
+def _claim_bounded(value: Any, default: int, low: int, high: int) -> int:
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(low, min(high, number))
+
+
+def _claim_day(day_key: str | None) -> str:
+    """抽取目标日：显式给就用，否则默认「昨天」（和睡眠/鲸眠同一口径）。"""
+    text = str(day_key or "").strip()
+    if text:
+        return text[:10]
+    from datetime import timedelta
+
+    from ..base import clock
+
+    return clock.day_key(clock.now() - timedelta(days=1))
+
+
+def claim_enabled(app: PMem) -> bool:
+    """claim 主开关（默认关）。"""
+    try:
+        return bool(app.config.get("claim.enabled", False))
+    except Exception:  # noqa: BLE001 坏 config 一律当关
+        return False
+
+
+def claim_list_payload(
+    app: PMem,
+    *,
+    kind: str | None = None,
+    status: str | None = None,
+    limit: Any = _CLAIM_LIMIT_DEFAULT,
+    include_superseded: bool = False,
+) -> dict[str, Any]:
+    from ..memory import claim as claim_mod
+
+    rows = claim_mod.list_claims(
+        app.db,
+        subject_id=getattr(app, "subject", None),
+        kind=(str(kind).strip() or None) if kind else None,
+        status=(str(status).strip() or None) if status else None,
+        include_superseded=bool(include_superseded),
+        limit=_claim_bounded(limit, _CLAIM_LIMIT_DEFAULT, 1, _CLAIM_LIMIT_MAX),
+    )
+    return {
+        "ok": True,
+        "data": {"items": rows, "total": len(rows), "enabled": claim_enabled(app)},
+    }
+
+
+def claim_search_payload(
+    app: PMem,
+    *,
+    query: str,
+    kind: str | None = None,
+    k: Any = _CLAIM_K_DEFAULT,
+) -> dict[str, Any]:
+    from ..memory import claim as claim_mod
+
+    text = str(query or "").strip()
+    if not text:
+        return {
+            "ok": False,
+            "error": {"code": "E_VALIDATION", "message": "query 不能为空", "field": "query"},
+        }
+    rows = claim_mod.search(
+        app.db,
+        text,
+        subject_id=getattr(app, "subject", None),
+        kind=(str(kind).strip() or None) if kind else None,
+        k=_claim_bounded(k, _CLAIM_K_DEFAULT, 1, _CLAIM_K_MAX),
+    )
+    return {
+        "ok": True,
+        "data": {"query": text, "items": rows, "total": len(rows), "enabled": claim_enabled(app)},
+    }
+
+
+def claim_delete_payload(
+    app: PMem, *, claim_id: str, reason: str = "user"
+) -> dict[str, Any]:
+    from ..memory import claim as claim_mod
+
+    target = str(claim_id or "").strip()
+    if not target:
+        return {
+            "ok": False,
+            "error": {"code": "E_VALIDATION", "message": "claim_id 不能为空", "field": "claim_id"},
+        }
+    try:
+        data = claim_mod.soft_delete(app.db, target, reason=str(reason or "user"))
+    except PmemError as exc:
+        return {"ok": False, "error": exc.to_dict()}
+    return {"ok": True, "data": data}
+
+
+def claim_prep_payload(
+    app: PMem, *, day_key: str | None = None, max_source_chars: Any = None
+) -> dict[str, Any]:
+    from ..memory import claim_extract
+
+    data = claim_extract.prep(
+        app.db,
+        subject=getattr(app, "subject", "self") or "self",
+        day_key=_claim_day(day_key),
+        config=app.config,
+        max_source_chars=(
+            None
+            if max_source_chars is None
+            else _claim_bounded(max_source_chars, 0, 0, _CLAIM_SOURCE_MAX)
+        ),
+    )
+    return {"ok": True, "data": data}
+
+
+def claim_apply_payload(
+    app: PMem, *, day_key: str | None = None, payload: Any = None
+) -> dict[str, Any]:
+    from ..memory import claim_extract
+
+    if payload is None:
+        return {
+            "ok": False,
+            "error": {
+                "code": "E_VALIDATION",
+                "message": "payload 不能为空（{\"claims\": [...]} 或 claims 数组）",
+                "field": "payload",
+            },
+        }
+    try:
+        data = claim_extract.apply(
+            app.db,
+            subject=getattr(app, "subject", "self") or "self",
+            day_key=_claim_day(day_key),
+            payload=payload,
+            config=app.config,
+        )
+    except PmemError as exc:
+        return {"ok": False, "error": exc.to_dict()}
+    return {"ok": True, "data": data}
+
+
+def claim_rule_payload(app: PMem, *, day_key: str | None = None) -> dict[str, Any]:
+    from ..memory import claim_extract
+
+    data = claim_extract.rule_extract(
+        app.db,
+        subject=getattr(app, "subject", "self") or "self",
+        day_key=_claim_day(day_key),
+        config=app.config,
+    )
+    return {"ok": True, "data": data}
+
+
+def _print_claim(data: dict[str, Any], action: str) -> None:
+    """``pmem claim ...`` 的人读输出（--json 时走 _emit，不走这里）。"""
+    if action in ("list", "search"):
+        items = data.get("items") or []
+        head = f"搜索「{data.get('query')}」" if action == "search" else "列表"
+        state = "开" if data.get("enabled") else "关"
+        print(f"— 断言{head}：{len(items)} 条（claim.enabled={state}）")
+        for item in items:
+            polarity = "¬" if int(item.get("polarity") or 0) == 0 else ""
+            subject = item.get("subject_id") or "self"
+            confidence = float(item.get("confidence") or 0)
+            print(
+                f"  · [{str(item.get('id') or '')[:8]}] {item.get('kind')} · {subject} "
+                f"{polarity}{item.get('predicate')} {item.get('object')}"
+                f"  ({item.get('status')}, {confidence:.2f})"
+            )
+            quote = str(item.get("evidence_quote") or "").strip()
+            if quote:
+                print(f"      原话：{quote[:80]}")
+        if not items and not data.get("enabled"):
+            print("  （claim.enabled=false：断言层没有数据；先开主开关再做抽取）")
+        return
+    if action == "delete":
+        print(f"✓ 已软删断言 {data.get('claim_id')}（只改 status，事件链留墓碑）")
+        return
+    if action == "prep":
+        if data.get("enabled") is False:
+            print(f"— {data.get('note') or 'claim.enabled=false，跳过抽取'}")
+            return
+        material = data.get("material") or []
+        print(
+            f"— 任务书已就绪（{data.get('day_key')} · 原话 {len(material)} 行 / "
+            f"{data.get('source_chars', 0)} 字）"
+        )
+        print(data.get("task") or "")
+        return
+    if action in ("apply", "rule"):
+        if data.get("enabled") is False:
+            print(f"— {data.get('note') or 'claim.enabled=false，不入库'}")
+            return
+        print(
+            f"✓ 断言入库：扫描 {data.get('scanned', 0)} / 保留 {data.get('kept', 0)} / "
+            f"新增 {data.get('inserted', 0)} / 合并 {data.get('merged', 0)} / "
+            f"更新 {data.get('updated', 0)} / 版本 {data.get('versioned', 0)} / "
+            f"丢弃 {data.get('dropped', 0)}"
+        )
+        reasons = data.get("reasons") or {}
+        if reasons:
+            print(f"  丢弃原因：{reasons}")
+        return
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+
+
 def main(argv: list[str] | None = None) -> int:
     # Windows 控制台默认 GBK，✓/✗ 会直接炸；只改编码，不改行为
     for stream_name in ("stdout", "stderr"):
@@ -419,6 +647,58 @@ def main(argv: list[str] | None = None) -> int:
     p_self = sub.add_parser("selfcheck", help="作答后自检：草稿回答里的日期/专名有没有记忆出处")
     p_self.add_argument("answer", nargs="?", default=None, help="草稿回答；不传则从 stdin 读")
     p_self.add_argument("--question", default=None, help="原问题（可选，只记录）")
+
+    # 答案保真减法（P0-A / 0.40.0，默认关）：以本次注入的 items 为上下文，逐 claim 指出
+    # 「有型且无支撑」的断言，给 risk + 最小修法（flag/hint/strip，默认 flag）。
+    p_verify = sub.add_parser("verify", help="答案保真检查：答案里有没有上下文没支撑的有型断言")
+    p_verify.add_argument("answer", nargs="?", default=None, help="待检答案；不传则从 stdin 读")
+    p_verify.add_argument("--query", default="", help="原问题（可选，只记录）")
+    p_verify.add_argument("--items", default=None, help="这次注入的 items JSON 文件（对象数组）")
+
+    # 作答计划（0.37.0）：回答之前问一句「这题该怎么答」，拿回结构化计划 + 一段纪律文本。
+    p_plan = sub.add_parser("plan", help="作答计划：纪律字段化（只答被问的 / 不补没依据的细节）")
+    p_plan.add_argument("question", nargs="?", default=None, help="用户问话；不传则从 stdin 读")
+    p_plan.add_argument("--when", default=None, help="逻辑时间（ISO-8601），换算「今天」的基准")
+    p_plan.add_argument("--from-search", action="store_true",
+                        help="先拿这句问话检索一次，把结果当证据卡喂进计划（不额外花钱）")
+
+    # 统一渲染（P0-2）：召回（或给定 items）→ 产品唯一的「证据块」文本，宿主/CLI/MCP 共用。
+    p_render = sub.add_parser("render", help="统一渲染：召回结果 → 证据块文本")
+    p_render.add_argument("query", nargs="?", default=None, help="问话；不传则用 --items 的 JSON 文件")
+    p_render.add_argument("--items", default=None, help="items JSON 文件（对象数组）")
+    p_render.add_argument("--k", type=int, default=None, help="先检索时返回几条；默认读 [retrieval].top_k")
+    p_render.add_argument("--title", default="相关记忆")
+    p_render.add_argument("--budget", type=int, default=None)
+
+    # 断言层（claim，0.41.0，默认关）：列表 / 搜索 / 删除 / 抽取（prep/apply/rule）。
+    # 业务实现与 MCP 的 claim_* 工具共用（见本文件 claim_*_payload）。
+    p_claim = sub.add_parser("claim", help="断言层：list / search / delete / extract（默认关）")
+    claim_sub = p_claim.add_subparsers(dest="claim_action", required=True)
+    p_cl = claim_sub.add_parser("list", help="列出断言（默认不含已改口/已删除）")
+    p_cl.add_argument("--kind", default=None)
+    p_cl.add_argument("--status", default=None)
+    p_cl.add_argument("--limit", type=int, default=_CLAIM_LIMIT_DEFAULT)
+    p_cl.add_argument("--include-superseded", action="store_true")
+    p_cs = claim_sub.add_parser("search", help="确定性检索断言（不做 FTS）")
+    p_cs.add_argument("query")
+    p_cs.add_argument("--kind", default=None)
+    p_cs.add_argument("--k", type=int, default=_CLAIM_K_DEFAULT)
+    p_cd = claim_sub.add_parser("delete", help="软删一条断言（只改 status，留墓碑）")
+    p_cd.add_argument("claim_id")
+    p_cd.add_argument("--reason", default="user")
+    p_ce = claim_sub.add_parser(
+        "extract", help="抽取断言：--prep 出任务书 / --apply 入库 / --rule 规则降级"
+    )
+    p_ce.add_argument("--day", default=None, help="哪一天（YYYY-MM-DD，默认昨天）")
+    p_ce.add_argument("--prep", action="store_true", help="输出宿主任务书 + 当天原话材料（默认）")
+    p_ce.add_argument(
+        "--apply", dest="apply_file", default=None, metavar="JSON",
+        help="宿主产出的 {claims:[...]} JSON 文件；校验后入库",
+    )
+    p_ce.add_argument("--rule", action="store_true", help="无宿主时的确定性规则降级抽取")
+    p_ce.add_argument(
+        "--max-source-chars", type=int, default=None, help="只取最近 N 字符原话（0=全读）"
+    )
 
     p_trace = sub.add_parser("trace", help="按字查原话（一字不差）：会话 / 行号 / 角色")
     p_trace.add_argument("query")
@@ -2433,6 +2713,103 @@ def main(argv: list[str] | None = None) -> int:
                 return _emit(result, args.json)
             data = result.get("data") or {}
             print(data.get("report") or "")
+            return 0
+        if args.cmd == "verify":
+            answer = args.answer
+            if answer is None:
+                answer = sys.stdin.read()
+            items = None
+            if args.items:
+                items = json.loads(Path(args.items).read_text(encoding="utf-8"))
+            result = app.verify_answer(answer, items=items, query=args.query)
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            data = result.get("data") or {}
+            print(data.get("report") or "")
+            return 0
+        if args.cmd == "render":
+            items = None
+            if getattr(args, "items", None):
+                import json as _json
+
+                raw = Path(args.items).read_text(encoding="utf-8")
+                loaded = _json.loads(raw)
+                if not isinstance(loaded, list):
+                    raise SystemExit("--items 需要 JSON 数组")
+                items = loaded
+            result = app.render(
+                items=items, query=args.query, k=args.k, title=args.title, budget=args.budget
+            )
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            print((result.get("data") or {}).get("text") or "")
+            return 0
+        if args.cmd == "claim":
+            action = str(args.claim_action)
+            if action == "list":
+                result = claim_list_payload(
+                    app,
+                    kind=args.kind,
+                    status=args.status,
+                    limit=args.limit,
+                    include_superseded=args.include_superseded,
+                )
+            elif action == "search":
+                result = claim_search_payload(
+                    app, query=args.query, kind=args.kind, k=args.k
+                )
+            elif action == "delete":
+                result = claim_delete_payload(
+                    app, claim_id=args.claim_id, reason=args.reason
+                )
+            else:  # extract
+                if args.apply_file and args.rule:
+                    parser.error("--apply 与 --rule 只能选一个")
+                if args.apply_file:
+                    try:
+                        payload = json.loads(
+                            Path(args.apply_file).read_text(encoding="utf-8")
+                        )
+                    except (OSError, ValueError) as exc:
+                        return _emit(
+                            {
+                                "ok": False,
+                                "error": {
+                                    "code": "E_VALIDATION",
+                                    "message": f"--apply 读不了 JSON：{exc}",
+                                    "field": "apply",
+                                },
+                            },
+                            args.json,
+                        )
+                    result = claim_apply_payload(
+                        app, day_key=args.day, payload=payload
+                    )
+                elif args.rule:
+                    result = claim_rule_payload(app, day_key=args.day)
+                else:
+                    result = claim_prep_payload(
+                        app, day_key=args.day, max_source_chars=args.max_source_chars
+                    )
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            _print_claim(result.get("data") or {}, action)
+            return 0
+        if args.cmd == "plan":
+            question = args.question
+            if question is None:
+                question = sys.stdin.read()
+            evidences = None
+            if args.from_search:
+                found = app.search(question, client="cli")
+                evidences = ((found.get("data") or {}).get("items") or []) if found.get("ok") else []
+            result = app.answer_plan(question, when=args.when, evidences=evidences)
+            if args.json or not result.get("ok"):
+                return _emit(result, args.json)
+            data = result.get("data") or {}
+            print(data.get("render") or "")
+            print()
+            print(data.get("summary") or "")
             return 0
         if args.cmd == "trace":
             result = app.trace(

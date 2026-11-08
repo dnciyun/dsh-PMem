@@ -109,6 +109,26 @@ class SearchContractCase(unittest.TestCase):
         self.assertTrue(loose, "大预算下应该能召回长文本记忆")
         self.assertLess(len(tight), len(loose), "小预算没有裁掉任何候选")
 
+    def test_mmr_pool_never_caps_below_requested_k(self) -> None:
+        """召回契约：mmr_pool 是 MMR 前的性能保护，不得把调用方请求的 k 静默截小。
+
+        2026-11-07 长文档记忆实测：默认 mmr_pool=16 时 k=50 只回 18 条，
+        候选池被截到 16 条（gold 召回被这一刀压掉约 1/3）。契约修复后
+        pool_cap=max(mmr_pool, k)：k=40 必须能拿到 ≥40 条（预算足够时），
+        而 k≤mmr_pool 的默认路径行为不变（由其余用例锁定）。
+        """
+        for index in range(60):
+            self.app.add(f"项目杂项 {index}：整理资料")
+        payload = self.app.search("项目杂项 资料", k=40, budget=30000, record=False)
+        self.assertTrue(payload["ok"], payload)
+        data = payload["data"]
+        self.assertGreaterEqual(len(data["items"]), 40,
+                                "请求 k=40 只回了 %d 条：mmr_pool 又把候选池截小了" % len(data["items"]))
+        info = (data.get("meta") or {}).get("retrieval") or {}
+        self.assertGreaterEqual(info.get("pool_cap", 0), 40)
+        self.assertEqual(info.get("k"), 40)
+        self.assertGreaterEqual(int(info.get("candidates") or 0), 40)
+
 
 if __name__ == "__main__":  # pragma: no cover - 方便单独调试
     unittest.main()

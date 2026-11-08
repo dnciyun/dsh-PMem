@@ -168,5 +168,100 @@ class CleanAnswerTest(SelfcheckCase):
         self.assertIn("11月8日", data["report"])
 
 
+class DateEvidenceToleranceTest(SelfcheckCase):
+    """task-36：中文数字日期与相对日期推导，不能让自检报「没依据」。"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.store.add(
+            "邻居小禾说她家孩子生日是十二月二号，想请几个小朋友来家里画画",
+            session_id="s1",
+            created_at="2026-06-01T10:00:00+00:00",
+        )
+        self.store.add(
+            "冷藏奶油要周五下午送来，收货后先放冰箱",
+            session_id="s1",
+            created_at="2026-06-30T10:00:00+00:00",
+        )
+
+    def test_cn_number_date_is_not_reported(self) -> None:
+        clock.set_now(datetime(2026, 6, 1, 12, 0, tzinfo=UTC))
+        result = check_answer(self.store, "日期是 12月2号。")
+        self.assertTrue(result["clean"], result)
+
+    def test_derived_relative_date_is_not_reported(self) -> None:
+        clock.set_now(datetime(2026, 7, 1, 12, 0, tzinfo=UTC))
+        result = check_answer(self.store, "周五（7月3日）下午送到。")
+        self.assertTrue(result["clean"], result)
+
+    def test_truly_fabricated_date_still_reported(self) -> None:
+        clock.set_now(datetime(2026, 7, 1, 12, 0, tzinfo=UTC))
+        result = check_answer(self.store, "你 9月9日去看了房子。")
+        self.assertFalse(result["clean"], result)
+        self.assertEqual(self._kinds(result), ["date"])
+
+
+if __name__ == "__main__":  # pragma: no cover - 方便单独调试
+    unittest.main()
+
+class NameExtractorBoundaryTest(unittest.TestCase):
+    """专名抽取器边界证据（task-34）：改的是公共抽取器，产品自检也吃到收益。"""
+
+    def test_word_fragments_are_not_candidates(self) -> None:
+        from pmem.memory.selfcheck import _name_candidates
+
+        for text, bad in (
+            ("别塞进行李箱，晕车药提前吃。", "李箱"),
+            ("米米周三要值日，得晚点接。", "周三米"),
+            ("是一张旧地图，上面画着一只蓝色小船。", "张旧"),
+        ):
+            names = _name_candidates(text, spans=[], limit=20)
+            self.assertNotIn(bad, names, f"{text} 里切出了词片段 {bad}")
+
+    def test_real_names_are_kept(self) -> None:
+        from pmem.memory.selfcheck import _name_candidates
+
+        for text, good in (
+            ("你上周和李婷去看了房子。", "李婷"),
+            ("赵铁柱当时也在。", "赵铁柱"),
+            ("提到林潇跟你说过什么。", "林潇"),
+        ):
+            self.assertIn(good, _name_candidates(text, spans=[], limit=20), text)
+
+
+
+class DateEvidenceToleranceTest(SelfcheckCase):
+    """task-36：中文数字日期与相对日期推导，不能让自检报「没依据」。"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.store.add(
+            "邻居小禾说她家孩子生日是十二月二号，想请几个小朋友来家里画画",
+            session_id="s1",
+            created_at="2026-06-01T10:00:00+00:00",
+        )
+        self.store.add(
+            "冷藏奶油要周五下午送来，收货后先放冰箱",
+            session_id="s1",
+            created_at="2026-06-30T10:00:00+00:00",
+        )
+
+    def test_cn_number_date_is_not_reported(self) -> None:
+        clock.set_now(datetime(2026, 6, 1, 12, 0, tzinfo=UTC))
+        result = check_answer(self.store, "日期是 12月2号。")
+        self.assertTrue(result["clean"], result)
+
+    def test_derived_relative_date_is_not_reported(self) -> None:
+        clock.set_now(datetime(2026, 7, 1, 12, 0, tzinfo=UTC))
+        result = check_answer(self.store, "周五（7月3日）下午送到。")
+        self.assertTrue(result["clean"], result)
+
+    def test_truly_fabricated_date_still_reported(self) -> None:
+        clock.set_now(datetime(2026, 7, 1, 12, 0, tzinfo=UTC))
+        result = check_answer(self.store, "你 9月9日去看了房子。")
+        self.assertFalse(result["clean"], result)
+        self.assertEqual(self._kinds(result), ["date"])
+
+
 if __name__ == "__main__":  # pragma: no cover - 方便单独调试
     unittest.main()

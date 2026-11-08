@@ -206,8 +206,19 @@ def s6_traits(ctx: SleepContext) -> dict[str, Any]:
 
 
 def s7_reflect(ctx: SleepContext) -> dict[str, Any]:
-    """生命周期（按等级淡忘）+ 七问反思。"""
-    tick = lifecycle.tick(ctx.db, subject=ctx.subject)
+    """生命周期（按等级淡忘）+ 七问反思。
+
+    自动淡忘受 ``lifecycle.enabled``（默认 False）控制：关时这里**不写任何状态**，
+    只在报告里标 ``lifecycle_skipped: True``；显式 ``memory_lifecycle`` 不受此键限制。
+    """
+    lifecycle_enabled = bool(ctx.config.get("lifecycle.enabled", False))
+    if lifecycle_enabled:
+        tick = lifecycle.tick(ctx.db, subject=ctx.subject)
+        lifecycle_moved = tick["moved"]
+        lifecycle_dry_run = tick["dry_run"]
+    else:
+        lifecycle_moved = 0
+        lifecycle_dry_run = False
     reflection_stats = reflection.write(
         ctx.db,
         subject=ctx.subject,
@@ -215,9 +226,9 @@ def s7_reflect(ctx: SleepContext) -> dict[str, Any]:
         run_id=ctx.run_id,
         due_days=int(ctx.config.get("surface.due_days", 30)),
     )
-    return {
-        "lifecycle_moved": tick["moved"],
-        "lifecycle_dry_run": tick["dry_run"],
+    result = {
+        "lifecycle_moved": lifecycle_moved,
+        "lifecycle_dry_run": lifecycle_dry_run,
         "reflection_id": reflection_stats["id"],
         "reflection_created": reflection_stats["created"],
         "conflicts_open": reflection_stats["metrics"]["conflicts_open"],
@@ -225,6 +236,10 @@ def s7_reflect(ctx: SleepContext) -> dict[str, Any]:
         "quality": reflection_stats.get("quality"),
         "defects": len(reflection_stats.get("defects") or []),
     }
+    if not lifecycle_enabled:
+        # 只在跳过的这一代加字段：打开时报告与 0.39.0 逐字节一致。
+        result["lifecycle_skipped"] = True
+    return result
 
 
 def s8_snapshot(ctx: SleepContext) -> dict[str, Any]:

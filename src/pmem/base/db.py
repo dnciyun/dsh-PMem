@@ -93,6 +93,7 @@ class Database:
         self._migrate_event_log_run(conn)
         for stmt in schema.DDL:
             conn.execute(stmt)
+        self._migrate_claim_columns(conn)
         # 老库补建 0.30.0 新增的索引：DDL 里已有 CREATE INDEX IF NOT EXISTS，
         # 这里再显式跑一遍（幂等），保证「先有表、后加索引」的旧库开一次就能补上。
         self._migrate_indexes(conn)
@@ -122,6 +123,29 @@ class Database:
                 "VALUES(?,?,?,?,?,?)",
                 (predicate, inverse, domain, range_, transitive, max_weight),
             )
+
+    def _migrate_claim_columns(self, conn: object) -> None:
+        """1.11.0：「断言层」在 memory 上加 claim_group 列（幂等）。
+
+        说明：任务书写的是 memory 加 kind/status/claim_group 三列，但 memory 从
+        1.0.0 起就有 kind（episodic/semantic/...）和 status（candidate/active/...），
+        再建同名列会冲突。所以这里只补真正缺的 ``claim_group``；kind/status 已存在，
+        检查到就跳过（旧库/新库都幂等）。
+        """
+        try:
+            cols = {row["name"] for row in conn.execute("PRAGMA table_info(memory)")}  # type: ignore[attr-defined]
+        except sqlite3.DatabaseError:
+            return
+        if not cols:
+            return
+        for column in ("kind", "status", "claim_group"):
+            if column in cols:
+                continue
+            try:
+                conn.execute(f"ALTER TABLE memory ADD COLUMN {column} TEXT")  # type: ignore[attr-defined]
+            except sqlite3.DatabaseError:
+                # 只读库/极旧库：迁移失败不能把库打不开；下次 init 再试。
+                return
 
     def _migrate_last_surfaced(self, conn: object) -> None:
         """1.4.0 → 1.5.0：记忆表补 ``last_surfaced_at``。

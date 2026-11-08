@@ -630,7 +630,7 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
         turns: config.handoffTurns,
         minMs: config.handoffMinMs,
       },
-      mcp: { serverName: 'pmem', tools: 27 },
+      mcp: { serverName: 'pmem', tools: 30 },
     }
   }
 
@@ -796,6 +796,22 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
       throw new Error(String(payload?.error?.message ?? payload?.error ?? `写入 ${key} 失败`))
     }
     return cfgValue(payload)
+  }
+
+  /** 从 callPmem 抛出的错里还原 CLI 的 JSON 错误信封（非 0 退出时 stdout 里还有数据）。 */
+  const cliErrorOf = error => {
+    const raw = String(error?.stdout ?? '').trim()
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw)
+        const detail = parsed?.error ?? {}
+        const message = typeof detail === 'string' ? detail : detail?.message
+        if (message) return { code: String(detail?.code ?? ''), message: String(message) }
+      } catch {
+        // stdout 不是 JSON：用原始错误
+      }
+    }
+    return { code: '', message: String(error?.message ?? error) }
   }
 
   /** HH:MM 规范化；非法返回 null。 */
@@ -996,8 +1012,242 @@ export function createWeb({ config, callPmem, version, runtimeFile, starmapBase,
     return json(res, 200, { ...snapshot, applied, warnings })
   })
 
+  // ---- 项目 scope（P3-17）：显式限定检索范围，不是自动分类 ---------------------
+  // 落到 PMem 配置 retrieval.scope.project.{enabled,name}；检索侧读这两个键做
+  // 分组（grp）路径前缀过滤。关（默认）/ 名称为空时，检索行为与 0.38.0 一致。
+  const PROJECT_NAME_MAX = 80
+  const projectScopeRead = async () => {
+    const [enabled, name] = await Promise.all([
+      cfgGet('retrieval.scope.project.enabled'),
+      cfgGet('retrieval.scope.project.name'),
+    ])
+    return { enabled: enabled === true, name: typeof name === 'string' ? name : '' }
+  }
+
+  route('exact', `${API}/project-scope`, async (req, res) => {
+    if (req.method === 'GET') {
+      try {
+        return json(res, 200, { ok: true, ...(await projectScopeRead()) })
+      } catch (error) {
+        return json(res, 500, {
+          ok: false,
+          enabled: false,
+          name: '',
+          error: String(error?.message ?? error),
+        })
+      }
+    }
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 GET / POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) body = {}
+    if (body.enabled === undefined && body.name === undefined) {
+      return json(res, 400, { ok: false, enabled: false, name: '', error: 'body 需要 enabled 或 name' })
+    }
+    if (body.enabled !== undefined && typeof body.enabled !== 'boolean') {
+      return json(res, 400, { ok: false, enabled: false, name: '', error: 'enabled 必须是布尔值' })
+    }
+    let name = null
+    if (body.name !== undefined) {
+      if (typeof body.name !== 'string') {
+        return json(res, 400, { ok: false, enabled: false, name: '', error: 'name 必须是字符串' })
+      }
+      name = body.name.trim()
+      if (name.length > PROJECT_NAME_MAX) {
+        return json(res, 400, {
+          ok: false,
+          enabled: false,
+          name: '',
+          error: `项目名称最多 ${PROJECT_NAME_MAX} 个字`,
+        })
+      }
+    }
+    try {
+      if (body.enabled !== undefined) await cfgSet('retrieval.scope.project.enabled', body.enabled)
+      if (name !== null) await cfgSet('retrieval.scope.project.name', name)
+      return json(res, 200, { ok: true, ...(await projectScopeRead()) })
+    } catch (error) {
+      return json(res, 500, {
+        ok: false,
+        enabled: false,
+        name: '',
+        error: String(error?.message ?? error),
+      })
+    }
+  })
+
+  // ---- 自动淡忘（0.40.0，默认关）：lifecycle.enabled -------------------------
+  // 关 = 记忆不会因为久不用而下沉/归档，召回池不随时间缩水；
+  // 开 = 按等级淡忘（S 永不、A 180 天、B 90 天、C 30 天、D 7 天，只降级不删除）。
+  // 显式 `pmem lifecycle` 命令不受这个开关限制（那是用户主动要跑一次）。
+  route('exact', `${API}/lifecycle`, async (req, res) => {
+    if (req.method === 'GET') {
+      try {
+        return json(res, 200, { ok: true, enabled: (await cfgGet('lifecycle.enabled')) === true })
+      } catch (error) {
+        // 读不到就当关：默认不忘，比误开淡忘安全。
+        return json(res, 500, { ok: false, enabled: false, error: String(error?.message ?? error) })
+      }
+    }
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 GET / POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body) || typeof body.enabled !== 'boolean') {
+      return json(res, 400, { ok: false, enabled: false, error: 'body 需要 { enabled: true | false }' })
+    }
+    try {
+      await cfgSet('lifecycle.enabled', body.enabled)
+      return json(res, 200, { ok: true, enabled: (await cfgGet('lifecycle.enabled')) === true })
+    } catch (error) {
+      return json(res, 500, { ok: false, enabled: false, error: String(error?.message ?? error) })
+    }
+  })
+
+  // ---- 断言层（claim，0.41.0，默认关）：记忆 → 断言层 最小页 -------------------
+  // 只读列表/搜索 + 软删误抽；编辑不做。数据一律走 CLI `claim ...`，插件不直接读库。
+  // 主开关 claim.enabled 不在这里开（它管抽取/检索接入），面板只显示状态。
+  const CLAIM_SWITCH_KEYS = {
+    index: 'claim.index.enabled',
+    version: 'claim.version.enabled',
+    boundaryCheck: 'answer.boundary_check.enabled',
+  }
+
+  const claimSwitchSnapshot = async () => {
+    const [index, version, boundaryCheck, master] = await Promise.all([
+      cfgGet(CLAIM_SWITCH_KEYS.index),
+      cfgGet(CLAIM_SWITCH_KEYS.version),
+      cfgGet(CLAIM_SWITCH_KEYS.boundaryCheck),
+      cfgGet('claim.enabled'),
+    ])
+    return {
+      enabled: index === true,
+      version: version === true,
+      boundary_check: boundaryCheck === true,
+      master: master === true,
+    }
+  }
+
+  route('exact', `${API}/claims`, async (req, res) => {
+    if (req.method !== 'GET') return json(res, 405, { ok: false, error: '只接受 GET' })
+    const url = new URL(req.url, 'http://localhost')
+    const query = String(url.searchParams.get('q') ?? '').trim().slice(0, 200)
+    const kind = String(url.searchParams.get('kind') ?? '').trim()
+    const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit')) || 50))
+    const argv = query
+      ? ['claim', 'search', query, '--k', String(Math.min(50, limit))]
+      : ['claim', 'list', '--limit', String(limit)]
+    if (kind) argv.push('--kind', kind)
+    try {
+      const payload = await callPmem(config, argv, { json: true, timeout: 15000 })
+      if (payload?.ok === false) {
+        const detail = payload?.error?.message ?? payload?.error ?? '读取断言失败'
+        return json(res, 500, { ok: false, error: String(detail) })
+      }
+      const data = payload?.data ?? {}
+      return json(res, 200, {
+        ok: true,
+        mode: query ? 'search' : 'list',
+        query,
+        items: Array.isArray(data.items) ? data.items : [],
+        total: Number(data.total) || 0,
+        enabled: data.enabled === true,
+      })
+    } catch (error) {
+      return json(res, 500, { ok: false, error: cliErrorOf(error).message })
+    }
+  })
+
+  route('exact', `${API}/claims/delete`, async (req, res) => {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, error: 'body 不是 JSON' })
+    }
+    const claimId = String(body?.claim_id ?? '').trim()
+    if (!claimId) return json(res, 400, { ok: false, error: 'body 需要 claim_id' })
+    const reason = String(body?.reason ?? 'user').slice(0, 200)
+    try {
+      const payload = await callPmem(config, ['claim', 'delete', claimId, '--reason', reason], {
+        json: true,
+        timeout: 15000,
+      })
+      if (payload?.ok === false) {
+        const detail = payload?.error?.message ?? payload?.error ?? '删除断言失败'
+        const code = String(payload?.error?.code ?? '')
+        return json(res, code === 'E_VALIDATION' ? 404 : 500, { ok: false, error: String(detail) })
+      }
+      return json(res, 200, { ok: true, ...(payload?.data ?? {}) })
+    } catch (error) {
+      const detail = cliErrorOf(error)
+      return json(res, detail.code === 'E_VALIDATION' ? 404 : 500, {
+        ok: false,
+        error: detail.message,
+      })
+    }
+  })
+
+  route('exact', `${API}/claim-settings`, async (req, res) => {
+    const empty = { ok: false, enabled: false, version: false, boundary_check: false, master: false }
+    if (req.method === 'GET') {
+      try {
+        return json(res, 200, { ok: true, ...(await claimSwitchSnapshot()) })
+      } catch (error) {
+        return json(res, 500, { ...empty, error: cliErrorOf(error).message })
+      }
+    }
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: '只接受 GET / POST' })
+    let body = {}
+    try {
+      const raw = await readBody(req)
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return json(res, 400, { ok: false, ...empty, error: 'body 不是 JSON' })
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) body = {}
+    // master（claim.enabled）从只读改成可写：用户不碰命令行就能开整层。
+    const fields = [
+      ['master', 'claim.enabled'],
+      ['enabled', CLAIM_SWITCH_KEYS.index],
+      ['version', CLAIM_SWITCH_KEYS.version],
+      ['boundary_check', CLAIM_SWITCH_KEYS.boundaryCheck],
+    ]
+    for (const [field] of fields) {
+      if (body[field] !== undefined && typeof body[field] !== 'boolean') {
+        return json(res, 400, { ok: false, ...empty, error: `${field} 必须是布尔值` })
+      }
+    }
+    if (!fields.some(([field]) => body[field] !== undefined)) {
+      return json(res, 400, {
+        ok: false,
+        ...empty,
+        error: 'body 需要 master / enabled / version / boundary_check 之一',
+      })
+    }
+    try {
+      for (const [field, key] of fields) {
+        if (body[field] !== undefined) await cfgSet(key, body[field])
+      }
+      return json(res, 200, { ok: true, ...(await claimSwitchSnapshot()) })
+    } catch (error) {
+      return json(res, 500, { ...empty, error: cliErrorOf(error).message })
+    }
+  })
+
   route('exact', `${API}/mcp`, async (req, res) => {
-    return json(res, 200, { ok: true, serverName: 'pmem', tools: 27, note: 'MCP 由官方 client 管理；这里是静态摘要' })
+    return json(res, 200, { ok: true, serverName: 'pmem', tools: 30, note: 'MCP 由官方 client 管理；这里是静态摘要（claim 打开时 35）' })
   })
 
   // ---- 星图 ----------------------------------------------------------------

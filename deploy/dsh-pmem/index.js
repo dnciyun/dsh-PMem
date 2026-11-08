@@ -183,7 +183,8 @@ function formatItems(payload) {
     lines.push(`- ⚠ 不确定：${why.join('，') || '这次召回把握不高'}。用之前先核对，别当成确定的事。`)
   }
   lines.push('<<<END_PMEM_RECALL>>>')
-  return lines.join('\\n')
+  // 真换行（不是字面 `\n`）：旧格式回退也要是逐行文本，否则模型/日志里看到的是一整行。
+  return lines.join('\n')
 }
 
 const SURFACE_TAG = {
@@ -443,6 +444,14 @@ export function handoffSummary(handoff) {
 
 export function apply(ctx, input = {}) {
   const config = settings(input)
+  // 只有测试会传：把「调 Python CLI」换成一个可断言的桩（和 openBrowser 同一类口子）。
+  const pmem = typeof input.callPmem === 'function' ? input.callPmem : callPmem
+  // 统一渲染器（P0-2）的开关读取缓存：默认 30s；测试传 renderCardsTtlMs: 0 时每次都读。
+  const renderCardsTtlMs = Number.isFinite(Number(input.renderCardsTtlMs))
+    ? Math.max(0, Math.trunc(Number(input.renderCardsTtlMs)))
+    : 30 * 1000
+  let renderCards = false
+  let renderCardsAt = 0
   let disposed = false
   let cardText = readCache()
   let liveText = readCache(LIVE_CACHE_FILE)
@@ -458,7 +467,7 @@ export function apply(ctx, input = {}) {
   // 设置页 / 星图：同一个 store，不建第二份配置。
   const web = createWeb({
     config,
-    callPmem,
+    callPmem: pmem,
     version: VERSION,
     runtimeFile: config.runtimeFile,
     starmapBase: join(config.cwd, 'data', 'starmap'),
@@ -474,12 +483,65 @@ export function apply(ctx, input = {}) {
     }
   }
 
+  // ---- 统一渲染器（P0-2）：gate.render.cards 打开时，召回文本改由 PMem.render 产出 ----
+  // 关（默认）：0.38.0 的本地格式（search + formatItems），输出逐字不变；
+  // 开：CLI `render` 返回的 data.text **原样**透传给模型，宿主不再二次加工；
+  // 读不到开关 / render 失败 / 老版本 PMem 没有 render 命令 → 回退旧本地渲染。
+  const configValueOf = payload => {
+    if (!payload || typeof payload !== 'object') return undefined
+    const fromData = payload.data?.value
+    return fromData === undefined ? payload.value : fromData
+  }
+
+  const renderCardsEnabled = async () => {
+    const at = Date.now()
+    if (renderCardsAt && at - renderCardsAt < renderCardsTtlMs) return renderCards
+    let enabled = false
+    try {
+      const payload = await pmem(config, ['config', 'get', 'gate.render.cards'], {
+        json: true,
+        timeout: 8000,
+      })
+      enabled = payload?.ok === false ? false : configValueOf(payload) === true
+    } catch {
+      // 老版本 PMem 没有 config 命令 / Python 不在：保持旧格式
+    }
+    renderCards = enabled
+    renderCardsAt = at
+    return enabled
+  }
+
+  /**
+   * 召回文本：新渲染器可用就原样返回它的 text，否则回退 0.38.0 的本地格式。
+   * 返回 { ok, text }：/pmem 命令分支要区分「检索失败」和「没有结果」。
+   */
+  const recallText = async (query, k) => {
+    const size = boundedInt(k, 5, 1, 20)
+    if (await renderCardsEnabled()) {
+      try {
+        const rendered = await pmem(config, ['render', query, '--k', String(size)], {
+          json: true,
+          timeout: 20000,
+        })
+        const text = rendered?.ok === false ? '' : rendered?.data?.text
+        if (typeof text === 'string' && text.trim()) return { ok: true, text }
+      } catch {
+        // 渲染失败（老版本 PMem / 入口异常）：下面回退旧 formatItems
+      }
+    }
+    const payload = await pmem(config, ['search', query, '--k', String(size)], { json: true })
+    return {
+      ok: payload.ok,
+      text: payload.ok ? formatItems(payload) : JSON.stringify(payload.error ?? payload),
+    }
+  }
+
   const refresh = async () => {
     if (disposed) return
     if (refreshing) return refreshing
     refreshing = (async () => {
       try {
-        const payload = await callPmem(
+        const payload = await pmem(
           config,
           ['wake', '--budget', String(config.budget)],
           { json: true, timeout: 20000 },
@@ -548,7 +610,7 @@ export function apply(ctx, input = {}) {
     state.writing = (async () => {
       try {
         const hash = createHash('sha1').update(text).digest('hex').slice(0, 12)
-        const payload = await callPmem(config, [
+        const payload = await pmem(config, [
           'add', text, '--kind', 'episodic', '--group', '我们/停在哪',
           '--grade', 'B', '--idem', `handoff:${state.id}:${hash}`,
         ], { json: true })
@@ -558,7 +620,7 @@ export function apply(ctx, input = {}) {
           // 卡有预算，但下一句该从哪儿接不能丢。
           const stop = handoffSummary(text)
           if (stop) {
-            await callPmem(config, ['soul', 'note', '--field', '停在哪', '--text', stop], {
+            await pmem(config, ['soul', 'note', '--field', '停在哪', '--text', stop], {
               json: true,
               timeout: 8000,
             }).catch(() => { /* 自我层没建也不影响 handoff 落库 */ })
@@ -588,7 +650,7 @@ export function apply(ctx, input = {}) {
     if (reply && !TRIVIAL.test(reply)) lines.push({ role: 'assistant', text: reply })
     if (!lines.length) return
     const argv = ['journal', 'turn', '--session', state.id, '--lines', JSON.stringify(lines)]
-    const send = () => callPmem(config, argv, { json: true, timeout: 15000 })
+    const send = () => pmem(config, argv, { json: true, timeout: 15000 })
     // 原话是最贵的一层：失败先重试一次（短延迟），仍失败只 warn，绝不抛给宿主。
     // 旧实现 ``.catch(() => {})`` 把锁冲突彻底吞掉，那一轮原话就静默丢了。
     void send()
@@ -620,7 +682,7 @@ export function apply(ctx, input = {}) {
     const argv = ['receipt', '--session', state.id, '--text', answer, '--tokens', String(tokens)]
     if (cached?.cue) argv.push('--exclude', cached.cue)
     try {
-      await callPmem(config, argv, { json: true, timeout: 20000 })
+      await pmem(config, argv, { json: true, timeout: 20000 })
     } catch {
       // 回执失败不影响会话；下一轮还会再来
     }
@@ -719,7 +781,7 @@ export function apply(ctx, input = {}) {
         const argv = ['surface', '--session', sid, '--mode', 'turn']
         if (cue) argv.push('--cue', cue)
         argv.push('--context', JSON.stringify(context))
-        const payloadOut = await callPmem(config, argv, {
+        const payloadOut = await pmem(config, argv, {
           json: true,
           timeout: config.surfaceTimeoutMs,
         })
@@ -816,7 +878,7 @@ export function apply(ctx, input = {}) {
         // 两者都只提醒不动手，而且**不消费**这一次自动交接机会。
         const canHandoff = Boolean(lastUser || sessions.get(sid)?.lastUser)
         if (web.live.contextAuto === false || !canHandoff) argv.push('--no-auto')
-        const out = await callPmem(config, argv, { json: true, timeout: config.contextTimeoutMs })
+        const out = await pmem(config, argv, { json: true, timeout: config.contextTimeoutMs })
         const data = out?.ok ? out.data : null
         if (!data) return decision
         const level = data.status?.level ?? 'ok'
@@ -894,13 +956,13 @@ export function apply(ctx, input = {}) {
           if (verb === 'recall') {
             const query = rest.join(' ').trim()
             if (!query) return { kind: 'error', text: '用法：/pmem recall <关键词>' }
-            const payload = await callPmem(config, ['search', query, '--k', '5'], { json: true })
-            return { kind: payload.ok ? 'success' : 'error', text: formatItems(payload) }
+            const out = await recallText(query, 5)
+            return { kind: out.ok ? 'success' : 'error', text: out.text }
           }
           if (verb === 'remember') {
             const content = rest.join(' ').trim()
             if (!content) return { kind: 'error', text: '用法：/pmem remember <内容>' }
-            const payload = await callPmem(config, ['add', content, '--kind', 'semantic', '--grade', 'B'], { json: true })
+            const payload = await pmem(config, ['add', content, '--kind', 'semantic', '--grade', 'B'], { json: true })
             if (payload.ok) void refresh()
             return { kind: payload.ok ? 'success' : 'error', text: payload.ok ? `已记住：${payload.data.id}` : JSON.stringify(payload.error ?? payload) }
           }
@@ -908,7 +970,7 @@ export function apply(ctx, input = {}) {
             const cue = rest.join(' ').trim()
             const argv = ['surface', '--session', `cmd:${Date.now()}`, '--mode', 'turn']
             if (cue) argv.push('--cue', cue)
-            const payload = await callPmem(config, argv, {
+            const payload = await pmem(config, argv, {
               json: true,
               timeout: config.surfaceTimeoutMs,
             })
@@ -921,7 +983,7 @@ export function apply(ctx, input = {}) {
             }
           }
           if (verb === 'stats') {
-            const payload = await callPmem(config, ['stats'], { json: true })
+            const payload = await pmem(config, ['stats'], { json: true })
             const data = payload?.data ?? {}
             return { kind: 'success', text: JSON.stringify(data, null, 2) }
           }
@@ -957,16 +1019,15 @@ export function apply(ctx, input = {}) {
           if (definition.name === 'pmem_recall') {
             const query = String(args?.query ?? '').trim()
             if (!query) throw new Error('缺少参数 query')
-            const k = Math.min(20, Math.max(1, Number(args?.k) || 5))
-            const payload = await callPmem(config, ['search', query, '--k', String(k)], { json: true })
-            return { text: payload.ok ? formatItems(payload) : JSON.stringify(payload.error ?? payload) }
+            const out = await recallText(query, args?.k)
+            return { text: out.text }
           }
           if (definition.name === 'pmem_remember') {
             const content = String(args?.text ?? '').trim()
             if (!content) throw new Error('缺少参数 text')
             const argv = ['add', content, '--kind', 'semantic', '--grade', String(args?.grade || 'B')]
             if (args?.group) argv.push('--group', String(args.group))
-            const payload = await callPmem(config, argv, { json: true })
+            const payload = await pmem(config, argv, { json: true })
             if (payload.ok) void refresh()
             return { text: payload.ok ? `已记住：${payload.data.id}` : JSON.stringify(payload.error ?? payload) }
           }
@@ -983,14 +1044,14 @@ export function apply(ctx, input = {}) {
               for (const item of args?.done ?? []) argv.push('--done', String(item))
             }
             if (args?.note && action !== 'show' && action !== 'status' && action !== 'loops') argv.push('--note', String(args.note))
-            const payload = await callPmem(config, ['--json', ...argv], { json: true })
+            const payload = await pmem(config, ['--json', ...argv], { json: true })
             if (!payload.ok) return { text: JSON.stringify(payload.error ?? payload) }
             const data = payload.data ?? {}
             if (action === 'show') return { text: String(data.text ?? '') }
             return { text: JSON.stringify(data, null, 2) }
           }
           if (definition.name === 'pmem_stats') {
-            const payload = await callPmem(config, ['stats'], { json: true })
+            const payload = await pmem(config, ['stats'], { json: true })
             return { text: JSON.stringify(payload?.data ?? payload, null, 2) }
           }
           throw new Error(`未知工具 ${definition.name}`)

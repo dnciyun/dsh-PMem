@@ -1689,6 +1689,133 @@ window.__ModuleLoader__.load({
       )
     }
 
+    // 断言层（claim，0.41.0，默认关）：最小页 = 列表 + 搜索 + 软删（不做编辑）。
+    // 主开关 claim.enabled 管「抽取/检索接入」，不在这个面板里开；这里只读它的状态。
+    function ClaimPanel({ notify }) {
+      const [query, setQuery] = useState('')
+      const [items, setItems] = useState([])
+      const [total, setTotal] = useState(0)
+      const [enabled, setEnabled] = useState(false)
+      const [loading, setLoading] = useState(false)
+      const [error, setError] = useState('')
+      const [pending, setPending] = useState('')
+      const [busyId, setBusyId] = useState('')
+      const [loaded, setLoaded] = useState(false)
+
+      const load = useCallback(async value => {
+        setLoading(true)
+        setError('')
+        try {
+          const params = new URLSearchParams({ limit: '50' })
+          const text = String(value ?? '').trim()
+          if (text) params.set('q', text)
+          const data = await api('/claims?' + params.toString())
+          setItems(Array.isArray(data.items) ? data.items : [])
+          setTotal(Number(data.total) || 0)
+          setEnabled(data.enabled === true)
+        } catch (cause) {
+          setError(`读断言失败：${cause.message}`)
+          setItems([])
+          setTotal(0)
+        } finally {
+          setLoading(false)
+          setLoaded(true)
+        }
+      }, [])
+
+      useEffect(() => { void load('') }, [load])
+
+      const remove = async claimId => {
+        setBusyId(claimId)
+        setError('')
+        try {
+          await api('/claims/delete', {
+            method: 'POST',
+            body: JSON.stringify({ claim_id: claimId, reason: 'console' }),
+          })
+          setPending('')
+          notify?.('已删除这条断言（只改状态，事件链可审计）')
+          await load(query)
+        } catch (cause) {
+          setError(`删除失败：${cause.message}`)
+        } finally {
+          setBusyId('')
+        }
+      }
+
+      return h(
+        'details',
+        { className: 'pconsole-danger', style: { marginTop: '12px' } },
+        h('summary', null, '断言层（claim）· 列表 / 搜索 / 删除'),
+        h('p', { className: 'pconsole-note' },
+          '断言层默认关（claim.enabled=false）。这里是只读最小页：能看、能搜、能软删误抽的断言；'
+          + '不改原文、不做编辑。软删只改 status，事件链留墓碑。'),
+        h('div', { className: 'pconsole-toolbar', style: { margin: '8px 0 0' } },
+          h('input', {
+            className: 'pconsole-input',
+            type: 'search',
+            placeholder: '搜谓词 / 客体 / 原话',
+            'aria-label': '搜索断言',
+            value: query,
+            onChange: event => setQuery(event.target.value),
+          }),
+          h('button', {
+            className: 'pconsole-btn',
+            type: 'button',
+            disabled: loading,
+            onClick: () => void load(query),
+          }, loading ? '搜索中…' : '搜索'),
+          h('button', {
+            className: 'pconsole-btn',
+            type: 'button',
+            disabled: loading,
+            onClick: () => { setQuery(''); void load(''); },
+          }, '刷新列表'),
+          h('span', { className: 'pconsole-note', style: { margin: 0 } },
+            `${total} 条 · 主开关 ${enabled ? '开' : '关'}`)),
+        error ? h('p', { className: 'pconsole-error' }, error) : null,
+        !loaded && loading ? h('p', { className: 'pconsole-empty' }, '读取中断言…') : null,
+        loaded && !items.length
+          ? h('p', { className: 'pconsole-empty' },
+              enabled
+                ? '还没有断言。主开关已开：夜间抽取会产出断言（或终端跑 `pmem claim extract --rule`）；误抽的可以在这里软删。'
+                : '断言层主开关关闭：去「设置 → 断言层」打开它（打开后夜间抽取才会写断言）。')
+          : null,
+        items.length
+          ? h('div', { style: { marginTop: '8px' } },
+              ...items.map(item => h('div', { key: item.id, className: 'pconsole-relation' },
+                h('div', { className: 'pconsole-relation-head' },
+                  h('span', { className: 'pconsole-chip' }, item.kind || 'claim'),
+                  h('span', { className: 'pconsole-relation-pred' },
+                    `${Number(item.polarity) === 0 ? '¬' : ''}${item.predicate || ''}`),
+                  h('span', null, String(item.object || '')),
+                  h('span', { className: 'pconsole-note', style: { margin: 0 } },
+                    `· ${item.status || 'unknown'} · ${Math.round(Number(item.confidence || 0) * 100)}%`)),
+                h('p', { className: 'pconsole-note', style: { margin: '2px 0 2px' } },
+                  '原话：', clampText(item.evidence_quote || '—', 120)),
+                pending === item.id
+                  ? h('div', { className: 'pconsole-actions' },
+                      h('button', {
+                        className: 'pconsole-btn pconsole-btn-danger',
+                        type: 'button',
+                        disabled: busyId === item.id,
+                        onClick: () => void remove(item.id),
+                      }, busyId === item.id ? '删除中…' : '确认软删'),
+                      h('button', {
+                        className: 'pconsole-btn',
+                        type: 'button',
+                        onClick: () => setPending(''),
+                      }, '取消'))
+                  : h('button', {
+                      className: 'pconsole-btn',
+                      type: 'button',
+                      disabled: !item.id,
+                      onClick: () => setPending(item.id),
+                    }, '删除…'))))
+          : null,
+      )
+    }
+
     // 记忆管理：搜索 / 过滤 / 排序 / 真分页 / 多选批量 / 详情（元数据、证据、历史、冲突、相关记忆）。
     // task-8 起 /memories 支持 offset/limit/sort/since/until，返回 total/hasMore/capped：
     // 排序与翻页都交给后端，前端只保留「分组多选」这一条客户端过滤。
@@ -2887,6 +3014,8 @@ window.__ModuleLoader__.load({
         { className: 'pconsole-memory' },
         toolbar,
         h('div', { className: 'pconsole-two-col' }, list, detailPane),
+        // 最小断言层页：折叠，不抢记忆主流程的屏幕。
+        h(ClaimPanel, { notify }),
       )
     }
 
@@ -3611,6 +3740,22 @@ window.__ModuleLoader__.load({
       const [night, setNight] = useState(null)
       const [nightAt, setNightAt] = useState('03:30')
       const [nightIdle, setNightIdle] = useState('45')
+      // 项目 scope（P3-17）：显式限定检索范围，落 PMem 配置，默认关。
+      const [project, setProject] = useState(null)
+      const [projectEnabled, setProjectEnabled] = useState(false)
+      const [projectName, setProjectName] = useState('')
+      const [projectBusy, setProjectBusy] = useState(false)
+      // 自动淡忘（0.40.0）：落 PMem 配置 lifecycle.enabled，**默认关**（不忘记记忆）。
+      const [lifecycle, setLifecycle] = useState(null)
+      const [lifecycleEnabled, setLifecycleEnabled] = useState(false)
+      const [lifecycleBusy, setLifecycleBusy] = useState(false)
+      // 断言层（0.41.0）：主开关 claim.enabled + 三个子开关，写 PMem 配置，全默认关。
+      const [claimSettings, setClaimSettings] = useState(null)
+      const [claimMaster, setClaimMaster] = useState(false)
+      const [claimIndex, setClaimIndex] = useState(false)
+      const [claimVersion, setClaimVersion] = useState(false)
+      const [claimBoundary, setClaimBoundary] = useState(false)
+      const [claimBusy, setClaimBusy] = useState(false)
       // 危险区（真路由）：备份列表/生成/下载、向量重建（可取消）、运维动作白名单。
       const [backups, setBackups] = useState(null)
       const [backupBusy, setBackupBusy] = useState('')
@@ -3627,6 +3772,15 @@ window.__ModuleLoader__.load({
         setToast(message)
         notify?.(message)
       }, [notify])
+
+      // 断言层快照 → 五个本地状态（主开关 + 三个子开关）；放一处，避免三处重复。
+      const applyClaimSettings = useCallback(data => {
+        setClaimSettings(data)
+        setClaimMaster(data?.master === true)
+        setClaimIndex(data?.enabled === true)
+        setClaimVersion(data?.version === true)
+        setClaimBoundary(data?.boundary_check === true)
+      }, [])
 
       useEffect(() => {
         let alive = true
@@ -3650,6 +3804,42 @@ window.__ModuleLoader__.load({
           .catch(() => {})
         return () => { alive = false }
       }, [])
+
+      // 项目 scope：进设置页回显；默认关、名称空（读不到就保持默认）。
+      useEffect(() => {
+        let alive = true
+        api('/project-scope')
+          .then(data => {
+            if (!alive) return
+            setProject(data)
+            setProjectEnabled(data?.enabled === true)
+            setProjectName(typeof data?.name === 'string' ? data.name : '')
+          })
+          .catch(() => {})
+        return () => { alive = false }
+      }, [])
+
+      // 自动淡忘：进设置页回显；默认关（读不到就保持关，不忘记记忆）。
+      useEffect(() => {
+        let alive = true
+        api('/lifecycle')
+          .then(data => {
+            if (!alive) return
+            setLifecycle(data)
+            setLifecycleEnabled(data?.enabled === true)
+          })
+          .catch(() => {})
+        return () => { alive = false }
+      }, [])
+
+      // 断言层：主开关 + 三个子开关，进设置页回显；默认全关（读不到就保持关）。
+      useEffect(() => {
+        let alive = true
+        api('/claim-settings')
+          .then(data => { if (alive) applyClaimSettings(data) })
+          .catch(() => {})
+        return () => { alive = false }
+      }, [applyClaimSettings])
 
       const runtime = status?.runtime ?? {}
       const locked = runtime.locked ?? {}
@@ -3687,6 +3877,76 @@ window.__ModuleLoader__.load({
           api('/night').then(setNight).catch(() => {})
         } finally {
           setNightBusy(false)
+        }
+      }
+
+      // 项目 scope 也写 PMem 配置；失败要重读，别让界面停在猜的状态。
+      const saveProject = async (patch, message = '已保存（下一轮生效）') => {
+        setProjectBusy(true)
+        setError('')
+        try {
+          const data = await api('/project-scope', { method: 'POST', body: JSON.stringify(patch) })
+          setProject(data)
+          setProjectEnabled(data?.enabled === true)
+          setProjectName(typeof data?.name === 'string' ? data.name : '')
+          say(message)
+        } catch (cause) {
+          setError(`项目设置保存失败：${cause.message}`)
+          api('/project-scope')
+            .then(data => {
+              setProject(data)
+              setProjectEnabled(data?.enabled === true)
+              setProjectName(typeof data?.name === 'string' ? data.name : '')
+            })
+            .catch(() => {})
+        } finally {
+          setProjectBusy(false)
+        }
+      }
+
+      // 自动淡忘也写 PMem 配置；失败要重读，别让界面停在猜的状态。
+      const saveLifecycle = async value => {
+        setLifecycleBusy(true)
+        setError('')
+        try {
+          const data = await api('/lifecycle', {
+            method: 'POST',
+            body: JSON.stringify({ enabled: value }),
+          })
+          setLifecycle(data)
+          setLifecycleEnabled(data?.enabled === true)
+          say('已保存（下一轮生效）')
+        } catch (cause) {
+          setError(`自动淡忘保存失败：${cause.message}`)
+          api('/lifecycle')
+            .then(data => {
+              setLifecycle(data)
+              setLifecycleEnabled(data?.enabled === true)
+            })
+            .catch(() => {})
+        } finally {
+          setLifecycleBusy(false)
+        }
+      }
+
+      // 断言层主开关 + 三个子开关都写 PMem 配置；失败要重读，别让界面停在猜的状态。
+      const saveClaim = async (patch, message = '已保存（下一轮生效）') => {
+        setClaimBusy(true)
+        setError('')
+        try {
+          const data = await api('/claim-settings', {
+            method: 'POST',
+            body: JSON.stringify(patch),
+          })
+          applyClaimSettings(data)
+          say(message)
+        } catch (cause) {
+          setError(`断言层设置保存失败：${cause.message}`)
+          api('/claim-settings')
+            .then(data => applyClaimSettings(data))
+            .catch(() => {})
+        } finally {
+          setClaimBusy(false)
         }
       }
 
@@ -4095,6 +4355,129 @@ window.__ModuleLoader__.load({
             : null,
         ),
 
+        // ── 项目：显式限定检索范围（不是自动分类）。默认关，写 PMem 配置，下一轮生效。──
+        h(
+          Panel,
+          {
+            title: '项目',
+            note: '默认关。项目是「显式限定」，不是自动分类：开启后检索只在名字对应的分组（grp 路径前缀）里找；'
+              + '名字对不上任何分组时行为等同关闭。改完下一轮生效。',
+          },
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '用项目限定检索'),
+            h('span', null, h(Switch, {
+              checked: projectEnabled,
+              disabled: projectBusy,
+              onChange: value => void saveProject({ enabled: value }),
+              label: projectEnabled ? '开' : '关',
+            }))),
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '项目名称'),
+            h('span', { style: { display: 'inline-flex', gap: '6px', alignItems: 'center' } },
+              h('input', {
+                className: 'pconsole-input',
+                type: 'text',
+                maxLength: 80,
+                placeholder: '例如 工作/PMem',
+                'aria-label': '项目名称',
+                value: projectName,
+                disabled: projectBusy,
+                onChange: event => setProjectName(event.target.value),
+              }),
+              h('button', {
+                className: 'pconsole-btn',
+                type: 'button',
+                disabled: projectBusy || projectName.trim() === (project?.name ?? ''),
+                onClick: () => void saveProject({ name: projectName }, '项目名称已保存（下一轮生效）'),
+              }, '存名称'))),
+          h('p', { className: 'pconsole-note', style: { margin: '6px 0 0' } },
+            '名称留空 = 不限定。这个开关只影响检索候选集（按分组前缀过滤），'
+            + '不会自动把记忆归类；关着的时候检索行为与旧版一致。'),
+        ),
+
+        // ── 记忆：自动淡忘（0.40.0，默认关）。写 PMem 配置 lifecycle.enabled，下一轮生效。──
+        h(
+          Panel,
+          {
+            title: '记忆',
+            note: '记忆只增不减是默认：自动淡忘默认关，关着的时候没有任何按时间下沉/归档的动作。',
+          },
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '自动淡忘（默认关）'),
+            h('span', null, h(Switch, {
+              checked: lifecycleEnabled,
+              disabled: lifecycleBusy,
+              onChange: value => void saveLifecycle(value),
+              label: lifecycleEnabled ? '开' : '关',
+            }))),
+          h('p', { className: 'pconsole-note', style: { margin: '6px 0 0' } },
+            '关 = 记忆不会因为久不用而下沉/归档，召回池不会随时间缩水。'
+            + '开 = 按等级淡忘（S 永不淡忘、A 180 天、B 90 天、C 30 天、D 7 天，只降级不删除）。'
+            + '显式命令 `pmem lifecycle` 不受这个开关限制；改完下一轮生效。'),
+          lifecycle?.enabled === true
+            ? h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } },
+                '当前：开——久不用的记忆会被自动降到更低等级（不删除）。')
+            : h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } },
+                '当前：关——记忆不会因为久不用而消失；想手动跑一次用 `pmem lifecycle`。'),
+        ),
+
+        // ── 断言层（claim，0.41.0，默认关）：三个互相独立的子开关。──
+        h(
+          Panel,
+          {
+            title: '断言层',
+            note: '断言层默认关。主开关管整层（抽取/检索接入/MCP 工具）；三个子开关互相独立，'
+              + '主开关关闭时不生效。改完下一轮生效（MCP 工具清单要重启 MCP server 才刷新）。',
+          },
+          h('div', { className: 'pconsole-kv' },
+            h('span', null, '断言层主开关（claim.enabled）'),
+            h('span', null, h(Switch, {
+              checked: claimMaster,
+              disabled: claimBusy,
+              onChange: value => void saveClaim({ master: value }, value ? '断言层已开启（下一轮生效，MCP 工具需重启）' : '断言层已关闭（不再写 claim 表）'),
+              label: claimMaster ? '开' : '关',
+            }))),
+          h('p', { className: 'pconsole-note', style: { margin: '2px 0 0' } },
+            '开 = 夜间抽取会把当天原话结构化成断言，MCP 工具 30→35；'
+            + '关 = 不写 claim 表、MCP 工具仍是 30、面板列表为空。'),
+          claimMaster
+            ? null
+            : h('p', { className: 'pconsole-note', style: { margin: '4px 0 0' } },
+                '主开关关闭时子开关不生效（先打开上面的主开关）。'),
+          h('div', { className: 'pconsole-kv', style: { marginTop: '8px' } },
+            h('span', null, '断言索引（claim.index）'),
+            h('span', null, h(Switch, {
+              checked: claimIndex,
+              disabled: claimBusy || !claimMaster,
+              onChange: value => void saveClaim({ enabled: value }),
+              label: claimIndex ? '开' : '关',
+            }))),
+          h('p', { className: 'pconsole-note', style: { margin: '2px 0 0' } },
+            '开 = 检索时把断言层作为并行通道接入（RRF 合并）；关 = 不参与检索，零开销。'),
+          h('div', { className: 'pconsole-kv', style: { marginTop: '6px' } },
+            h('span', null, '改口版本链（claim.version）'),
+            h('span', null, h(Switch, {
+              checked: claimVersion,
+              disabled: claimBusy || !claimMaster,
+              onChange: value => void saveClaim({ version: value }),
+              label: claimVersion ? '开' : '关',
+            }))),
+          h('p', { className: 'pconsole-note', style: { margin: '2px 0 0' } },
+            '开 = 同一主体/谓词下客体或极性变了就开新版本，旧行标 superseded；关 = 只合并不建链。'),
+          h('div', { className: 'pconsole-kv', style: { marginTop: '6px' } },
+            h('span', null, '边界自查（answer.boundary_check）'),
+            h('span', null, h(Switch, {
+              checked: claimBoundary,
+              disabled: claimBusy || !claimMaster,
+              onChange: value => void saveClaim({ boundary_check: value }),
+              label: claimBoundary ? '开' : '关',
+            }))),
+          h('p', { className: 'pconsole-note', style: { margin: '2px 0 0' } },
+            '开 = 注入「记录只截止到某天；没记到不等于没发生」的边界提示，治「不知道却编」。'),
+          h('p', { className: 'pconsole-note', style: { margin: '6px 0 0' } },
+            '断言列表/搜索/软删在「记忆 → 断言层」折叠区。'),
+        ),
+
         // ── 排查面板 ──────────────────────────────────────────────────────────
         h(
           Panel,
@@ -4131,7 +4514,7 @@ window.__ModuleLoader__.load({
             h('span', null, h('span', { className: 'pconsole-chip' }, status?.mcp?.serverName ?? 'pmem'))),
           h('div', { className: 'pconsole-kv' },
             h('span', null, 'MCP 工具数'),
-            h('span', null, `${status?.mcp?.tools ?? 27} 个`)),
+            h('span', null, `${status?.mcp?.tools ?? 30} 个`)),
           h('div', { className: 'pconsole-kv' },
             h('span', null, '原生工具'),
             h('span', null, '5 个（pmem_wake / recall / remember / soul / stats）')),

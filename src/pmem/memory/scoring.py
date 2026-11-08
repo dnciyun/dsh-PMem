@@ -209,6 +209,52 @@ def rrf_normalize(
     return _clip(score / ceiling) if ceiling else 0.0
 
 
+# 软淡忘（task-40）：等级权重只是排序里的一档，不是淘汰；S 永不衰减等级档。
+DECAY_GRADE_FACTORS: dict[str, float] = {
+    "S": 1.0,
+    "A": 0.95,
+    "B": 0.9,
+    "C": 0.8,
+    "D": 0.7,
+}
+
+
+def decay_factor(
+    *,
+    idle_days: float,
+    half_life_days: float = 30.0,
+    min_factor: float = 0.35,
+    grade: str | None = None,
+    use_count: int = 0,
+    grade_weight: bool = True,
+    use_count_weight: bool = True,
+) -> float:
+    """软淡忘的排序因子：**只用于最终注入列表的重排**（不改状态/选中集合/注入条数）。
+
+    1. 时间：``factor = max(min_factor, 0.5 ** (idle_days / half_life_days))``，
+       ``idle_days`` 用 ``last_used_at or created_at``（与 lifecycle 同口径）；
+    2. 等级：低等级再乘一档（S 1.0 / A 0.95 / B 0.9 / C 0.8 / D 0.7）；
+    3. 使用次数：``1 + min(0.10, 0.03 * ln(1 + use_count))`` 的轻微加成（log，不是阈值）。
+
+    ``min_factor`` 是下限：久不用的记忆在排序里最多只损失 ``1 - min_factor`` 的权重，
+    但**不会因此落选**——候选池/MMR/预算都用未衰减分数，因子只在最后对已注入的
+    那批条目排先后。
+    """
+    floor = max(0.0, min(1.0, float(min_factor)))
+    half = float(half_life_days)
+    idle = max(0.0, float(idle_days))
+    if half > 0 and idle > 0:
+        factor = 0.5 ** (idle / half)
+    else:
+        factor = 1.0
+    factor = max(floor, factor)
+    if grade_weight:
+        factor *= DECAY_GRADE_FACTORS.get(str(grade or "").upper(), 1.0)
+    if use_count_weight:
+        factor *= 1.0 + min(0.10, 0.03 * math.log1p(max(0, int(use_count))))
+    return factor
+
+
 def final_score(
     *,
     rrf_norm: float,

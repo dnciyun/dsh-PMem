@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-SCHEMA_VERSION = "1.10.0"
+SCHEMA_VERSION = "1.11.0"
 
 # 实体表单独提出来：M3 的迁移要重建它（SQLite 不支持改 CHECK 约束）
 ENTITY_DDL = """
@@ -110,6 +110,7 @@ DDL: list[str] = [
       episode_id     TEXT REFERENCES episode(id),
       session_id     TEXT,
       claim_sig      TEXT,
+      claim_group    TEXT,
       sensitivity    TEXT NOT NULL DEFAULT 'personal' CHECK (sensitivity IN ('public','personal','secret')),
       pinned         INTEGER NOT NULL DEFAULT 0 CHECK (pinned IN (0,1)),
 
@@ -660,6 +661,65 @@ DDL: list[str] = [
     )
     """,
     "CREATE INDEX IF NOT EXISTS idx_me_b ON memory_edge(b_seq)",
+    # ---- 断言层（claim，1.11.0，全部默认关）--------------------------------
+    # 为什么不复用 memory：一条记忆是一段叙述（「昨天和妈妈去看了房子」），
+    # 一条 claim 是一个可核对的最小事实（subject/predicate/object/polarity/status）。
+    # claim 只做「存与取」，不参与默认检索；关掉 claim.enabled 时既有路径零行为变化。
+    """
+    CREATE TABLE IF NOT EXISTS claim (
+      id             TEXT PRIMARY KEY,
+      subject_id     TEXT NOT NULL,
+      kind           TEXT NOT NULL CHECK (kind IN
+                       ('fact','preference','date','third_party','boundary')),
+      predicate      TEXT NOT NULL,
+      object         TEXT NOT NULL,
+      polarity       INTEGER NOT NULL DEFAULT 1 CHECK (polarity IN (0,1)),
+      status         TEXT NOT NULL DEFAULT 'happened' CHECK (status IN
+                       ('happened','planned','hypothetical','rumored','unknown',
+                        'candidate','superseded','deleted')),
+      event_date     TEXT,
+      mentioned_at   TEXT NOT NULL,
+      event_end      TEXT,
+      scope          TEXT,
+      claim_group    TEXT,
+      seq            INTEGER NOT NULL DEFAULT 1,
+      superseded_by  TEXT,
+      confidence     REAL NOT NULL DEFAULT 0.8,
+      source_line    TEXT,
+      source_turn    INTEGER,
+      evidence_quote TEXT NOT NULL,
+      extractor      TEXT NOT NULL,
+      schema_ver     TEXT NOT NULL DEFAULT '1',
+      use_count      INTEGER NOT NULL DEFAULT 1,
+      last_seen      TEXT NOT NULL
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS claim_subject ON claim(subject_id, kind, status)",
+    "CREATE INDEX IF NOT EXISTS claim_group_idx ON claim(claim_group, seq)",
+    "CREATE INDEX IF NOT EXISTS claim_date ON claim(event_date)",
+    "CREATE INDEX IF NOT EXISTS claim_source_line ON claim(source_line)",
+    # 版本链：同一 claim_group 的历次说法（答题给最新 + 变更次数）。
+    # prev_id 指向上一版；reason 记录「为什么改」（改口/真实变化/当场纠错）。
+    """
+    CREATE TABLE IF NOT EXISTS claim_link (
+      claim_id  TEXT NOT NULL,
+      prev_id   TEXT,
+      reason    TEXT,
+      changed_at TEXT NOT NULL
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS claim_link_claim ON claim_link(claim_id)",
+    # 人物卡：由 claims 聚合，不单独维护真相；null = 还没聚合过。
+    """
+    CREATE TABLE IF NOT EXISTS person_card (
+      entity_id  TEXT PRIMARY KEY,
+      relation   TEXT,
+      facts      TEXT NOT NULL DEFAULT '[]',
+      boundary   TEXT NOT NULL DEFAULT '[]',
+      contested  TEXT NOT NULL DEFAULT '[]',
+      updated_at TEXT NOT NULL
+    )
+    """,
 ]
 
 # 初始谓词表（03 §8.2；M3 扩到 12 个，后续睡眠/进化阶段再拆细）

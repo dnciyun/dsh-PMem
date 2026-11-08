@@ -61,12 +61,27 @@ def _brief(row: Any) -> dict[str, Any]:
     return item
 
 
-def _auto_tick(db: Any, subject: str) -> None:
-    """每天第一次浮现时顺带跑一次生命周期，不需要独立守护进程。"""
+def _lifecycle_enabled(config: Any) -> bool:
+    """自动淡忘开关（``lifecycle.enabled``，默认 False）；没有 config 句柄就当作关。"""
+    if config is None:
+        return False
+    try:
+        return bool(config.get("lifecycle.enabled", False))
+    except Exception:  # noqa: BLE001 坏 config 不阻断浮现
+        return False
+
+
+def _auto_tick(db: Any, subject: str, *, enabled: bool) -> None:
+    """每天第一次浮现时顺带跑一次生命周期（受 ``lifecycle.enabled`` 控制）。
+
+    关时**不写任何记忆状态**，只推进 ``surface.lifecycle_day`` 标记（避免每次浮现
+    都重试一次 tick）；开时行为与 0.39.0 完全一致。
+    """
     today = day_key()
     if db.meta("surface.lifecycle_day") == today:
         return
-    lifecycle.tick(db, subject=subject)
+    if enabled:
+        lifecycle.tick(db, subject=subject)
     db.set_meta("surface.lifecycle_day", today)
 
 
@@ -382,13 +397,14 @@ def card(
     due_days: int = 30,
     snippet_chars: int = 40,
     auto_tick: bool = True,
+    config: Any = None,
 ) -> dict[str, Any]:
     if mode not in ("session_start", "turn"):
         raise ValidationError("mode 只能是 session_start / turn", field="mode")
     if not session_id or not session_id.strip():
         raise ValidationError("session_id 不能为空", field="session_id")
     if auto_tick:
-        _auto_tick(db, subject)
+        _auto_tick(db, subject, enabled=_lifecycle_enabled(config))
 
     default_budget = 220 if mode == "session_start" else 80
     budget = max(40, int(budget or default_budget))

@@ -16,7 +16,39 @@ DEFAULTS: dict[str, Any] = {
     "storage": {
         "path": "data/pmem.db",
     },
+    # 断言层（claim，1.11.0，全部默认关）：把「一段叙述」拆成可核对的最小事实
+    # （subject/predicate/object/polarity/status），只做存与取；不参与默认检索、
+    # 不改既有路径。五个子开关互相独立，关掉 claim.enabled 时整层不起作用。
+    "claim": {
+        "enabled": False,
+        "index": {"enabled": False},
+        "version": {"enabled": False},
+        "extract": {
+            # host = 宿主模型（会话模型）按任务书输出 JSON；规则抽取永远可降级。
+            "mode": "host",
+            # 0 = 当天原话全读（夜间无延迟压力）；>0 只取最近 N 字符。
+            "max_source_chars": 0,
+            # 低于 min_confidence 整条丢弃；低于 candidate_below 落 candidate 等复述确认。
+            "min_confidence": 0.6,
+            "candidate_below": 0.8,
+            "kinds": ["fact", "preference", "date", "third_party", "boundary"],
+        },
+        # boundary claim 注入上限（按相关度取，最多 3 条）。
+        "inject": {"boundary_limit": 3},
+    },
     "retrieval": {
+        # 软淡忘（task-40，默认关）：**不是遗忘**。不改 status、不删候选、不缩注入条数，
+        # 只在排序分上乘一个衰减因子：越久没被真正用到（last_used_at/created_at）、
+        # 等级越低、被用得越少，排序越吃亏。记忆仍然 active、仍然可召回（`pmem search`
+        # 仍能取到）；关掉就完全回到旧排序（逐字节等价）。
+        # factor = max(min_factor, 0.5 ** (idle_days / half_life_days))
+        "decay": {
+            "enabled": False,
+            "half_life_days": 30,
+            "min_factor": 0.35,
+            "grade_weight": True,
+            "use_count_weight": True,
+        },
         "rrf_k": 60,
         "top_k": 8,
         "token_budget": 600,
@@ -31,6 +63,8 @@ DEFAULTS: dict[str, Any] = {
         # 16（M23 提速）：32→16 实测 p50 3.81→3.37ms（−0.44ms / −13%），
         # 308 题可答/MRR/时效/抗干扰 四项一模一样。去冗只需要「最可能重复」的头部，
         # pool 再大只是多算两两 Jaccard。
+        # ★ 这是**性能保护**，不是业务上限：实际生效 pool = max(mmr_pool, k)，
+        #   k≤16 时与旧版等价；k>16（长文/批量证据场景）不会再被静默截到 16 条。
         "mmr_pool": 16,
         # 词法候选池：先取多少条候选进覆盖率打分。太窄会被「导师/第一天」这种高频词
         # 的记忆挤出去（答案明明在池外），太宽则是 O(候选×词) 的覆盖率成本。
@@ -78,6 +112,55 @@ DEFAULTS: dict[str, Any] = {
             # 收到 0 之后 hit@10 只涨不掉，而且「覆盖率 0」在 714 题里正是绝大多数
             # 尾巴的形态（deepen 归因：24 道满槽位题的尾巴覆盖率 100% 是 0）。
             "evict_cover": 0.0,
+        },
+        # 词面第二路（G2，0.38.0 候选）：把问句压成内容词（``query.content_terms``）
+        # 再检索一遍，把它的结果**补进**首遍（首遍顺序不动；有空位就补，满了置换弱尾巴）。
+        # 为什么不是加 k/预算：0-cost 探针显示 42 道没召回的题深检索 k=50 依然 0/42 命中；
+        # 而「压成内容词再搜一遍」在预算内实测多捞回 8 道、通过题零损失
+        # （g2/merge_report.md 的 A2 列）。做成通道不行——通道只改融合分、候选仍按原问句
+        # 覆盖率裁预算，实测 0 收益（g2/impl_report.md）。
+        # **默认关**：先全量 714 同币种 A/B，确认不掉分再决定默认值。
+        # 预算去向仪表（P0-4，默认关）：把每个阶段加了几条/置换几条/丢几条/花了多少 token
+        # 记进返回体的 budget_trace。没有它，调通道权重就是盲调（G2 的 +8 上界就是死在
+        # 「预算装不装得下」看不见）。默认关：多算一层统计，且会多占返回体。
+        "budget_trace": False,
+        # 证据指针展开（P2-13，默认关）：派生事实截断/改人称后丢掉的细节，从 journal_line
+        # 按 source_line_id 取回 ≤max_chars 的原文片段附在条目后。关时零额外 SQL。
+        "spans": {
+            "enabled": False,
+            "max_chars": 120,
+        },
+        # 聚合型问法（P1-7，默认关）：问「各/分别/哪几/两类」时，答案需要同一主体的多条
+        # 事实，top-k 相似度只带回一条。开启后用 query.plan 的 subject_terms 做同主体枚举，
+        # 只填空位、不重排（沿用 _place_items 的语义）。默认关：主体定错会塞无关事实。
+        "aggregate": {
+            "enabled": False,
+            "max_items": 10,
+        },
+        # 预算打包（P2-12，默认关）：现在预算分配是「先到先得 + 尾部丢弃」（scoring.fit_budget
+        # 遇到放不下的条目截 120 字就 break）。开启后按 coverage×类型覆盖×新鲜度做一次
+        # 贪心装箱，must_cover 相关条目优先，再按价值填剩余预算。只重排注入集合、不重排候选。
+        "packing": {
+            "enabled": False,
+            "type_weight": 0.15,
+        },
+        # P2-15（assistant 原话通道）**核实为伪需求，不设开关**：raw_fallback 从 0.36.1 起
+        # 就不按 role 过滤，assistant 原话默认就能进原话兜底（2026-11-07 实测：零记忆 +
+        # 只放一条 assistant 行 → 默认配置即可召回）。加开关只会多一个「看起来能开」的
+        # 死键，所以删掉；search.py 里留了一行注释 + 一条正向断言防回归。
+        "second_query": {
+            "enabled": False,
+            # 最多从第二遍补几条（受 k 和 token 预算双重限制）。
+            "max_add": 6,
+            # 置换时头部保护的条数：前 N 名永不参与置换。
+            "head": 2,
+            # 最多置换几条：每换一条就是一次「拿走一条词法结果」的风险，宁少勿多。
+            "max_evict": 3,
+            # 条件触发（P1-10）：只有首遍覆盖 < trigger_coverage 才跑第二遍。
+            # 语义是严格小于，coverage 恒 ≥0，所以 0.0 = **永不触发**；
+            # 默认 1.01 = 只要 second_query.enabled 就总是跑（保持 0.38 语义）。
+            # 想「只在低覆盖时跑」设 0.45~0.6。
+            "trigger_coverage": 1.01,
         },
         # 「我说过的话」通道（0.32.0）：assistant 原话按设计不进 memory（facts 只从
         # 用户行派生），所以「你上次答应我什么」这类问题只能回 journal 原话里找。
@@ -196,6 +279,13 @@ DEFAULTS: dict[str, Any] = {
             "name_bonus": 0.04,
             "other_owner_penalty": 0.06,
             "owner_conflict_penalty": 0.22,
+            # 显式项目范围（P3-17，默认关）：宿主/用户指定「当前在哪个项目」，检索按
+            # grp 路径前缀过滤候选。**不让模型在写入时自己猜分类**——项目是数据，不是规则。
+            # 关时行为与 0.38.0 完全一致（一个 dict 点查）。
+            "project": {
+                "enabled": False,
+                "name": "",
+            },
         },
         # 答案类型（M28）：问「多少/几层/哪+地点/什么时候」时，候选里得有那种东西的
         # 字面证据。只认写法明确的类型，人名不做（没 NER，硬判会误伤）。
@@ -227,6 +317,14 @@ DEFAULTS: dict[str, Any] = {
             "cap_budget": 600,
             # 检索条目日期后补「（距今 N 天）」。0 天（今天）不补，避免每条都涨价。
             "age_labels": True,
+            # 渲染层相对日期换算（G3，0.38.0 候选）：条目文本里**明确**的相对说法
+            # （上周五 / 下周三 / 昨天 / 三天前 / 半个月前）按**这条记忆自己的日期**
+            # 换算成绝对日期，附在条目后面：〔「上周五」=2026-05-01〕。
+            # 为什么要放渲染层而不是提示词：靶场实测「让模型自己算」（v4b）更差——通过题
+            # 也开始写日期，被判「无证据日期」（docs/roadmap.md §3.9.2）。
+            # **默认关**：时间类 111 题小样本实测 +2（涨 5 跌 3，同一判卷同模型），
+            # 等全量 A/B 确认再决定默认值。
+            "relative_dates": False,
         },
         # 向量通道（M13）：本地 bge-small-zh-v1.5（ONNX int8）语义检索。
         # 只在**词法覆盖率低于 trigger_coverage** 时跑（第二手段），只补候选不重排；
@@ -344,6 +442,14 @@ DEFAULTS: dict[str, Any] = {
         "due_days": 30,
         "snippet_chars": 40,
     },
+    # 淡忘/生命周期（0.40.0，**默认关**）：M3.6 的「按等级淡忘」——candidate/active 按 idle 天数
+    # 下沉到 dormant、再按归档天数进 archived（archived 默认不进召回＝对答话等于忘了）。
+    # 关 = **永不自动下沉**（记忆只增不减，召回池不随时间缩水）；只降级不删除的铁律不变，
+    # 显式 `pmem lifecycle` 命令仍可手动跑一次（那是用户意图，不受这个开关限制）。
+    # 两个自动触发点都要受这个开关管：睡（s7_reflect）与浮现（surface._auto_tick）。
+    "lifecycle": {
+        "enabled": False,
+    },
     # 上下文水位（M19）：不指望拿到真实 usage，用「即将发送的 messages」估算，
     # 底座补上工具 schema/系统提示这类固定开销。估少比估多危险，所以底座给得偏大。
     "context": {
@@ -388,6 +494,18 @@ DEFAULTS: dict[str, Any] = {
         "min_lines": 3,            # 少于这个行数不值得写一篇
         "recent_days": 2,          # 醒来卡「最近」往回看几天
         "recent_items": 2,         # 「最近」最多几行
+        # 写入侧主体归属（P1-8，默认关）：把该行已抽取的实体挂到派生 fact 上
+        # （subject_entity_ids / subject），让「各/分别/哪几」这类聚合题能按主体取全。
+        # 只复用已有 entity_mention，不新增规则表、不改写原文；关时 fact 结构与 0.38.0 一致。
+        "subject_links": {
+            "enabled": False,
+        },
+        # 写时时间归一（P2-16，默认关）：派生 fact 时，把明确的相对说法（上周五/三天前/
+        # 下周三）按这一行的逻辑时间换算成绝对日期，存进 fact["time_expr"]/["time_abs"]，
+        # 原文不动。只做「明确说法」，模糊词（上次/那次/以前）不猜——猜错窗口比不猜更糟。
+        "time_normalize": {
+            "enabled": False,
+        },
     },
     # 作答自检（0.36.0）：回答完再看一遍草稿——日期/专名这些「容易编」的东西
     # 到底在不在记忆里。确定性核对（只读 SQL，0 模型调用、0 成本）；填了 model
@@ -399,10 +517,78 @@ DEFAULTS: dict[str, Any] = {
         "max_names": 20,
         "max_answer_chars": 4000,
         "evidence_per_issue": 3,
+        # 按需自检（P1-6，默认关）：只对「检索覆盖低 / 证据不足」的题跑第二遍模型复核，
+        # 收益集中在低覆盖题（714 实测：coverage<0.35 触发 26% 题量、吃掉约一半增益）。
+        # 关时行为与 0.38.0 完全一致。
+        "on_demand": {
+            "enabled": False,
+            "coverage": 0.35,
+            # 2026-11-07 全量 A/B 证明「按检索覆盖度门控」方向搞反了（触发题 +4、未触发题 −10）。
+            # 这版改成**答案侧**门控：只数答案里有多少「可核验断言」（日期/数字/专名/相对时间），
+            # 少于 min_assertions 才跳过模型复核。默认关；门控信号换了，需要重新 A/B 才准开。
+            "min_assertions": 2,
+        },
+    },
+    # 作答计划（0.37.0）：把「该怎么答」从散文变成字段——回答只答被问到的点、不补没依据的细节、
+    # 相对时间要落到有依据的绝对日期、有依据就肯定说。
+    # **默认关**：0.37.0 全量 714 实测「叠在基线模板上」是净掉 57 题（586→529/705），
+    # 主要在「资料不足 / 第三方事实 / 助手说过的话」三类——措辞变谨慎后被判成「否认证据」，
+    # 变短后被判成「没满足 required」。重新设计前不默认开（详见 docs/roadmap.md §3.6）。
+    "answer": {
+        "plan": {
+            "enabled": False,
+            "max_sentences": 2,
+            "suppress": [
+                "date_without_basis",
+                "unsupported_name",
+                "unrelated_past",
+                "other_private",
+            ],
+            "assert_when_evidenced": True,
+            "allow_creative": False,
+            "date_basis_required": True,
+        },
+        # 证据契约（P2-11，默认关）：把「这题要覆盖什么/证据可不可用/风险多高」变成字段，
+        # 由 memory.contract 产出，渲染层只读字段。关时渲染输出与 0.38.0 逐字一致。
+        "contract": {
+            "enabled": False,
+        },
+        # 弃答边界（P2-14，默认关）：把 answerability（answerable/partial/unanswerable）
+        # 作为一行确定性事实渲染给模型，**不给「你必须说不知道」这种指令**。
+        "answerability": {
+            "enabled": False,
+        },
+        # 边界自查（C 臂，默认关）：作为可开关的提示层，先单独上线。
+        # 「记录截止某天；没记到 ≠ 没发生」——治「不知道却编」。
+        "boundary_check": {
+            "enabled": False,
+            "text": "记录只截止到 {day_key}；没记到不等于没发生。不确定就说不确定，不要编。",
+        },
+        # 答案保真检查（0.40.0，默认关）：作答**之后**只认「有型且无支撑」的断言（日期/数字/
+        # 专名/关系），纯评价句不罚。flag=只出报告；hint=给宿主最小修法（不删原文）；
+        # strip=去掉无支撑断言（敢用之前必须先有 A/B 证据）。关时不碰任何既有路径。
+        "verify": {
+            "enabled": False,
+            "mode": "flag",
+            "min_claims": 2,       # 分母下限：断言太少不判风险，避免短答案被误伤
+            "risk_threshold": 0.34,
+            "max_claims": 40,
+            # 参与「风险/删除」判定的断言类型。默认只认日期类：714 题实测日期类
+            # 召回 21.5%/误伤 0.5%，数字类 23.7%/2.2%（误伤 10 条来自数字），专名抽取器
+            # 当前会把「行李箱→李箱」切错（误伤 8.8%）→ 专名等抽取器修好再进这里。
+            "kinds": ["date", "relative_date"],
+        },
+    },
+    # 运维：失败聚类审核队列（P3-18，默认关）。评测/回执里的失败样例先聚类、落成
+    # 待人工审核的 JSON 队列；**不自动改参数**（改参数要人看）。
+    "ops": {
+        "review_queue": {
+            "enabled": False,
+            "limit": 200,
+        },
     },
     "evolve": {
-        "auto_resolve_conflicts": True,
-        "conflict_escalate_days": 14,
+        "auto_resolve_conflicts": True,        "conflict_escalate_days": 14,
         "experience_match_threshold": 0.55,
         "tuning": {
             "min_labels": 50,
@@ -461,6 +647,12 @@ DEFAULTS: dict[str, Any] = {
         "rest_host": "127.0.0.1",
         "rest_port": 8765,
         "max_export_mb": 16,
+        # 统一渲染器（P0-2，默认关）：宿主/CLI/MCP 用的「证据块」渲染统一由
+        # PMem.render() 产出（卡片 + 契约行 + 相对日期）。关时宿主仍用自己的旧格式，
+        # 保证产品行为与 0.38.0 逐字一致。
+        "render": {
+            "cards": False,
+        },
     },
 }
 

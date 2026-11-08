@@ -95,6 +95,7 @@ for (const endpoint of [
   "apiConsole('/vector/rebuild'",
   "apiConsole('/memory/batch'",
   "apiConsole('/action'",
+  "api('/project-scope'",
 ]) {
   assert.ok(source.includes(endpoint), `缺少真实接口调用：${endpoint}`)
 }
@@ -277,7 +278,7 @@ globalThis.fetch = async () => {
 
 const bootFull = {
   version: '0.8.0',
-  status: { db: { memory_total: 12, integrity_ok: true, db_size_bytes: 4096, schema_version: 3 }, mcp: { tools: 27 } },
+  status: { db: { memory_total: 12, integrity_ok: true, db_size_bytes: 4096, schema_version: 3 }, mcp: { tools: 30 } },
   model: { available: true, provider: 'deepseek-account', model: 'deepseek-flash', providers: ['deepseek-account'], source: 'default', note: null },
   counts: { memory_total: 12, today_new: 2, today_recalls: 7, open_conflicts: 1, uses: 30 },
   wake: { text: '卡', tokens: 100, chars: 260 },
@@ -289,7 +290,7 @@ const bootFull = {
 const statusFull = {
   version: '0.8.0',
   db: { integrity_ok: true, db_size_bytes: 4096, schema_version: 3, by_status: { active: 10 } },
-  mcp: { serverName: 'pmem', tools: 27 },
+  mcp: { serverName: 'pmem', tools: 30 },
   tokens: { p95: 100, mean: 90, samples: 4 },
   wake: { chars: 260 },
   runtime: { spec: { budget: { type: 'int', min: 120, max: 1200, step: 20, label: '预算', unit: 'token' } } },
@@ -356,6 +357,16 @@ assert.equal(segs.length, 4, '排序应该有四个分段按钮')
 assert.deepEqual(segs.map(seg => textOf(seg.children)), ['相关度', '时间', '重要度', '使用次数'])
 assert.ok(textOf(memoryTree).includes('分组过滤（含子组·多选）'))
 assert.ok(source.includes('加载更多'), '记忆页要有「加载更多」（当前无结果时不渲染按钮，故查源码）')
+// 断言层最小页（0.41.0）：记忆页折叠区 = 列表 + 搜索 + 删除
+const memoryText = textOf(memoryTree)
+assert.ok(memoryText.includes('断言层（claim）· 列表 / 搜索 / 删除'), '记忆页缺少断言层入口')
+assert.equal(
+  findAll(memoryTree, node => node.props?.['aria-label'] === '搜索断言').length,
+  1,
+  '断言层缺少搜索框',
+)
+assert.ok(source.includes("api('/claims?"), '断言列表/搜索要走 /claims')
+assert.ok(source.includes("api('/claims/delete'"), '断言软删要走 /claims/delete')
 
 // 实体页：真路由的表单/合并入口都在（初始无数据也不白屏）
 const entityTree = client.ConsoleEntities({ notify: idle, goto: idle })
@@ -381,6 +392,44 @@ assert.ok(settingsText.includes('闲多久算该睡'), '夜间缺少空闲阈值
 assert.ok(settingsText.includes('pmem-daemon'), '夜间缺少 daemon 状态')
 assert.ok(source.includes("api('/night'"), '夜间设置要走 /night')
 assert.ok(source.includes('schedule: { at: nightAt }'), '存时间要发 schedule.at')
+
+// 项目 scope（P3-17）：设置页有显式限定的开关 + 名称，读写走 /project-scope
+for (const label of ['用项目限定检索', '项目名称', '存名称', '不是自动分类']) {
+  assert.ok(settingsText.includes(label), `项目面板缺少：${label}`)
+}
+assert.ok(source.includes("api('/project-scope'"), '项目 scope 要走 /project-scope')
+assert.ok(source.includes('{ enabled: value }'), '项目开关要发 enabled')
+assert.ok(source.includes('{ name: projectName }'), '存名称要发 name')
+
+// 自动淡忘（0.40.0）：默认关，开关读写走 /lifecycle，说明里要有等级表与「不删除」铁律
+for (const label of ['自动淡忘（默认关）', '召回池不会随时间缩水', '只降级不删除', 'pmem lifecycle']) {
+  assert.ok(settingsText.includes(label), `记忆面板缺少：${label}`)
+}
+assert.ok(source.includes("api('/lifecycle'"), '自动淡忘要走 /lifecycle')
+assert.ok(source.includes("setLifecycleEnabled(data?.enabled === true)"), '进页面要回显 lifecycle.enabled')
+
+// 断言层（0.41.0）：设置页主开关置顶 + 三个子开关（claim.index / claim.version / answer.boundary_check），默认全关
+for (const label of [
+  '断言层主开关（claim.enabled）',
+  '断言索引（claim.index）',
+  '改口版本链（claim.version）',
+  '边界自查（answer.boundary_check）',
+  '主开关关闭时子开关不生效',
+]) {
+  assert.ok(settingsText.includes(label), `断言层面板缺少：${label}`)
+}
+assert.ok(source.includes("api('/claim-settings'"), '断言层开关要走 /claim-settings')
+assert.ok(source.includes('applyClaimSettings(data)'), '进页面要回显断言层设置')
+assert.ok(source.includes('setClaimMaster(data?.master === true)'), '回显时要带上主开关 claim.enabled')
+assert.ok(source.includes('saveClaim({ master: value }'), '主开关可写：要 POST master')
+assert.equal(
+  source.split('disabled: claimBusy || !claimMaster').length - 1,
+  3,
+  '主开关关闭时三个子开关都要置灰（不要隐藏）',
+)
+assert.ok(source.includes('去「设置 → 断言层」打开它'), '断言列表空态要引导去设置里打开')
+// 记忆页空态（ClaimPanel 无数据时）在「记忆」里。
+assert.ok(source.includes('断言层主开关关闭'), '断言列表要有主开关关闭的空态提示')
 
 // 总览：今日召回 + 空库引导；不再有「待办」
 const overviewText = textOf(client.ConsoleOverview({

@@ -248,3 +248,149 @@ def coverage_idf_sets(
         if term in target:
             num += weight
     return (num / denom) if denom else 0.0
+
+
+# ---- 问句计划（P1-7）：只产字段，不决定行为 --------------------------------
+#
+# 为什么单独一层：检索/渲染想知道「这句更像哪一种问法」，但如果每个调用方各自
+# 写一套「是不是聚合题/比较题」的判断，就又长成题型 if 表（路线图 §0.2 反对的
+# 那种）。所以这里只回答一次：kind + 命中的信号原文 + 可做同主体锚的实词。
+# **纯函数**：无 DB、无 cfg、不调模型；同一句话永远得到同一份结果。
+
+# 聚合型问法：答案可能需要**同一主体的多条事实**（「各/分别/哪几/几类…」）。
+AGGREGATE_SIGNALS: tuple[str, ...] = (
+    "各自", "各", "分别", "哪几", "哪些", "两类", "几类", "几个", "几件", "还有哪些",
+)
+# 「都 + 动词」：单独一个「都」多半是副词（「都是朋友」），所以要求后面跟实义动词。
+# 动词是封闭集合，和 net/entities 的词表同一种「确定性预筛」思路，不引入模型。
+DISTRIBUTIVE_VERBS: frozenset[str] = frozenset(
+    {"是", "有", "会", "去", "来", "做", "吃", "穿", "用", "买", "说", "在", "想", "要"}
+)
+# 比较型问法：两个对象/两段时间的对照。
+COMPARE_SIGNALS: tuple[str, ...] = (
+    "相比", "对比", "比起", "比一比", "哪个更", "谁更", "哪个好", "差多少",
+    "差距", "差别", "高还是低", "多还是少", "一样吗", "不同",
+)
+_QUESTION_WORDS: frozenset[str] = frozenset(
+    {"什么", "啥", "哪些", "哪个", "哪里", "哪儿", "怎么", "怎样", "如何",
+     "多少", "几个", "几件", "是否", "为什么", "哪几", "几类", "两类"}
+)
+# subject_terms 的清洗字符集：聚合/比较信号的字不能当主体锚（「妈各」不是主体），
+# 首尾是单字虚词的双字也去掉（「我住」「的工」）。都是已有 STOP_WORDS 的复用。
+_AGGREGATE_CHARS = frozenset("各都哪几些两类件分别")
+_COMPARE_CHARS = frozenset("相比差对距")
+_QUESTION_CHARS = frozenset("谁咋啥怎吗呢")
+_SINGLE_STOP = frozenset(word for word in STOP_WORDS if len(word) == 1)
+# 时间词表从 timecue 取（lazy import：避免 query → retrieval → search → query 的循环）。
+_TIME_WORDS: tuple[str, ...] | None = None
+
+
+def _time_words() -> tuple[str, ...]:
+    global _TIME_WORDS
+    if _TIME_WORDS is None:
+        try:
+            from .retrieval import timecue
+
+            _TIME_WORDS = tuple(timecue._STRONG_WORDS) + tuple(timecue._WEAK_WORDS)
+        except Exception:  # noqa: BLE001 词表取不到时只影响 subject_terms 过滤
+            _TIME_WORDS = ()
+    return _TIME_WORDS
+
+
+def _time_kind(text: str) -> bool:
+    try:
+        from .retrieval import timecue
+
+        return bool(timecue.is_time_question(text))
+    except Exception:  # noqa: BLE001 取不到就退回最小词面判断，不抛
+        return any(word in text for word in ("什么时候", "哪天", "几号", "上周", "去年", "多久"))
+
+
+def _aggregate_hits(text: str) -> list[str]:
+    """命中的聚合信号原文（≤4）。「都+动词」只取一次；长信号覆盖短信号。"""
+    hits: list[str] = []
+    for signal in sorted(AGGREGATE_SIGNALS, key=len, reverse=True):
+        if signal not in text:
+            continue
+        if any(signal in longer for longer in hits):  # 「还有哪些」命中后不再重复计「哪些」
+            continue
+        hits.append(signal)
+    if "都" in text:
+        for index, char in enumerate(text[:-1]):
+            if char == "都" and text[index + 1] in DISTRIBUTIVE_VERBS:
+                fragment = text[index:index + 2]
+                if fragment not in hits:
+                    hits.append(fragment)
+                break
+    return hits[:4]
+
+
+def _subject_terms(text: str) -> list[str]:
+    """问句里可做「同主体」锚的实词，≤4。
+
+    判据全部复用已有函数：``content_terms`` 先去掉疑问词/虚词，这里再滤掉
+    - 时间词（「上周」不能当主体锚，词表复用 timecue）、残留疑问词；
+    - 聚合/比较信号字（「妈各」「各喜」不是主体）、首尾单字虚词（「我住」「的工」）。
+    没有新词表：字符集都是 STOP_WORDS / AGGREGATE_SIGNALS / COMPARE_SIGNALS 的复用。
+    """
+    drop = set(_QUESTION_WORDS) | set(_time_words())
+    out: list[str] = []
+    for term in content_terms(text):
+        if not term or term in drop or term in out:
+            continue
+        chars = set(term)
+        if chars & _AGGREGATE_CHARS or chars & _COMPARE_CHARS or chars & _QUESTION_CHARS:
+            continue
+        if term[0] in _SINGLE_STOP or term[-1] in _SINGLE_STOP:
+            continue
+        out.append(term)
+        if len(out) >= 4:
+            break
+    return out
+
+
+def plan(question: str) -> dict[str, object]:
+    """一句话 → 问句计划（纯函数，不读 DB/cfg）。
+
+    返回 ``{kind, aggregate_terms, subject_terms, confidence}``：
+
+    - ``kind``：``lookup``（普通查找）/ ``aggregate``（要同一主体的多条）/
+      ``compare``（两个对象对照）/ ``time``（问时间或某段时间）；
+    - ``aggregate_terms``：命中的聚合信号原文（≤4；非聚合题也原样给出，供调用方判断）；
+    - ``subject_terms``：可做同主体锚的实词（≤4）；
+    - ``confidence``：0~1，问法同时命中多个类别时会降下来。
+
+    **只产字段**：怎么用（加候选/改渲染/换预算）由调用方决定，这里不写行为分支。
+    """
+    text = str(question or "").strip()
+    if not text:
+        return {"kind": "lookup", "aggregate_terms": [], "subject_terms": [], "confidence": 0.0}
+    aggregate_terms = _aggregate_hits(text)
+    compare_hits = [signal for signal in COMPARE_SIGNALS if signal in text][:4]
+    is_time = _time_kind(text)
+    if compare_hits:
+        kind = "compare"
+        signals = compare_hits
+    elif aggregate_terms and len(text) >= 6:
+        kind = "aggregate"
+        signals = aggregate_terms
+    elif is_time:
+        kind = "time"
+        signals = ["time"]
+    else:
+        kind = "lookup"
+        signals = []
+    # 同一句同时像两类问法 = 问法本身有歧义；置信度降下来，让调用方别拿它做硬判断。
+    categories = sum(
+        [bool(compare_hits), bool(aggregate_terms) and len(text) >= 6, is_time]
+    )
+    confidence = 0.30 if kind == "lookup" else 0.35 + 0.10 * min(len(signals), 3)
+    if kind == "aggregate":
+        confidence += 0.05
+    confidence -= 0.10 * max(0, categories - 1)
+    return {
+        "kind": kind,
+        "aggregate_terms": aggregate_terms,
+        "subject_terms": _subject_terms(text),
+        "confidence": round(max(0.02, min(0.95, confidence)), 2),
+    }

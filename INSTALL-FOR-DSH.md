@@ -141,7 +141,7 @@ pmem doctor
 3. 转成 PMem 的 JSONL，格式如下（首行必须是 header）：
 
 ```json
-{"type":"pmem_export","version":"v1","schema_version":"1.10.0","created_at":"2026-11-04T00:00:00Z","embedding_model":null,"counts":{"memory":2}}
+{"type":"pmem_export","version":"v1","schema_version":"1.11.0","created_at":"2026-11-04T00:00:00Z","embedding_model":null,"counts":{"memory":2}}
 {"type":"memory","id":"01IMPORT0000000000000000001","text":"用户的猫叫年糕，是只橘猫","kind":"semantic","provenance":"external","status":"active","sensitivity":"personal","created_at":"2026-10-01T12:00:00Z","day":"2026-10-01","source":{"kind":"imported","ref":"dsh-soul"},"extra":{"origin_table":"nodes","origin_id":"n-42"}}
 {"type":"memory","id":"01IMPORT0000000000000000002","text":"2026-10-03 他说想换工作，但还没下定决心","kind":"episodic","provenance":"external","status":"active","sensitivity":"personal","created_at":"2026-10-03T21:30:00Z","day":"2026-10-03","source":{"kind":"imported","ref":"dsh-soul"}}
 ```

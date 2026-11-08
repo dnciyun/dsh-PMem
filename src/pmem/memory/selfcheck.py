@@ -29,6 +29,7 @@ from datetime import date
 from typing import Any
 
 from ..base import clock
+from . import timeresolve
 
 # 下面是「配置缺失/调用方没传」时的兜底默认值：真正生效的阈值优先读
 # ``selfcheck.*``（和 config.py 里的默认值同口径），显式传参再覆盖配置。
@@ -138,6 +139,13 @@ def _extract_dates(text: str, *, today: date, limit: int) -> list[dict[str, Any]
                 "day": int(match.group(2)),
             }
         )
+    # 中文数字日期（task-36）：十二月二号 / 二〇二五年十二月二日；复用 timeresolve.cn_date_hits。
+    for hit in timeresolve.cn_date_hits(text):
+        span = (int(hit["start"]), int(hit["start"]) + len(str(hit["span"])))
+        if _overlaps(span, occupied):
+            continue
+        occupied.append(span)
+        hits.append(dict(hit))
     hits.sort(key=lambda item: item["start"])
     return hits[: max(1, int(limit or 1))]
 
@@ -169,6 +177,101 @@ def _memory_row(row: Any) -> dict[str, Any]:
     }
 
 
+
+# ------------------------------------------------- 日期证据的「宽容取证」（task-36）
+# 目标：宁可漏报不可误报——记到过就不要再报「没依据」。三条补充证据全部只加支持、不加指控：
+#   1) 记录正文里用中文/数字写的同月日（十二月二号 ↔ 12月2号）；
+#   2) 相对说法按该行记录日推导出的绝对日期（周五 按 2026-06-30 推得 07-03）；
+#   3) 上面两条的来源是 memory.text_raw 与 journal_line.text，不限 structured day。
+# 缓存按 (id(conn), subject) 存一次推导结果，避免每条日期重复扫文本。
+_DERIVED_DAYS_CACHE: dict[tuple[int, str], set[str]] = {}
+
+
+def _text_date_patterns(target: date) -> list[str]:
+    month, day = target.month, target.day
+    cn_month, cn_day = timeresolve._cn_int_text(month), timeresolve._cn_int_text(day)
+    values = {
+        f"%{month}月{day}号%", f"%{month}月{day}日%",
+        f"%{cn_month}月{cn_day}号%", f"%{cn_month}月{cn_day}日%",
+    }
+    return sorted(values)
+
+
+def _text_date_evidence(
+    conn: Any, subject: str, target: date, *, limit: int
+) -> list[dict[str, Any]]:
+    """记录正文里有没有「同月日」的写法（中文/数字）；有就返回摘要（仍只是**支持**证据）。"""
+    cap = max(1, int(limit or 1))
+    patterns = _text_date_patterns(target)
+    like = " OR ".join("text_raw LIKE ?" for _ in patterns)
+    mem_sql = (
+        "SELECT id, text_raw AS text, COALESCE(valid_from, day_key) AS stamp FROM memory "
+        f"WHERE subject_id=? AND status<>'deleted' AND ({like}) ORDER BY seq DESC LIMIT ?"
+    )
+    rows = conn.execute(mem_sql, (subject, *patterns, cap)).fetchall()
+    evidence = [_memory_row(row) for row in rows]
+    if len(evidence) >= cap:
+        return evidence[:cap]
+    line_like = " OR ".join("text LIKE ?" for _ in patterns)
+    line_sql = (
+        "SELECT id, text, ts AS stamp FROM journal_line "
+        f"WHERE subject_id=? AND ({line_like}) ORDER BY seq DESC LIMIT ?"
+    )
+    line_rows = conn.execute(line_sql, (subject, *patterns, cap - len(evidence))).fetchall()
+    evidence.extend(
+        {"id": str(row["id"]), "text": str(row["text"] or "")[:120], "day": str(row["stamp"] or "")[:10]}
+        for row in line_rows
+    )
+    return evidence[:cap]
+
+
+def _derived_days(conn: Any, subject: str) -> set[str]:
+    """把记录正文里的相对说法/中文日期按各自记录日推导成绝对日期集合（缓存）。"""
+    # 缓存键必须带「这张库当前的记录规模」：id(conn) 在测试里会被复用，
+    # 只按 id 缓存会把上一张库的推导结果串过来（宁可重算，不能串库）。
+    try:
+        signature = int(
+            conn.execute("SELECT COUNT(*) FROM memory WHERE subject_id=?", (subject,)).fetchone()[0]
+        ) + int(
+            conn.execute("SELECT COUNT(*) FROM journal_line WHERE subject_id=?", (subject,)).fetchone()[0]
+        )
+    except Exception:  # noqa: BLE001 坏表就不缓存
+        signature = -1
+    key = (id(conn), subject, signature)
+    cached = _DERIVED_DAYS_CACHE.get(key)
+    if cached is not None:
+        return cached
+    days: set[str] = set()
+    for sql in (
+        "SELECT text_raw AS text, COALESCE(valid_from, day_key, '') AS stamp FROM memory "
+        "WHERE subject_id=? AND status<>'deleted' ORDER BY seq DESC LIMIT 300",
+        "SELECT text, COALESCE(day_key, ts, '') AS stamp FROM journal_line "
+        "WHERE subject_id=? ORDER BY seq DESC LIMIT 300",
+    ):
+        try:
+            rows = conn.execute(sql, (subject,)).fetchall()
+        except Exception:  # noqa: BLE001 老库/坏表：取证退化，不指控
+            continue
+        for row in rows:
+            body, stamp = str(row["text"] or ""), str(row["stamp"] or "")[:10]
+            if not body or not stamp:
+                continue
+            for _phrase, iso in timeresolve.loose_relative_dates(body, stamp):
+                days.add(iso)
+            try:
+                base_day = date.fromisoformat(stamp)
+            except ValueError:
+                continue
+            for hit in timeresolve.cn_date_hits(body):
+                resolved = _resolve_date(hit, base_day)  # type: ignore[arg-type]
+                if resolved is not None:
+                    days.add(resolved.isoformat())
+    if len(_DERIVED_DAYS_CACHE) > 64:
+        _DERIVED_DAYS_CACHE.clear()
+    _DERIVED_DAYS_CACHE[key] = days
+    return days
+
+
 def _date_evidence(
     conn: Any, subject: str, target: date, *, year_known: bool, limit: int = MAX_EVIDENCE
 ) -> list[dict[str, Any]]:
@@ -177,13 +280,12 @@ def _date_evidence(
     evidence: list[dict[str, Any]] = []
     if year_known:
         stamp = target.isoformat()
-        args: tuple[Any, ...] = (subject, stamp, stamp, cap)
         mem_rows = conn.execute(
             "SELECT id, text_raw AS text, COALESCE(valid_from, day_key) AS stamp FROM memory "
             "WHERE subject_id=? AND status<>'deleted' "
             "AND (substr(day_key,1,10)=? OR substr(valid_from,1,10)=?) "
             "ORDER BY seq DESC LIMIT ?",
-            args,
+            (subject, stamp, stamp, cap),
         ).fetchall()
     else:
         md = target.strftime("%m-%d")
@@ -195,6 +297,10 @@ def _date_evidence(
             (subject, md, md, cap),
         ).fetchall()
     evidence.extend(_memory_row(row) for row in mem_rows)
+    if len(evidence) >= cap:
+        return evidence[:cap]
+    # 结构化字段没有，再看记录正文的写法（中文数字/月日）——宁可漏报不可误报。
+    evidence.extend(_text_date_evidence(conn, subject, target, limit=cap - len(evidence)))
     if len(evidence) >= cap:
         return evidence[:cap]
     if year_known:
@@ -221,6 +327,23 @@ def _date_evidence(
         }
         for row in line_rows
     )
+    if len(evidence) >= cap:
+        return evidence[:cap]
+    # 最后一道：相对说法按记录日推导出的绝对日期（周五/上个月24号/明天…）。
+    derived = _derived_days(conn, subject)
+    if year_known:
+        matched = target.isoformat() in derived
+    else:
+        md = target.strftime("%m-%d")
+        matched = any(day[5:] == md for day in derived)
+    if matched:
+        evidence.append(
+            {
+                "id": "derived-relative",
+                "text": f"记录里的相对日期按记录日可推导到 {target.isoformat()}",
+                "day": target.isoformat(),
+            }
+        )
     return evidence[:cap]
 
 
@@ -393,10 +516,104 @@ def _trim_trailing(candidate: str) -> str:
     return candidate
 
 
+# ------------------------------------------------- 专名候选的边界/词性证据打分（task-34）
+# 为什么改成打分：旧实现「姓氏 + 2–4 字 + 不是虚词尾」会把普通词切成人名
+# （行李箱→李箱、周三米米→周三米、一张旧地图→张旧、那张报价单→张报价），H1 在
+# 592 通过答案上误伤 6.8%/8.8%。这里不往黑名单里加词，而是给候选算**证据分**：
+#   左边界（句首/标点=强，功能词=中，实词连续=负）、右边界（句末/标点/谓词/代词/语气=强，
+#   时间续接=负，实词连续=负）、词性类别（数词+量词组合、昵称前缀）、实体抽取模板共现。
+# 阈值可配：`NAME_BOUNDARY_MIN_SCORE`（默认 2.0）或调用方传 ``min_score``。
+# 这套打分只影响「候选像不像人名」，不改 `check_answer` 的判定语义（有据/无据仍照旧）。
+NAME_BOUNDARY_MIN_SCORE = 2.0
+
+_NAME_LEFT_STRONG = set("和跟与及对给让叫请把被将是说问答看听找等带同随由从向往到于为帮陪替")
+_NAME_RIGHT_STRONG = set(
+    "说问道笑哭喊骂答听说看找去来在也都还又就才总不没把被给让是的了他她它们和跟与及"
+    "下上中里外家改做写买拿放留帮陪当有会要想能一"
+)
+_NAME_DEMO_NUMERAL = set("一二三四五六七八九十几两这那哪每各第单半")
+_NAME_MEASURE = set("张条只把件位个名份次棵座间本支辆台套句段篇页块周岁天年月日号点分秒斤元")
+_NAME_NICK_PREFIX = set("小老阿大")
+_NAME_TIME_RIGHT = set("年月日号时点分秒周礼拜")
+
+
+def _name_pattern_bonus(run: str, index: int, candidate: str) -> float:
+    """实体抽取模板共现证据（复用 net.entities 的人名模板；不新造规则）。
+
+    候选正好落在「X 说 / X 告诉 / X 也 / X 爸妈 / X 家」这类高精度人名模板的 name 位时
+    加 3 分——这是「共现证据」，比任何词表都可靠。
+    """
+    try:
+        from ..net import entities as net_entities
+    except Exception:  # noqa: BLE001 net 不可用时少一类证据，不影响主流程
+        return 0.0
+    for pattern in (
+        net_entities._PERSON3,
+        net_entities._PERSON2,
+        net_entities._PERSON_ACT,
+        net_entities._PERSON_KIN,
+    ):
+        try:
+            matches = pattern.finditer(run, max(0, index - 3))
+        except Exception:  # noqa: BLE001 坏正则/坏数据都只少一类证据
+            continue
+        for match in matches:
+            start = match.start("name")
+            if start > index:
+                break
+            if start == index and match.group("name") == candidate:
+                return 3.0
+    return 0.0
+
+
+def _name_boundary_score(
+    *, body: str, base: int, chunk: str, index: int, candidate: str, surnames: frozenset[str]
+) -> float:
+    """候选的证据分：左边界 + 右边界 + 词性类别 + 实体模板共现。"""
+    left = body[base + index - 1] if base + index > 0 else ""
+    end = base + index + len(candidate)
+    right = body[end] if end < len(body) else ""
+    score = 0.0
+    if not left or not ("\u4e00" <= left <= "\u9fff"):
+        score += 2.0  # 句首/标点/空白/被遮蔽的已知名之后
+    elif left in _NAME_LEFT_STRONG:
+        score += 1.5
+    elif left in _NAME_DEMO_NUMERAL or left in _NAME_NICK_PREFIX:
+        score -= 2.0  # 「一张旧」「小唐再定」：量词/昵称前面的那截不是名字开头
+    else:
+        score -= 2.5  # 实词连续：候选大概率是词中间（「进行李箱」的「李箱」）
+    if not right or not ("\u4e00" <= right <= "\u9fff"):
+        score += 2.0  # 句末/标点/空白
+    elif right in _NAME_RIGHT_STRONG:
+        score += 1.5  # 名字后面紧跟谓词/代词/语气词
+    elif right in _NAME_TIME_RIGHT:
+        score -= 2.0
+    else:
+        score -= 1.5  # 词继续往下走（行李箱→李箱、周三米米→周三米）
+    if candidate[0] in _NAME_MEASURE and left in _NAME_DEMO_NUMERAL:
+        score -= 2.5  # 「一张旧地图」的「张旧」：张是量词不是姓
+    if candidate[:2] in _COMPOUND_SURNAMES or candidate[0] in surnames:
+        score += 0.5
+    score += _name_pattern_bonus(chunk, index, candidate)
+    score += 1.0 if len(candidate) == 2 else (0.5 if len(candidate) == 3 else -1.0)
+    return score
+
+
 def _name_candidates(
-    text: str, *, spans: list[tuple[int, int]], limit: int
+    text: str,
+    *,
+    spans: list[tuple[int, int]],
+    limit: int,
+    min_score: float | None = None,
 ) -> list[str]:
-    """从答案的连续汉字里挑「像人名」的字串；已知名字所在的位置先遮蔽。"""
+    """从答案的连续汉字里挑「像人名」的候选；已知名字所在位置先遮蔽。
+
+    候选先按 3→2→4 字生成（`_looks_like_person_name` 做硬过滤），再用
+    ``_name_boundary_score`` 的证据分过阈值（默认 ``NAME_BOUNDARY_MIN_SCORE``）。
+    目标：把「行李箱→李箱 / 周三米米→周三米 / 一张旧地图→张旧」这类词中间切片刷掉，
+    同时保留真名（真名通常有句首/标点/谓词/模板共现的边界证据）。
+    """
+    threshold = NAME_BOUNDARY_MIN_SCORE if min_score is None else float(min_score)
     masked = list(text)
     for begin, end in spans:
         for index in range(max(0, begin), min(len(masked), end)):
@@ -406,6 +623,7 @@ def _name_candidates(
     found: list[str] = []
     for run in _CN_RUN.finditer(body):
         chunk = run.group(0)
+        base = run.start()
         index = 0
         while index < len(chunk):
             if len(found) >= max(1, int(limit or 1)):
@@ -422,18 +640,28 @@ def _name_candidates(
             picked = ""
             # 中文人名以 2–3 字为主，4 字多是复姓或少数民族名：先试 3 再试 2，
             # 都不成立才试 4（避免「赵铁柱打」这种把后一个动词也吃进来）。
-            if compound:
-                sizes = (4, 3)
-            else:
-                sizes = (3, 2, 4)
+            sizes = (4, 3) if compound else (3, 2, 4)
             for size in sizes:
                 if index + size > len(chunk):
                     continue
                 # 先裁右边界再校验：「李静当时也在」的 3 字候选要落回「李静」。
                 candidate = _trim_trailing(chunk[index : index + size])
-                if _looks_like_person_name(candidate, surnames=surnames, bad_tail=bad_tail):
-                    picked = candidate
-                    break
+                if not _looks_like_person_name(candidate, surnames=surnames, bad_tail=bad_tail):
+                    continue
+                # 时间词不是人名（周三/今天/周一）：复用 timecue 的现成判据，算词性证据。
+                try:
+                    from .retrieval import timecue
+
+                    if timecue._WEEKDAY.match(candidate):
+                        continue
+                except Exception:  # noqa: BLE001 timecue 不可用就跳过这条证据
+                    pass
+                if _name_boundary_score(
+                    body=body, base=base, chunk=chunk, index=index, candidate=candidate, surnames=surnames
+                ) < threshold:
+                    continue
+                picked = candidate
+                break
             if picked:
                 found.append(picked)
                 index += len(picked)
@@ -463,12 +691,17 @@ def _check_names(
     text: str,
     *,
     max_names: int,
+    min_score: float | None = None,
 ) -> tuple[list[dict[str, Any]], int, bool]:
-    """核对答案里的专名；返回 (issues, 核了几个名字, 是否因上限被截断)。"""
+    """核对答案里的专名；返回 (issues, 核了几个名字, 是否因上限被截断)。
+
+    ``min_score``：候选证据分阈值（默认 ``NAME_BOUNDARY_MIN_SCORE``）；verifier 可以按
+    自己的配置传更低/更高的阈值，selfcheck 既有调用方不传、行为由默认值决定。
+    """
     text_lower = text.lower()
     names = _known_names(conn, subject)
     known_spans, recognized = _mark_known_spans(text_lower, names)
-    candidates = _name_candidates(text, spans=known_spans, limit=max_names)
+    candidates = _name_candidates(text, spans=known_spans, limit=max_names, min_score=min_score)
     truncated = len(candidates) >= max(1, int(max_names or 1))
     issues: list[dict[str, Any]] = []
     checked = recognized

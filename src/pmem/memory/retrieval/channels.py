@@ -57,6 +57,21 @@ def _assistant_voice_query(q: str) -> list[str]:
 
 
 
+def claim_hits(
+    store: Any, query: str, *, limit: int = 12, kinds: list[str] | None = None
+) -> list[dict[str, Any]]:
+    """claim 命中通道（task-45，只在 claim.index.enabled 时由 search 调用）。
+
+    真正的 FTS/索引维护在 ``retrieval.claim_index``；这里只是 search 侧的薄包装，
+    保持「通道函数都在 channels.py」的一致性。subject/kind 过滤在 claim_index 内做。
+    """
+    from . import claim_index
+
+    return claim_index.search(
+        store.db, query, subject=store.subject, kinds=kinds, limit=limit
+    )
+
+
 def _json_dump(data: dict[str, Any] | None) -> str:
     # 和 ``memory/store.py`` 里的同名实现必须保持一致（channels 不能 import store，
     # 否则循环）；改 canonical JSON 口径时两处一起改。
@@ -555,7 +570,9 @@ def place_items(
         victim = victims[0]
         release = estimate_tokens(str(payload[victim].get("text") or "")) + 12
         if cost > avail + release:
-            break
+            # 这一条太大放不下：跳过它试后面更短的，别因此整批放弃
+            # （G2 实测：第二路第一条是长摘要时 break 会把后面能放下的全挡住）。
+            continue
         victims.pop(0)
         evicted.append(victim)
         avail += release
@@ -580,6 +597,104 @@ def place_items(
     return result_payload, result_seq, result_cov, result_spent, len(fitted), len(evicted)
 
 
+def pack_items(
+    items: list[dict[str, Any]],
+    seqs: list[int] | None = None,
+    *,
+    budget: int,
+    k: int,
+    values: list[float],
+    covers: list[set[str]] | None = None,
+    must_cover: list[str] | None = None,
+    per_item_overhead: int = 12,
+    truncate_at: int = 120,
+) -> tuple[list[dict[str, Any]], list[int], int]:
+    """预算打包（P2-12，默认关）：按价值装箱决定「注入哪些 / 什么顺序」。
+
+    和 ``scoring.fit_budget`` 的分工：那个是**先到先得**（按已有顺序装，装不下就截断
+    120 字并停）；这里改成贪心装箱，只换「装填策略」，**候选评分一分不动**。
+
+    两阶段（确定性）：
+    1. must_cover 优先：每个必须覆盖的槽位挑价值最高、装得下的条目（宁缺勿错：装不下
+       就跳过该槽位，不硬塞）；
+    2. 剩余预算按价值从高到低填。价值由调用方算（``search._pack_payload``：
+       coverage × 类型覆盖 × 新鲜度），这里只读 ``values``/``covers``。
+
+    约束：返回顺序即注入顺序；``len(结果) ≤ k``、``used ≤ budget``。放不下的长条目按
+    ``fit_budget`` 同款规则截到 ``truncate_at`` 字再试一次（标 ``truncated``），仍放不下
+    就跳过继续试后面的（装箱不该因为一条太长而停）。
+    返回 ``(items, seqs, used)``——seqs 与 items 对齐，供调用方回填 payload_seq。
+    """
+    cap_k = max(0, int(k))
+    cap_budget = max(0, int(budget))
+    if not items or cap_k <= 0 or cap_budget <= 0:
+        return [], [], 0
+    seq_list = list(seqs) if seqs is not None else [0] * len(items)
+    if len(seq_list) != len(items):
+        seq_list = [0] * len(items)
+    slots = [str(slot) for slot in (must_cover or []) if str(slot)]
+    cover_list: list[set[str]] = list(covers) if covers is not None else [set() for _ in items]
+
+    packed: list[dict[str, Any]] = []
+    packed_seqs: list[int] = []
+    taken: set[int] = set()
+    used = 0
+
+    def _try_take(index: int) -> bool:
+        """装下第 index 条（装不下先按既有规则截断再试）；成功返回 True。"""
+        nonlocal used
+        item = items[index]
+        text = str(item.get("text") or "")
+        avail = cap_budget - used
+        cost = estimate_tokens(text) + per_item_overhead
+        if cost <= avail:
+            packed.append(item)
+            packed_seqs.append(seq_list[index])
+            used += cost
+            return True
+        # 和 fit_budget 同款：剩余够 40 token 才值得截断，否则这条放弃。
+        if avail - per_item_overhead < 40:
+            return False
+        head_chars = max(20, min(len(text), truncate_at))
+        clipped = dict(item)
+        clipped["text"] = text[:head_chars] + "…"
+        clipped["truncated"] = True
+        cost = estimate_tokens(clipped["text"]) + per_item_overhead
+        if cost > avail:
+            return False
+        packed.append(clipped)
+        packed_seqs.append(seq_list[index])
+        used += cost
+        return True
+
+    # 阶段 1：must_cover 槽位优先（每个槽位最多一条；同价值按原顺序，保证确定性）。
+    for slot in slots:
+        if len(packed) >= cap_k:
+            break
+        candidates = [
+            index
+            for index in range(len(items))
+            if index not in taken and slot in cover_list[index]
+        ]
+        candidates.sort(key=lambda index: (-float(values[index] or 0.0), index))
+        for index in candidates:
+            if _try_take(index):
+                taken.add(index)
+                break
+    # 阶段 2：剩余预算按价值从高到低贪心填满（同价值按原顺序）。
+    for index in sorted(range(len(items)), key=lambda i: (-float(values[i] or 0.0), i)):
+        if len(packed) >= cap_k:
+            break
+        if index in taken:
+            continue
+        if _try_take(index):
+            taken.add(index)
+    return packed, packed_seqs, used
+
+
+# P2-15（2026-11-07）核实后判定为**伪需求，不设开关**：assistant 原话从 0.36.1 起
+# 就不按 role 过滤（本函数 SQL 一直没 role 条件），assistant 行默认就能被原话兜底召回，
+# 加开关没有可观察语义。留一条正向断言防回归（tests/test_assistant_raw.py）。
 def raw_fallback(
     store: Any,
     *,
@@ -894,3 +1009,136 @@ def record_search(
                     "returned": len(payload),
                 },
             )
+
+
+# ---------------------------------------------------------------- P0–P3 新增（默认关）
+# 下面三个函数只服务默认关闭的 opt-in 能力（docs/impl-contract-2026-11-07.md §5）。
+# 放在 channels.py 而不是 search.py：它们都要把「seq/行」变成条目 dict，和
+# ``entity_append`` 是同一份口径（id/text/score/kind/day/valid_from/groups/grade…）；
+# search.py 只负责编排与预算。**关时调用方根本不进这些函数**，对 0.38.0 零影响。
+
+def _aggregate_terms(subject_terms: Any, *, limit: int = 4) -> list[str]:
+    """把 plan.subject_terms 收成去重后的短词表（最多 4 个，空串丢掉）。"""
+    terms: list[str] = []
+    for raw in subject_terms or []:
+        term = str(raw or "").strip()
+        if term and term not in terms:
+            terms.append(term)
+    return terms[: max(0, int(limit))]
+
+
+def _entity_mention_seqs(store: Any, term: str, *, limit: int) -> list[int]:
+    """实体名包含 ``term`` 的 memory seq（P1-7 的「实体命中」那一路）。只读。"""
+    if not term:
+        return []
+    try:
+        rows = store.db.conn.execute(
+            "SELECT DISTINCT em.memory_seq AS seq FROM entity_mention em "
+            "JOIN entity e ON e.id=em.entity_id "
+            "WHERE e.subject_id=? AND e.status='active' "
+            "AND (e.name=? OR e.name LIKE ?) LIMIT ?",
+            (store.subject, term, f"%{term}%", max(1, int(limit))),
+        ).fetchall()
+    except Exception:  # noqa: BLE001 实体表缺/坏只是少一路命中，不影响检索
+        return []
+    return [int(row["seq"]) for row in rows]
+
+
+def aggregate_append(
+    store: Any,
+    *,
+    subject_terms: Any,
+    filters: dict[str, Any],
+    limit: int = 10,
+) -> list[dict[str, Any]]:
+    """同主体枚举（P1-7，默认关）：按 ``query.plan`` 的 subject_terms 找同主体的多条事实。
+
+    为什么需要：问「各/分别/哪几/两类」时，答案天然是多条并列事实，top-k 相似度只
+    带回其中最像的一条。这里用主体词把「同一主体的其它事实」整批取回来，交给调用方
+    **只填空位**（不重排）——主体定错时最多多塞几条，不会把原有排序打乱。
+
+    命中两路（契约 §5.4「memory 文本/实体命中」）：
+    1. 文本：``store._chan_terms`` 走现成 FTS（和词法通道同一份索引）；
+    2. 实体：``entity_mention`` 里名字包含主体词的已抽实体。
+    两条都只是**先取候选**，状态/分组/项目范围/密级仍由 ``fetch_scored`` 统一过滤。
+
+    **只填空位是硬语义**：调用方只用 ``_place_items(head=k, max_evict=0)`` 把它接在
+    payload 尾部——k 个槽位满时这些候选一条都进不去（默认 k=8 / bench k=40 基本都是满的）。
+    置换会挤掉本来对的答案（G2 实测），所以这里不提供「置换」选项，要开另议。
+    """
+    terms = _aggregate_terms(subject_terms, limit=4)
+    cap = max(0, int(limit or 0))
+    if not terms or cap <= 0:
+        return []
+    hits: dict[int, float] = {}
+    per_term = max(4, cap * 3)
+    for term in terms:
+        try:
+            seqs = store._chan_terms([term], limit=per_term)
+        except Exception:  # noqa: BLE001 词法通道挂了只是少一路命中
+            seqs = []
+        for seq in seqs:
+            hits[int(seq)] = hits.get(int(seq), 0.0) + 1.0
+        for seq in _entity_mention_seqs(store, term, limit=per_term):
+            hits[int(seq)] = hits.get(int(seq), 0.0) + 1.0
+    if not hits:
+        return []
+    rows = fetch_scored(store, hits, filters, limit=max(1, cap))
+    if not rows:
+        return []
+    ids = [row["id"] for row in rows]
+    group_map = group_mod.group_map(store.db, "memory", ids)
+    grade_map = group_mod.grade_map(store.db, "memory", ids)
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        hit_count = float(hits.get(int(row["seq"]), 1.0))
+        out.append(
+            {
+                "id": row["id"],
+                "text": row["text_raw"],
+                # 分数压在首遍之下：聚合只能填空位，不该和词法结果抢排位。
+                "score": round(min(0.6, 0.30 + 0.08 * hit_count), 4),
+                "kind": row["kind"],
+                "day": row["day_key"],
+                "valid_from": row["valid_from"],
+                "importance": row["importance"],
+                "confidence": row["confidence"],
+                "provenance": row["provenance"],
+                "channels": ["aggregate"],
+                "truncated": False,
+                "groups": group_map.get(row["id"], []),
+                "grade": grade_map.get(row["id"]),
+                "source": "aggregate",
+                "reach": round(min(1.0, hit_count / max(1, len(terms))), 3),
+            }
+        )
+    return out
+
+
+def journal_excerpts(store: Any, line_ids: Any, *, max_chars: int = 120) -> dict[str, str]:
+    """``source_line_id`` → 原文片段（P2-13，默认关；只读 ``journal_line``）。
+
+    为什么是「片段」而不是改条目正文：派生事实被截断/改人称后丢掉的细节要补回，
+    但条目的 ``text`` 是记忆层的正文，不能偷偷替换（会破坏「原文只追加」和对齐）。
+    所以只在条目旁边附一段 ``source_span``，读原文、不改条目。
+
+    一次 IN 查询取回全部行；关时调用方根本不调本函数（契约要求「关时零额外 SQL」）。
+    """
+    ids: list[str] = []
+    for raw in line_ids or []:
+        line_id = str(raw or "").strip()
+        if line_id and line_id not in ids:
+            ids.append(line_id)
+    if not ids:
+        return {}
+    cap = max(1, int(max_chars or 1))
+    marks = ",".join("?" for _ in ids)
+    try:
+        rows = store.db.conn.execute(
+            f"SELECT id, text FROM journal_line WHERE subject_id=? AND id IN ({marks})",
+            (store.subject, *ids),
+        ).fetchall()
+    except Exception:  # noqa: BLE001 老库/表缺失：没有原文就返回空，不影响检索
+        return {}
+    return {str(row["id"]): str(row["text"] or "")[:cap] for row in rows}
+

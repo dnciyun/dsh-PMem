@@ -12,7 +12,7 @@
 3. 会话结束时自动 handoff；
 4. `/pmem` 命令；
 5. 5 个 `pmem_*` 原生工具；
-6. 同一 bundle 通过官方 MCP client 带上 27 个 `memory_*` 工具；
+6. 同一 bundle 通过官方 MCP client 带上 30 个 `memory_*` 工具；
 7. 侧边栏一行**「记忆控制台」**：整页可视化控制台（总览 / 醒来卡 / 记忆 / 实体 / 睡眠 / 设置），替代原来只能窝在设置弹窗里的卡片窗口。
 
 上下文清空、换会话、换天之后，模型不该从零开始。插件会在 system prompt 里放一张
@@ -35,7 +35,7 @@
 
 DSH 里 MCP server 拿不到 system prompt，也没有 hook（`docs/04-interface.md` §6.3）。
 MCP 只能“模型主动调工具”，而醒来卡必须在模型开口之前就在。所以自动注入只能由
-宿主插件做；PMem 的 27 个 MCP 工具仍然可以另接，两者不冲突。
+宿主插件做；PMem 的 30 个 MCP 工具仍然可以另接，两者不冲突。
 
 ## 安装（M9.8：一条命令）
 
@@ -152,7 +152,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 | 记忆 | 搜索（auto/keyword/vector/recent）+ 分组树过滤 + 排序 + 多选批量；详情含正文、元数据编辑（kind/grade/分组/敏感级/重要度/状态/置顶）、证据原话、变更历史、冲突、相关记忆、使用统计；反馈/撤回/删除（默认软删、二次确认） |
 | 实体 | 实体列表/详情（别名、提及记忆、1 跳关系）、2 跳查询、合并（先 dry_run 预览再确认）、跳星图 |
 | 睡眠 | 八阶段 run 列表 + 每阶段耗时/条数小条形图 + 进行中进度轮询 + 最近 14 次质量趋势；现在入睡 / 大睡一场（模板 / DSH） |
-| 设置 | 运行时开关与数值、**夜间：鲸眠开关 + 每天定时（几点睡）+ 空闲阈值（闲多久算该睡）+ pmem-daemon/定时任务状态**、检索/大睡默认值（localStorage）、排查面板（请求日志/醒来卡缓存/MCP/路径/doctor/体积/配置差异）、危险区（备份/恢复需输入 RESTORE/重建索引/运维白名单/批量删除） |
+| 设置 | 运行时开关与数值、**夜间：鲸眠开关 + 每天定时（几点睡）+ 空闲阈值（闲多久算该睡）+ pmem-daemon/定时任务状态**、**项目：显式限定检索范围（开关 + 名称，不是自动分类）**、**记忆：自动淡忘（默认关，关=永不自动下沉）**、**断言层：主开关 claim.enabled（默认关）+ claim.index / claim.version / answer.boundary_check 三子开关（主开关关时置灰）**、检索/大睡默认值（localStorage）、排查面板（请求日志/醒来卡缓存/MCP/路径/doctor/体积/配置差异）、危险区（备份/恢复需输入 RESTORE/重建索引/运维白名单/批量删除） |
 
 ![记忆控制台 · 总览](docs/images/console-overview.png)
 
@@ -188,6 +188,65 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
   宿主没装 schedule 插件时降级为「只写配置 + 在面板上说明」，不会假装同步成功。
 - 面板底部显示 `pmem-daemon` 的登记状态与日志末行（最近心跳），以及定时任务的下次触发时间。
 - 夜间定时任务先看 `memory_capabilities` 的 `night.llm`，再决定走鲸眠还是本地 8 阶段；改完下一晚生效。
+
+### 项目 scope（P3-17）：显式限定检索范围，不是自动分类
+
+设置页「项目」面板两件事，落在 PMem 配置（`$DSH_HOME/pmem/config.toml`）：
+
+| 控件 | 配置键 | 默认 | 作用 |
+|---|---|---|---|
+| 用项目限定检索 | `retrieval.scope.project.enabled` | 关 | 开 = 检索候选集按项目对应的分组前缀过滤 |
+| 项目名称 | `retrieval.scope.project.name` | 空 | 分组（grp）路径前缀，如 `工作/PMem`；留空 = 不限定 |
+
+- **项目是「显式限定」，不是自动分类**：不会把记忆自动归到某个项目；名字对不上任何分组时行为等同关闭。
+- 关着（或名称为空）时检索行为与旧版一致；只影响候选集，不改排序规则。
+- 接口 `GET/POST /dsh-pmem/api/project-scope`，读写走 CLI 的 `config get/set`；名称会 trim，最多 80 字。
+
+### 自动淡忘（0.40.0，默认关）
+
+设置页「记忆」面板只有一件事：自动淡忘开关，落在 PMem 配置 `lifecycle.enabled`（**默认 false**）。
+
+| 状态 | 行为 |
+|---|---|
+| 关（默认） | 记忆不会因为久不用而下沉/归档，召回池不随时间缩水（只增不减） |
+| 开 | 按等级淡忘：S 永不淡忘、A 180 天、B 90 天、C 30 天、D 7 天；**只降级不删除** |
+
+- 接口 `GET/POST /dsh-pmem/api/lifecycle`，读写走 CLI 的 `config get/set`；默认关、读不到也当关（默认不忘最安全）。
+- 显式命令 `pmem lifecycle` 不受这个开关限制——那是用户主动要跑一次。
+- 两个自动触发点（睡 s7_reflect / 浮现 surface._auto_tick）都受这个开关管；关时零额外动作。
+
+### 断言层（claim，0.41.0，默认关）
+
+把「一段叙述」拆成可核对的最小事实（subject / predicate / object / polarity / status），**并存**在记忆旁边，
+不替代记忆、不参与默认检索。主开关 `claim.enabled` 默认 **false**：关时既有检索/工具/返回零变化，
+MCP 工具数仍是 30；打开后才多出 5 个 `claim_*` 工具（35 个）。
+
+| 接口 | 用法 |
+|---|---|
+| CLI | `pmem claim list [--kind] [--status] [--limit]` / `pmem claim search <词> --k` / `pmem claim delete <id>` |
+| CLI 抽取 | `pmem claim extract --prep --day YYYY-MM-DD`（出宿主任务书）→ 宿主产出 JSON → `pmem claim extract --apply claims.json`；无宿主时 `--rule` 规则降级 |
+| MCP | `claim_list` / `claim_search` / `claim_delete` / `claim_prep` / `claim_apply`（与 CLI 同一份实现） |
+| Web | `GET /dsh-pmem/api/claims?q=&limit=`、`POST /dsh-pmem/api/claims/delete` |
+
+面板（最小页，不做编辑）：
+
+- **记忆 → 断言层**（页底折叠区）：列表 + 搜索 + 软删误抽的断言；软删只改 status、事件链留墓碑。
+  主开关关闭时空态直接提示「去『设置 → 断言层』打开它」。
+- **设置 → 断言层**：**主开关置顶**（`claim.enabled`，默认关），三个子开关在其下：
+  - `claim.index.enabled`：检索/RRF 接入断言层；
+  - `claim.version.enabled`：同主体同谓词改口时开新版本链（旧行 superseded）；
+  - `answer.boundary_check.enabled`：注入「记录截止某天；没记到不等于没发生」边界提示。
+- 开关矩阵（全部写 PMem 配置，改完下一轮生效；MCP 工具清单要重启 MCP server 才刷新）：
+
+  | 主开关 `claim.enabled` | 子开关 | 效果 |
+  |---|---|---|
+  | 关（默认） | 任意（置灰、不生效） | 不写 claim 表；MCP 工具 30；面板列表空态 |
+  | 开 | 全关 | 夜间抽取可写 claim 表；MCP 工具 35；检索/边界行为不变 |
+  | 开 | 按需 | `claim.index` 接入检索；`claim.version` 建版本链；`answer.boundary_check` 注入边界提示 |
+
+- 接口 `GET/POST /dsh-pmem/api/claim-settings`：GET 回主开关 + 三子开关；POST 逐键 `config set`
+  （`master` / `enabled` / `version` / `boundary_check`），各字段独立、可只写一个。
+- CLI 也能直接改：`pmem config set claim.enabled true` 等（与面板同一份配置）。
 
 ### 大睡一场（插件 0.8.3）
 
@@ -294,7 +353,7 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 运行时开关写在 `~/.dsh/pmem/runtime.json`（`surface` / `starmap` / `starmapLive`），
 不改 profile；profile 里关掉的能力运行时打不开。
 
-## MCP（27 个工具）
+## MCP（30 个工具）
 
 `cordis.patch.yml` 里除了 `dsh-pmem`，还 insert 了一条官方
 `@deepseek-ai/dsh-mcp-client`：
@@ -309,9 +368,10 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
     args: ['-m', 'pmem.gate.mcp_server', '--db', '...']
 ```
 
-- 27 个 `memory_*` 工具由 MCP 提供；原生 5 个 `pmem_*` 保留；
+- 30 个 `memory_*` 工具由 MCP 提供；原生 5 个 `pmem_*` 保留；
+- 断言层主开关 `claim.enabled=true` 时再追加 5 个 `claim_*` 工具（共 35）；默认关，清单与调用都不变；
 - MCP 起不来不影响醒来卡和原生工具（`failOnStartupError: false`）；
-- `/pmem mcp` 或 `probeMcp()` 可查 20 工具/延迟；
+- `/pmem mcp` 或 `probeMcp()` 可查工具清单/延迟；
 - 包内 patch 只注册插件本体；MCP 那一段由 `pmem dsh install` 按本机路径生成
   （见上面「为什么 MCP 那一段不在包内 patch 里」）。
 
@@ -327,6 +387,12 @@ Python 不可用、超时、返回空，都只是这一轮少一块提示，不�
 - **自动 handoff**：`agent/pre-step` 记最后一条有意义的用户消息；`turn/end`
   每 6 轮且间隔 ≥10 分钟落一次；`agent/disposed` 落最终点。写 `我们/停在哪`
   （等级 B，`--idem` 幂等），写完刷新卡。太短、纯客套、命令行不写；失败不打断会话。
+- **统一渲染器（P0-2）**：`gate.render.cards`（默认 false）打开后，插件召回
+  （`pmem_recall` 工具 / `/pmem recall`）先调 `pmem.gate.cli render <query> --k <n>`，
+  把 `data.text` 原样交给模型，宿主不再二次拼格式；关着 / 读不到开关 / render 失败
+  （老版本 PMem 没有这条命令）都回退 0.38.0 的本地 `PMEM_RECALL` 格式。
+  同一个入口 CLI / MCP（`memory_render`）/ SDK（`PMem.render`）共用，卡片与契约行由
+  PMem 配置（`gate.render.cards` / `answer.contract.enabled`）决定，默认全关。
 
 ## 验证
 
@@ -343,4 +409,4 @@ node deploy/dsh-pmem/test-starmap.mjs  # 星图静态契约
 第一个用假 ctx 确认：注册了 `dsh-pmem:wake` 的 system prompt、5 个工具、`/pmem` 命令，
 并且能从真实库读到含 `PMEM_WAKE` 的卡。第二个用临时库跑完整 handoff 链路：
 假会话 → `我们/停在哪` → 醒来卡出现「上次」。第三个用临时库确认 MCP：
-`initialize` → 27 个 `memory_*` 工具 → `memory_add` → `memory_stats`。
+`initialize` → 30 个 `memory_*` 工具 → `memory_add` → `memory_stats`。
