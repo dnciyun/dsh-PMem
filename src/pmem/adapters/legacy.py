@@ -1,4 +1,4 @@
-"""dsh-soul 只读适配：用于 shadow 对比。
+"""旧记忆插件只读适配（第三方记忆库）：用于 shadow 对比。
 
 **只是基线**，不参与 AWB 的任何写入。已知事实（`docs/phase0-recon.md` + 实测）：
 
@@ -7,18 +7,38 @@
 
 所以对比必须分两套口径，否则"重合率 0%"会是个假的结论：
 
-1. ``fts``：dsh-soul 的原生召回（对中文几乎为 0，这是**能力差异**，不是参数差异）；
+1. ``fts``：旧插件的原生召回（对中文几乎为 0，这是**能力差异**，不是参数差异）；
 2. ``like``：把它的存储换成等价的中文可用词法（LIKE），当作"同样的词法基线"再用一次。
 """
 
 from __future__ import annotations
 
+import os
 import re
 import sqlite3
 from pathlib import Path
 from typing import Any
 
-DEFAULT_DB = Path.home() / ".dsh" / "dsh-soul" / "desktop" / "evolve.sqlite"
+def _default_db() -> Path:
+    """旧记忆库的默认位置。
+
+    这些库是**别人系统**的家，路径因插件而异，所以产品不写死某一家：
+    先读环境变量 ``PMEM_LEGACY_DB``；没设就在 ``~/.dsh/*/desktop/evolve.sqlite``
+    这类常见位置里找第一个存在的；都找不到就返回一个不存在的路径
+    （``available`` 为 False，调用方只会看到「读不到」）。
+    """
+    override = os.environ.get("PMEM_LEGACY_DB", "").strip()
+    if override:
+        return Path(override)
+    base = Path.home() / ".dsh"
+    for pattern in ("*/desktop/evolve.sqlite", "*/evolve.sqlite"):
+        hits = sorted(base.glob(pattern))
+        if hits:
+            return hits[0]
+    return base / "legacy" / "memory.sqlite"
+
+
+DEFAULT_DB = _default_db()
 
 
 def _quote(term: str) -> str:
@@ -35,8 +55,8 @@ def _terms(query: str) -> list[str]:
     return ascii_words + bigrams
 
 
-class SoulReader:
-    """只读打开 dsh-soul 的库；文件不存在或表缺失都不抛，``available`` 为 False。"""
+class LegacyReader:
+    """只读打开旧插件的库；文件不存在或表缺失都不抛，``available`` 为 False。"""
 
     def __init__(self, path: str | Path | None = None) -> None:
         self.path = Path(path) if path else DEFAULT_DB
@@ -66,7 +86,7 @@ class SoulReader:
             self._conn.close()
             self._conn = None
 
-    def __enter__(self) -> SoulReader:
+    def __enter__(self) -> LegacyReader:
         return self
 
     def __exit__(self, *exc: object) -> None:
@@ -80,7 +100,7 @@ class SoulReader:
         return int(row["c"]) if row else 0
 
     def search(self, query: str, scope: str, *, k: int = 3, mode: str = "fts") -> list[dict[str, Any]]:
-        """``mode='fts'`` 用 dsh-soul 原生 FTS；``'like'`` 用等价词法兜底。"""
+        """``mode='fts'`` 用旧插件原生 FTS；``'like'`` 用等价词法兜底。"""
         if not self.available:
             return []
         if mode == "fts":

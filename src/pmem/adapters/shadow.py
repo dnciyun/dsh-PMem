@@ -4,7 +4,7 @@
 它回答三个问题：
 
 1. AWB 能不能召回到东西？（命中率）
-2. 和现役的 dsh-soul 比，召回的是不是同一批内容？（重合率）
+2. 和现役的旧记忆插件比，召回的是不是同一批内容？（重合率）
 3. 注入成本多少？（tokens/turn，目标 ≤600）
 """
 
@@ -23,7 +23,7 @@ from ..base import events as event_log
 from ..gate.sdk import PMem
 from ..memory.text import char_ngrams, jaccard
 from . import dsh
-from .soul import SoulReader
+from .legacy import LegacyReader
 
 OVERLAP_THRESHOLD = 0.5  # 3-gram Jaccard 到这个值才算"同一段内容"
 
@@ -158,18 +158,18 @@ def run_shadow(
     *,
     scope: str | None,
     out_path: Path,
-    soul: SoulReader | None = None,
+    legacy: LegacyReader | None = None,
     limit: int | None = None,
     k: int = 8,
     node: str | None = None,
     min_chars: int = 6,
 ) -> dict[str, Any]:
-    """逐条用户消息跑一次召回，记录 AWB / dsh-soul 各自的结果（不注入）。
+    """逐条用户消息跑一次召回，记录 AWB / 旧插件各自的结果（不注入）。
 
     ``scope=None`` 表示"每个会话用它自己的作用域"——这样一次就能覆盖所有项目，
     而不是只测当前目录。传具体值时只跑那一个项目。
     """
-    soul = soul or SoulReader()
+    legacy = legacy or LegacyReader()
     run_id = ulid()
     records: list[dict[str, Any]] = []
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -191,7 +191,7 @@ def run_shadow(
             for message in dsh.user_messages(events, min_chars=min_chars):
                 if limit is not None and len(records) >= limit:
                     break
-                record = _one_query(app, soul, session_scope, meta["id"], message, k)
+                record = _one_query(app, legacy, session_scope, meta["id"], message, k)
                 record["run_id"] = run_id
                 record["scope"] = session_scope
                 records.append(record)
@@ -205,7 +205,7 @@ def run_shadow(
 
 def _one_query(
     app: PMem,
-    soul: SoulReader,
+    legacy: LegacyReader,
     scope: str,
     session_id: str,
     message: dict[str, Any],
@@ -232,8 +232,8 @@ def _one_query(
             "error": repr(exc),
         }
 
-    soul_fts = soul.search(query, scope, k=3, mode="fts")
-    soul_like = soul.search(query, scope, k=3, mode="like")
+    legacy_fts = legacy.search(query, scope, k=3, mode="fts")
+    legacy_like = legacy.search(query, scope, k=3, mode="like")
 
     return {
         "ts": to_iso(datetime.now(UTC)),
@@ -249,10 +249,10 @@ def _one_query(
             "latency_ms": latency_ms,
             "tokens": tokens,
         },
-        "soul_fts": {"n": len(soul_fts), "top": [{"seq": s["seq"], "head": s["text"][:80]} for s in soul_fts]},
-        "soul_like": {"n": len(soul_like), "top": [{"seq": s["seq"], "head": s["text"][:80]} for s in soul_like]},
-        "overlap_fts": _overlap(items, soul_fts),
-        "overlap_like": _overlap(items, soul_like),
+        "legacy_fts": {"n": len(legacy_fts), "top": [{"seq": s["seq"], "head": s["text"][:80]} for s in legacy_fts]},
+        "legacy_like": {"n": len(legacy_like), "top": [{"seq": s["seq"], "head": s["text"][:80]} for s in legacy_like]},
+        "overlap_fts": _overlap(items, legacy_fts),
+        "overlap_like": _overlap(items, legacy_like),
     }
 
 
@@ -261,23 +261,23 @@ def _ref_for(app: PMem, memory_id: str) -> str | None:
     return row["source_ref"] if row else None
 
 
-def _overlap(items: list[dict[str, Any]], soul_hits: list[dict[str, Any]]) -> float:
-    """AWB 返回的条目里，有多少能在 dsh-soul 的命中里找到同一段内容。
+def _overlap(items: list[dict[str, Any]], legacy_hits: list[dict[str, Any]]) -> float:
+    """AWB 返回的条目里，有多少能在旧插件的命中里找到同一段内容。
 
-    用**包含度**而不是 Jaccard：AWB 存的是完整用户消息，dsh-soul 存的是会话切片，
+    用**包含度**而不是 Jaccard：AWB 存的是完整用户消息，旧插件存的是会话切片，
     长度天然不同（"杭州"那条 vs 整段 span）。Jaccard 会因为长度差把真命中判成不重合，
-    包含度（AWB 文本的 3-gram 有多少出现在 soul 文本里）才对得上这个场景。
+    包含度（AWB 文本的 3-gram 有多少出现在旧插件文本里）才对得上这个场景。
     """
-    if not items or not soul_hits:
+    if not items or not legacy_hits:
         return 0.0
-    soul_grams = [char_ngrams(h["text"]) for h in soul_hits]
+    legacy_grams = [char_ngrams(h["text"]) for h in legacy_hits]
     hit = 0
     for item in items:
         grams = char_ngrams(item["text"])
         if not grams:
             continue
         best = max(
-            (len(grams & sg) / len(grams) for sg in soul_grams),
+            (len(grams & sg) / len(grams) for sg in legacy_grams),
             default=0.0,
         )
         if best >= OVERLAP_THRESHOLD:
@@ -292,9 +292,9 @@ def summarize(records: list[dict[str, Any]]) -> dict[str, Any]:
     latencies = [r["awb"]["latency_ms"] for r in ok]
     tokens = [r["awb"]["tokens"] for r in ok]
     awb_hit = [r for r in ok if r["awb"]["n"] > 0]
-    soul_hit = [r for r in ok if r["soul_fts"]["n"] > 0]
-    like_hit = [r for r in ok if r["soul_like"]["n"] > 0]
-    both = [r for r in ok if r["awb"]["n"] > 0 and r["soul_fts"]["n"] > 0]
+    legacy_hit = [r for r in ok if r["legacy_fts"]["n"] > 0]
+    like_hit = [r for r in ok if r["legacy_like"]["n"] > 0]
+    both = [r for r in ok if r["awb"]["n"] > 0 and r["legacy_fts"]["n"] > 0]
 
     def pct(values: list[int], p: float) -> int:
         if not values:
@@ -306,8 +306,8 @@ def summarize(records: list[dict[str, Any]]) -> dict[str, Any]:
         "queries": len(records),
         "errors": len(records) - len(ok),
         "awb_hit_rate": round(len(awb_hit) / len(ok), 3) if ok else 0.0,
-        "soul_fts_hit_rate": round(len(soul_hit) / len(ok), 3) if ok else 0.0,
-        "soul_like_hit_rate": round(len(like_hit) / len(ok), 3) if ok else 0.0,
+        "legacy_fts_hit_rate": round(len(legacy_hit) / len(ok), 3) if ok else 0.0,
+        "legacy_like_hit_rate": round(len(like_hit) / len(ok), 3) if ok else 0.0,
         "overlap_fts_mean": round(statistics.fmean(r["overlap_fts"] for r in both), 3) if both else 0.0,
         "overlap_like_mean": round(statistics.fmean(r["overlap_like"] for r in ok), 3) if ok else 0.0,
         "tokens_mean": round(statistics.fmean(tokens), 1) if tokens else 0.0,
@@ -332,8 +332,8 @@ def write_report(summary: dict[str, Any], records: list[dict[str, Any]], path: P
         "| 指标 | 值 | 说明 |",
         "|---|---|---|",
         f"| AWB 命中率 | {summary['awb_hit_rate']:.0%} | 至少召回 1 条的查询占比 |",
-        f"| dsh-soul（原生 FTS）命中率 | {summary['soul_fts_hit_rate']:.0%} | 中文无分词，基本为 0 |",
-        f"| dsh-soul（等价词法 LIKE）命中率 | {summary['soul_like_hit_rate']:.0%} | 把词法换成本机可用的形式 |",
+        f"| 旧插件（原生 FTS）命中率 | {summary['legacy_fts_hit_rate']:.0%} | 中文无分词，基本为 0 |",
+        f"| 旧插件（等价词法 LIKE）命中率 | {summary['legacy_like_hit_rate']:.0%} | 把词法换成本机可用的形式 |",
         f"| 重合率（对比原生 FTS） | {summary['overlap_fts_mean']:.0%} | 仅统计双方都有命中的查询 |",
         f"| 重合率（对比等价词法） | {summary['overlap_like_mean']:.0%} | 全体查询平均 |",
         f"| 注入 tokens 均值 | {summary['tokens_mean']} | 目标 ≤600 |",
@@ -342,7 +342,7 @@ def write_report(summary: dict[str, Any], records: list[dict[str, Any]], path: P
         "",
         "## 逐条明细",
         "",
-        "| # | 查询（截断） | AWB | soul(FTS) | soul(LIKE) | 重合 |",
+        "| # | 查询（截断） | AWB | 旧插件(FTS) | 旧插件(LIKE) | 重合 |",
         "|---|---|---|---|---|---|",
     ]
     for idx, record in enumerate(records, start=1):
@@ -351,8 +351,8 @@ def write_report(summary: dict[str, Any], records: list[dict[str, Any]], path: P
             continue
         query = record["query"].replace("|", "\\|").replace("\n", " ")[:24]
         lines.append(
-            f"| {idx} | {query} | {record['awb']['n']} | {record['soul_fts']['n']} | "
-            f"{record['soul_like']['n']} | {record['overlap_like']:.0%} |"
+            f"| {idx} | {query} | {record['awb']['n']} | {record['legacy_fts']['n']} | "
+            f"{record['legacy_like']['n']} | {record['overlap_like']:.0%} |"
         )
     lines += [
         "",
@@ -360,9 +360,9 @@ def write_report(summary: dict[str, Any], records: list[dict[str, Any]], path: P
         "",
         "- **命中率 100% 不代表质量好**：M1.5 的查询就是被回填的那条消息本身，",
         "  属于「自召回」；它证明管道通了、成本可控，不证明语义召回好。真正的质量要等 M2 的标注集。",
-        "- **重合率低不一定是 AWB 差**：AWB 存的是「用户说过的话」，dsh-soul 存的是会话切片，",
+        "- **重合率低不一定是 AWB 差**：AWB 存的是「用户说过的话」，旧插件存的是会话切片，",
         "  两者粒度不同；重合率衡量的是「是否找到同一段内容」，不是召回质量。",
-        "- **soul 的中文命中率偏低是能力问题**：它的 `span_fts` 用 unicode61，中文整段成一个 token，",
+        "- **旧插件的中文命中率偏低是能力问题**：它的 `span_fts` 用 unicode61，中文整段成一个 token，",
         "  `MATCH '记忆'` 命中 0 条，而 `LIKE '%记忆%'` 有 97 条。所以另给了一列等价词法基线。",
         "",
     ]

@@ -493,7 +493,7 @@ def card(
             if p < _threshold_for(reason):
                 continue
             # 排序键不是 p 本身：词法/情境命中越可能越好，
-            # 节律则相反——越接近遗忘越值得提（dsh-soul 的 due 也是这么算的）。
+            # 节律则相反——越接近遗忘越值得提（参考实现里的 due 也是这么算的）。
             r = dynamics.retrievability(marks)
             value = p if reason != "rhythm" else 1.0 + (dynamics.RHYTHM_HIGH - r)
             scored.append((value, p, reason, row, grade))
