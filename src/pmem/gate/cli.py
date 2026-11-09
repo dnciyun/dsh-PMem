@@ -144,8 +144,8 @@ def _print_human(data: dict[str, Any]) -> None:
         return
     if "awb_hit_rate" in data:  # shadow run
         print(f"— 影子查询 {data['queries']} 条（错误 {data['errors']}）")
-        print(f"  AWB 命中率 {data['awb_hit_rate']:.0%} · soul(FTS) {data['soul_fts_hit_rate']:.0%} · "
-              f"soul(LIKE) {data['soul_like_hit_rate']:.0%}")
+        print(f"  AWB 命中率 {data['awb_hit_rate']:.0%} · 旧插件(FTS) {data['legacy_fts_hit_rate']:.0%} · "
+              f"旧插件(LIKE) {data['legacy_like_hit_rate']:.0%}")
         print(f"  重合率：对比 FTS {data['overlap_fts_mean']:.0%} · 对比 LIKE {data['overlap_like_mean']:.0%}")
         print(f"  tokens 均值 {data['tokens_mean']} / p95 {data['tokens_p95']} · "
               f"延迟 p50 {data['latency_p50_ms']} ms / p95 {data['latency_p95_ms']} ms")
@@ -1361,7 +1361,7 @@ def main(argv: list[str] | None = None) -> int:
         action_parser.add_argument("--scope", default=None)
         action_parser.add_argument("--out", default=None)
         action_parser.add_argument("--file", default=None, help="report 时读哪个 shadow 日志")
-        action_parser.add_argument("--soul", default=None, help="dsh-soul 库路径")
+        action_parser.add_argument("--legacy-db", default=None, help="旧记忆插件库路径（第三方记忆库）")
         action_parser.add_argument("--node", default=None)
 
     args = parser.parse_args(argv)
@@ -2718,25 +2718,25 @@ def main(argv: list[str] | None = None) -> int:
             return _emit({"ok": True, "data": stats}, args.json)
         if args.cmd == "shadow":
             from ..adapters import dsh, shadow
-            from ..adapters.soul import SoulReader
+            from ..adapters.legacy import LegacyReader
 
             if args.action == "run":
                 root = Path(args.root) if args.root else Path.home() / ".dsh" / "sessions"
                 files = dsh.recent_sessions(root, days=args.days)
                 out = Path(args.out) if args.out else Path(".tmp/shadow/shadow.jsonl")
-                soul = SoulReader(args.soul) if args.soul else SoulReader()
+                legacy = LegacyReader(args.legacy_db) if args.legacy_db else LegacyReader()
                 try:
                     summary = shadow.run_shadow(
                         app,
                         files,
                         scope=args.scope,
                         out_path=out,
-                        soul=soul,
+                        legacy=legacy,
                         limit=args.limit,
                         node=args.node,
                     )
                 finally:
-                    soul.close()
+                    legacy.close()
                 return _emit({"ok": True, "data": summary}, args.json)
             src = Path(args.file) if args.file else Path(".tmp/shadow/shadow.jsonl")
             records = shadow.load_records(src)

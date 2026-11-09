@@ -7,7 +7,7 @@
  *   · `/dsh-pmem/starmap/*`  星图的静态资源（三份文件，白名单）
  *   · `/dsh-pmem/api/starmap/events`  SSE：新记忆写进库就通知页面重绘
  *
- * 安全边界（和 surfcore 同一条线，不自己发明）：
+ * 安全边界（沿用宿主桥接插件同一套，不自己发明）：
  *   1. 只接受回环地址；
  *   2. 写操作必须同源 + `application/json`，body ≤ 256 KB；
  *   3. 再过一次 DSH 的 `connection.requestRejection`；

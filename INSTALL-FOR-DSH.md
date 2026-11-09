@@ -26,7 +26,7 @@ PMem 是**一个东西**，两层皮：
 |---|---|---|
 | 1 | 这台机器上的这条鱼，是**陪你过日子**，还是给它**干活**？ | 陪聊：常驻卡 + 宽注入（每轮 300~500 token）更自然；干活：预算收紧到 200 左右，优先工具调用。 |
 | 2 | 记忆库想放在哪？默认是**仓库里的 `data/pmem.db`**，也可以放别处。 | 放仓库里方便跟着仓库走；放独立目录更安全（不怕 `git clean`）。无论放哪都要定期备份。 |
-| 3 | 现在**有没有旧记忆要接管**？是哪个：`dsh-soul` / `surfcore` / `dsh-hippocampus` / 别的记忆插件 / 纯文本或 markdown 文件 / 没有？ | 有旧记忆就必须走第 5 节的迁移流程；没有就直接新建。**先问清楚，别直接装完当空库用。** |
+| 3 | 现在**有没有旧记忆要接管**？是哪个：别的记忆插件（SQLite 库 / JSONL）/ 纯文本或 markdown 文件 / 没有？ | 有旧记忆就必须走第 5 节的迁移流程；没有就直接新建。**先问清楚，别直接装完当空库用。** |
 | 4 | 旧数据**要不要保留**（默认保留，只读）？ | 永远默认保留。删旧库这件事，除非用户明确说"删"，否则不做。 |
 | 5 | 这个 DSH **会不会多开会话 / 多台机器**？ | 多会话：备份要勤（`pmem backup run`），并注意别让两个进程同时批量写同一个库。 |
 | 6 | 要不要**接 QQ / 微信 / B站**这类桥？**接了的话，群里的话要不要也写进记忆？** | 桥接有工具白名单，PMem 的工具默认被拒。要接就得改白名单（只放读和"记一句"）。另外桥接端说的话默认**进不了**记忆——要进就得加钩子，见 4.5 节。 |
@@ -98,7 +98,7 @@ pmem dsh uninstall        # 只摘注册，不碰数据库
 工具 "pmem_recall" 不在 QQ 桥接白名单内，已拒绝
 ```
 
-要接就改桥接的白名单（例如 SurfCore 的 `qq-tool-restrict.mjs`），**只加这些**：
+要接就改桥接插件的白名单（例如 `qq-tool-restrict.mjs` 这类文件），**只加这些**：
 
 - 原生：`pmem_wake` / `pmem_recall` / `pmem_remember` / `pmem_stats`
 - MCP：`memory_search` / `memory_get` / `memory_trace` / `memory_stats` / `memory_history` /
@@ -132,7 +132,7 @@ pmem doctor
 
 注意：回填只读会话文件，不改 DSH 数据；同一作用域重复跑用 `--reset` 先清上一次的回填结果。
 
-### 4.3 情况 B：从别的记忆插件迁移（dsh-soul / surfcore / hippocampus / 文本库）
+### 4.3 情况 B：从别的记忆插件迁移（SQLite 库 / JSONL / 文本库）
 
 没有一键转换器（各家表结构不一样，硬写等于瞎猜），正确做法是**让用户看着你写一个一次性转换器**：
 
@@ -142,8 +142,8 @@ pmem doctor
 
 ```json
 {"type":"pmem_export","version":"v1","schema_version":"1.11.0","created_at":"2026-11-04T00:00:00Z","embedding_model":null,"counts":{"memory":2}}
-{"type":"memory","id":"01IMPORT0000000000000000001","text":"用户的猫叫年糕，是只橘猫","kind":"semantic","provenance":"external","status":"active","sensitivity":"personal","created_at":"2026-10-01T12:00:00Z","day":"2026-10-01","source":{"kind":"imported","ref":"dsh-soul"},"extra":{"origin_table":"nodes","origin_id":"n-42"}}
-{"type":"memory","id":"01IMPORT0000000000000000002","text":"2026-10-03 他说想换工作，但还没下定决心","kind":"episodic","provenance":"external","status":"active","sensitivity":"personal","created_at":"2026-10-03T21:30:00Z","day":"2026-10-03","source":{"kind":"imported","ref":"dsh-soul"}}
+{"type":"memory","id":"01IMPORT0000000000000000001","text":"用户的猫叫年糕，是只橘猫","kind":"semantic","provenance":"external","status":"active","sensitivity":"personal","created_at":"2026-10-01T12:00:00Z","day":"2026-10-01","source":{"kind":"imported","ref":"legacy"},"extra":{"origin_table":"nodes","origin_id":"n-42"}}
+{"type":"memory","id":"01IMPORT0000000000000000002","text":"2026-10-03 他说想换工作，但还没下定决心","kind":"episodic","provenance":"external","status":"active","sensitivity":"personal","created_at":"2026-10-03T21:30:00Z","day":"2026-10-03","source":{"kind":"imported","ref":"legacy"}}
 ```
 
 - `id` 必须唯一（自己生成 ULID 或加前缀即可）；`text` 必填；
@@ -171,7 +171,7 @@ pmem search "年糕"                                    # 抽一条验证
 ### 4.4 接管：别双写，先只读并行
 
 - **新写入只走一个系统**：切到 PMem 之后，旧的记忆插件要停用（或至少不再写）。双写一定会分叉；
-- **旧数据只留档**：`~/.dsh/dsh-soul/`、`~/.dsh/hippocampus/` 这些目录**不要删**，
+- **旧数据只留档**：旧插件的记忆目录（`~/.dsh/<插件名>/` 那一层）**不要删**，
   留一份"原始账本"随时比对；
 - **并行期判定标准**：抽样 20 条关键记忆（我是谁、关系、承诺、偏好、上个月做的事），
   在 PMem 里搜得到、内容对得上，再宣布"接管完成"；
@@ -179,14 +179,14 @@ pmem search "年糕"                                    # 抽一条验证
 
 ### 4.5 桥接钩子：让 QQ / 微信里说的话也进记忆（可选，但很值）
 
-**问题**：桥接（SurfCore 这类）每轮塞给 agent 的是**唤醒包装**（`【当前时间】/【当前角色】/【你的身份】…`），
+**问题**：桥接插件每轮塞给 agent 的是**唤醒包装**（`【当前时间】/【当前角色】/【你的身份】…`），
 真正的群消息要 agent 自己调工具才读得到。PMem 插件只抓「DSH 的 user message」——
 所以在不加钩子的情况下，**QQ 里说十句话，记忆库一句话都没有**；另一边（B站、主会话）当然也就查不到。
 
 **做法**：在桥接的「消息入库」处加一个钩子，把用户原话写进 PMem 的**原话流水**
 （`journal turn`），先不写记忆表——等夜里消化成日记/事实，或者 agent 自己 `pmem_remember`。
 
-SurfCore 的 `config.json` 里加：
+桥接插件的 `config.json` 里加：
 
 ```json
 "pmemBridge": {
@@ -201,7 +201,7 @@ SurfCore 的 `config.json` 里加：
 }
 ```
 
-钩子行为（实现见 `surfcore/src/bridge.js` 的 `pmemBridgeIngest`）：
+钩子行为（实现见桥接插件 `src/bridge.js` 里那个入库入口）：
 
 - **只写用户消息**，不写 agent 自己的回复；
 - 批量：2 秒窗口攒一次，一次最多 12 行，只起一个 python 子进程，失败静默（不影响桥接）；

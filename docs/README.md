@@ -4,7 +4,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [`07-hippocampus.md`](07-hippocampus.md) | 和第三方记忆插件（dsh-hippocampus）的取舍记录：为什么最后只留数据、不留插件 |
+| [`07-hippocampus.md`](07-hippocampus.md) | 和第三方记忆插件的取舍记录：为什么最后只留数据、不留插件 |
 | [`archive-semantics.md`](archive-semantics.md) | 「淡忘 / 归档 / 删除 / 撤回」到底各是什么意思 |
 
 ## 关于源码注释里的 `PLAN.md` / `docs/02…06` 引用

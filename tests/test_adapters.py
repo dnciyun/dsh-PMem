@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 from pmem.adapters import dsh, shadow
-from pmem.adapters.soul import SoulReader
+from pmem.adapters.legacy import LegacyReader
 from pmem.gate.sdk import PMem
 
 from .support import drop_dir, temp_dir
@@ -41,7 +41,7 @@ def write_session(path: Path, lines: list[dict]) -> Path:
     return path
 
 
-def make_soul_db(path: Path) -> Path:
+def make_legacy_db(path: Path) -> Path:
     con = sqlite3.connect(path)
     con.executescript(
         """
@@ -146,32 +146,32 @@ class TestBackfill(unittest.TestCase):
         self.assertEqual(self.app.store.stats()["memory_total"], 0)
 
 
-class TestSoulReader(unittest.TestCase):
+class TestLegacyReader(unittest.TestCase):
     def setUp(self) -> None:
         self.dir = temp_dir("soul")
-        self.db = make_soul_db(self.dir / "evolve.sqlite")
+        self.db = make_legacy_db(self.dir / "evolve.sqlite")
 
     def tearDown(self) -> None:
         drop_dir(self.dir)
 
     def test_missing_file_is_unavailable(self) -> None:
-        reader = SoulReader(self.dir / "nope.sqlite")
+        reader = LegacyReader(self.dir / "nope.sqlite")
         self.assertFalse(reader.available)
         self.assertEqual(reader.search("杭州", DEMO_SCOPE), [])
         reader.close()
 
     def test_available_and_count(self) -> None:
-        with SoulReader(self.db) as reader:
+        with LegacyReader(self.db) as reader:
             self.assertTrue(reader.available)
             self.assertEqual(reader.span_count(DEMO_SCOPE), 1)
 
     def test_fts_cannot_match_chinese(self) -> None:
         """这是实测结论，不是 bug：unicode61 把整段中文当一个 token。"""
-        with SoulReader(self.db) as reader:
+        with LegacyReader(self.db) as reader:
             self.assertEqual(reader.search("杭州", DEMO_SCOPE, mode="fts"), [])
 
     def test_like_matches_chinese(self) -> None:
-        with SoulReader(self.db) as reader:
+        with LegacyReader(self.db) as reader:
             hits = reader.search("杭州", DEMO_SCOPE, mode="like")
             self.assertEqual(len(hits), 1)
             self.assertEqual(hits[0]["seq"], 8)
@@ -194,10 +194,10 @@ class TestOverlapAndSummary(unittest.TestCase):
 
     def test_summarize(self) -> None:
         records = [
-            {"query": "q1", "awb": {"n": 2, "latency_ms": 10, "tokens": 100}, "soul_fts": {"n": 0},
-             "soul_like": {"n": 1}, "overlap_fts": 0.0, "overlap_like": 0.5},
-            {"query": "q2", "awb": {"n": 0, "latency_ms": 20, "tokens": 0}, "soul_fts": {"n": 0},
-             "soul_like": {"n": 0}, "overlap_fts": 0.0, "overlap_like": 0.0},
+            {"query": "q1", "awb": {"n": 2, "latency_ms": 10, "tokens": 100}, "legacy_fts": {"n": 0},
+             "legacy_like": {"n": 1}, "overlap_fts": 0.0, "overlap_like": 0.5},
+            {"query": "q2", "awb": {"n": 0, "latency_ms": 20, "tokens": 0}, "legacy_fts": {"n": 0},
+             "legacy_like": {"n": 0}, "overlap_fts": 0.0, "overlap_like": 0.0},
         ]
         summary = shadow.summarize(records)
         self.assertEqual(summary["queries"], 2)
@@ -211,7 +211,7 @@ class TestShadowRun(unittest.TestCase):
         self.dir = temp_dir("shadow")
         self.app = PMem.open(self.dir / "pmem.db")
         self.session = write_session(self.dir / "s.jsonl", SESSION_LINES)
-        self.soul_db = make_soul_db(self.dir / "evolve.sqlite")
+        self.legacy_db = make_legacy_db(self.dir / "evolve.sqlite")
         self.out = self.dir / "shadow.jsonl"
 
     def tearDown(self) -> None:
@@ -220,14 +220,14 @@ class TestShadowRun(unittest.TestCase):
 
     def test_run_records_and_reports(self) -> None:
         shadow.backfill(self.app, [self.session], scope_key=DEMO_SCOPE)
-        with SoulReader(self.soul_db) as soul:
+        with LegacyReader(self.legacy_db) as legacy:
             summary = shadow.run_shadow(
-                self.app, [self.session], scope=DEMO_SCOPE, out_path=self.out, soul=soul
+                self.app, [self.session], scope=DEMO_SCOPE, out_path=self.out, legacy=legacy
             )
         self.assertEqual(summary["queries"], 1)
         self.assertEqual(summary["awb_hit_rate"], 1.0)
-        self.assertEqual(summary["soul_fts_hit_rate"], 0.0)  # 中文 FTS 不通
-        self.assertEqual(summary["soul_like_hit_rate"], 1.0)
+        self.assertEqual(summary["legacy_fts_hit_rate"], 0.0)  # 中文 FTS 不通
+        self.assertEqual(summary["legacy_like_hit_rate"], 1.0)
 
         records = shadow.load_records(self.out)
         self.assertEqual(len(records), 1)
@@ -245,9 +245,9 @@ class TestShadowRun(unittest.TestCase):
             self.dir / "other.jsonl",
             [{**SESSION_LINES[0], "id": "sess-x", "cwd": "D:\\Other"}, SESSION_LINES[2]],
         )
-        with SoulReader(self.soul_db) as soul:
+        with LegacyReader(self.legacy_db) as legacy:
             summary = shadow.run_shadow(
-                self.app, [other], scope=DEMO_SCOPE, out_path=self.out, soul=soul
+                self.app, [other], scope=DEMO_SCOPE, out_path=self.out, legacy=legacy
             )
         self.assertEqual(summary["queries"], 0)
 

@@ -4,7 +4,7 @@
 DSH 自带的 Node 有 ``zlib.zstdDecompressSync``，所以解压交给 ``tools/session_dump.mjs``，
 Python 只负责解析 —— 依赖方向是"外部工具可选，核心不依赖"。
 
-作用域键必须与 dsh-soul 完全一致（`phase0-recon.md` §5）：
+作用域键必须与旧插件的实现完全一致（`phase0-recon.md` §5）：
 ``project:<sha256(小写化、正斜杠、去尾斜杠的 cwd)>``。
 """
 
@@ -29,7 +29,7 @@ SESSION_GLOB = "**/session.v4.jsonl.zstd"
 # ---------------------------------------------------------------- 作用域
 
 def normalize_path(path: str) -> str:
-    """与 dsh-soul 的 normalizePath 等价：反斜杠→正斜杠、去尾斜杠、Windows 路径小写。
+    """与旧插件的 normalizePath 等价：反斜杠→正斜杠、去尾斜杠、Windows 路径小写。
 
     注意「Windows 路径小写」是**按路径形态判断的，不按当前系统**：scope 是跨机器共享的键，
     在 Linux 上处理一个 ``D:\\work\\demo`` 时如果保留大小写，算出来的哈希就和 Windows
@@ -44,7 +44,7 @@ def normalize_path(path: str) -> str:
 
 
 def project_scope(cwd: str) -> str:
-    """``project:<sha256>``，与 dsh-soul 的 projectScope 逐字节一致。"""
+    """``project:<sha256>``，与旧插件的 projectScope 逐字节一致。"""
     return "project:" + hashlib.sha256(normalize_path(cwd).encode()).hexdigest()
 
 
