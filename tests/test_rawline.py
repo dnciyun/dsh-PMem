@@ -179,3 +179,51 @@ class RawlineTest(RawlineCase):
 
 if __name__ == "__main__":  # pragma: no cover - 方便单独调试
     unittest.main()
+
+class RawlineDayDedupeCase(unittest.TestCase):
+    """跨天的近似原话 = 两个时间点，不该被当重复删掉（0.41.1）。
+
+    真实场景：4/1 说「明天陪爸去社区医院开降糖药」，7/20 又回忆「陪爸去社区医院
+    开降糖药，排了四十分钟」。两句话 12 字窗口高度重叠，旧逻辑会把 7/20 那条当重复
+    删掉；可问「最早说的那天是几号」时，恰恰需要两条都在。
+    """
+
+    def _pick(self, payload, candidates, overlap=0.6, same_day_days=1):
+        cfg = Config({"retrieval": {"rawline": {
+            "enabled": True, "count": 8, "min_score": 0.0,
+            "budget_share": 1.0, "dedupe_overlap": overlap,
+            "dedupe_same_day_days": same_day_days,
+        }}})
+        return rawline.pick(payload, "开药", cfg=cfg, candidates=candidates, budget=2400)
+
+    def test_cross_day_near_duplicate_kept(self):
+        payload = [{"text": "明天还得陪爸去社区医院开降糖药，他嫌排队", "day": "2026-04-01"}]
+        candidates = [{
+            "line_id": "L2", "text": "之前陪爸去社区医院开降糖药，排了四十分钟",
+            "day": "2026-07-20", "score": 0.5, "ts": "2026-07-20T21:00:00+08:00",
+            "role": "user",
+        }]
+        picked = self._pick(payload, candidates)
+        self.assertEqual(len(picked), 1)
+        self.assertIn("四十分钟", picked[0]["text"])
+
+    def test_same_day_near_duplicate_dropped(self):
+        payload = [{"text": "明天还得陪爸去社区医院开降糖药，他嫌排队", "day": "2026-04-01"}]
+        candidates = [{
+            "line_id": "L3", "text": "陪爸去社区医院开降糖药，他嫌排队得很",
+            "day": "2026-04-01", "score": 0.5, "ts": "2026-04-01T21:00:00+08:00",
+            "role": "user",
+        }]
+        self.assertEqual(self._pick(payload, candidates), [])
+
+    def test_same_day_days_window_can_widen(self):
+        payload = [{"text": "明天还得陪爸去社区医院开降糖药，他嫌排队", "day": "2026-04-01"}]
+        candidates = [{
+            "line_id": "L4", "text": "陪爸去社区医院开降糖药，他嫌排队得很",
+            "day": "2026-04-02", "score": 0.5, "ts": "2026-04-02T21:00:00+08:00",
+            "role": "user",
+        }]
+        # 相隔 1 天：窗口=0 时算两个时间点（保留），窗口=1 时算同一次表述（删掉）
+        self.assertEqual(len(self._pick(payload, candidates, same_day_days=0)), 1)
+        self.assertEqual(len(self._pick(payload, candidates, same_day_days=1)), 0)
+

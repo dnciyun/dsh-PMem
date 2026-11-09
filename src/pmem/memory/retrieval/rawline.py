@@ -33,6 +33,8 @@ DEFAULT_MAX_AGE_DAYS = 45
 DEFAULT_MIN_SCORE = 0.10
 DEFAULT_BUDGET_SHARE = 0.4
 DEFAULT_DEDUPE_OVERLAP = 0.6
+# 只有相隔 ≤N 天的近似文本才算「重复」；默认 1（同日 + 次日）。
+DEFAULT_DEDUPE_SAME_DAY_DAYS = 1
 
 
 def settings(cfg: Any) -> dict[str, Any]:
@@ -49,6 +51,10 @@ def settings(cfg: Any) -> dict[str, Any]:
         "min_score": max(0.0, float(data.get("min_score", DEFAULT_MIN_SCORE) or 0.0)),
         "budget_share": max(0.0, min(1.0, float(data.get("budget_share", DEFAULT_BUDGET_SHARE) or 0.0))),
         "dedupe_overlap": max(0.0, min(1.0, float(data.get("dedupe_overlap", DEFAULT_DEDUPE_OVERLAP) or 0.0))),
+        # 跨天的近似文本**不是**重复：同一件事在 4/1 和 7/20 各说一次，是「两个事件/
+        # 两个时间点」，问「最早是什么时候」时恰恰需要两条都在。只有同一天（同日复述、
+        # 助手回声）才当成重复去掉。0 = 只删同一天，N = 相隔 ≤N 天也算同一次。
+        "dedupe_same_day_days": max(0, int(data.get("dedupe_same_day_days", DEFAULT_DEDUPE_SAME_DAY_DAYS) or 0)),
     }
 
 
@@ -161,8 +167,30 @@ def _windows(text: str, width: int = 12) -> set[str]:
     return {body[index : index + width] for index in range(len(body) - width + 1)}
 
 
-def _duplicates(payload: list[dict[str, Any]], text: str, overlap: float) -> bool:
-    """12 字窗口重叠率：候选窗口里有多少已出现在任一 payload 条目里。"""
+def _day_gap(left: str, right: str) -> int | None:
+    """两个 day_key 相差几天；解析不了就返回 None（当同一天处理，保守去重）。"""
+    try:
+        from datetime import date
+
+        return abs((date.fromisoformat(str(left)[:10]) - date.fromisoformat(str(right)[:10])).days)
+    except Exception:  # noqa: BLE001 坏日期不参与跨天判定
+        return None
+
+
+def _duplicates(
+    payload: list[dict[str, Any]],
+    text: str,
+    overlap: float,
+    *,
+    day: str | None = None,
+    same_day_days: int = DEFAULT_DEDUPE_SAME_DAY_DAYS,
+) -> bool:
+    """12 字窗口重叠率：候选窗口里有多少已出现在任一 payload 条目里。
+
+    跨天的近似文本不算重复：同一件事在不同日期各说一次，是**两个时间点**，
+    问「最早/原来的说法」时两条都要在场。只有相隔 ≤same_day_days 天的才算同一次
+    表述（同日复述、助手回声）。
+    """
     grams = _windows(text)
     if not grams:
         return True
@@ -172,6 +200,11 @@ def _duplicates(payload: list[dict[str, Any]], text: str, overlap: float) -> boo
             continue
         hit = sum(1 for gram in grams if gram in existing)
         if hit / len(grams) > overlap:
+            other_day = str(item.get("day") or "")
+            if day and other_day and same_day_days >= 0:
+                gap = _day_gap(day, other_day)
+                if gap is not None and gap > same_day_days:
+                    continue
             return True
     return False
 
@@ -203,7 +236,13 @@ def pick(
         text = str(candidate.get("text") or "").strip()
         if not text:
             continue
-        if _duplicates(payload + out, text, conf["dedupe_overlap"]):
+        if _duplicates(
+            payload + out,
+            text,
+            conf["dedupe_overlap"],
+            day=str(candidate.get("day") or ""),
+            same_day_days=int(conf.get("dedupe_same_day_days", DEFAULT_DEDUPE_SAME_DAY_DAYS)),
+        ):
             continue
         if char_cap is not None and used_chars + len(text) > char_cap:
             continue
