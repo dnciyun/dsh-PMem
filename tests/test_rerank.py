@@ -8,7 +8,10 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import numpy as np
+try:  # 重排器依赖是可选安装：基础环境（CI 的 -e .）没有 numpy，缺了只跳过单元校验
+    import numpy as np
+except ImportError:  # pragma: no cover
+    np = None
 
 from pmem.base import clock
 from pmem.base.config import Config
@@ -88,6 +91,7 @@ class RerankUnitTest(unittest.TestCase):
         self.assertEqual(out, items)
         self.assertTrue(all("rerank_score" not in item for item in out))
 
+    @unittest.skipIf(np is None, "需要 numpy（重排器的可选依赖，基础环境不装）")
     def test_logits_shapes(self) -> None:
         self.assertEqual(rerank._logits_to_scores(np.array([[2.5]], dtype=np.float32)), [2.5])
         self.assertEqual(
